@@ -164,9 +164,9 @@ Our mission is to design and develop a unified and secure smart home ecosystem l
    </a>
    </td>
     <td style="display: block">
-    <a href="https://github.com/">
+    <a href="https://github.com/TreasureAD">
      <img src="https://github.com/github.png?size=50">
-      Treasure Allien Davis
+      Treasure Davis
    </a>
     </td>
     <td style="display: block">

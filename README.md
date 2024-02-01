@@ -123,7 +123,7 @@ Our mission is to design and develop a unified and secure smart home ecosystem l
   <tr style="display: table-cell">
     <td style="display: block">
     <a href="https://github.com/mabraham2o24">
-     <img src="https://github.com/mabraham2o24.png?size=50" style="width: 50px">
+     <img src="https://github.com/mabraham2o24.png?size=50" >
       Mahima Susan Abraham
    </a>
    </td>

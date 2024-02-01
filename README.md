@@ -123,7 +123,7 @@ Our mission is to design and develop a unified and secure smart home ecosystem l
   <tr style="display: table-cell">
     <td style="display: block">
     <a href="https://github.com/mabraham2o24">
-     <img src="https://github.com/mabraham2o24.png?size=50" >
+     <img src="https://github.com/mabraham2o24.png?size=50">
       Mahima Susan Abraham
    </a>
    </td>
@@ -165,7 +165,7 @@ Our mission is to design and develop a unified and secure smart home ecosystem l
    </td>
     <td style="display: block">
     <a href="https://github.com/TreasureAD">
-     <img src="https://github.com/TreasureAD?size=50">
+     <img src="https://github.com/TreasureAD.png?size=50">
       Treasure Davis
    </a>
     </td>

@@ -158,8 +158,8 @@ Our mission is to design and develop a unified and secure smart home ecosystem l
    </a>
     </td>
     <td style="display: block">
-    <a href="https://github.com/">
-     <img src="https://github.com/github.png?size=50">
+    <a href="https://github.com/Taazkir">
+     <img src="https://github.com/Taazkir.png?size=50">
       Taazkir Nasir
    </a>
    </td>

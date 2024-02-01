@@ -1,10 +1,10 @@
 # ***Front End Weekly Reports***
 
-# ***Table of Contents***
-Each weekly report has to be linked so it is easy to find! 
+## Table of Contents
+- [Weekly Report 02/01](#weekly-report-0201)
+  
 
-1. Weekly Report mm/dd
-2. Weekly Report mm/ddd
+## Weekly Report 02/01
 
 # ***Goals from last week***
 Exact copy of the third section from last week (goals from a week ago)

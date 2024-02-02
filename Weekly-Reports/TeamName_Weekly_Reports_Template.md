@@ -24,11 +24,10 @@
 	- 
 	- 
 	-
-- Member 2: 
-	- 
-	- 
-	-
-	-
+- Member 2: Charles Langley
+	- Virtual Machine set up with all necessary components
+	- Functional Requirements Section of Deliverable
+
 - Member 3: Dravya Patel
 	- 
 	- Completed Setting up the Development structure required for the project. 
@@ -61,9 +60,9 @@
 - Member 1:
 	- 
 	- 
-- Member 2:
-	- 
-	- 
+- Member 2: Charles Langley
+	- Researching Blockchain communication between IoT devices
+	- Practice using AES to encrypt messages using Golang
 - Member 3: Dravya Patel
 	- 
 	- Research how to set up blockchain communication among IoT devices.

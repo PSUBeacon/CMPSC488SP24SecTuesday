@@ -19,11 +19,11 @@
    	- Eric Estadt
    	- Mark Vernachio
    	- 
-- Member 1:
-	- 
-	- 
-	- 
-	-
+- Member 1: Cameron Bussom
+	- Setting up the raspberry pi and ssh stuff
+	- Setting up VM as well
+	- Researching more about Golang to get more comfortable with the language
+	- Completed my assigned section on the first deliverable 
 - Member 2: Charles Langley
 	- Virtual Machine set up with all necessary components
 	- Functional Requirements Section of Deliverable
@@ -57,9 +57,10 @@
 - All members:
 	- 
 	- 
-- Member 1:
-	- 
-	- 
+- Member 1: Cameron Bussom
+	- Research blockchain to get a better understand of how we can be more secure with communication between IoT devices
+	- Practice some blockchain techniques
+ 	- Do more research into Golang and IoT devices 
 - Member 2: Charles Langley
 	- Researching Blockchain communication between IoT devices
 	- Practice using AES to encrypt messages using Golang

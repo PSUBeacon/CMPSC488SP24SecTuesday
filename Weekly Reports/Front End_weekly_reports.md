@@ -17,7 +17,7 @@ Exact copy of the third section from last week (goals from a week ago)
    + No Goals From Last Week 
 
 3. Taazkir Nasir
-   + start here
+   + No Goals From Last Week 
 
 # ***Progress and Issues***
 No progress or issues right now because we are just kickstarting the project. 
@@ -36,4 +36,6 @@ No progress or issues right now because we are just kickstarting the project.
    + Start designing and creating a wireframe for the front end web/mobile interface.
 
 3. Taazkir Nasir
-   + start here
+   + Research how to connect devices using API and develop API endpoints that can be used to connect to the Zigbee network.
+   + Understand how authentication and role-based access work with JWT tokens, and how to deal with expired token.
+   + Keep working on Golang tutorial on Udemy

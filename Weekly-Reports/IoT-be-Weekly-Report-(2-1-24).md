@@ -34,10 +34,9 @@
 	- Ensured Virtual Machine has necessary components (go, GitHub, MongoDB, etc)
 	- Researched User Stories to brainstorm ideas on what functionalities can be implemented in our project. I contributed to the User Stories completion task in the first deliverable to build on that. 
 - Member 4:
-	- 
-	- 
-	- 
-	-
+	- Set up vitual machine with all necessary components: golang, Github repo, MongoDB, ssh, etc.
+ 	- Set-up IoT google calendar for team meets/ checkups.  
+	- Use Case Diagram for the first deliverable.
 - Member 5:
 	- 
 	- 

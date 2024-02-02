@@ -1,9 +1,9 @@
 # TeamName Weekly Reports 
 
 ## Table of Contents
-1. [Weekly Report mm/dd](#weekly-report-mmdd)
+1. [Weekly Report 01/29](#weekly-report-mmdd)
 
-## Weekly Report mm/ddd
+## Weekly Report
 
 ### Goals from last week
 
@@ -13,24 +13,39 @@
 
 - All members:
 	- 
-	- 
-	- 
+	- Cameron Bussom
+	- Charles Langley
+	- Dravya Patel
+   	- Eric Estadt
+   	- Mark Vernachio
+   	- 
 - Member 1:
 	- 
 	- 
-- Member 2:
+	- 
+	-
+- Member 2: 
+	- 
+	- 
+	-
+	-
+- Member 3: Dravya Patel
+	- 
+	- Completed Setting up the Development structure required for the project. 
+	- Ensured Virtual Machine has necessary components (go, GitHub, MongoDB, etc)
+	- Researched User Stories to brainstorm ideas on what functionalities can be implemented in our project. I contributed to the User Stories completion task in the first deliverable to build on that. 
+- Member 4:
 	- 
 	- 
 	- 
-	- 
-- Member 3:
-	- 
-	- 
+	-
+- Member 5:
 	- 
 	- 
-
+	- 
+	-
 **This second subsection should report on progress and issues:**
-**...what did we actually do...what worked...what did we learn...what did we have trouble with...where did we get stuck...did we solve the issue...if so how...**
+**...what did we do...what worked...what did we learn...what did we have trouble with...where did we get stuck...did we solve the issue...if so how...**
 
 
 
@@ -49,7 +64,13 @@
 - Member 2:
 	- 
 	- 
-	- 
 - Member 3:
 	- 
+	- Research how to set up blockchain communication among IoT devices.
+   	- Test check encryption in GoLang. 
+- Member 4:
 	- 
+	- 
+- Member 5:
+  	-
+  	-

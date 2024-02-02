@@ -64,7 +64,7 @@
 - Member 2:
 	- 
 	- 
-- Member 3:
+- Member 3: Dravya Patel
 	- 
 	- Research how to set up blockchain communication among IoT devices.
    	- Test check encryption in GoLang. 

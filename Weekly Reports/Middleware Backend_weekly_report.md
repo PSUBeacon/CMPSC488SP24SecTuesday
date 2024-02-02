@@ -13,7 +13,7 @@ Exact copy of the third section from last week (goals from a week ago)
    + start here
 
 2. Nicanor Sanderson:
-   + start here
+   - Worked on technical requirements
 
 3. Nikolay Sizov
    + start here
@@ -34,7 +34,8 @@ In the final section outline your plans and goals for the following week Use bul
    + start here
 
 2. Nicanor Sanderson:
-   + start here
+   - Familiarize myself with restful API architecture as well as Swagger API template.
+   - Work on setting up the first endpoint and initial testing with postman
 
 3. Nikolay Sizov
    + start here

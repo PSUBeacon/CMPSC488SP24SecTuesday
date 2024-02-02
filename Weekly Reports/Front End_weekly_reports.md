@@ -28,6 +28,8 @@ No progress or issues right now because we are just kickstarting the project.
    + Get the design ready by atleast Monday and send out to group to decide which one is the best or other features to add. 
 
 2. Treasure Davis:
-   + start here
+   + Look into what APIs could be used for frontend and backend connection.
+   + Familiarize myself with the workings of JWT tokens and how to implement authentication.
+   + Start designing and creating a wireframe for the front end web/mobile interface.
 
 

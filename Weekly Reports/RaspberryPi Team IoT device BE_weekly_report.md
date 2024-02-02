@@ -21,7 +21,7 @@ Exact copy of the third section from last week (goals from a week ago)
    + start here
 
 5. Mark Vernachio:
-   + start here
+   + Domain Discovery Use Case on Deliverable
 
 
 The section below should report on progress and issues: ...what did we actually do...what worked...what did we learn...what did we have trouble with...where did we get stuck...did we solve the issue...if so how...
@@ -45,4 +45,5 @@ In the final section outline your plans and goals for the following week Use bul
    + start here
 
 5. Mark Vernachio:
-   + start here
+   + Researching how to setup blockchain communication between IoT devices.
+   + Practice using AES to encrypt messages using Golang

@@ -3,7 +3,7 @@
 # ***Table of Contents***
 Each weekly report has to be linked so it is easy to find! 
 
-1. Weekly Report mm/dd
+1. [Weekly Report 02/01](#weekly-report-0201)
 2. Weekly Report mm/ddd
 
 # ***Goals from last week***
@@ -16,7 +16,7 @@ Exact copy of the third section from last week (goals from a week ago)
    + start here
 
 3. Nikolay Sizov
-   + start here
+   + none
   
 4. Richard McDowell
    + start here
@@ -29,7 +29,7 @@ The section below should report on progress and issues: ...what did we actually 
 3. 
 
 In the final section outline your plans and goals for the following week Use bullet points. If tasks from last week aren't complete, roll them over into tasks for the next week with an updated time estimate for time to completion
-# ***This Weeks Goals***
+# ***Weekly Report 02/01***
 1. Mohamed Chikani:
    + start here
 
@@ -37,7 +37,11 @@ In the final section outline your plans and goals for the following week Use bul
    + start here
 
 3. Nikolay Sizov
-   + start here
+   + Work on zigbee library for go, make it compile, configure network, join one node
+   + Build basic Blockchain communication channel between two peers
+   + Setup project, tasks
+   + Work with BE team to build first API endpoint and use it as template for the rest of endpoint
+   + Work wit BE/DB team to deploy database, enable security on it 
   
 4. Richard McDowell
    + start here

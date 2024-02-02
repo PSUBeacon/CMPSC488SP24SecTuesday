@@ -38,8 +38,8 @@
  	- Set-up IoT google calendar for team meets/ checkups.  
 	- Use Case Diagram for the first deliverable.
 - Member 5:
-	- 
-	- 
+	- Worked on the domain discovery use cases section in the first deliverable.
+	- Ensured Virtual Machine has necessary components (go, GitHub, MongoDB, etc)
 	- 
 	-
 **This second subsection should report on progress and issues:**
@@ -67,9 +67,9 @@
 	- 
 	- Research how to set up blockchain communication among IoT devices.
    	- Test check encryption in GoLang. 
-- Member 4:
+- Member 4: 
 	- 
 	- 
-- Member 5:
-  	-
-  	-
+- Member 5: Mark Vernachio
+  	- Research how to get blockchain communication working with our IoT devices
+  	- Mess around with the encryption in Golang and get more familiar with it

@@ -15,7 +15,9 @@ Exact copy of the third section from last week (goals from a week ago)
 
 2. Treasure Davis:
    + No Goals From Last Week 
-  
+
+3. Taazkir Nasir
+   + start here
 
 # ***Progress and Issues***
 No progress or issues right now because we are just kickstarting the project. 
@@ -23,13 +25,15 @@ No progress or issues right now because we are just kickstarting the project.
 
 # ***This Weeks Goals***
 1. Mahima Abraham:
-   + Watch videos of react(maybe go) to get a basic understanding how to use it to build up the front-end and other features.
+   + Watch videos of react to get a basic understanding how to use it to build up the front-end and other features.
    + Work on the design(wireframe) and just have a basic plan layed out.
-   + Get the design ready by atleast Monday and send out to group to decide which one is the best or other features to add. 
+   + Look into what APIs could be used for frontend and backend connection.
+   + Familiarize myself with the workings of JWT tokens and how to implement authentication.
 
 2. Treasure Davis:
    + Look into what APIs could be used for frontend and backend connection.
    + Familiarize myself with the workings of JWT tokens and how to implement authentication.
    + Start designing and creating a wireframe for the front end web/mobile interface.
 
-
+3. Taazkir Nasir
+   + start here

@@ -37,7 +37,7 @@
 	- Set up vitual machine with all necessary components: golang, Github repo, MongoDB, ssh, etc.
  	- Set-up IoT google calendar for team meets/ checkups.  
 	- Use Case Diagram for the first deliverable.
-- Member 5:
+- Member 5: Mark Vernachio
 	- Worked on the domain discovery use cases section in the first deliverable.
 	- Ensured Virtual Machine has necessary components (go, GitHub, MongoDB, etc)
 	- 

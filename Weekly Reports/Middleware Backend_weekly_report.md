@@ -45,4 +45,5 @@ In the final section outline your plans and goals for the following week Use bul
    + Work wit BE/DB team to deploy database, enable security on it 
   
 4. Richard McDowell
-   + start here
+   + Tested out some basic ideas for middlewear/backend to get comfortable with go
+   + Set up and began some research on the tasks assigned to the group

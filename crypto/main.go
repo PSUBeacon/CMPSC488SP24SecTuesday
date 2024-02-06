@@ -6,9 +6,42 @@ import (
 	"crypto/rand"
 	"fmt"
 	"io"
+	"os"
+	"time"
 )
 
-func encrypt(plaintext []byte, key []byte) ([]byte, error) {
+// function to generate an encryption key if it doesn't exist
+func generateRandomKey() string {
+	key := make([]byte, 16) // 16-byte key
+	_, err := rand.Read(key)
+	if err != nil {
+		fmt.Println("Error generating random key:", err)
+	}
+	return fmt.Sprintf("%x", key)
+}
+
+// function to get an encryption key from an environment variable
+func getEncryptionKey() []byte {
+	// get the encryption key from an environment variable
+	// PRE-SET ENVIRONMENT VARIABLE FOR THE KEY TO BE SAME ALL THE TIME
+	key := os.Getenv("ENCRYPTION_KEY")
+
+	// generate a random key if the key is not available in an environment variable
+	if key == "" {
+		key = generateRandomKey()
+		err := os.Setenv("ENCRYPTION_KEY", key)
+		if err != nil {
+			fmt.Println("Error setting environment variable:", err)
+		}
+	}
+
+	return []byte(key)
+}
+
+// function to encrypt a message
+func encrypt(plaintext []byte) ([]byte, error) {
+	// get the encryption key from the environment variable
+	key := getEncryptionKey()
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
@@ -25,7 +58,10 @@ func encrypt(plaintext []byte, key []byte) ([]byte, error) {
 	return ciphertext, nil
 }
 
-func decrypt(ciphertext []byte, key []byte) ([]byte, error) {
+// function to decrypt a message
+func decrypt(ciphertext []byte) ([]byte, error) {
+	// get the encryption key from the environment variable
+	key := getEncryptionKey()
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
@@ -44,20 +80,32 @@ func decrypt(ciphertext []byte, key []byte) ([]byte, error) {
 }
 
 func main() {
-	key := []byte("1234567890123456") // Replace with your key
+	// message to encrypt, and later decrypt
 	plaintext := []byte("Hello, Golang Encryption!")
 
-	ciphertext, err := encrypt(plaintext, key)
+	// Record the start time
+	startTime := time.Now()
+
+	ciphertext, err := encrypt(plaintext)
 	if err != nil {
 		fmt.Println("Encryption error:", err)
 		return
 	}
-	fmt.Printf("Encrypted: %x\n", ciphertext)
 
-	decrypted, err := decrypt(ciphertext, key)
+	decrypted, err := decrypt(ciphertext)
 	if err != nil {
 		fmt.Println("Decryption error:", err)
 		return
 	}
+
+	// Record the end time
+	endTime := time.Now()
+
+	// Calculate the duration
+	duration := endTime.Sub(startTime)
+
+	fmt.Printf("Encrypted: %x\n", ciphertext)
 	fmt.Println("Decrypted:", string(decrypted))
+	fmt.Println("Encryption key:", string(getEncryptionKey()))
+	fmt.Println("Encryption and decryption took:", duration)
 }

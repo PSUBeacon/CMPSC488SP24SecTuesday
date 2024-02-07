@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"time"
 )
 
 // function to generate an encryption key if it doesn't exist
@@ -83,9 +82,6 @@ func main() {
 	// message to encrypt, and later decrypt
 	plaintext := []byte("Hello, Golang Encryption!")
 
-	// Record the start time
-	startTime := time.Now()
-
 	ciphertext, err := encrypt(plaintext)
 	if err != nil {
 		fmt.Println("Encryption error:", err)
@@ -98,14 +94,7 @@ func main() {
 		return
 	}
 
-	// Record the end time
-	endTime := time.Now()
-
-	// Calculate the duration
-	duration := endTime.Sub(startTime)
-
 	fmt.Printf("Encrypted: %x\n", ciphertext)
 	fmt.Println("Decrypted:", string(decrypted))
 	fmt.Println("Encryption key:", string(getEncryptionKey()))
-	fmt.Println("Encryption and decryption took:", duration)
 }

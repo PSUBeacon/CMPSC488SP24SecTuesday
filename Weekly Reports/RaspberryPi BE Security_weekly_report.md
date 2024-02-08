@@ -2,7 +2,7 @@
 
 ## Table of Contents
 1. [Weekly Report 02/01](#weekly-report-0201)
-2. [Weekly Report 02/07](#weekly-report-
+2. [Weekly Report 02/07](#weekly-report-0207)
 
 ## Weekly Report 02/01
 
@@ -51,7 +51,7 @@ Researching AES encryption and different security protocols that we can use in t
 - Finished testing hashing algorithms, results are ready for the team, and team can discuss and decide what to use.
 - Researching on AES encryption is done, security team has implemented features to use environment variables for safe encryption key operations.
 
-  ### What we will do this week
+  ## What we will do this week
 
   - No plans yet, the team will be assigned tasks on Thursday, Feb 8.
 

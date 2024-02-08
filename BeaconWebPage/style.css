@@ -1,0 +1,81 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #F0F1F3;
+    color: #08192B;
+    padding: 15px; /* Increase padding to make navbar thicker */
+}
+
+.navbar-logo {
+    display: flex; /* Align the logo and text horizontally */
+    align-items: center; /* Center logo and text vertically */
+}
+
+.navbar-logo img {
+    height: 50px; /* Adjust the size as needed */
+}
+
+.logo-text { /* New style for the text next to the logo */
+    margin-left: 10px;
+    font-size: 24px; /* Adjust the size as needed */
+    font-weight: bold;
+}
+
+.navbar-menu a {
+    color: #08192B;
+    text-decoration: none;
+    margin: 0 15px;
+    font-size: 20px;
+}
+
+.navbar-menu a:hover {
+    color: #aaa; /* Highlight color on hover */
+}
+
+.navbar-icons {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-icons img {
+    height: 25px; /* Adjust the size as needed */
+    margin-left: 30px;
+    margin-right: 20px;
+}
+
+.navbar-icons span {
+    margin-left: 10px;
+}
+
+/* Existing CSS code */
+
+.main-body {
+    display: flex;
+    margin-top: 0px; /* Adjust the margin as needed */
+}
+
+.left-section, .right-section {
+    flex: 1; /* Assigns equal width to both sections */
+    padding: 100px; /* Adds padding inside the sections */
+    background-color: #f0f1f3; /* Sample background color */
+}
+
+.middle-section {
+    flex: 2; /* Middle section takes twice the space of the other sections */
+    display: flex;
+    justify-content: center; /* Centers the house image horizontally */
+    align-items: center; /* Centers the house image vertically */
+}
+
+.house-image {
+    max-width: 100%; /* Makes sure the image does not overflow its container */
+    height: auto; /* Keeps the aspect ratio of the image */
+}
+
+/* You may need to add more styles to match the design in your reference image. */

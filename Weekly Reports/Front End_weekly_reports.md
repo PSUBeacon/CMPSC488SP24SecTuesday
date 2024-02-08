@@ -64,7 +64,7 @@ Exact copy of the third section from last week (goals from a week ago)
 
 
 3. Treasure Davis:
-   + Look into what APIs could be used for frontend and backend connection.
-   + Familiarize myself with the workings of JWT tokens and how to implement authentication.
-   + Start designing and creating a wireframe for the front end web/mobile interface.
+   + Finalize the remaining page layouts and designs after Thursday's meeting so that we can begin coding the web page.
+   + Familiarize myself with Bootstrap, React, and other needed frameworks for the web page.
+   + Finish coding the basic framework and structure of the webpage before functionality can be added.
 

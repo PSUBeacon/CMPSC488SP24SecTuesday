@@ -22,7 +22,7 @@ type User struct {
 var (
 	mongoURI = "mongodb://localhost:27017" // MongoDB server URI
 	dbName   = "smartHomeDB"               // Database name
-)
+) // ASK MOHAMED CHIKANI IF CONNECTION ISSUES -mohamed chikani
 
 // Connect to MongoDB and return a MongoDB client
 func connectToMongoDB() (*mongo.Client, error) {

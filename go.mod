@@ -3,7 +3,6 @@ module CMPSC488SP24SecTuesday
 go 1.21.3
 
 require (
-	github.com/ebusto/xbee v0.0.0-20211128081126-54de4ab76749
 	github.com/google/gopacket v1.1.19
 	go.bug.st/serial v1.6.1
 	go.mongodb.org/mongo-driver v1.13.1

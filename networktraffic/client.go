@@ -4,24 +4,30 @@ import (
 	"log"
 	"time"
 
-	"github.com/ebusto/xbee"
+	//"github.com/ebusto/xbee"
+	"go.bug.st/serial"
 )
 
 func SendMessagesToServer() {
 	// Open the XBee module for communication
-	xbeeModule, err := xbee.Open("/dev/ttyUSB0", 9600)
+	mode := &serial.Mode{
+		BaudRate: 9600,
+	}
+	port, err := serial.Open("/dev/ttyUSB0", mode)
 	if err != nil {
 		log.Fatal("Error opening XBee module:", err)
 	}
-	defer xbeeModule.Close()
 
+	//sender := xbee.NewSender(port)
 	// Configure XBee module as a client
 
 	for {
 		// Send a message to the server
 		message := "Hello from XBee client"
-		xbeeModule.Send([]byte(message))
-
+		_, err := port.Write([]byte(message))
+		if err != nil {
+			log.Println("Error sending message:", err)
+		}
 		time.Sleep(5 * time.Second) // Send message every 5 seconds
 	}
 }

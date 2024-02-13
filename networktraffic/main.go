@@ -14,6 +14,13 @@ import (
 
 func main() {
 	networkAdapters()
+
+	// Call the function to configure XBee as a controller
+	go ConfigureController()
+
+	// Call the function to send messages from XBee client
+	go SendMessagesToServer()
+
 	// Define the network interface you want to capture packets from
 	device := "lo0"
 

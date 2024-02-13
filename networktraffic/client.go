@@ -1,11 +1,10 @@
 package main
 
 import (
+	"fmt"
+	"go.bug.st/serial"
 	"log"
 	"time"
-
-	//"github.com/ebusto/xbee"
-	"go.bug.st/serial"
 )
 
 func SendMessagesToServer() {
@@ -23,11 +22,16 @@ func SendMessagesToServer() {
 
 	for {
 		// Send a message to the server
-		message := "Hello from XBee client"
+		message := "Hello"
 		_, err := port.Write([]byte(message))
+		fmt.Printf("Sent \n")
 		if err != nil {
 			log.Println("Error sending message:", err)
 		}
 		time.Sleep(5 * time.Second) // Send message every 5 seconds
 	}
+}
+
+func main() {
+	SendMessagesToServer()
 }

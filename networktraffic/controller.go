@@ -2,11 +2,9 @@ package main
 
 import (
 	"fmt"
+	"go.bug.st/serial"
 	"io"
 	"log"
-
-	//"github.com/ebusto/xbee"
-	"go.bug.st/serial"
 )
 
 func ConfigureController() {
@@ -14,7 +12,7 @@ func ConfigureController() {
 	mode := &serial.Mode{
 		BaudRate: 9600,
 	}
-	xbeeModule, err := serial.Open("/dev/ttyUSB1", mode)
+	port, err := serial.Open("/dev/ttyUSB0", mode)
 	if err != nil {
 		log.Fatal("Error opening XBee module:", err)
 	}
@@ -24,7 +22,7 @@ func ConfigureController() {
 	for {
 		// Receive messages from clients
 		message := make([]byte, 128)
-		n, err := xbeeModule.Read(message)
+		n, err := port.Read(message)
 		if err != nil {
 			if err != io.EOF {
 				log.Fatal("Error receiving message:", err)
@@ -33,4 +31,8 @@ func ConfigureController() {
 		}
 		fmt.Printf("Received message from client: %s\n", string(message[:n]))
 	}
+}
+
+func main() {
+	ConfigureController()
 }

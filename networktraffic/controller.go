@@ -17,12 +17,7 @@ func ConfigureController() {
 	if err != nil {
 		log.Fatal("Error opening XBee module:", err)
 	}
-	defer func(port serial.Port) {
-		err := port.Close()
-		if err != nil {
 
-		}
-	}(port)
 	// Configure XBee module as a controller
 	reader := bufio.NewReader(port)
 	fmt.Println("Waiting for incoming messages...")

@@ -28,15 +28,14 @@ func ConfigureController() {
 	fmt.Println("Waiting for incoming messages...")
 	for {
 		// Receive messages from clients
-		message := make([]byte, 128)
-		n, err := reader.ReadString('\n')
+		message, err := reader.ReadString('\n')
 		if err != nil {
 			if err != io.EOF {
 				log.Fatal("Error receiving message:", err)
 			}
 			continue
 		}
-		fmt.Printf("Received message from client: %s\n", string(message[:n]))
+		fmt.Printf("Received message from client: %s\n", message)
 	}
 }
 

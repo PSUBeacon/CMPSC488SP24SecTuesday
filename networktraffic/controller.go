@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"go.bug.st/serial"
 	"io"
@@ -16,13 +17,19 @@ func ConfigureController() {
 	if err != nil {
 		log.Fatal("Error opening XBee module:", err)
 	}
-	// Configure XBee module as a controller
+	defer func(port serial.Port) {
+		err := port.Close()
+		if err != nil {
 
+		}
+	}(port)
+	// Configure XBee module as a controller
+	reader := bufio.NewReader(port)
 	fmt.Println("Waiting for incoming messages...")
 	for {
 		// Receive messages from clients
 		message := make([]byte, 128)
-		n, err := port.Read(message)
+		n, err := reader.ReadString('\n')
 		if err != nil {
 			if err != io.EOF {
 				log.Fatal("Error receiving message:", err)

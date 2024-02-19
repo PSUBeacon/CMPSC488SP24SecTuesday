@@ -9,7 +9,8 @@ import (
 func main() {
 	// Create a new light switch appliance
 	lightSwitch := appliances.NewAppliance("Light Switch", false, 0)
-	fmt.Println(appliances.ReceiverController())
+	RecievedVal := appliances.ReceiverController()
+	fmt.Println("Value is: ", RecievedVal)
 	// Use the appliance
 	lightSwitch.TurnOn()
 	lightSwitch.TurnOff()

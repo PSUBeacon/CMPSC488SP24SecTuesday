@@ -32,6 +32,7 @@ func SendMessagesToServer() {
 		os.Exit(1)
 	}
 	for {
+
 		// Send a message to the server
 		//The controller will search until it finds a /n character in the message string
 		_, err := port.Write([]byte(message))

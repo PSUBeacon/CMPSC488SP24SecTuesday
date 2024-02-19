@@ -2,6 +2,7 @@
 
 ## Table of Contents
 1. [Weekly Report 02/01](#weekly-report-0201)
+2. [Weekly Report 02/07](#weekly-report-0207)
 
 ## Weekly Report 02/01
 
@@ -32,3 +33,28 @@ Researching AES encryption and different security protocols that we can use in t
 	- Same as 'All members'
 - Mikheil Uglava:
 	- Same as 'All members'
+
+-------------------------
+## Weekly Report 02/07
+
+### Goals from last week
+
+- All members:
+	- Figure out what to do with an AES encryption key so that it's not exposed to everyone or hardcoded.
+	- Test different encryption hashes (MD5, SHA1, ShA256) on the raspberry pi and compare the times.
+- Lasha Kaliashvili:
+	- Same as 'All members'
+- Mikheil Uglava:
+	- Same as 'All members'
+
+## Progress and Issues
+- Finished testing hashing algorithms, results are ready for the team, and team can discuss and decide what to use.
+- Researching on AES encryption is done, security team has implemented features to use environment variables for safe encryption key operations.
+
+## What we will do this week
+
+- No plans yet, the team will be assigned tasks on Thursday, Feb 8.
+
+
+
+

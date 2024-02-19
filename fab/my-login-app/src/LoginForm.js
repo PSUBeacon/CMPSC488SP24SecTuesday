@@ -10,7 +10,7 @@ const LoginForm = () => {
     event.preventDefault();
   
     // Specify the full URL for the Go server
-    const serverUrl = 'http://localhost:8080/login';
+    const serverUrl = 'http://localhost:8081/login';
   
     try {
       const response = await axios.post(serverUrl, {

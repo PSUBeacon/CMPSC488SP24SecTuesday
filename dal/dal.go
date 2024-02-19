@@ -1,4 +1,4 @@
-package main
+package dal
 
 //go get go.mongodb.org/mongo-driver/mongo
 
@@ -26,7 +26,7 @@ var (
 )
 
 // Connect to MongoDB and return a MongoDB client
-func connectToMongoDB() (*mongo.Client, error) {
+func ConnectToMongoDB() (*mongo.Client, error) {
 	clientOptions := options.Client().ApplyURI(mongoURI)
 	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
@@ -44,7 +44,7 @@ func connectToMongoDB() (*mongo.Client, error) {
 }
 
 // Create a new user in the MongoDB database
-func createUser(client *mongo.Client, user User) error {
+func CreateUser(client *mongo.Client, user User) error {
 	collection := client.Database(dbName).Collection(collectionName)
 	_, err := collection.InsertOne(context.Background(), user)
 	return err
@@ -52,7 +52,7 @@ func createUser(client *mongo.Client, user User) error {
 
 func main() {
 	// Connect to MongoDB
-	client, err := connectToMongoDB()
+	client, err := ConnectToMongoDB()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -64,7 +64,7 @@ func main() {
 		Email:    "john@example.com",
 	}
 
-	err = createUser(client, newUser)
+	err = CreateUser(client, newUser)
 	if err != nil {
 		log.Fatal(err)
 	}

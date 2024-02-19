@@ -1,4 +1,4 @@
-package bam_api
+package main
 
 import (
 	"context"

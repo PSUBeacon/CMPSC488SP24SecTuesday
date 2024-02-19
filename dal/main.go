@@ -20,9 +20,10 @@ type User struct {
 
 // MongoDB configuration
 var (
-	mongoURI = "mongodb://localhost:27017" // MongoDB server URI
-	dbName   = "smartHomeDB"               // Database name
-) // ASK MOHAMED CHIKANI IF CONNECTION ISSUES -mohamed chikani
+	mongoURI       = "mongodb://localhost:27017" // MongoDB server URI
+	dbName         = "mydb"                      // Database name
+	collectionName = "users"                     // Collection name
+)
 
 // Connect to MongoDB and return a MongoDB client
 func connectToMongoDB() (*mongo.Client, error) {
@@ -43,7 +44,7 @@ func connectToMongoDB() (*mongo.Client, error) {
 }
 
 // Create a new user in the MongoDB database
-func createUser(client *mongo.Client, dbName, collectionName string, user User) error {
+func createUser(client *mongo.Client, user User) error {
 	collection := client.Database(dbName).Collection(collectionName)
 	_, err := collection.InsertOne(context.Background(), user)
 	return err
@@ -62,8 +63,8 @@ func main() {
 		Username: "john_doe",
 		Email:    "john@example.com",
 	}
-	collectionName := "HVAC"
-	err = createUser(client, dbName, collectionName, newUser)
+
+	err = createUser(client, newUser)
 	if err != nil {
 		log.Fatal(err)
 	}

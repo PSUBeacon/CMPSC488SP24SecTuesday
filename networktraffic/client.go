@@ -19,10 +19,16 @@ func SendMessagesToServer() {
 
 	//sender := xbee.NewSender(port)
 	// Configure XBee module as a client
-
+	message := ""
+	fmt.Print("Enter command: ")
+	_, err = fmt.Scan(&message)
+	if err != nil {
+		return
+	}
+	message += "\n"
 	for {
 		// Send a message to the server
-		message := "Hello world\n" // The controller will search until it finds a /n character in the message string
+		//The controller will search until it finds a /n character in the message string
 		_, err := port.Write([]byte(message))
 		fmt.Printf("Sent \n")
 		if err != nil {

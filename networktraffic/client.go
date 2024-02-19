@@ -21,7 +21,7 @@ func SendMessagesToServer() {
 	// Configure XBee module as a client
 	message := ""
 	fmt.Print("Enter command: ")
-	_, err = fmt.Scan(&message)
+	_, err = fmt.Scanln(&message)
 	if err != nil {
 		return
 	}

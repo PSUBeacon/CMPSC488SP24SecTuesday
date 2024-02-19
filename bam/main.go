@@ -1,85 +1,75 @@
-package main
+package mongodb_dal
 
 import (
-	"encoding/json"
-	"fmt"
-	"github.com/dgrijalva/jwt-go"
-	"net/http"
+	"context"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
-
-	"github.com/gorilla/mux"
 )
 
-var users = []User{
-	{ID: 1, Username: "user1", Password: "pass1"},
+type MongoDBDAL struct {
+	client     *mongo.Client
+	database   *mongo.Database
+	collection *mongo.Collection
 }
 
-var secretKey = []byte("your_secret_key")
-
-type User struct {
-	ID       int    `json:"id"`
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
-type Claims struct {
-	UserID int `json:"userId"`
-	jwt.StandardClaims
-}
-
-func main() {
-	router := mux.NewRouter()
-
-	router.HandleFunc("/login", loginHandler).Methods("POST")
-
-	port := 3002
-	fmt.Printf("Server is running on port %d...\n", port)
-	http.ListenAndServe(fmt.Sprintf(":%d", port), router)
-}
-
-func loginHandler(w http.ResponseWriter, r *http.Request) {
-	var userCredentials User
-	err := json.NewDecoder(r.Body).Decode(&userCredentials)
+func NewMongoDBDAL(connectionString, dbName, collectionName string) (*MongoDBDAL, error) {
+	clientOptions := options.Client().ApplyURI(connectionString)
+	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
+		return nil, err
 	}
 
-	user := findUser(userCredentials.Username, userCredentials.Password)
-	if user != nil {
-		token := generateToken(user.ID)
-		response := map[string]string{"token": token}
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(response)
-	} else {
-		http.Error(w, "Invalid username or password", http.StatusUnauthorized)
+	// Check the connection
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	err = client.Ping(ctx, nil)
+	if err != nil {
+		return nil, err
 	}
+
+	db := client.Database(dbName)
+	coll := db.Collection(collectionName)
+
+	return &MongoDBDAL{
+		client:     client,
+		database:   db,
+		collection: coll,
+	}, nil
 }
 
-func findUser(username, password string) *User {
-	for _, u := range users {
-		if u.Username == username && u.Password == password {
-			return &u
-		}
+func (d *MongoDBDAL) InsertOne(data interface{}) (*mongo.InsertOneResult, error) {
+	result, err := d.collection.InsertOne(context.Background(), data)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (d *MongoDBDAL) FindOne(filter interface{}, result interface{}) error {
+	err := d.collection.FindOne(context.Background(), filter).Decode(result)
+	if err != nil {
+		return err
 	}
 	return nil
 }
 
-func generateToken(userID int) string {
-	claims := &Claims{
-		UserID: userID,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: jwt.At(time.Now().Add(time.Hour)),
-			IssuedAt:  jwt.Now().Unix(),
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	signedToken, err := token.SignedString(secretKey)
+func (d *MongoDBDAL) UpdateOne(filter interface{}, update interface{}) (*mongo.UpdateResult, error) {
+	result, err := d.collection.UpdateOne(context.Background(), filter, update)
 	if err != nil {
-		fmt.Println("Error generating token:", err)
-		return ""
+		return nil, err
 	}
+	return result, nil
+}
 
-	return signedToken
+func (d *MongoDBDAL) DeleteOne(filter interface{}) (*mongo.DeleteResult, error) {
+	result, err := d.collection.DeleteOne(context.Background(), filter)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (d *MongoDBDAL) Close() {
+	d.client.Disconnect(context.Background())
 }

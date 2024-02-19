@@ -28,6 +28,7 @@ func SendMessagesToServer() {
 		if err != nil {
 			return
 		} // The controller will search until it finds a /n character in the message string
+		//message += "\n"
 		_, err = port.Write([]byte(message))
 		fmt.Printf("Sent \n")
 		if err != nil {

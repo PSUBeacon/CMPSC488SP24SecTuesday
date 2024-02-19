@@ -22,14 +22,8 @@ func SendMessagesToServer() {
 
 	for {
 		// Send a message to the server
-		var message string
-		fmt.Print("Enter a command: ")
-		_, err := fmt.Scan(&message)
-		if err != nil {
-			return
-		} // The controller will search until it finds a /n character in the message string
-		//message += "\n"
-		_, err = port.Write([]byte(message))
+		message := "Hello world\n" // The controller will search until it finds a /n character in the message string
+		_, err := port.Write([]byte(message))
 		fmt.Printf("Sent \n")
 		if err != nil {
 			log.Println("Error sending message:", err)

@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+// Git not working big annoying
 func main() {
 	// Create a new light switch appliance
 	lightSwitch := appliances.NewAppliance("Light Switch", false, 0)

@@ -99,7 +99,7 @@ func loginHandler(c *gin.Context) {
 	defer client.Disconnect(context.Background())
 
 	// Fetch user by username from MongoDB
-	fetchedUser, err := dal.fetchUser(client, "username", loginData.Username)
+	fetchedUser, err := dal.FetchUser(client, "name", loginData.Username)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
 		return
@@ -114,7 +114,7 @@ func loginHandler(c *gin.Context) {
 
 	// JWT token creation
 	claims := jwt.MapClaims{
-		"username": fetchedUser.Username,
+		"username": fetchedUser.Name,
 		"role":     "admin",                               // Replace with the actual role from MongoDB
 		"exp":      time.Now().Add(time.Hour * 24).Unix(), // Token expiration time
 	}

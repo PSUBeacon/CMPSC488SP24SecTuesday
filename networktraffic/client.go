@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"go.bug.st/serial"
 	"log"
+	"os"
 	"time"
 )
 
@@ -19,10 +21,20 @@ func SendMessagesToServer() {
 
 	//sender := xbee.NewSender(port)
 	// Configure XBee module as a client
-
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("Enter command: ")
+	message, err := reader.ReadString('\n')
+	if err != nil {
+		_, err := fmt.Fprintln(os.Stderr, "Error reading from input:", err)
+		if err != nil {
+			return
+		}
+		os.Exit(1)
+	}
 	for {
+
 		// Send a message to the server
-		message := "Hello\n" // The controller will search until it finds a /n character in the message string
+		//The controller will search until it finds a /n character in the message string
 		_, err := port.Write([]byte(message))
 		fmt.Printf("Sent \n")
 		if err != nil {

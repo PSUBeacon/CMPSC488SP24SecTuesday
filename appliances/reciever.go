@@ -1,4 +1,4 @@
-package main
+package appliances
 
 import (
 	"bufio"
@@ -6,9 +6,10 @@ import (
 	"go.bug.st/serial"
 	"io"
 	"log"
+	"strings"
 )
 
-func receiverController() {
+func ReceiverController() (message string) {
 	// Open the XBee module for communication
 	mode := &serial.Mode{
 		BaudRate: 9600,
@@ -42,6 +43,8 @@ func receiverController() {
 		}
 
 		// Process the received message
-		fmt.Printf("Received message from client: %s", message) // Adjust printing based on ReadBytes or ReadString
+		fmt.Printf("Received message from client: %s", message)
+		message = []byte(strings.Trim(string(message), "\n"))
+		return string(message) // Adjust printing based on ReadBytes or ReadString
 	}
 }

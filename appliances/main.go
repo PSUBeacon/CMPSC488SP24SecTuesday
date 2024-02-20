@@ -1,4 +1,4 @@
-package main
+package appliances
 
 import (
 	"fmt"
@@ -35,18 +35,4 @@ func (a *Appliance) TurnOff() {
 func (a *Appliance) AdjustTemp(setTemp int) {
 	a.Temp = setTemp
 	fmt.Printf("%s temperature is now set to %d degrees farenheit\n", a.Name, a.Temp)
-}
-
-func main() {
-	// Create a new light switch appliance
-	lightSwitch := NewAppliance("Light Switch", false, 0)
-
-	// Use the appliance
-	lightSwitch.TurnOn()
-	lightSwitch.TurnOff()
-
-	oven := NewAppliance("Oven", false, 0)
-
-	oven.AdjustTemp(300)
-	oven.TurnOn()
 }

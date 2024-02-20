@@ -6,6 +6,7 @@ import (
 	"go.bug.st/serial"
 	"io"
 	"log"
+	"strings"
 )
 
 func ReceiverController() (message string) {
@@ -43,6 +44,7 @@ func ReceiverController() (message string) {
 
 		// Process the received message
 		fmt.Printf("Received message from client: %s", message)
+		message = []byte(strings.Trim(string(message), "\n"))
 		return string(message) // Adjust printing based on ReadBytes or ReadString
 	}
 }

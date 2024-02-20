@@ -10,18 +10,17 @@ func main() {
 	// Create a new light switch appliance
 	lightSwitch := appliances.NewAppliance("Light Switch", false, 0)
 	ReceivedVal := appliances.ReceiverController()
-	fmt.Print("Value is: ", ReceivedVal)
-	if ReceivedVal == "lights off\n" {
+	fmt.Println("Value is: ", ReceivedVal)
+	if ReceivedVal == "lights off" {
 		lightSwitch.TurnOff()
 	}
 
-	if ReceivedVal == "lights on\n" {
+	if ReceivedVal == "lights on" {
 		lightSwitch.TurnOn()
 	}
 
 	// Use the appliance
 	oven := appliances.NewAppliance("Oven", false, 0)
-
 	oven.AdjustTemp(300)
 	oven.TurnOn()
 }

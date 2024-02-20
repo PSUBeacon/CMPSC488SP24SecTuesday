@@ -43,7 +43,7 @@ func SendMessagesToServer() {
 	// The message to be encrypted.
 	plaintext := []byte("This encrypted everything")
 
-	message, _ := encryptAES(key, plaintext)
+	encryptmessage, _ := encryptAES(key, plaintext)
 
 	// Open the XBee module for communication
 	mode := &serial.Mode{
@@ -56,11 +56,11 @@ func SendMessagesToServer() {
 
 	//sender := xbee.NewSender(port)
 	// Configure XBee module as a client
-
+	sendmessage := append(encryptmessage, '\n')
 	for {
 		// Send a message to the server
 
-		_, err := port.Write(message)
+		_, err := port.Write(sendmessage)
 		fmt.Printf("Sent \n")
 		if err != nil {
 			log.Println("Error sending message:", err)

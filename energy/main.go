@@ -1,28 +1,27 @@
-package main
+package energy
 
 import (
 	"fmt"
 	"time"
 )
 
-type Device struct{
+type Device struct {
 	DeviceID int // 0 = Solar, 1 = Battery, 2 = Security Systems, 4 = Lighting, 5 = Other
-	Name string
-	Power int
-	State bool 
-	Sector int
+	Name     string
+	Power    int
+	State    bool
+	Sector   int
 }
 
-func newDevice(deviceID int, name string, power int, state bool, sector int) *Device{
+func newDevice(deviceID int, name string, power int, state bool, sector int) *Device {
 	return &Device{
 		DeviceID: deviceID,
-		Name: name,
-		Power: power,
-		State: state,
-		Sector: sector,
+		Name:     name,
+		Power:    power,
+		State:    state,
+		Sector:   sector,
 	}
 }
-
 
 // SolarPanel represents a solar panel as a power source.
 type SolarPanel struct {
@@ -82,16 +81,15 @@ func (a *Appliance) TurnOff() {
 	fmt.Printf("%s is turned OFF\n", a.Name)
 }
 
-
-func monitor(){
+func monitor() {
 	solarPanel := newDevice(0, "Solar 1", 1500, false, -1)
-	houseBattery :=newDevice(1, "Battery 1", 3000, true, 0)
+	houseBattery := newDevice(1, "Battery 1", 3000, true, 0)
 	solarEnergy := solarPanel.Power
 	houseBattery.Power += solarEnergy
 }
 
 // !FOR DEMO ONLY NOT FOR FINAL PROD
-func demoMonitoring(){
+func demoMonitoring() {
 	// Create a solar panel, battery, and appliances
 	solarPanel := NewSolarPanel("Solar Panel", 500)         // 500 watts of power output
 	houseBattery := NewBattery("House Battery", 2000)       // 2000 watt-hours capacity
@@ -100,11 +98,11 @@ func demoMonitoring(){
 
 	// TODO: showing gain and subtract per 10 sec
 	i := 1
-	for(i <= 6){
-		
+	for i <= 6 {
+
 		time.Sleep(10000)
 		i += 1
-			// Simulate powering the appliances with solar energy
+		// Simulate powering the appliances with solar energy
 		solarEnergy := solarPanel.PowerOutput
 		houseBattery.Charge += solarEnergy
 

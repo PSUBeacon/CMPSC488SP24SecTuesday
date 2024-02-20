@@ -8,6 +8,7 @@ import (
 	"go.bug.st/serial"
 	"io"
 	"log"
+	"strings"
 )
 
 func decryptAES(key, ciphertext []byte) ([]byte, error) {
@@ -78,7 +79,7 @@ func ConfigureController() {
 			}
 		}
 		key := []byte("890fa9277f40e9394dc80e53b203f952") //This key is for testing, will be switched later
-
+		message = []byte(strings.Trim(string(message), "\n"))
 		// Decrypt the message.
 		decryptedText, err := decryptAES(key, message)
 		if err != nil {

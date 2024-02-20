@@ -5,7 +5,9 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"fmt"
+	"github.com/joho/godotenv"
 	"io"
+	"log"
 	"os"
 )
 
@@ -22,13 +24,12 @@ func generateRandomKey() string {
 // function to get an encryption key from an environment variable
 func getEncryptionKey() []byte {
 	// get the encryption key from an environment variable
-	// PRE-SET ENVIRONMENT VARIABLE FOR THE KEY TO BE SAME ALL THE TIME
-	key := os.Getenv("ENCRYPTION_KEY")
+	key := os.Getenv("AES_ENCRYPTION_KEY")
 
 	// generate a random key if the key is not available in an environment variable
 	if key == "" {
 		key = generateRandomKey()
-		err := os.Setenv("ENCRYPTION_KEY", key)
+		err := os.Setenv("AES_ENCRYPTION_KEY", key)
 		if err != nil {
 			fmt.Println("Error setting environment variable:", err)
 		}
@@ -79,6 +80,12 @@ func decrypt(ciphertext []byte) ([]byte, error) {
 }
 
 func main() {
+	// load .env file which is in gitignore
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	// message to encrypt, and later decrypt
 	plaintext := []byte("Hello, Golang Encryption!")
 

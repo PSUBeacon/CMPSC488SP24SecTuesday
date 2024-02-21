@@ -1,10 +1,12 @@
 package AES
 
 import (
+	"CMPSC488SP24SecTuesday/blockchain"
 	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
+	"encoding/json"
 	"fmt"
 	"github.com/joho/godotenv"
 	"go.bug.st/serial"
@@ -43,9 +45,21 @@ func SendMessagesToServer() {
 	err := godotenv.Load()
 	AesKey := os.Getenv("AES_KEY")
 	// The message to be encrypted.
-	plaintext := []byte("This message was encrypted")
-	encryptmessage, _ := encryptAES([]byte(AesKey), plaintext)
+	// Create a new blockchain and add a block
+	blockMessage := blockchain.NewBlockchain()
+	blockMessage.CreateBlock("This used block chain")
 
+	// Convert the blockchain to JSON
+	blockchainJSON, err := json.Marshal(blockMessage)
+	if err != nil {
+		log.Fatal("Error marshalling blockchain:", err)
+	}
+
+	// Encrypt the blockchain JSON
+	encryptedBlock, err := encryptAES([]byte(AesKey), blockchainJSON)
+	if err != nil {
+		log.Fatal("Error encrypting block:", err)
+	}
 	// Open the XBee module for communication
 	mode := &serial.Mode{
 		BaudRate: 9600,
@@ -57,7 +71,7 @@ func SendMessagesToServer() {
 
 	//sender := xbee.NewSender(port)
 	// Configure XBee module as a client
-	sendmessage := append(encryptmessage, '\n')
+	sendmessage := append(encryptedBlock, '\n')
 	for {
 		// Send a message to the server
 

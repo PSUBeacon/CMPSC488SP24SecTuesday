@@ -61,16 +61,20 @@ func decryptAES(key, ciphertext []byte) ([]byte, error) {
 	return ciphertext, nil
 }
 
-func readMessage(reader *bufio.Reader) (string, error) {
+func readJSONMessage(reader *bufio.Reader) (string, error) {
 	var message []byte
 	for {
-		buf, isPrefix, err := reader.ReadLine()
+		// Read until the delimiter (e.g., newline)
+		line, err := reader.ReadBytes('\n')
 		if err != nil {
-			return "", err
+			if err == io.EOF {
+				break // End of message
+			}
+			return "", err // Handle other errors
 		}
-		message = append(message, buf...)
-		if !isPrefix {
-			break
+		message = append(message, line...)
+		if len(line) > 0 && line[len(line)-1] == '\n' {
+			break // End of JSON object
 		}
 	}
 	return string(message), nil
@@ -100,7 +104,7 @@ func ConfigureController() {
 	for {
 		// Use ReadBytes or ReadString to dynamically handle incoming data
 		// For example, reading until a newline character (adjust as needed)
-		message, err := readMessage(reader)
+		message, err := readJSONMessage(reader)
 		if err != nil {
 			if err == io.EOF {
 				// End of file (or stream) reached, could handle differently if needed
@@ -127,12 +131,10 @@ func ConfigureController() {
 		}
 		fmt.Printf("Decrypted text: %s\n", decryptedText)
 
-		tojson := json.Unmarshal(decryptedText, &block)
-		if tojson != nil {
-
-			// if error is not nil
-			// print error
-			fmt.Println(tojson)
+		var obj Block
+		err = json.Unmarshal([]byte(message), &obj)
+		if err != nil {
+			log.Fatal("Error unmarshaling JSON message:", err)
 		}
 		//fmt.Println(tojson)
 		for i := range block {

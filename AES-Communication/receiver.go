@@ -12,6 +12,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -124,8 +125,9 @@ func ConfigureController() {
 		}
 		//fmt.Println(tojson)
 		for i := range block {
-			fmt.Println(string(rune(block[i].Index)) + " - " + block[i].Timestamp + " - " + block[i].Data + " - " + block[i].PrevHash + " - " + block[i].Hash)
+			fmt.Println(strconv.Itoa(block[i].Index) + " - " + block[i].Timestamp + " - " + block[i].Data + " - " + block[i].PrevHash + " - " + block[i].Hash)
 		}
+
 	}
 }
 

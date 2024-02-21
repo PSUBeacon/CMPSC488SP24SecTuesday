@@ -36,6 +36,8 @@ func encryptAES(key, plaintext []byte) ([]byte, error) {
 	mode := cipher.NewCBCEncrypter(block, iv)
 	mode.CryptBlocks(ciphertext[aes.BlockSize:], plaintext)
 
+	fmt.Printf("Ciphertext length after encryption: %d\n", len(ciphertext))
+
 	return ciphertext, nil
 }
 

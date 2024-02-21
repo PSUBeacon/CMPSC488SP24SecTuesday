@@ -5,11 +5,20 @@ import (
 	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
+	"encoding/json"
 	"fmt"
+	"github.com/joho/godotenv"
 	"go.bug.st/serial"
 	"io"
+	"io/ioutil"
 	"log"
+	"os"
+	"strings"
 )
+
+type EncryptedData struct {
+	Ciphertext []byte `json:"ciphertext"`
+}
 
 func decryptAES(key, ciphertext []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
@@ -90,22 +99,39 @@ func ConfigureController() {
 
 		fmt.Println("The length after trimming is: ", len(message))
 		fmt.Println(message)
-		/*
-			//fmt.Println(message)
-			fmt.Println("The length before decryption is: ", len(message))
-			err = godotenv.Load()
-			AesKey := os.Getenv("AES_KEY") //This key is for testing, will be switched later
-			message = []byte(strings.Trim(string(message), "\n"))
-			//Decrypt the message.
-			decryptedText, err := decryptAES([]byte(AesKey), message)
-			//decryptedText := message
-			if err != nil {
-				fmt.Println("Error decrypting:", err)
-				return
-			}
-			fmt.Printf("Decrypted text: %s\n", decryptedText)
 
-		*/
+		//fmt.Println(message)
+		fmt.Println("The length before decryption is: ", len(message))
+
+		err = godotenv.Load()
+		AesKey := os.Getenv("AES_KEY") //This key is for testing, will be switched later
+		message = []byte(strings.Trim(string(message), "\n"))
+
+		decryptedText := message
+		if err != nil {
+			fmt.Println("Error decrypting:", err)
+			return
+		}
+		fmt.Printf("Decrypted text: %s\n", decryptedText)
+
+		jsonData, err := ioutil.ReadFile("blockchain.json")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		var data EncryptedData
+		err = json.Unmarshal(jsonData, &data)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		plaintext, err := decryptAES([]byte(AesKey), data.Ciphertext)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Printf("Decrypted text: %s\n", plaintext)
+
 	}
 }
 

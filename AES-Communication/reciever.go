@@ -76,7 +76,6 @@ func ConfigureController() {
 				log.Fatal("Error receiving message:", err)
 			}
 		}
-		fmt.Printf("this is the message len before encryption: ", len(message))
 		err = godotenv.Load()
 		AesKey := os.Getenv("AES_KEY") //This key is for testing, will be switched later
 		message = []byte(strings.Trim(string(message), "\n"))
@@ -86,7 +85,6 @@ func ConfigureController() {
 			fmt.Println("Error decrypting:", err)
 			return
 		}
-		fmt.Printf("this is the message len after encryption: ", len(message))
 		fmt.Printf("Decrypted text: %s\n", decryptedText)
 	}
 }

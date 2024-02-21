@@ -57,7 +57,6 @@ func SendMessagesToServer() {
 
 	//sender := xbee.NewSender(port)
 	// Configure XBee module as a client
-	fmt.Printf("this is the message len after encryption: ", len(encryptmessage))
 	sendmessage := append(encryptmessage, '\n')
 
 	for {

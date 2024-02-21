@@ -43,7 +43,7 @@ func SendMessagesToServer() {
 	err := godotenv.Load()
 	AesKey := os.Getenv("AES_KEY")
 	// The message to be encrypted.
-	plaintext := []byte("This encrypted everything")
+	plaintext := []byte("This message was encrypted")
 	encryptmessage, _ := encryptAES([]byte(AesKey), plaintext)
 
 	// Open the XBee module for communication

@@ -23,6 +23,10 @@ func decryptAES(key, ciphertext []byte) ([]byte, error) {
 		return nil, fmt.Errorf("ciphertext too short")
 	}
 
+	if len(ciphertext)%aes.BlockSize != 0 {
+		return nil, fmt.Errorf("ciphertext is not a multiple of the block size")
+	}
+
 	iv := ciphertext[:aes.BlockSize]
 	ciphertext = ciphertext[aes.BlockSize:]
 

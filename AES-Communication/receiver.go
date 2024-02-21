@@ -10,7 +10,6 @@ import (
 	"go.bug.st/serial"
 	"io"
 	"log"
-	"os"
 )
 
 func decryptAES(key, ciphertext []byte) ([]byte, error) {
@@ -95,10 +94,11 @@ func ConfigureController() {
 		//fmt.Println(message)
 		fmt.Println("The length before decryption is: ", len(message))
 		err = godotenv.Load()
-		AesKey := os.Getenv("AES_KEY") //This key is for testing, will be switched later
+		//AesKey := os.Getenv("AES_KEY") //This key is for testing, will be switched later
 		//message = []byte(strings.Trim(string(message), "\n"))
 		// Decrypt the message.
-		decryptedText, err := decryptAES([]byte(AesKey), message)
+		//decryptedText, err := decryptAES([]byte(AesKey), message)
+		decryptedText := message
 		if err != nil {
 			fmt.Println("Error decrypting:", err)
 			return

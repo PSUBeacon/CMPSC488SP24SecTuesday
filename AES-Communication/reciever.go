@@ -1,4 +1,4 @@
-package AES
+package main
 
 import (
 	"bufio"

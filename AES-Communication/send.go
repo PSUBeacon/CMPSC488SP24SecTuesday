@@ -1,4 +1,4 @@
-package AES
+package main
 
 import (
 	"CMPSC488SP24SecTuesday/blockchain"

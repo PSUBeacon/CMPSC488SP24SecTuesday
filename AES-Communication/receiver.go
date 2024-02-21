@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/json"
@@ -111,17 +110,15 @@ func ConfigureController() {
 		}
 
 		// Trim the newline character
-		message = string(bytes.TrimRight([]byte(message), "\n"))
+		//message = string(bytes.TrimRight([]byte(message), "\n"))
 
 		fmt.Println("The length after trimming is: ", len(message))
 		//fmt.Println(message)
 
 		err = godotenv.Load()
 		AesKey := os.Getenv("AES_KEY") //This key is for testing, will be switched later
-		//message = string([]byte(strings.Trim(string(message), "\n")))
 		//Decrypt the message.
 		decryptedText, err := decryptAES([]byte(AesKey), []byte(message))
-		//decryptedText := message
 
 		if err != nil {
 			fmt.Println("Error decrypting:", err)

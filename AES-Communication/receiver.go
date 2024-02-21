@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
 	"fmt"
@@ -83,7 +84,15 @@ func ConfigureController() {
 				log.Fatal("Error receiving message:", err)
 			}
 		}
-		fmt.Println(message)
+
+		fmt.Println("The length before trimming is: ", len(message))
+
+		// Trim the newline character
+		message = bytes.TrimRight(message, "\n")
+
+		fmt.Println("The length after trimming is: ", len(message))
+
+		//fmt.Println(message)
 		fmt.Println("The length before decryption is: ", len(message))
 		err = godotenv.Load()
 		AesKey := os.Getenv("AES_KEY") //This key is for testing, will be switched later

@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
+	"encoding/json"
 	"fmt"
 	"github.com/joho/godotenv"
 	"go.bug.st/serial"
@@ -14,8 +15,12 @@ import (
 	"strings"
 )
 
-type EncryptedData struct {
-	Ciphertext []byte `json:"ciphertext"`
+type Block struct {
+	Index     int
+	Timestamp string
+	Data      string
+	PrevHash  string
+	Hash      string
 }
 
 func decryptAES(key, ciphertext []byte) ([]byte, error) {
@@ -59,6 +64,7 @@ func decryptAES(key, ciphertext []byte) ([]byte, error) {
 
 func ConfigureController() {
 	// Open the XBee module for communication
+	var block []Block
 	mode := &serial.Mode{
 		BaudRate: 9600,
 	}
@@ -90,28 +96,36 @@ func ConfigureController() {
 			}
 		}
 
-		fmt.Println("The length before trimming is: ", len(message))
-
 		// Trim the newline character
 		message = bytes.TrimRight(message, "\n")
 
 		fmt.Println("The length after trimming is: ", len(message))
 		//fmt.Println(message)
 
-		//fmt.Println(message)
-		fmt.Println("The length before decryption is: ", len(message))
 		err = godotenv.Load()
 		AesKey := os.Getenv("AES_KEY") //This key is for testing, will be switched later
 		message = []byte(strings.Trim(string(message), "\n"))
 		//Decrypt the message.
 		decryptedText, err := decryptAES([]byte(AesKey), message)
 		//decryptedText := message
+
 		if err != nil {
 			fmt.Println("Error decrypting:", err)
 			return
 		}
-		fmt.Printf("Decrypted text: %s\n", decryptedText)
+		//fmt.Printf("Decrypted text: %s\n", decryptedText)
+		tojson := json.Unmarshal(decryptedText, &block)
+		if tojson != nil {
 
+			// if error is not nil
+			// print error
+			fmt.Println(tojson)
+		}
+		//fmt.Println(tojson)
+		for i := range block {
+			fmt.Println(string(rune(block[i].Index)) + " - " + block[i].Timestamp +
+				" - " + block[i].Data + " - " + block[i].PrevHash + " - " + block[i].Hash)
+		}
 	}
 }
 

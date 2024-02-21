@@ -108,7 +108,7 @@ func loginHandler(c *gin.Context) {
 	//err = bcrypt.CompareHashAndPassword([]byte(fetchedUser.Password), []byte(loginData.Password))
 	//if err != nil {
 	if fetchedUser.Password != loginData.Password {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid  password"})
 		return
 	}
 

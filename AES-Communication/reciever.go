@@ -84,6 +84,7 @@ func ConfigureController() {
 			}
 		}
 		fmt.Println(message)
+		fmt.Println("The length before decryption is: ", len(message))
 		err = godotenv.Load()
 		AesKey := os.Getenv("AES_KEY") //This key is for testing, will be switched later
 		//message = []byte(strings.Trim(string(message), "\n"))

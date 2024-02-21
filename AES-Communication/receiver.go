@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/json"
@@ -110,7 +111,7 @@ func ConfigureController() {
 		}
 
 		// Trim the newline character
-		//message = string(bytes.TrimRight([]byte(message), "\n"))
+		message = string(bytes.TrimRight([]byte(message), "\n"))
 
 		fmt.Println("The length after trimming is: ", len(message))
 		//fmt.Println(message)

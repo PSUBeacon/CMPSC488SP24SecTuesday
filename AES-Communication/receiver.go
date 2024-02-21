@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
-	"encoding/json"
 	"fmt"
 	"github.com/joho/godotenv"
 	"go.bug.st/serial"
@@ -64,7 +63,7 @@ func decryptAES(key, ciphertext []byte) ([]byte, error) {
 
 func ConfigureController() {
 	// Open the XBee module for communication
-	var block []Block
+	//var block []Block
 	mode := &serial.Mode{
 		BaudRate: 9600,
 	}
@@ -113,19 +112,20 @@ func ConfigureController() {
 			fmt.Println("Error decrypting:", err)
 			return
 		}
-		//fmt.Printf("Decrypted text: %s\n", decryptedText)
-		tojson := json.Unmarshal(decryptedText, &block)
-		if tojson != nil {
+		fmt.Printf("Decrypted text: %s\n", decryptedText)
 
-			// if error is not nil
-			// print error
-			fmt.Println(tojson)
-		}
-		//fmt.Println(tojson)
-		for i := range block {
-			fmt.Println(string(rune(block[i].Index)) + " - " + block[i].Timestamp +
-				" - " + block[i].Data + " - " + block[i].PrevHash + " - " + block[i].Hash)
-		}
+		//tojson := json.Unmarshal(decryptedText, &block)
+		//if tojson != nil {
+		//
+		//	// if error is not nil
+		//	// print error
+		//	fmt.Println(tojson)
+		//}
+		////fmt.Println(tojson)
+		//for i := range block {
+		//	fmt.Println(string(rune(block[i].Index)) + " - " + block[i].Timestamp +
+		//		" - " + block[i].Data + " - " + block[i].PrevHash + " - " + block[i].Hash)
+		//}
 	}
 }
 

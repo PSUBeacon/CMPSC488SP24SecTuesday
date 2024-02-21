@@ -59,11 +59,13 @@ func SendMessagesToServer() {
 		log.Fatal("Error marshalling blockchain:", err)
 	}
 	// Encrypt the blockchain JSON
-	encryptedBlock, err := encryptAES([]byte(AesKey), blockchainJSON)
-	if err != nil {
-		log.Fatal("Error encrypting block:", err)
-	}
-	//encryptedBlock := blockchainJSON
+	/*
+		encryptedBlock, err := encryptAES([]byte(AesKey), blockchainJSON)
+		if err != nil {
+			log.Fatal("Error encrypting block:", err)
+		}
+	*/
+	encryptedBlock := blockchainJSON
 	// Open the XBee module for communication
 	mode := &serial.Mode{
 		BaudRate: 9600,

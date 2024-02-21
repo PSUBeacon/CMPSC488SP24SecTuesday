@@ -53,7 +53,7 @@ func SendMessagesToServer() {
 	//blockMessage.CreateBlock("This used block chain")
 
 	// Convert the blockchain to JSON
-	blockchainJSON, err := json.Marshal(blockMessage)
+	blockchainJSON, err := json.MarshalIndent(blockMessage, "", "  ")
 	if err != nil {
 		log.Fatal("Error marshalling blockchain:", err)
 	}

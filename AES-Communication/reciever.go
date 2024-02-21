@@ -10,7 +10,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"strings"
 )
 
 func decryptAES(key, ciphertext []byte) ([]byte, error) {
@@ -87,7 +86,7 @@ func ConfigureController() {
 		fmt.Println(message)
 		err = godotenv.Load()
 		AesKey := os.Getenv("AES_KEY") //This key is for testing, will be switched later
-		message = []byte(strings.Trim(string(message), "\n"))
+		//message = []byte(strings.Trim(string(message), "\n"))
 		// Decrypt the message.
 		decryptedText, err := decryptAES([]byte(AesKey), message)
 		if err != nil {

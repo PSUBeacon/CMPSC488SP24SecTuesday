@@ -96,7 +96,7 @@ func ConfigureController() {
 		message = bytes.TrimRight(message, "\n")
 
 		fmt.Println("The length after trimming is: ", len(message))
-		fmt.Println(message)
+		//fmt.Println(message)
 
 		//fmt.Println(message)
 		fmt.Println("The length before decryption is: ", len(message))

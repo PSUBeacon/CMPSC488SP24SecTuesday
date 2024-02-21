@@ -7,7 +7,6 @@ import (
 	"github.com/golang-jwt/jwt"
 	//"github.com/joho/godotenv"
 	"CMPSC488SP24SecTuesday/dal"
-	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
 	"os"
@@ -101,13 +100,14 @@ func loginHandler(c *gin.Context) {
 	// Fetch user by username from MongoDB
 	fetchedUser, err := dal.FetchUser(client, "name", loginData.Username)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username (not found in DB"})
 		return
 	}
 
 	// Compare the password hash using bcrypt.CompareHashAndPassword
-	err = bcrypt.CompareHashAndPassword([]byte(fetchedUser.Password), []byte(loginData.Password))
-	if err != nil {
+	//err = bcrypt.CompareHashAndPassword([]byte(fetchedUser.Password), []byte(loginData.Password))
+	//if err != nil {
+	if fetchedUser.Password != loginData.Password {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
 		return
 	}

@@ -81,7 +81,7 @@ func ConfigureController() {
 
 	// Wrap the port in a bufio.Reader
 	reader := bufio.NewReader(port)
-	var message []byte
+
 	fmt.Println("Waiting for incoming messages...")
 	for {
 		// Use ReadBytes or ReadString to dynamically handle incoming data
@@ -89,45 +89,43 @@ func ConfigureController() {
 		message, err := reader.ReadBytes('*') // or reader.ReadString('\n')       // The controller will search until it finds a /n character in the message string
 		if err != nil {
 			if err == io.EOF {
+
 				// End of file (or stream) reached, could handle differently if needed
-				continue
+				// Trim the newline character
+				message = bytes.TrimRight(message, "\n")
+
+				fmt.Println("The length after trimming is: ", len(message))
+				//fmt.Println(message)
+
+				err = godotenv.Load()
+				AesKey := os.Getenv("AES_KEY") //This key is for testing, will be switched later
+				message = []byte(strings.Trim(string(message), "*"))
+				//Decrypt the message.
+				decryptedText, err := decryptAES([]byte(AesKey), message)
+				//decryptedText := message
+
+				if err != nil {
+					fmt.Println("Error decrypting:", err)
+					return
+				}
+				fmt.Printf("Decrypted text: %s\n", decryptedText)
+
+				tojson := json.Unmarshal(decryptedText, &block)
+				if tojson != nil {
+
+					// if error is not nil
+					// print error
+					fmt.Println(tojson)
+				}
+				//fmt.Println(tojson)
+				for i := range block {
+					fmt.Println(string(rune(block[i].Index)) + " - " + block[i].Timestamp + " - " + block[i].Data + " - " + block[i].PrevHash + " - " + block[i].Hash)
+				}
 			} else {
 				log.Fatal("Error receiving message:", err)
 			}
 		}
-
-		// Trim the newline character
-		message = bytes.TrimRight(message, "\n")
-		break
 	}
-	fmt.Println("The length after trimming is: ", len(message))
-	//fmt.Println(message)
-
-	err = godotenv.Load()
-	AesKey := os.Getenv("AES_KEY") //This key is for testing, will be switched later
-	message = []byte(strings.Trim(string(message), "*"))
-	//Decrypt the message.
-	decryptedText, err := decryptAES([]byte(AesKey), message)
-	//decryptedText := message
-
-	if err != nil {
-		fmt.Println("Error decrypting:", err)
-		return
-	}
-	fmt.Printf("Decrypted text: %s\n", decryptedText)
-
-	tojson := json.Unmarshal(decryptedText, &block)
-	if tojson != nil {
-
-		// if error is not nil
-		// print error
-		fmt.Println(tojson)
-	}
-	//fmt.Println(tojson)
-	for i := range block {
-		fmt.Println(string(rune(block[i].Index)) + " - " + block[i].Timestamp + " - " + block[i].Data + " - " + block[i].PrevHash + " - " + block[i].Hash)
-	}
-
 }
 
 func main() {

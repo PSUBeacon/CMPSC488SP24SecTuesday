@@ -76,7 +76,7 @@ func SendMessagesToServer() {
 	//sendmessage := append(encryptedBlock, '\n')
 	for {
 		// Send a message to the server
-
+		fmt.Println(len(encryptedBlock))
 		_, err := port.Write(encryptedBlock)
 		_, err = port.Write([]byte("\n"))
 		fmt.Printf("Sent \n")

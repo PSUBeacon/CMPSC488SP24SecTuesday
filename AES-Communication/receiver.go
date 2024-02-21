@@ -12,6 +12,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"strings"
 )
 
 type Block struct {
@@ -61,25 +62,6 @@ func decryptAES(key, ciphertext []byte) ([]byte, error) {
 	return ciphertext, nil
 }
 
-func readJSONMessage(reader *bufio.Reader) (string, error) {
-	var message []byte
-	for {
-		// Read until the delimiter (e.g., newline)
-		line, err := reader.ReadBytes('\n')
-		if err != nil {
-			if err == io.EOF {
-				break // End of message
-			}
-			return "", err // Handle other errors
-		}
-		message = append(message, line...)
-		if len(line) > 0 && line[len(line)-1] == '\n' {
-			break // End of JSON object
-		}
-	}
-	return string(message), nil
-}
-
 func ConfigureController() {
 	// Open the XBee module for communication
 	var block []Block
@@ -104,7 +86,7 @@ func ConfigureController() {
 	for {
 		// Use ReadBytes or ReadString to dynamically handle incoming data
 		// For example, reading until a newline character (adjust as needed)
-		message, err := readJSONMessage(reader)
+		message, err := reader.ReadBytes('*') // or reader.ReadString('\n')       // The controller will search until it finds a /n character in the message string
 		if err != nil {
 			if err == io.EOF {
 				// End of file (or stream) reached, could handle differently if needed
@@ -115,15 +97,17 @@ func ConfigureController() {
 		}
 
 		// Trim the newline character
-		message = string(bytes.TrimRight([]byte(message), "\n"))
+		message = bytes.TrimRight(message, "\n")
 
 		fmt.Println("The length after trimming is: ", len(message))
 		//fmt.Println(message)
 
 		err = godotenv.Load()
 		AesKey := os.Getenv("AES_KEY") //This key is for testing, will be switched later
+		message = []byte(strings.Trim(string(message), "*"))
 		//Decrypt the message.
-		decryptedText, err := decryptAES([]byte(AesKey), []byte(message))
+		decryptedText, err := decryptAES([]byte(AesKey), message)
+		//decryptedText := message
 
 		if err != nil {
 			fmt.Println("Error decrypting:", err)
@@ -131,10 +115,12 @@ func ConfigureController() {
 		}
 		fmt.Printf("Decrypted text: %s\n", decryptedText)
 
-		var obj Block
-		err = json.Unmarshal([]byte(message), &obj)
-		if err != nil {
-			log.Fatal("Error unmarshaling JSON message:", err)
+		tojson := json.Unmarshal(decryptedText, &block)
+		if tojson != nil {
+
+			// if error is not nil
+			// print error
+			fmt.Println(tojson)
 		}
 		//fmt.Println(tojson)
 		for i := range block {

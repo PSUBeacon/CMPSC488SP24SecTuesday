@@ -5,9 +5,11 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"fmt"
+	"github.com/joho/godotenv"
 	"go.bug.st/serial"
 	"io"
 	"log"
+	"os"
 	"strings"
 )
 
@@ -74,10 +76,12 @@ func ConfigureController() {
 				log.Fatal("Error receiving message:", err)
 			}
 		}
-		key := []byte("890fa9277f40e9394dc80e53b203f952") //This key is for testing, will be switched later
+
+		err = godotenv.Load()
+		AesKey := os.Getenv("AES_KEY") //This key is for testing, will be switched later
 		message = []byte(strings.Trim(string(message), "\n"))
 		// Decrypt the message.
-		decryptedText, err := decryptAES(key, message)
+		decryptedText, err := decryptAES([]byte(AesKey), message)
 		if err != nil {
 			fmt.Println("Error decrypting:", err)
 			return

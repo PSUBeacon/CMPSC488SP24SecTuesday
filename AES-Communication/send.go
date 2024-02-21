@@ -6,9 +6,11 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"fmt"
+	"github.com/joho/godotenv"
 	"go.bug.st/serial"
 	"io"
 	"log"
+	"os"
 	"time"
 )
 
@@ -38,12 +40,11 @@ func encryptAES(key, plaintext []byte) ([]byte, error) {
 func SendMessagesToServer() {
 
 	// The key should be 16, 24, or 32 bytes long for AES-128, AES-192, or AES-256, respectively.
-	key := []byte("890fa9277f40e9394dc80e53b203f952") //This key is for testing, will be switched later
-
+	err := godotenv.Load()
+	AesKey := os.Getenv("AES_KEY")
 	// The message to be encrypted.
 	plaintext := []byte("This encrypted everything")
-
-	encryptmessage, _ := encryptAES(key, plaintext)
+	encryptmessage, _ := encryptAES([]byte(AesKey), plaintext)
 
 	// Open the XBee module for communication
 	mode := &serial.Mode{

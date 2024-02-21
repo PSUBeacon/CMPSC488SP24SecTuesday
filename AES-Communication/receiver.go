@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
+	"encoding/json"
 	"fmt"
 	"github.com/joho/godotenv"
 	"go.bug.st/serial"
@@ -13,6 +14,10 @@ import (
 	"os"
 	"strings"
 )
+
+type DecryptedData struct {
+	Text string `json:"text"`
+}
 
 func decryptAES(key, ciphertext []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
@@ -106,6 +111,19 @@ func ConfigureController() {
 			return
 		}
 		fmt.Printf("Decrypted text: %s\n", decryptedText)
+		data := DecryptedData{Text: string(decryptedText)}
+		jsonData, err := json.Marshal(data)
+		if err != nil {
+			fmt.Println("Error marshaling JSON:", err)
+			continue
+		}
+
+		err = os.WriteFile("blockchain.json", jsonData, 0644)
+		if err != nil {
+			fmt.Println("Error writing to JSON file:", err)
+			continue
+		}
+		fmt.Println("Decrypted text stored in JSON file")
 	}
 }
 

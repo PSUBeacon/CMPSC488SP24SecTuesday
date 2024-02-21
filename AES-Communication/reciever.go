@@ -84,7 +84,7 @@ func ConfigureController() {
 				log.Fatal("Error receiving message:", err)
 			}
 		}
-
+		fmt.Println(message)
 		err = godotenv.Load()
 		AesKey := os.Getenv("AES_KEY") //This key is for testing, will be switched later
 		message = []byte(strings.Trim(string(message), "\n"))

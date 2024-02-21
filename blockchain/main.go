@@ -64,7 +64,6 @@ func main() {
 	// Add some blocks to the blockchain
 	blockchain.CreateBlock("Block 1 Data")
 	blockchain.CreateBlock("Block 2 Data")
-
 	// Print the blockchain
 	blockchainJSON, _ := json.MarshalIndent(blockchain, "", "  ")
 	fmt.Println(string(blockchainJSON))

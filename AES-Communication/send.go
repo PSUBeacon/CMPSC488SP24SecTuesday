@@ -12,6 +12,7 @@ import (
 	"go.bug.st/serial"
 	"io"
 	"log"
+	"os"
 	"time"
 )
 
@@ -45,27 +46,24 @@ func SendMessagesToServer() {
 	// The key should be 16, 24, or 32 bytes long for AES-128, AES-192, or AES-256, respectively.
 
 	err := godotenv.Load()
-	//AesKey := os.Getenv("AES_KEY")
+	AesKey := os.Getenv("AES_KEY")
 
 	// The message to be encrypted.
 	// Create a new blockchain and add a block
 	blockMessage := blockchain.NewBlockchain()
-	blockMessage.CreateBlock("This used block chain")
+	//blockMessage.CreateBlock("This used block chain")
 
 	// Convert the blockchain to JSON
 	blockchainJSON, err := json.Marshal(blockMessage)
 	if err != nil {
 		log.Fatal("Error marshalling blockchain:", err)
 	}
-	/*
-		// Encrypt the blockchain JSON
-		encryptedBlock, err := encryptAES([]byte(AesKey), blockchainJSON)
-		if err != nil {
-			log.Fatal("Error encrypting block:", err)
-		}
-
-	*/
-	encryptedBlock := blockchainJSON
+	// Encrypt the blockchain JSON
+	encryptedBlock, err := encryptAES([]byte(AesKey), blockchainJSON)
+	if err != nil {
+		log.Fatal("Error encrypting block:", err)
+	}
+	//encryptedBlock := blockchainJSON
 	// Open the XBee module for communication
 	mode := &serial.Mode{
 		BaudRate: 9600,

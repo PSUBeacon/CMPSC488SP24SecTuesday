@@ -12,7 +12,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"strings"
 )
 
 type Block struct {
@@ -62,6 +61,21 @@ func decryptAES(key, ciphertext []byte) ([]byte, error) {
 	return ciphertext, nil
 }
 
+func readMessage(reader *bufio.Reader) (string, error) {
+	var message []byte
+	for {
+		buf, isPrefix, err := reader.ReadLine()
+		if err != nil {
+			return "", err
+		}
+		message = append(message, buf...)
+		if !isPrefix {
+			break
+		}
+	}
+	return string(message), nil
+}
+
 func ConfigureController() {
 	// Open the XBee module for communication
 	var block []Block
@@ -86,7 +100,7 @@ func ConfigureController() {
 	for {
 		// Use ReadBytes or ReadString to dynamically handle incoming data
 		// For example, reading until a newline character (adjust as needed)
-		message, err := reader.ReadBytes('\n') // or reader.ReadString('\n')       // The controller will search until it finds a /n character in the message string
+		message, err := readMessage(reader)
 		if err != nil {
 			if err == io.EOF {
 				// End of file (or stream) reached, could handle differently if needed
@@ -97,16 +111,16 @@ func ConfigureController() {
 		}
 
 		// Trim the newline character
-		message = bytes.TrimRight(message, "\n")
+		message = string(bytes.TrimRight([]byte(message), "\n"))
 
 		fmt.Println("The length after trimming is: ", len(message))
 		//fmt.Println(message)
 
 		err = godotenv.Load()
 		AesKey := os.Getenv("AES_KEY") //This key is for testing, will be switched later
-		message = []byte(strings.Trim(string(message), "\n"))
+		//message = string([]byte(strings.Trim(string(message), "\n")))
 		//Decrypt the message.
-		decryptedText, err := decryptAES([]byte(AesKey), message)
+		decryptedText, err := decryptAES([]byte(AesKey), []byte(message))
 		//decryptedText := message
 
 		if err != nil {

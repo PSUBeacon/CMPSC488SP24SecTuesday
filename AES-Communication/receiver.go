@@ -11,7 +11,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"strings"
 )
 
 func decryptAES(key, ciphertext []byte) ([]byte, error) {
@@ -67,43 +66,36 @@ func ConfigureController() {
 		if err != nil {
 
 		}
-	}(port) // Ensure the port is closed when the function returns
+	}(port)
 
 	// Wrap the port in a bufio.Reader
 	reader := bufio.NewReader(port)
 
 	fmt.Println("Waiting for incoming messages...")
 	for {
-		// Use ReadBytes or ReadString to dynamically handle incoming data
-		// For example, reading until a newline character (adjust as needed)
-		message, err := reader.ReadBytes('\n') // or reader.ReadString('\n')       // The controller will search until it finds a /n character in the message string
+		message, err := reader.ReadBytes('\n')
 		if err != nil {
 			if err == io.EOF {
-				// End of file (or stream) reached, could handle differently if needed
 				continue
 			} else {
 				log.Fatal("Error receiving message:", err)
 			}
 		}
 
-		fmt.Println("The length before trimming is: ", len(message))
-
 		// Trim the newline character
 		message = bytes.TrimRight(message, "\n")
-
 		fmt.Println("The length after trimming is: ", len(message))
 
-		//fmt.Println(message)
-		fmt.Println("The length before decryption is: ", len(message))
 		err = godotenv.Load()
-		AesKey := os.Getenv("AES_KEY") //This key is for testing, will be switched later
-		message = []byte(strings.Trim(string(message), "\n"))
-		//Decrypt the message.
+		if err != nil {
+			log.Fatal("Error loading .env file:", err)
+		}
+
+		AesKey := os.Getenv("AES_KEY")
 		decryptedText, err := decryptAES([]byte(AesKey), message)
-		//decryptedText := message
 		if err != nil {
 			fmt.Println("Error decrypting:", err)
-			return
+			continue // Continue listening for new messages
 		}
 		fmt.Printf("Decrypted text: %s\n", decryptedText)
 	}

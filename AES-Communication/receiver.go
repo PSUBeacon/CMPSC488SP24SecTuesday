@@ -106,7 +106,6 @@ func ConfigureController() {
 			return
 		}
 		fmt.Printf("Decrypted text: %s\n", decryptedText)
-
 	}
 }
 

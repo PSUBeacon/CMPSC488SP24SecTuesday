@@ -1,15 +1,21 @@
 import React from 'react';
-import LoginForm from './LoginForm'; // Make sure the path matches where you saved LoginForm.js
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import LoginForm from './LoginForm'; // Import LoginForm component
+import Dashboard from './Dashboard'; // Import Dashboard component
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <LoginForm />
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<LoginForm />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Routes>
+    </Router>
   );
 }
 
 export default App;
+
+
+
 

@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import axios from 'axios'; //This line imports the Axios library, a promise-based HTTP client for making requests to backends.
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const LoginForm = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate(); // Instantiate useNavigate
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-  
-    // Specify the full URL for the Go server
     const serverUrl = 'http://localhost:8080/login';
-  
+
     try {
       const response = await axios.post(serverUrl, {
         username,
@@ -19,12 +19,13 @@ const LoginForm = () => {
       });
       const jwtToken = response.data.token; // Assuming the token is returned in a field named 'token'
       console.log('JWT Token:', jwtToken);
-  
-      // Save the JWT token in localStorage or handle it as needed
+
       localStorage.setItem('token', jwtToken);
-  
-      // Redirect user or show success message
-    }catch (error) {
+
+      // Redirect user to the dashboard page
+      navigate('/dashboard'); // Use navigate to redirect
+
+    } catch (error) {
       setError('Failed to login. Please check your network connection and credentials.');
       console.error('Login error:', error.toJSON());
       if (error.response) {
@@ -38,10 +39,7 @@ const LoginForm = () => {
       }
       console.error(error.config);
     }
-    };
-  
-  
-  
+  };
 
   return (
     <div>
@@ -71,3 +69,4 @@ const LoginForm = () => {
 };
 
 export default LoginForm;
+

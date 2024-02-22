@@ -4,13 +4,9 @@ import (
 	"bufio"
 	"crypto/aes"
 	"crypto/cipher"
-	"encoding/json"
 	"fmt"
-	"github.com/joho/godotenv"
 	"go.bug.st/serial"
 	"log"
-	"os"
-	"strings"
 )
 
 type Block struct {
@@ -64,7 +60,7 @@ func decryptAES(key, ciphertext []byte) ([]byte, error) {
 
 func ConfigureController() {
 	// Open the XBee module for communication
-	var block []Block
+	//var block []Block
 	mode := &serial.Mode{
 		BaudRate: 9600,
 	}
@@ -84,40 +80,52 @@ func ConfigureController() {
 	reader := bufio.NewReaderSize(port, bufferSize)
 
 	fmt.Println("Waiting for incoming messages...")
+	// Use ReadBytes or ReadString to dynamically handle incoming data
 	for {
-		// Use ReadBytes or ReadString to dynamically handle incoming data
-		// For example, reading until a newline character (adjust as needed)
-		message, _ := reader.ReadBytes('Z') // or reader.ReadString('\n')       // The controller will search until it finds a /n character in the message string
-
+		// Read and parse the data manually
+		var message []byte
+		for {
+			b, err := reader.ReadByte()
+			if err != nil {
+				log.Fatal("Error reading byte:", err)
+			}
+			// Check for the UTF-8 encoding of '♄' (E2 99 B4)
+			if len(message) >= 2 && message[len(message)-2] == 0xE2 && message[len(message)-1] == 0x99 && b == 0xB4 {
+				message = message[:len(message)-2] // Remove the delimiter from the message
+				break
+			}
+			message = append(message, b)
+		}
 		// Trim the delim character
-		message = []byte(strings.Trim(string(message), "♄"))
-		fmt.Println(message)
-		fmt.Println("The length after trimming is: ", len(message))
-		//fmt.Println(message)
+		//message = []byte(strings.Trim(string(message), "♄"))
+		/*
+			fmt.Println(message)
+			fmt.Println("The length after trimming is: ", len(message))
+			//fmt.Println(message)
 
-		err = godotenv.Load()
-		AesKey := os.Getenv("AES_KEY") //This key is for testing, will be switched later
-		//Decrypt the message.
-		decryptedText, err := decryptAES([]byte(AesKey), []byte(message))
-		//decryptedText := message
+			err = godotenv.Load()
+			AesKey := os.Getenv("AES_KEY") //This key is for testing, will be switched later
+			//Decrypt the message.
+			decryptedText, err := decryptAES([]byte(AesKey), []byte(message))
+			//decryptedText := message
 
-		if err != nil {
-			fmt.Println("Error decrypting:", err)
-			return
-		}
-		fmt.Printf("Decrypted text: %s\n", decryptedText)
+			if err != nil {
+				fmt.Println("Error decrypting:", err)
+				return
+			}
+			fmt.Printf("Decrypted text: %s\n", decryptedText)
 
-		tojson := json.Unmarshal(decryptedText, &block)
-		if tojson != nil {
+			tojson := json.Unmarshal(decryptedText, &block)
+			if tojson != nil {
 
-			// if error is not nil
-			// print error
-			fmt.Println(tojson)
-		}
-		//fmt.Println(tojson)
-		for i := range block {
-			fmt.Println(string(rune(block[i].Index)) + " - " + block[i].Timestamp + " - " + block[i].Data + " - " + block[i].PrevHash + " - " + block[i].Hash)
-		}
+				// if error is not nil
+				// print error
+				fmt.Println(tojson)
+			}
+			//fmt.Println(tojson)
+			for i := range block {
+				fmt.Println(string(rune(block[i].Index)) + " - " + block[i].Timestamp + " - " + block[i].Data + " - " + block[i].PrevHash + " - " + block[i].Hash)
+			}*/
 	}
 }
 

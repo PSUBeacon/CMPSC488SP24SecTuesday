@@ -42,9 +42,7 @@ func encryptAES(key, plaintext []byte) ([]byte, error) {
 }
 
 func SendMessagesToServer() {
-
 	// The key should be 16, 24, or 32 bytes long for AES-128, AES-192, or AES-256, respectively.
-
 	err := godotenv.Load()
 	AesKey := os.Getenv("AES_KEY")
 
@@ -64,7 +62,6 @@ func SendMessagesToServer() {
 		log.Fatal("Error encrypting block:", err)
 	}
 
-	//encryptedBlock := blockchainJSON
 	// Open the XBee module for communication
 	mode := &serial.Mode{
 		BaudRate: 9600,
@@ -73,16 +70,21 @@ func SendMessagesToServer() {
 	if err != nil {
 		log.Fatal("Error opening XBee module:", err)
 	}
+	defer func(port serial.Port) {
+		err := port.Close()
+		if err != nil {
 
-	//sender := xbee.NewSender(port)
-	// Configure XBee module as a client
-	//sendmessage := encryptedBlock
-	sendmessage := append(encryptedBlock, '♄')
+		}
+	}(port)
+
+	// Append the UTF-8 encoding of '♄' to the encrypted block
+	delimiter := []byte{0xE2, 0x99, 0xB4}
+	sendmessage := append(encryptedBlock, delimiter...)
+
 	for {
 		// Send a message to the server
 		fmt.Println(len(sendmessage))
 		_, err := port.Write(sendmessage)
-		//_, err = port.Write([]byte("*"))
 		fmt.Printf("Sent \n")
 		if err != nil {
 			log.Println("Error sending message:", err)
@@ -90,7 +92,6 @@ func SendMessagesToServer() {
 		time.Sleep(5 * time.Second) // Send message every 5 seconds
 	}
 }
-
 func main() {
 
 	SendMessagesToServer()

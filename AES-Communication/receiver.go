@@ -87,7 +87,7 @@ func ConfigureController() {
 	for {
 		// Use ReadBytes or ReadString to dynamically handle incoming data
 		// For example, reading until a newline character (adjust as needed)
-		message, err := reader.ReadBytes('*') // or reader.ReadString('\n')       // The controller will search until it finds a /n character in the message string
+		message, err := reader.ReadString('*') // or reader.ReadString('\n')       // The controller will search until it finds a /n character in the message string
 		if err != nil {
 			if err == io.EOF {
 				// End of file (or stream) reached, could handle differently if needed
@@ -106,7 +106,7 @@ func ConfigureController() {
 		err = godotenv.Load()
 		AesKey := os.Getenv("AES_KEY") //This key is for testing, will be switched later
 		//Decrypt the message.
-		decryptedText, err := decryptAES([]byte(AesKey), message)
+		decryptedText, err := decryptAES([]byte(AesKey), []byte(message))
 		//decryptedText := message
 
 		if err != nil {

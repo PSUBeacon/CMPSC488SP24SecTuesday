@@ -106,7 +106,7 @@ func ConfigureController() {
 		}
 		fmt.Printf("Decrypted text: %s\n", decryptedText)
 
-		// Unmarshal the JSON object
+		// Unmarshal the JSON object possibly
 		err = json.Unmarshal(decryptedText, &block)
 		if err != nil {
 			log.Fatal("Error unmarshaling JSON:", err)

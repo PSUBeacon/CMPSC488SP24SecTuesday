@@ -80,14 +80,14 @@ func ConfigureController() {
 	}(port) // Ensure the port is closed when the function returns
 
 	// Wrap the port in a bufio.Reader
-	const bufferSize = 10000 // Adjust this value as needed
+	const bufferSize = 4096 // Adjust this value as needed
 	reader := bufio.NewReaderSize(port, bufferSize)
 
 	fmt.Println("Waiting for incoming messages...")
 	for {
 		// Use ReadBytes or ReadString to dynamically handle incoming data
 		// For example, reading until a newline character (adjust as needed)
-		message, err := reader.ReadString('*') // or reader.ReadString('\n')       // The controller will search until it finds a /n character in the message string
+		message, err := reader.ReadBytes('?') // or reader.ReadString('\n')       // The controller will search until it finds a /n character in the message string
 		if err != nil {
 			if err == io.EOF {
 				// End of file (or stream) reached, could handle differently if needed

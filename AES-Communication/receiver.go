@@ -99,7 +99,7 @@ func ConfigureController() {
 			}
 			message = append(message, b)
 		}
-		fmt.Println(message)
+		//fmt.Println(message)
 		// Trim the delim character
 		//message = []byte(strings.Trim(string(message), "♄"))
 		/*

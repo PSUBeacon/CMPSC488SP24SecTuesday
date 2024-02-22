@@ -61,8 +61,9 @@ func decryptAES(key, ciphertext []byte) ([]byte, error) {
 	return ciphertext, nil
 }
 
-func receiveMessage() ([]byte, error) {
+func ConfigureController() {
 	// Open the XBee module for communication
+	var block []Block
 	mode := &serial.Mode{
 		BaudRate: 9600,
 	}
@@ -70,12 +71,7 @@ func receiveMessage() ([]byte, error) {
 	if err != nil {
 		log.Fatal("Error opening XBee module:", err)
 	}
-	defer func(port serial.Port) {
-		err := port.Close()
-		if err != nil {
-
-		}
-	}(port)
+	defer port.Close()
 
 	// Wrap the port in a bufio.Reader
 	reader := bufio.NewReader(port)
@@ -96,38 +92,32 @@ func receiveMessage() ([]byte, error) {
 
 		// Process the message
 		fmt.Println("Received message:", string(message))
-		return message, nil
 
-	}
-}
-func decryptMessage() {
-	message, _ := receiveMessage()
-	var block []Block
-	// Decrypt the message
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file:", err)
-	}
+		// Decrypt the message
+		err = godotenv.Load()
+		if err != nil {
+			log.Fatal("Error loading .env file:", err)
+		}
 
-	AesKey := os.Getenv("AES_KEY")
-	decryptedText, err := decryptAES([]byte(AesKey), message)
-	if err != nil {
-		log.Fatal("Error decrypting:", err)
-	}
-	fmt.Printf("Decrypted text: %s\n", decryptedText)
+		AesKey := os.Getenv("AES_KEY")
+		decryptedText, err := decryptAES([]byte(AesKey), message)
+		if err != nil {
+			log.Fatal("Error decrypting:", err)
+		}
+		fmt.Printf("Decrypted text: %s\n", decryptedText)
 
-	// Unmarshal the JSON object
-	err = json.Unmarshal(decryptedText, &block)
-	if err != nil {
-		log.Fatal("Error unmarshaling JSON:", err)
-	}
+		// Unmarshal the JSON object
+		err = json.Unmarshal(decryptedText, &block)
+		if err != nil {
+			log.Fatal("Error unmarshaling JSON:", err)
+		}
 
-	for _, b := range block {
-		fmt.Printf("%d - %s - %s - %s - %s\n", b.Index, b.Timestamp, b.Data, b.PrevHash, b.Hash)
+		for _, b := range block {
+			fmt.Printf("%d - %s - %s - %s - %s\n", b.Index, b.Timestamp, b.Data, b.PrevHash, b.Hash)
+		}
 	}
-
 }
 
 func main() {
-	decryptMessage()
+	ConfigureController()
 }

@@ -6,18 +6,18 @@ import (
 
 // Here is the Security System Structure
 type SecuritySystem struct {
-	Location          string //(mcq)
-	SensorType        string //(mcq)
-	Status            bool
-	EnergyConsumption int    //(kilowatts)
-	LastTriggered     string //(this will be the main notification)
+	Location          string `json:"Location"`   //(mcq)
+	SensorType        string `json:"SensorType"` //(mcq)
+	Status            bool   `json:"Status"`
+	EnergyConsumption int    `json:"EnergyConsumption"` //(kilowatts)
+	LastTriggered     string `json:"LastTriggered"`     //(this will be the main notification)
 }
 
 // MotionSensor represents a motion sensor component.
 
 type MotionSensor struct {
-	Name           string
-	MotionDetected bool
+	Name           string `json:"Name"`
+	MotionDetected bool   `json:"MotionDetected"`
 }
 
 // NewMotionSensor creates a new MotionSensor instance with the given name.
@@ -35,10 +35,10 @@ func (m *MotionSensor) DetectMotion() {
 
 // Alarm represents a simple alarm component.
 type Alarm struct {
-	Name    string
-	Armed   bool
-	Sounded bool
-	Energy  int
+	Name    string `json:"Name"`
+	Armed   bool   `json:"Armed"`
+	Sounded bool   `json:"Sounded"`
+	Energy  int    `json:"Energy"`
 }
 
 // NewAlarm creates a new Alarm instance with the given name.
@@ -69,7 +69,50 @@ func (a *Alarm) Trigger() {
 	}
 }
 
-// PadLock strucute
+// DoorLock structure
+type DoorLock struct {
+	Location string `json:"Location"`
+	Lock     bool   `json:"Lock"`
+}
+
+// creates door lock at location like lock kitchen or lock front door
+func NewDoorLock(location string, lock bool) *DoorLock {
+	return &DoorLock{
+		Location: location,
+		Lock:     lock,
+	}
+}
+
+// Creates a lock or unlock feature
+func (a *DoorLock) LockOrUnlock(lock bool) {
+
+	if lock == true {
+		// if the location is already locked then tell them it is already locked
+		if lock == a.Lock {
+			fmt.Printf("%s is already locked!\n", a.Location)
+
+			// else lock door at that location
+		} else {
+			a.Lock = true
+			fmt.Printf("%s is now locked!\n", a.Location)
+		}
+
+		// if lock is false
+	} else {
+
+		// if lock is already false meaning not locked then tell user it is already unlocked
+		if lock == a.Lock {
+			fmt.Printf("%s is already unlocked!\n", a.Location)
+			// else unlock it at that location
+		} else {
+			a.Lock = false
+			fmt.Printf("%s is now unlocked.\n", a.Location)
+		}
+
+	}
+}
+
+// PadLock structure
 type PadLock struct {
 	Name string
 	Pin  string
@@ -100,6 +143,7 @@ func main() {
 	motionSensor := NewMotionSensor("Motion Sensor")
 	securityAlarm := NewAlarm("Security Alarm")
 	padLock1 := NewPadlock("PadLock1", "1234")
+	frontdoor := NewDoorLock("FrontDoor", true)
 
 	// Arm the security system
 	securityAlarm.Arm()
@@ -124,5 +168,16 @@ func main() {
 
 	// pin works and should unlock
 	padLock1.Verify("1234")
-}
 
+	// should return already locked
+	frontdoor.LockOrUnlock(true)
+
+	// should unlock it
+	frontdoor.LockOrUnlock(false)
+
+	// should return already unlocked
+	frontdoor.LockOrUnlock(false)
+
+	// should lock it
+	frontdoor.LockOrUnlock(true)
+}

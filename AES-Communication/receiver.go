@@ -11,7 +11,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"strings"
 )
 
 type Block struct {
@@ -99,7 +98,7 @@ func ConfigureController() {
 		}
 
 		// Trim the newline character
-		message = []byte(strings.Trim(string(message), "*"))
+		//message = []byte(strings.Trim(string(message), "*"))
 		fmt.Println(message)
 		fmt.Println("The length after trimming is: ", len(message))
 		//fmt.Println(message)

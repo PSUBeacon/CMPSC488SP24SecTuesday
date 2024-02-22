@@ -90,7 +90,7 @@ func ConfigureController() {
 		message, _ := reader.ReadBytes('Z') // or reader.ReadString('\n')       // The controller will search until it finds a /n character in the message string
 
 		// Trim the delim character
-		message = []byte(strings.Trim(string(message), "Z"))
+		message = []byte(strings.Trim(string(message), "♄"))
 		fmt.Println(message)
 		fmt.Println("The length after trimming is: ", len(message))
 		//fmt.Println(message)

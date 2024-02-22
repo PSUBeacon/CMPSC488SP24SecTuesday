@@ -76,7 +76,8 @@ func SendMessagesToServer() {
 
 	//sender := xbee.NewSender(port)
 	// Configure XBee module as a client
-	sendmessage := append(encryptedBlock, '*')
+	sendmessage := encryptedBlock
+	//sendmessage := append(encryptedBlock, '*')
 	for {
 		// Send a message to the server
 		fmt.Println(len(sendmessage))

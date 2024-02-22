@@ -11,8 +11,6 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
-	"github.com/joho/godotenv"
-	"golang.org/x/crypto/bcrypt"
 )
 
 func main() {
@@ -80,54 +78,48 @@ func getJwtKey() string {
 var jwtKey = []byte(getJwtKey())
 
 func loginHandler(c *gin.Context) {
-	//  authentication logic goes here
-	// if authentication is successful, create a JWT token.
-
-	// load .env file which is in gitignore
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
-	tmpUsername := os.Getenv("TMP_USERNAME")      // get this from .env file
-	tmpPasswordHash := os.Getenv("TMP_PASS_HASH") // get this from .env file
-
-	fmt.Printf("tmpUsername: %s\n", tmpUsername)
-	fmt.Printf("tmpPasswordHash: %s\n", tmpPasswordHash)
-
-	fmt.Printf("tmpUsername: %s\n", tmpUsername)
-	fmt.Printf("tmpPasswordHash: %s\n", tmpPasswordHash)
-
 	var loginData struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
 	}
 
-	// BindJSON will return an error if the JSON is invalid
 	if err := c.BindJSON(&loginData); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON"})
 		return
 	}
 
-	if loginData.Username != tmpUsername {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
+	// Connect to MongoDB
+	client, err := dal.ConnectToMongoDB()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to MongoDB"})
+		return
+	}
+	defer client.Disconnect(context.Background())
+
+	// Fetch user by username from MongoDB
+	fetchedUser, err := dal.FetchUser(client, "name", loginData.Username)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username (not found in DB"})
 		return
 	}
 
-	// CompareHashAndPassword will return an error if the password does not match the hash
-	if err := bcrypt.CompareHashAndPassword([]byte(tmpPasswordHash), []byte(loginData.Password)); err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
+	// Compare the password hash using bcrypt.CompareHashAndPassword
+	//err = bcrypt.CompareHashAndPassword([]byte(fetchedUser.Password), []byte(loginData.Password))
+	//if err != nil {
+	if fetchedUser.Password != loginData.Password {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid  password"})
 		return
 	}
 
-	// jwt token creation:
+	// JWT token creation
 	claims := jwt.MapClaims{
-		"username": loginData.Username,                    // replace with matching value from mongoDB users table
-		"role":     "admin",                               // temporary role
-		"exp":      time.Now().Add(time.Hour * 24).Unix(), // token expiration time
+		"username": fetchedUser.Name,
+		"role":     "admin",                               // Replace with the actual role from MongoDB
+		"exp":      time.Now().Add(time.Hour * 24).Unix(), // Token expiration time
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(jwtKey)
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return

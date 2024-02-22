@@ -7,18 +7,22 @@ import (
 // HVAC represents an HVAC system with temperature control, fan speed, and mode.
 type HVAC struct {
 	Name        string
-	Temperature int    // Desired temperature in Celsius
-	FanSpeed    int    // Fan speed (0-100%)
+	Temperature int // Desired temperature in Celsius
+	FanSpeed    int // Fan speed (0-100%)
+	Humidity    int
 	Mode        string // HVAC mode (e.g., "Cool", "Heat", "Fan", "Off")
+	Zone        int
 }
 
 // NewHVAC creates a new HVAC instance with the given name and initial settings.
 func NewHVAC(name string) *HVAC {
 	return &HVAC{
 		Name:        name,
-		Temperature: 25,    // Initial temperature setting
+		Temperature: 25, // Initial temperature setting
+		Humidity:    80,
 		FanSpeed:    50,    // Initial fan speed setting (50%)
 		Mode:        "Off", // Initial mode is Off
+		Zone:        1,
 	}
 }
 
@@ -45,16 +49,12 @@ func (h *HVAC) SetMode(mode string) {
 	fmt.Printf("%s mode is set to %s\n", h.Name, h.Mode)
 }
 
-func main() {
-	// Create a new HVAC system
-	livingRoomHVAC := NewHVAC("Living Room HVAC")
-
-	// Use the HVAC system
-	livingRoomHVAC.SetMode("Cool")
-	livingRoomHVAC.SetTemperature(22)
-	livingRoomHVAC.SetFanSpeed(75)
-
-	// Display the current settings
-	fmt.Printf("Current %s settings: Mode: %s, Temperature: %d°C, Fan Speed: %d%%\n",
-		livingRoomHVAC.Name, livingRoomHVAC.Mode, livingRoomHVAC.Temperature, livingRoomHVAC.FanSpeed)
+func (h *HVAC) SetHumidity(humidity int) {
+	if humidity < 0 {
+		humidity = 0 // Ensure humidity is not set below 0%
+	} else if humidity > 100 {
+		humidity = 100 // Ensure humidity does not exceed 100%
+	}
+	h.Humidity = humidity
+	fmt.Printf("%s humidity is set to %d%%\n", h.Name, h.Humidity)
 }

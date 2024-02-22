@@ -110,7 +110,7 @@ func ConfigureController() {
 		err = godotenv.Load()
 		AesKey := os.Getenv("AES_KEY") //This key is for testing, will be switched later
 		//Decrypt the message.
-		decryptedText, err := decryptAES([]byte(AesKey), []byte(message))
+		decryptedText, err := decryptAES([]byte(AesKey), message)
 		//decryptedText := message
 
 		if err != nil {

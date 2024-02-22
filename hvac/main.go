@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 )
 
@@ -19,7 +20,7 @@ type HVAC struct {
 // NewHVAC creates a new HVAC instance with the given name and initial settings.
 func NewHVAC(name string) *HVAC {
 	return &HVAC{
-		Name:              "Humidity Sensor",
+		Name:              name,
 		Temperature:       25, // Initial temperature setting
 		Humidity:          80,
 		FanSpeed:          "Low", // Initial fan speed setting (50%)
@@ -39,10 +40,10 @@ func (h *HVAC) SetTemperature(temperature int) {
 // SetFanSpeed sets the fan speed for the HVAC system.
 func (h *HVAC) SetFanSpeed(speed string) {
 	h.FanSpeed = speed
-	fmt.Printf("%s fan speed is set to %d%%\n", h.Name, h.FanSpeed)
+	fmt.Printf("%s fan speed is set to %s%%\n", h.Name, h.FanSpeed)
 }
 
-// SetMode sets the status (e.g., "Cool", "Heat", "Fan", "Off") for the HVAC system.
+// SetStatus sets the status (e.g., "Cool", "Heat", "Fan", "Off") for the HVAC system.
 func (h *HVAC) SetStatus(status string) {
 	h.Status = status
 	fmt.Printf("%s mode is set to %s\n", h.Name, h.Status)
@@ -56,4 +57,24 @@ func (h *HVAC) SetHumidity(humidity int) {
 	}
 	h.Humidity = humidity
 	fmt.Printf("%s humidity is set to %d%%\n", h.Name, h.Humidity)
+}
+func main() {
+	// Create a new HVAC instance
+	hvac := NewHVAC("My HVAC")
+
+	// Optional: Modify the HVAC instance as needed
+	hvac.SetTemperature(22)
+	hvac.SetFanSpeed("Medium")
+	hvac.SetStatus("Cool")
+	hvac.SetHumidity(45)
+
+	// Serialize the HVAC instance to JSON
+	jsonData, err := json.Marshal(hvac)
+	if err != nil {
+		fmt.Println("Error serializing HVAC to JSON:", err)
+		return
+	}
+
+	// Print the serialized JSON string
+	fmt.Println(string(jsonData))
 }

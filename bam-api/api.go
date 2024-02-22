@@ -95,6 +95,9 @@ func loginHandler(c *gin.Context) {
 	fmt.Printf("tmpUsername: %s\n", tmpUsername)
 	fmt.Printf("tmpPasswordHash: %s\n", tmpPasswordHash)
 
+	fmt.Printf("tmpUsername: %s\n", tmpUsername)
+	fmt.Printf("tmpPasswordHash: %s\n", tmpPasswordHash)
+
 	var loginData struct {
 		Username string `json:"username"`
 		Password string `json:"password"`

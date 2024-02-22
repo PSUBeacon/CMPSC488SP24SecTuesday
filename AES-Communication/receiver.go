@@ -11,7 +11,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"strings"
 )
 
 type Block struct {
@@ -23,7 +22,7 @@ type Block struct {
 }
 
 func decryptAES(key, ciphertext []byte) ([]byte, error) {
-	ciphertext = []byte(strings.Trim(string(ciphertext), "*"))
+	//ciphertext = []byte(strings.Trim(string(ciphertext), "*"))
 	block, err := aes.NewCipher(key)
 
 	if err != nil {

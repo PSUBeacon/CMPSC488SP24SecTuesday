@@ -1,4 +1,4 @@
-package main
+package dal
 
 //go get go.mongodb.org/mongo-driver/mongo
 

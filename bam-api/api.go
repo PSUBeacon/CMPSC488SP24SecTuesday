@@ -1,16 +1,16 @@
 package main
 
 import (
+	"CMPSC488SP24SecTuesday/dal"
 	"fmt"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt"
 	"log"
 	"net/http"
 	"os"
 	"strings"
 	"time"
-
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt"
 )
 
 func main() {

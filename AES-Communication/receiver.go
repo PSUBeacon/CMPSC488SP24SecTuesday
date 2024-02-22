@@ -4,9 +4,12 @@ import (
 	"bufio"
 	"crypto/aes"
 	"crypto/cipher"
+	"encoding/json"
 	"fmt"
+	"github.com/joho/godotenv"
 	"go.bug.st/serial"
 	"log"
+	"os"
 )
 
 type Block struct {
@@ -60,7 +63,7 @@ func decryptAES(key, ciphertext []byte) ([]byte, error) {
 
 func ConfigureController() {
 	// Open the XBee module for communication
-	//var block []Block
+	var block []Block
 	mode := &serial.Mode{
 		BaudRate: 9600,
 	}
@@ -103,30 +106,30 @@ func ConfigureController() {
 			fmt.Println(message)
 			fmt.Println("The length after trimming is: ", len(message))
 			//fmt.Println(message)
+		*/
+		err = godotenv.Load()
+		AesKey := os.Getenv("AES_KEY") //This key is for testing, will be switched later
+		//Decrypt the message.
+		decryptedText, err := decryptAES([]byte(AesKey), []byte(message))
+		//decryptedText := message
 
-			err = godotenv.Load()
-			AesKey := os.Getenv("AES_KEY") //This key is for testing, will be switched later
-			//Decrypt the message.
-			decryptedText, err := decryptAES([]byte(AesKey), []byte(message))
-			//decryptedText := message
+		if err != nil {
+			fmt.Println("Error decrypting:", err)
+			return
+		}
+		fmt.Printf("Decrypted text: %s\n", decryptedText)
 
-			if err != nil {
-				fmt.Println("Error decrypting:", err)
-				return
-			}
-			fmt.Printf("Decrypted text: %s\n", decryptedText)
+		tojson := json.Unmarshal(decryptedText, &block)
+		if tojson != nil {
 
-			tojson := json.Unmarshal(decryptedText, &block)
-			if tojson != nil {
-
-				// if error is not nil
-				// print error
-				fmt.Println(tojson)
-			}
-			//fmt.Println(tojson)
-			for i := range block {
-				fmt.Println(string(rune(block[i].Index)) + " - " + block[i].Timestamp + " - " + block[i].Data + " - " + block[i].PrevHash + " - " + block[i].Hash)
-			}*/
+			// if error is not nil
+			// print error
+			fmt.Println(tojson)
+		}
+		//fmt.Println(tojson)
+		for i := range block {
+			fmt.Println(string(rune(block[i].Index)) + " - " + block[i].Timestamp + " - " + block[i].Data + " - " + block[i].PrevHash + " - " + block[i].Hash)
+		}
 	}
 }
 

@@ -6,7 +6,7 @@ import (
 	"fmt"
 )
 
-func decryptAES(key, ciphertext []byte) ([]byte, error) {
+func decryptionAES(key, ciphertext []byte) ([]byte, error) {
 	//ciphertext = []byte(strings.Trim(string(ciphertext), "*"))
 	block, err := aes.NewCipher(key)
 

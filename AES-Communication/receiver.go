@@ -10,6 +10,7 @@ import (
 	"go.bug.st/serial"
 	"log"
 	"os"
+	"strings"
 )
 
 type Block struct {
@@ -88,8 +89,8 @@ func ConfigureController() {
 		// For example, reading until a newline character (adjust as needed)
 		message, _ := reader.ReadBytes('Z') // or reader.ReadString('\n')       // The controller will search until it finds a /n character in the message string
 
-		// Trim the newline character
-		//message = []byte(strings.Trim(string(message), "*"))
+		// Trim the delim character
+		message = []byte(strings.Trim(string(message), "Z"))
 		fmt.Println(message)
 		fmt.Println("The length after trimming is: ", len(message))
 		//fmt.Println(message)

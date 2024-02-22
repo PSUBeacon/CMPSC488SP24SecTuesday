@@ -80,6 +80,7 @@ func SendMessagesToServer() {
 	// Append the UTF-8 encoding of '♄' to the encrypted block
 	delimiter := []byte{0xE2, 0x99, 0xB4}
 	sendmessage := append(encryptedBlock, delimiter...)
+	//messages.append(sendmessage)
 
 	for {
 		// Send a message to the server
@@ -90,8 +91,10 @@ func SendMessagesToServer() {
 			log.Println("Error sending message:", err)
 		}
 		time.Sleep(5 * time.Second) // Send message every 5 seconds
+		break
 	}
 }
+
 func main() {
 
 	SendMessagesToServer()

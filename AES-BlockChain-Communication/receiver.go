@@ -68,6 +68,7 @@ func decryptAES(key, ciphertext []byte) ([]byte, error) {
 func blockReceiver() {
 	// Open the XBee module for communication
 	var chain Blockchain
+	var block Block
 	mode := &serial.Mode{
 		BaudRate: 9600,
 	}
@@ -116,18 +117,26 @@ func blockReceiver() {
 		}
 		fmt.Printf("Decrypted text: %s\n", decryptedText)
 
-		tojson := json.Unmarshal(decryptedText, &chain)
-		if tojson != nil {
+		if len(chain.Chain) == 0 {
+			chainTojson := json.Unmarshal(decryptedText, &chain)
+			if chainTojson != nil {
+				// if error is not nil
+				fmt.Println(chainTojson)
+			}
+		}
 
-			// if error is not nil
-			// print error
-			fmt.Println(tojson)
+		if len(chain.Chain) > 0 {
+			blockTojson := json.Unmarshal(decryptedText, &block)
+			if blockTojson != nil {
+				fmt.Println(blockTojson)
+			}
+			chain.Chain = append(chain.Chain, block)
 		}
 
 		fmt.Println(chain)
-		//for i := range chain {
-		//	fmt.Println(string(rune(block[i].Index)) + " - " + block[i].Timestamp + " - " + block[i].Data + " - " + block[i].PrevHash + " - " + block[i].Hash)
-		//}
+		for i := range chain.Chain {
+			fmt.Println(string(rune(chain.Chain[i].Index)) + " - " + chain.Chain[i].Timestamp + " - " + chain.Chain[i].Data + " - " + chain.Chain[i].PrevHash + " - " + chain.Chain[i].Hash)
+		}
 	}
 }
 

@@ -1,0 +1,54 @@
+name: Build Go Binary for Raspberry Pi 3,4
+
+on:
+  push:
+    branches:
+      - main
+      - middleware-be
+      - security
+      - network-traffic-analysis
+      - iot-be
+      - front-end
+  pull_request:
+    branches:
+      - main
+      - middleware-be
+      - security
+      - network-traffic-analysis
+      - iot-be
+      - front-end
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-linux-gnueabihf libc6-armhf-cross libc6-dev-armhf-cross
+
+      - name: Get shortened Git commit hash
+        run: echo ::set-output name=commit_hash::$(git rev-parse --short HEAD)
+
+      - name: Build for Raspberry Pi 3
+        run: env GOOS=linux GOARCH=arm GOARM=7 go build -o ${{ github.ref_slug }}_pi3_${{ steps.get_commit_hash.outputs.commit_hash }}
+
+      - name: Build for Raspberry Pi 4
+        run: env GOOS=linux GOARCH=arm64 go build -o ${{ github.ref_slug }}_pi4_${{ steps.get_commit_hash.outputs.commit_hash }}
+
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: myapp_artifacts
+          path: |
+            ${{ github.ref_slug }}_pi3_${{ steps.get_commit_hash.outputs.commit_hash }}
+            ${{ github.ref_slug }}_pi4_${{ steps.get_commit_hash.outputs.commit_hash }}

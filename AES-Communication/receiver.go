@@ -20,6 +20,10 @@ type Block struct {
 	Hash      string
 }
 
+type Blockchain struct {
+	Chain []Block
+}
+
 func decryptAES(key, ciphertext []byte) ([]byte, error) {
 	//ciphertext = []byte(strings.Trim(string(ciphertext), "*"))
 	block, err := aes.NewCipher(key)
@@ -63,7 +67,7 @@ func decryptAES(key, ciphertext []byte) ([]byte, error) {
 
 func ConfigureController() {
 	// Open the XBee module for communication
-	var block []Block
+	var chain Blockchain
 	mode := &serial.Mode{
 		BaudRate: 9600,
 	}
@@ -99,14 +103,7 @@ func ConfigureController() {
 			}
 			message = append(message, b)
 		}
-		//fmt.Println(message)
-		// Trim the delim character
-		//message = []byte(strings.Trim(string(message), "♄"))
-		/*
-			fmt.Println(message)
-			fmt.Println("The length after trimming is: ", len(message))
-			//fmt.Println(message)
-		*/
+
 		err = godotenv.Load()
 		AesKey := os.Getenv("AES_KEY") //This key is for testing, will be switched later
 		//Decrypt the message.
@@ -119,7 +116,7 @@ func ConfigureController() {
 		}
 		fmt.Printf("Decrypted text: %s\n", decryptedText)
 
-		tojson := json.Unmarshal(decryptedText, &block)
+		tojson := json.Unmarshal(decryptedText, &chain)
 		if tojson != nil {
 
 			// if error is not nil
@@ -127,9 +124,9 @@ func ConfigureController() {
 			fmt.Println(tojson)
 		}
 		//fmt.Println(tojson)
-		for i := range block {
-			fmt.Println(string(rune(block[i].Index)) + " - " + block[i].Timestamp + " - " + block[i].Data + " - " + block[i].PrevHash + " - " + block[i].Hash)
-		}
+		//for i := range chain {
+		//	fmt.Println(string(rune(block[i].Index)) + " - " + block[i].Timestamp + " - " + block[i].Data + " - " + block[i].PrevHash + " - " + block[i].Hash)
+		//}
 	}
 }
 

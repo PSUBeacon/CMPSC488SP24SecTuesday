@@ -80,7 +80,8 @@ func ConfigureController() {
 	}(port) // Ensure the port is closed when the function returns
 
 	// Wrap the port in a bufio.Reader
-	reader := bufio.NewReader(port)
+	const bufferSize = 10000 // Adjust this value as needed
+	reader := bufio.NewReaderSize(port, bufferSize)
 
 	fmt.Println("Waiting for incoming messages...")
 	for {

@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/json"
@@ -24,7 +23,9 @@ type Block struct {
 }
 
 func decryptAES(key, ciphertext []byte) ([]byte, error) {
+	ciphertext = []byte(strings.Trim(string(ciphertext), "*"))
 	block, err := aes.NewCipher(key)
+
 	if err != nil {
 		return nil, err
 	}
@@ -97,14 +98,13 @@ func ConfigureController() {
 		}
 
 		// Trim the newline character
-		message = bytes.TrimRight(message, "\n")
+		//message = []byte(strings.Trim(string(message), "*"))
 
 		fmt.Println("The length after trimming is: ", len(message))
 		//fmt.Println(message)
 
 		err = godotenv.Load()
 		AesKey := os.Getenv("AES_KEY") //This key is for testing, will be switched later
-		message = []byte(strings.Trim(string(message), "*"))
 		//Decrypt the message.
 		decryptedText, err := decryptAES([]byte(AesKey), message)
 		//decryptedText := message

@@ -103,39 +103,39 @@ func blockReceiver() {
 				break
 			}
 			message = append(message, b)
+		}
 
-			err = godotenv.Load()
-			AesKey := os.Getenv("AES_KEY") //This key is for testing, will be switched later
-			//Decrypt the message.
-			decryptedText, err := decryptAES([]byte(AesKey), message)
-			//decryptedText := message
+		err = godotenv.Load()
+		AesKey := os.Getenv("AES_KEY") //This key is for testing, will be switched later
+		//Decrypt the message.
+		decryptedText, err := decryptAES([]byte(AesKey), message)
+		//decryptedText := message
 
-			if err != nil {
-				fmt.Println("Error decrypting:", err)
-				return
+		if err != nil {
+			fmt.Println("Error decrypting:", err)
+			return
+		}
+		fmt.Printf("Decrypted text: %s\n", decryptedText)
+
+		if len(chain.Chain) == 0 {
+			chainTojson := json.Unmarshal(decryptedText, &chain)
+			if chainTojson != nil {
+				// if error is not nil
+				fmt.Println(chainTojson)
 			}
-			fmt.Printf("Decrypted text: %s\n", decryptedText)
+		}
 
-			if len(chain.Chain) == 0 {
-				chainTojson := json.Unmarshal(decryptedText, &chain)
-				if chainTojson != nil {
-					// if error is not nil
-					fmt.Println(chainTojson)
-				}
+		if len(chain.Chain) > 0 {
+			blockTojson := json.Unmarshal(decryptedText, &block)
+			if blockTojson != nil {
+				fmt.Println(blockTojson)
 			}
+			chain.Chain = append(chain.Chain, block)
+		}
 
-			if len(chain.Chain) > 0 {
-				blockTojson := json.Unmarshal(decryptedText, &block)
-				if blockTojson != nil {
-					fmt.Println(blockTojson)
-				}
-				chain.Chain = append(chain.Chain, block)
-			}
-
-			fmt.Println(chain)
-			for i := range chain.Chain {
-				fmt.Println(string(rune(chain.Chain[i].Index)) + " - " + chain.Chain[i].Timestamp + " - " + chain.Chain[i].Data + " - " + chain.Chain[i].PrevHash + " - " + chain.Chain[i].Hash)
-			}
+		fmt.Println(chain)
+		for i := range chain.Chain {
+			fmt.Println(string(rune(chain.Chain[i].Index)) + " - " + chain.Chain[i].Timestamp + " - " + chain.Chain[i].Data + " - " + chain.Chain[i].PrevHash + " - " + chain.Chain[i].Hash)
 		}
 	}
 }

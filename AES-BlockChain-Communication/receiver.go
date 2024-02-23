@@ -132,11 +132,22 @@ func blockReceiver() {
 			}
 			chain.Chain = append(chain.Chain, block)
 		}
-
-		fmt.Println(chain)
-		for i := range chain.Chain {
-			fmt.Println(string(rune(chain.Chain[i].Index)) + " - " + chain.Chain[i].Timestamp + " - " + chain.Chain[i].Data + " - " + chain.Chain[i].PrevHash + " - " + chain.Chain[i].Hash)
+		// Marshal the chain struct to JSON
+		toJsonFile, err := json.MarshalIndent(chain, "", "    ")
+		if err != nil {
+			panic(err)
 		}
+
+		// Write the JSON data to a file
+		err = os.WriteFile("chain.json", toJsonFile, 0644)
+		if err != nil {
+			panic(err)
+		}
+
+		//fmt.Println(chain)
+		//for i := range chain.Chain {
+		//	fmt.Println(string(rune(chain.Chain[i].Index)) + " - " + chain.Chain[i].Timestamp + " - " + chain.Chain[i].Data + " - " + chain.Chain[i].PrevHash + " - " + chain.Chain[i].Hash)
+		//}
 	}
 }
 

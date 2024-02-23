@@ -122,6 +122,7 @@ func blockReceiver() {
 			if chainTojson != nil {
 				// if error is not nil
 				fmt.Println(chainTojson)
+				verifyBlock()
 			}
 		}
 
@@ -154,7 +155,7 @@ func blockReceiver() {
 		if err != nil {
 			panic(err)
 		}
-
+		fmt.Println("This is the current block: ", readBlockchain.Chain)
 		// Print the data
 		fmt.Printf("%+v\n", readBlockchain)
 
@@ -163,6 +164,33 @@ func blockReceiver() {
 		//	fmt.Println(string(rune(chain.Chain[i].Index)) + " - " + chain.Chain[i].Timestamp + " - " + chain.Chain[i].Data + " - " + chain.Chain[i].PrevHash + " - " + chain.Chain[i].Hash)
 		//}
 	}
+}
+
+func verifyBlock() {
+	// Read the JSON file
+	jsonChainData, err := os.ReadFile("chain.json")
+	if err != nil {
+		panic(err)
+	}
+
+	var readBlockchain Blockchain
+	err = json.Unmarshal(jsonChainData, &readBlockchain)
+	if err != nil {
+		panic(err)
+	}
+
+	// Verify the hashes
+	for i := 1; i < len(readBlockchain.Chain); i++ {
+		currentBlock := readBlockchain.Chain[i]
+		previousBlock := readBlockchain.Chain[i-1]
+
+		if currentBlock.PrevHash != previousBlock.Hash {
+			fmt.Printf("Block %d has an invalid previous hash\n", currentBlock.Index)
+			return
+		}
+	}
+
+	fmt.Println("All blocks have valid previous hashes")
 }
 
 func main() {

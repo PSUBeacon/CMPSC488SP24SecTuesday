@@ -143,7 +143,20 @@ func blockReceiver() {
 		if err != nil {
 			panic(err)
 		}
+		// Read the JSON file
+		toJsonFile, err = os.ReadFile("blockchain.json")
+		if err != nil {
+			panic(err)
+		}
 
+		var readBlockchain Blockchain
+		err = json.Unmarshal(toJsonFile, &readBlockchain)
+		if err != nil {
+			panic(err)
+		}
+
+		// Print the data
+		fmt.Printf("%+v\n", readBlockchain)
 		//fmt.Println(chain)
 		//for i := range chain.Chain {
 		//	fmt.Println(string(rune(chain.Chain[i].Index)) + " - " + chain.Chain[i].Timestamp + " - " + chain.Chain[i].Data + " - " + chain.Chain[i].PrevHash + " - " + chain.Chain[i].Hash)

@@ -13,15 +13,15 @@ import (
 )
 
 type Block struct {
-	Index     int    `json:"index"`
-	Timestamp string `json:"timestamp"`
-	Data      string `json:"data"`
-	PrevHash  string `json:"prevHash"`
-	Hash      string `json:"hash"`
+	Index     int
+	Timestamp string
+	Data      string
+	PrevHash  string
+	Hash      string
 }
 
 type Blockchain struct {
-	Chain []Block `json:"chain"`
+	Chain []Block
 }
 
 func decryptAES(key, ciphertext []byte) ([]byte, error) {
@@ -36,12 +36,8 @@ func decryptAES(key, ciphertext []byte) ([]byte, error) {
 		return nil, fmt.Errorf("ciphertext too short")
 	}
 
-	//fmt.Printf("Ciphertext length (including IV): %d\n", len(ciphertext))
-
 	iv := ciphertext[:aes.BlockSize]
 	ciphertext = ciphertext[aes.BlockSize:]
-
-	//fmt.Printf("Ciphertext length (excluding IV): %d\n", len(ciphertext))
 
 	if len(ciphertext)%aes.BlockSize != 0 {
 		return nil, fmt.Errorf("ciphertext is not a multiple of the block size")
@@ -105,11 +101,12 @@ func blockReceiver() {
 			message = append(message, b)
 		}
 
+		//loads file and pulls the key from there
 		err = godotenv.Load()
-		AesKey := os.Getenv("AES_KEY") //This key is for testing, will be switched later
+		AesKey := os.Getenv("AES_KEY")
+
 		//Decrypt the message.
 		decryptedText, err := decryptAES([]byte(AesKey), message)
-		//decryptedText := message
 
 		if err != nil {
 			fmt.Println("Error decrypting:", err)
@@ -117,22 +114,30 @@ func blockReceiver() {
 		}
 		fmt.Printf("Decrypted text: %s\n", decryptedText)
 
+		//checks if the incoming block is the first in the chain
 		if len(chain.Chain) == 0 {
 			chainTojson := json.Unmarshal(decryptedText, &chain)
 			if chainTojson != nil {
 				// if error is not nil
 				fmt.Println(chainTojson)
-				verifyBlock()
 			}
 		}
 
+		//Checks if the incoming block is not the first block in a chain
 		if len(chain.Chain) > 0 {
 			blockTojson := json.Unmarshal(decryptedText, &block)
 			if blockTojson != nil {
 				fmt.Println(blockTojson)
 			}
-			chain.Chain = append(chain.Chain, block)
+			verify := verifyBlockchain(block)
+			if verify == true {
+				chain.Chain = append(chain.Chain, block)
+			}
+			if verify == false {
+				fmt.Println("Invalid Block")
+			}
 		}
+
 		// Marshal the chain struct to JSON
 		jsonChainData, err := json.MarshalIndent(chain, "", "    ")
 		if err != nil {
@@ -144,29 +149,10 @@ func blockReceiver() {
 		if err != nil {
 			panic(err)
 		}
-		// Read the JSON file
-		jsonChainData, err = os.ReadFile("chain.json")
-		if err != nil {
-			panic(err)
-		}
-
-		var readBlockchain Blockchain
-		err = json.Unmarshal(jsonChainData, &readBlockchain)
-		if err != nil {
-			panic(err)
-		}
-		fmt.Println("This is the current block: ", readBlockchain.Chain)
-		// Print the data
-		fmt.Printf("%+v\n", readBlockchain)
-
-		//fmt.Println(chain)
-		//for i := range chain.Chain {
-		//	fmt.Println(string(rune(chain.Chain[i].Index)) + " - " + chain.Chain[i].Timestamp + " - " + chain.Chain[i].Data + " - " + chain.Chain[i].PrevHash + " - " + chain.Chain[i].Hash)
-		//}
 	}
 }
 
-func verifyBlock() {
+func verifyBlockchain(currentblock Block) bool {
 	// Read the JSON file
 	jsonChainData, err := os.ReadFile("chain.json")
 	if err != nil {
@@ -179,18 +165,19 @@ func verifyBlock() {
 		panic(err)
 	}
 
-	// Verify the hashes
-	for i := 1; i < len(readBlockchain.Chain); i++ {
-		currentBlock := readBlockchain.Chain[i]
-		previousBlock := readBlockchain.Chain[i-1]
+	if readBlockchain.Chain[len(readBlockchain.Chain)-1].Hash == currentblock.PrevHash {
+		// Verify the rest of the hashes
+		for i := 1; i < len(readBlockchain.Chain); i++ {
+			currBlock := readBlockchain.Chain[i]
+			prevBlock := readBlockchain.Chain[i-1]
 
-		if currentBlock.PrevHash != previousBlock.Hash {
-			fmt.Printf("Block %d has an invalid previous hash\n", currentBlock.Index)
-			return
+			if currBlock.PrevHash != prevBlock.Hash { //invalid hash
+				return false
+			}
 		}
 	}
-
-	fmt.Println("All blocks have valid previous hashes")
+	fmt.Println("block and chain is valid")
+	return true
 }
 
 func main() {

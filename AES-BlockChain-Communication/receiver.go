@@ -114,8 +114,19 @@ func blockReceiver() {
 		}
 		fmt.Printf("Decrypted text: %s\n", decryptedText)
 
+		jsonChainData, err := os.ReadFile("chain.json")
+		if err != nil {
+			panic(err)
+		}
+
+		var readBlockchain Blockchain
+		err = json.Unmarshal(jsonChainData, &readBlockchain)
+		if err != nil {
+			panic(err)
+		}
+
 		//checks if the incoming block is the first in the chain
-		if len(chain.Chain) == 0 {
+		if len(readBlockchain.Chain) == 0 {
 			chainTojson := json.Unmarshal(decryptedText, &chain)
 			if chainTojson != nil {
 				// if error is not nil
@@ -124,7 +135,7 @@ func blockReceiver() {
 		}
 
 		//Checks if the incoming block is not the first block in a chain
-		if len(chain.Chain) > 0 {
+		if len(readBlockchain.Chain) > 0 {
 			blockTojson := json.Unmarshal(decryptedText, &block)
 			if blockTojson != nil {
 				fmt.Println(blockTojson)
@@ -139,7 +150,7 @@ func blockReceiver() {
 		}
 
 		// Marshal the chain struct to JSON
-		jsonChainData, err := json.MarshalIndent(chain, "", "    ")
+		jsonChainData, err = json.MarshalIndent(chain, "", "    ")
 		if err != nil {
 			panic(err)
 		}

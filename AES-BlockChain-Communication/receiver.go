@@ -13,15 +13,15 @@ import (
 )
 
 type Block struct {
-	Index     int
-	Timestamp string
-	Data      string
-	PrevHash  string
-	Hash      string
+	Index     int    `json:"index"`
+	Timestamp string `json:"timestamp"`
+	Data      string `json:"data"`
+	PrevHash  string `json:"prevHash"`
+	Hash      string `json:"hash"`
 }
 
 type Blockchain struct {
-	Chain []Block
+	Chain []Block `json:"chain"`
 }
 
 func decryptAES(key, ciphertext []byte) ([]byte, error) {

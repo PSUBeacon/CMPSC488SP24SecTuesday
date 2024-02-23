@@ -144,7 +144,7 @@ func blockReceiver() {
 			panic(err)
 		}
 		// Read the JSON file
-		toJsonFile, err = os.ReadFile("blockchain.json")
+		toJsonFile, err = os.ReadFile("chain.json")
 		if err != nil {
 			panic(err)
 		}

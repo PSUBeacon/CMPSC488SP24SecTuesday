@@ -2,6 +2,7 @@ package main
 
 import (
 	"CMPSC488SP24SecTuesday/dal"
+	"context"
 	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"

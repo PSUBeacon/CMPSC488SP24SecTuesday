@@ -119,23 +119,28 @@ func blockReceiver() {
 			panic(err)
 		}
 
-		var readBlockchain Blockchain
-		err = json.Unmarshal(jsonChainData, &readBlockchain)
-		if err != nil {
-			panic(err)
-		}
-
-		//checks if the incoming block is the first in the chain
-		if len(readBlockchain.Chain) == 0 {
+		//Checks if there is an existing chain or if this is the start of the chain
+		if len(jsonChainData) == 0 {
 			chainTojson := json.Unmarshal(decryptedText, &chain)
 			if chainTojson != nil {
 				// if error is not nil
 				fmt.Println(chainTojson)
 			}
+			// Marshal the chain struct to JSON
+			jsonChainData, err = json.MarshalIndent(chain, "", "    ")
+			if err != nil {
+				panic(err)
+			}
+			// Write the JSON data to a file
+			err = os.WriteFile("chain.json", jsonChainData, 0644)
+			if err != nil {
+				panic(err)
+			}
+
 		}
 
 		//Checks if the incoming block is not the first block in a chain
-		if len(readBlockchain.Chain) > 0 {
+		if len(jsonChainData) > 0 {
 			blockTojson := json.Unmarshal(decryptedText, &block)
 			if blockTojson != nil {
 				fmt.Println(blockTojson)
@@ -143,23 +148,22 @@ func blockReceiver() {
 			verify := verifyBlockchain(block)
 			if verify == true {
 				chain.Chain = append(chain.Chain, block)
+				// Marshal the chain struct to JSON
+				jsonChainData, err = json.MarshalIndent(chain, "", "    ")
+				if err != nil {
+					panic(err)
+				}
+				// Write the JSON data to a file
+				err = os.WriteFile("chain.json", jsonChainData, 0644)
+				if err != nil {
+					panic(err)
+				}
 			}
 			if verify == false {
 				fmt.Println("Invalid Block")
 			}
 		}
 
-		// Marshal the chain struct to JSON
-		jsonChainData, err = json.MarshalIndent(chain, "", "    ")
-		if err != nil {
-			panic(err)
-		}
-
-		// Write the JSON data to a file
-		err = os.WriteFile("chain.json", jsonChainData, 0644)
-		if err != nil {
-			panic(err)
-		}
 	}
 }
 

@@ -57,7 +57,7 @@ func CreateBlock(data string) Block {
 }
 
 // NewBlockchain creates a new blockchain with a genesis block.
-func NewBlockchain() *Blockchain {
+func NewBlockchain() Blockchain {
 	genesisBlock := Block{
 		Index:     0,
 		Timestamp: time.Now().String(),
@@ -66,17 +66,22 @@ func NewBlockchain() *Blockchain {
 		Hash:      "",
 	}
 	genesisBlock.Hash = CalculateHash(genesisBlock)
-	return &Blockchain{Chain: []Block{genesisBlock}}
+	chain := Blockchain{
+		Chain: []Block{genesisBlock},
+	}
+
+	return chain
+
 }
 
 func main() {
 	// Create a new blockchain
-	//blockchain := NewBlockchain()
+	blockchain := NewBlockchain()
 
 	// Add some blocks to the blockchain
 	//blockchain.CreateBlock("Block 1 Data")
 	//blockchain.CreateBlock("Block 2 Data")
 	// Print the blockchain
-	//blockchainJSON, _ := json.MarshalIndent(blockchain, "", "  ")
-	//fmt.Println(string(blockchainJSON))
+	blockchainJSON, _ := json.MarshalIndent(blockchain, "", "  ")
+	fmt.Println(string(blockchainJSON))
 }

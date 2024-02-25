@@ -50,6 +50,7 @@ func broadCastMessage(messageToSend string) {
 		panic(err)
 	}
 	fmt.Println("This is the length of whats in the file: ", len(jsonChainData))
+
 	//Checks if there is an existing chain or if this is the start of the chain
 	if len(jsonChainData) == 0 {
 		chain := blockchain.NewBlockchain()

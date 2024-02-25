@@ -1,4 +1,4 @@
-package dal
+package main
 
 //go get go.mongodb.org/mongo-driver/mongo
 
@@ -6,7 +6,9 @@ import (
 	"context"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
+	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -14,10 +16,101 @@ import (
 
 // Define a struct to represent your data model
 type User struct {
-	ID       string `bson:"_id,omitempty"`
-	Name     string `bson:"name"`
-	Password string `bson:"password"`
-	Email    string `bson:"email"`
+	ID       primitive.ObjectID `bson:"_id,omitempty"`
+	Username string             `bson:"username"`
+	Password string             `bson:"password"`
+	Email    string             `bson:"email"`
+}
+
+type SecuritySystem struct {
+	ID                primitive.ObjectID `bson:"_id,omitempty"`
+	UUID              string             `bson:"UUID"`
+	Location          string             `bson:"Location"`
+	SensorType        string             `bson:"SensorType"`
+	Status            bool               `bson:"Status"`
+	EnergyConsumption int                `bson:"EnergyConsumption"`
+	LastTriggered     time.Time          `bson:"LastTriggered"`
+}
+
+type Lighting struct {
+	ID                primitive.ObjectID `bson:"_id,omitempty"`
+	UUID              string             `bson:"UUID"`
+	Location          string             `bson:"Location"`
+	Brightness        string             `bson:"Brightness"`
+	Status            bool               `bson:"Status"`
+	EnergyConsumption int                `bson:"EnergyConsumption"`
+	LastChanged       time.Time          `bson:"LastChanged"`
+}
+
+type Microwave struct {
+	ID                primitive.ObjectID `bson:"_id,omitempty"`
+	UUID              string             `bson:"UUID"`
+	Status            bool               `bson:"Status"`
+	Power             string             `bson:"Power"`
+	TimerStopTime     time.Time          `bson:"TimerStopTime"`
+	EnergyConsumption int                `bson:"EnergyConsumption"`
+	LastChanged       time.Time          `bson:"LastChanged"`
+}
+
+type Dishwasher struct {
+	ID                primitive.ObjectID `bson:"_id,omitempty"`
+	UUID              string             `bson:"UUID"`
+	Status            bool               `bson:"Status"`
+	WashTime          string             `bson:"WashTime"`
+	TimerStopTime     time.Time          `bson:"TimerStopTime"`
+	EnergyConsumption int                `bson:"EnergyConsumption"`
+	LastChanged       time.Time          `bson:"LastChanged"`
+}
+
+type Fridge struct {
+	ID                  primitive.ObjectID `bson:"_id,omitempty"`
+	UUID                string             `bson:"UUID"`
+	Status              bool               `bson:"Status"`
+	TemperatureSettings string             `bson:"TemperatureSettings"`
+	EnergyConsumption   int                `bson:"EnergyConsumption"`
+	LastChanged         time.Time          `bson:"LastChanged"`
+	EnergySaveMode      bool               `bson:"EnergySaveMode"`
+}
+
+type HVAC struct {
+	ID                primitive.ObjectID `bson:"_id,omitempty"`
+	UUID              string             `bson:"UUID"`
+	Location          string             `bson:"Location"`
+	Temperature       string             `bson:"Temperature"`
+	Humidity          string             `bson:"Humidity"`
+	FanSpeed          string             `bson:"FanSpeed"`
+	Status            bool               `bson:"Status"`
+	EnergyConsumption int                `bson:"EnergyConsumption"`
+	LastChanged       time.Time          `bson:"LastChanged"`
+}
+type Oven struct {
+	ID                  primitive.ObjectID `bson:"_id,omitempty"`
+	UUID                string             `bson:"UUID"`
+	Status              bool               `bson:"Status"`
+	TemperatureSettings string             `bson:"TemperatureSettings"`
+	TimerStopTime       time.Time          `bson:"TimerStopTime"`
+	EnergyConsumption   int                `bson:"EnergyConsumption"`
+	LastChanged         time.Time          `bson:"LastChanged"`
+}
+
+type Toaster struct {
+	ID                  primitive.ObjectID `bson:"_id,omitempty"`
+	UUID                string             `bson:"UUID"`
+	Status              bool               `bson:"Status"`
+	TemperatureSettings string             `bson:"TemperatureSettings"`
+	TimerStopTime       time.Time          `bson:"TimerStopTime"`
+	EnergyConsumption   int                `bson:"EnergyConsumption"`
+	LastChanged         time.Time          `bson:"LastChanged"`
+}
+
+type SolarPanel struct {
+	ID                   primitive.ObjectID `bson:"_id,omitempty"`
+	UUID                 string             `bson:"UUID"`
+	PanelID              string             `bson:"PanelID"`
+	Status               bool               `bson:"Status"`
+	EnergyGeneratedToday int                `bson:"EnergyGeneratedToday"`
+	PowerOutput          int                `bson:"PowerOutput"`
+	LastChanged          time.Time          `bson:"LastChanged"`
 }
 
 // MongoDB configuration
@@ -44,27 +137,11 @@ func ConnectToMongoDB() (*mongo.Client, error) {
 	return client, nil
 }
 
-// Create a new user in the MongoDB database
-func CreateUser(client *mongo.Client, user User) error {
+// DEVELOPER ONLY FUNCTION
+func deleteAllUsers(client *mongo.Client) error {
 	collection := client.Database(dbName).Collection("users")
-	_, err := collection.InsertOne(context.Background(), user)
-	return err
-}
 
-func FetchUser(client *mongo.Client, key, value string) (User, error) {
-	collection := client.Database(dbName).Collection("users")
-	filter := bson.M{key: value}
-
-	var user User
-	err := collection.FindOne(context.Background(), filter).Decode(&user)
-	return user, err
-}
-
-func deleteUser(client *mongo.Client, key, value string) error {
-	collection := client.Database(dbName).Collection("users")
-	filter := bson.M{key: value}
-
-	_, err := collection.DeleteOne(context.Background(), filter)
+	_, err := collection.DeleteMany(context.Background(), bson.M{})
 	return err
 }
 
@@ -78,7 +155,7 @@ func main() {
 
 	// Example: Creating a new user
 	newUser := User{
-		Name:     "john_doess",
+		Name:     "john_does",
 		Password: "passlel",
 		Email:    "john@example.com",
 	}
@@ -97,4 +174,6 @@ func main() {
 	}
 	fmt.Println(fetchedUser)
 	fmt.Println(fetchedUser.Name)
+
+	deleteAllUsers(client)
 }

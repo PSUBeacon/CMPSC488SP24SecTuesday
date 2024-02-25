@@ -53,6 +53,7 @@ func broadCastMessage(messageToSend string) {
 	//Checks if there is an existing chain or if this is the start of the chain
 	if len(jsonChainData) == 0 {
 		chain := blockchain.NewBlockchain()
+		fmt.Println("This is the chain: ", chain)
 		// Marshal the chain struct to JSON
 		jsonChainData, err = json.Marshal(chain)
 		if err != nil {

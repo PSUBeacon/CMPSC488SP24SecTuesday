@@ -110,17 +110,14 @@ func send(message []byte) {
 	delimiter := []byte{0xE2, 0x99, 0xB4}
 	message = append(delimiter)
 	fmt.Println(message)
-	for {
-		// Send a message to the server
-		fmt.Println(len(message))
-		_, err := port.Write(message)
-		fmt.Printf("Sent \n")
-		if err != nil {
-			log.Println("Error sending message:", err)
-		}
-		//time.Sleep(5 * time.Second) // Send message every 5 seconds
-		break
+	// Send a message to the server
+	fmt.Println(len(message))
+	_, err = port.Write(message)
+	fmt.Printf("Sent \n")
+	if err != nil {
+		log.Println("Error sending message:", err)
 	}
+	//time.Sleep(5 * time.Second) // Send message every 5 seconds
 }
 
 func main() {

@@ -13,15 +13,16 @@ import (
 )
 
 type Block struct {
-	Index     int
-	Timestamp string
-	Data      string
-	PrevHash  string
-	Hash      string
+	Index     int    `json:"index"`
+	Timestamp string `json:"timestamp"`
+	Data      string `json:"data"`
+	PrevHash  string `json:"prevhash"`
+	Hash      string `json:"hash"`
 }
 
+// Blockchain is a simple blockchain structure.
 type Blockchain struct {
-	Chain []Block
+	Chain []Block `json:"chain"`
 }
 
 func decryptAES(key, ciphertext []byte) ([]byte, error) {

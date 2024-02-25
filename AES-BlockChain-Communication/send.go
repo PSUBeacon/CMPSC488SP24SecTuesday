@@ -41,31 +41,61 @@ func encryptAES(key, plaintext []byte) ([]byte, error) {
 	return ciphertext, nil
 }
 
-func SendMessagesToServer() {
+func broadCastMessage(messageToSend string) {
 	// The key should be 16, 24, or 32 bytes long for AES-128, AES-192, or AES-256, respectively.
 	err := godotenv.Load()
 	AesKey := os.Getenv("AES_KEY")
 
-	// The message to be encrypted.
-	// Create a new blockchain and add a block
-	blockMessage := blockchain.NewBlockchain()
-	//blockMessage.CreateBlock("This used block chain")
-
-	// Convert the blockchain to JSON
-	blockchainJSON, err := json.Marshal(blockMessage)
+	jsonChainData, err := os.ReadFile("chain.json")
 	if err != nil {
-		log.Fatal("Error marshalling blockchain:", err)
-	}
-	// Encrypt the blockchain JSON
-	encryptedBlock, err := encryptAES([]byte(AesKey), blockchainJSON)
-	if err != nil {
-		log.Fatal("Error encrypting block:", err)
+		panic(err)
 	}
 
+	//Checks if there is an existing chain or if this is the start of the chain
+	if len(jsonChainData) == 0 {
+		chain := blockchain.NewBlockchain()
+		// Marshal the chain struct to JSON
+		jsonChainData, err = json.Marshal(chain)
+		if err != nil {
+			panic(err)
+		}
+		// Write the JSON data to a file
+		err = os.WriteFile("chain.json", jsonChainData, 0644)
+		if err != nil {
+			panic(err)
+		}
+
+		encryptedBlockChain, err := encryptAES([]byte(AesKey), jsonChainData)
+		if err != nil {
+			log.Fatal("Error encrypting block:", err)
+		}
+
+		send(encryptedBlockChain)
+
+	}
+	if len(jsonChainData) > 0 {
+		block := blockchain.CreateBlock(messageToSend)
+		jsonBlock, err := json.Marshal(block)
+		err = os.WriteFile("chain.json", jsonBlock, 0644)
+		if err != nil {
+			panic(err)
+		}
+
+		encryptedBlock, err := encryptAES([]byte(AesKey), jsonBlock)
+		if err != nil {
+			log.Fatal("Error encrypting block:", err)
+		}
+
+		send(encryptedBlock)
+	}
+
+}
+func send(message []byte) {
 	// Open the XBee module for communication
 	mode := &serial.Mode{
 		BaudRate: 9600,
 	}
+
 	port, err := serial.Open("/dev/ttyUSB0", mode)
 	if err != nil {
 		log.Fatal("Error opening XBee module:", err)
@@ -77,15 +107,12 @@ func SendMessagesToServer() {
 		}
 	}(port)
 
-	// Append the UTF-8 encoding of '♄' to the encrypted block
 	delimiter := []byte{0xE2, 0x99, 0xB4}
-	sendmessage := append(encryptedBlock, delimiter...)
-	//messages.append(sendmessage)
-
+	message = append(delimiter)
 	for {
 		// Send a message to the server
-		fmt.Println(len(sendmessage))
-		_, err := port.Write(sendmessage)
+		fmt.Println(len(message))
+		_, err := port.Write(message)
 		fmt.Printf("Sent \n")
 		if err != nil {
 			log.Println("Error sending message:", err)
@@ -97,6 +124,6 @@ func SendMessagesToServer() {
 
 func main() {
 
-	SendMessagesToServer()
+	broadCastMessage("testing the stuff")
 
 }

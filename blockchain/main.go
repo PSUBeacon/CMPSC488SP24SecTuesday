@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"os"
 	"time"
 )
 
@@ -33,17 +34,26 @@ func CalculateHash(block Block) string {
 }
 
 // CreateBlock creates a new block in the blockchain.
-func (bc *Blockchain) CreateBlock(data string) {
-	prevBlock := bc.Chain[len(bc.Chain)-1]
+func CreateBlock(data string) Block {
+	var chain Blockchain
+	jsonChainData, err := os.ReadFile("chain.json")
+	if err != nil {
+		panic(err)
+	}
+	err = json.Unmarshal(jsonChainData, &chain)
+	if err != nil {
+		return Block{}
+	}
+
 	newBlock := Block{
-		Index:     prevBlock.Index + 1,
+		Index:     chain.Chain[len(chain.Chain)-1].Index + 1,
 		Timestamp: time.Now().String(),
 		Data:      data,
-		PrevHash:  prevBlock.Hash,
+		PrevHash:  chain.Chain[len(chain.Chain)-1].Hash,
 		Hash:      "",
 	}
 	newBlock.Hash = CalculateHash(newBlock)
-	bc.Chain = append(bc.Chain, newBlock)
+	return newBlock
 }
 
 // NewBlockchain creates a new blockchain with a genesis block.
@@ -61,12 +71,12 @@ func NewBlockchain() *Blockchain {
 
 func main() {
 	// Create a new blockchain
-	blockchain := NewBlockchain()
+	//blockchain := NewBlockchain()
 
 	// Add some blocks to the blockchain
-	blockchain.CreateBlock("Block 1 Data")
-	blockchain.CreateBlock("Block 2 Data")
+	//blockchain.CreateBlock("Block 1 Data")
+	//blockchain.CreateBlock("Block 2 Data")
 	// Print the blockchain
-	blockchainJSON, _ := json.MarshalIndent(blockchain, "", "  ")
-	fmt.Println(string(blockchainJSON))
+	//blockchainJSON, _ := json.MarshalIndent(blockchain, "", "  ")
+	//fmt.Println(string(blockchainJSON))
 }

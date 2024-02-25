@@ -64,7 +64,7 @@ func broadCastMessage(messageToSend string) {
 		if err != nil {
 			panic(err)
 		}
-
+		fmt.Println("This is the chain before encyption: ", jsonChainData)
 		encryptedBlockChain, err := encryptAES([]byte(AesKey), jsonChainData)
 		if err != nil {
 			log.Fatal("Error encrypting block:", err)
@@ -80,7 +80,7 @@ func broadCastMessage(messageToSend string) {
 		if err != nil {
 			panic(err)
 		}
-
+		fmt.Println("This is the block before encryption: ", jsonBlock)
 		encryptedBlock, err := encryptAES([]byte(AesKey), jsonBlock)
 		if err != nil {
 			log.Fatal("Error encrypting block:", err)

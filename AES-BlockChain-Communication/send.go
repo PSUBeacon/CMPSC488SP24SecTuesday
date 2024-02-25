@@ -109,6 +109,7 @@ func send(message []byte) {
 
 	delimiter := []byte{0xE2, 0x99, 0xB4}
 	message = append(delimiter)
+	fmt.Println(message)
 	for {
 		// Send a message to the server
 		fmt.Println(len(message))

@@ -65,7 +65,7 @@ func broadCastMessage(messageToSend string) {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println("This is the chain before encyption: ", jsonChainData)
+		fmt.Println("This is the chain before encyption: ", string(jsonChainData))
 		encryptedBlockChain, err := encryptAES([]byte(AesKey), jsonChainData)
 		if err != nil {
 			log.Fatal("Error encrypting block:", err)
@@ -74,22 +74,23 @@ func broadCastMessage(messageToSend string) {
 		send(encryptedBlockChain)
 
 	}
-	if len(jsonChainData) > 0 {
-		block := blockchain.CreateBlock(messageToSend)
-		jsonBlock, err := json.Marshal(block)
-		err = os.WriteFile("chain.json", jsonBlock, 0644)
-		if err != nil {
-			panic(err)
-		}
-		fmt.Println("This is the block before encryption: ", jsonBlock)
-		encryptedBlock, err := encryptAES([]byte(AesKey), jsonBlock)
-		if err != nil {
-			log.Fatal("Error encrypting block:", err)
-		}
+	/*
+		if len(jsonChainData) > 0 {
+			block := blockchain.CreateBlock(messageToSend)
+			jsonBlock, err := json.Marshal(block)
+			err = os.WriteFile("chain.json", jsonBlock, 0644)
+			if err != nil {
+				panic(err)
+			}
+			fmt.Println("This is the block before encryption: ", jsonBlock)
+			encryptedBlock, err := encryptAES([]byte(AesKey), jsonBlock)
+			if err != nil {
+				log.Fatal("Error encrypting block:", err)
+			}
 
-		send(encryptedBlock)
-	}
-
+			send(encryptedBlock)
+		}
+	*/
 }
 func send(message []byte) {
 	// Open the XBee module for communication

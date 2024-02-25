@@ -13,7 +13,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"time"
 )
 
 func encryptAES(key, plaintext []byte) ([]byte, error) {
@@ -50,7 +49,7 @@ func broadCastMessage(messageToSend string) {
 	if err != nil {
 		panic(err)
 	}
-
+	fmt.Println("This is the length of whats in the file: ", len(jsonChainData))
 	//Checks if there is an existing chain or if this is the start of the chain
 	if len(jsonChainData) == 0 {
 		chain := blockchain.NewBlockchain()
@@ -118,7 +117,7 @@ func send(message []byte) {
 		if err != nil {
 			log.Println("Error sending message:", err)
 		}
-		time.Sleep(5 * time.Second) // Send message every 5 seconds
+		//time.Sleep(5 * time.Second) // Send message every 5 seconds
 		break
 	}
 }

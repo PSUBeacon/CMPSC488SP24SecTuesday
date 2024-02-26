@@ -1,0 +1,48 @@
+use smartHomeDB
+db.IotDevices.insertMany({
+"uuid":"1357913",
+"name":"Dishwasher",
+"createdAt":new Date(),
+"updatedAt":new Date()
+},
+{"uuid":"2468024",
+"name":"Fridge",
+"createdAt": new Date(),
+"updatedAt":new Date()
+},
+{"uuid":"1223456",
+"name":"HVAC",
+"createdAt": new Date(),
+"updatedAt":new Date()
+},
+{"uuid":"1236789",
+"name":"Lighting",
+"createdAt": new Date(),
+"updatedAt":new Date()
+},
+{"uuid":"6345645",
+"name":"Microwave",
+"createdAt": new Date(),
+"updatedAt":new Date()
+},
+{"uuid":"3436842",
+"name":"Oven",
+"createdAt": new Date(),
+"updatedAt":new Date()
+},
+{"uuid":"9876543",
+"name":"SecuritySystem",
+"createdAt": new Date(),
+"updatedAt":new Date()
+},
+{"uuid":"5634892",
+"name":"SolarPanel",
+"createdAt": new Date(),
+"updatedAt":new Date()
+},
+{"uuid":"1029384",
+"name":"Toaster",
+"createdAt": new Date(),
+"updatedAt":new Date()
+},
+)

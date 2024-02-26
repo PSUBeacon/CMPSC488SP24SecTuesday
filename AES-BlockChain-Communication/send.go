@@ -42,24 +42,7 @@ func encryptAES(key, plaintext []byte) ([]byte, error) {
 
 func broadCastMessage(messageToSend []byte) {
 	// The key should be 16, 24, or 32 bytes long for AES-128, AES-192, or AES-256, respectively.
-
-	// Open the XBee module for communication
-	mode := &serial.Mode{
-		BaudRate: 9600,
-	}
-	//fmt.Println("This is in the send function", message)
-	port, err := serial.Open("/dev/ttyUSB0", mode)
-	if err != nil {
-		log.Fatal("Error opening XBee module:", err)
-	}
-	defer func(port serial.Port) {
-		err := port.Close()
-		if err != nil {
-
-		}
-	}(port)
-
-	err = godotenv.Load()
+	err := godotenv.Load()
 	AesKey := os.Getenv("AES_KEY")
 
 	jsonChainData, err := os.ReadFile("chain.json")
@@ -75,9 +58,8 @@ func broadCastMessage(messageToSend []byte) {
 		block := blockchain.CreateBlock(string(messageToSend))
 		chain.Chain = append(chain.Chain, block)
 
-		fmt.Println("This is the chain: ", chain)
 		// Marshal the chain struct to JSON
-		jsonChainData, err = json.Marshal(chain)
+		jsonChainData, err = json.MarshalIndent(chain, "", "  ")
 		if err != nil {
 			panic(err)
 		}
@@ -91,20 +73,7 @@ func broadCastMessage(messageToSend []byte) {
 		if err != nil {
 			log.Fatal("Error encrypting block:", err)
 		}
-
-		fmt.Println("This is before delim added", encryptedBlockChain)
-		delimiter := []byte{0xE2, 0x99, 0xB4}
-		encryptedBlockChain = append(encryptedBlockChain, delimiter...)
-		fmt.Println("This is after delim is added", encryptedBlockChain)
-
-		// Send a message to the server
-		fmt.Println(len(encryptedBlockChain))
-		_, err = port.Write(encryptedBlockChain)
-		fmt.Printf("Sent \n")
-		if err != nil {
-			log.Println("Error sending message:", err)
-		}
-		return
+		send(encryptedBlockChain)
 
 	}
 	/*
@@ -126,7 +95,35 @@ func broadCastMessage(messageToSend []byte) {
 		}
 	*/
 }
+func send(message []byte) {
+	// Open the XBee module for communication
+	mode := &serial.Mode{
+		BaudRate: 9600,
+	}
+	//fmt.Println("This is in the send function", message)
+	port, err := serial.Open("/dev/ttyUSB0", mode)
+	if err != nil {
+		log.Fatal("Error opening XBee module:", err)
+	}
+	defer func(port serial.Port) {
+		err := port.Close()
+		if err != nil {
 
+		}
+	}(port)
+
+	delimiter := []byte{0xE2, 0x99, 0xB4}
+	message = append(message, delimiter...)
+
+	// Send a message to the server
+	fmt.Println(len(message))
+	_, err = port.Write(message)
+	fmt.Printf("Sent \n")
+	if err != nil {
+		log.Println("Error sending message:", err)
+	}
+	return
+}
 func main() {
 
 	broadCastMessage([]byte("testing the stuff"))

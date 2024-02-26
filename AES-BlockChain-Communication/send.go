@@ -1,4 +1,4 @@
-package main
+package send
 
 import (
 	"CMPSC488SP24SecTuesday/blockchain"
@@ -40,7 +40,7 @@ func encryptAES(key, plaintext []byte) ([]byte, error) {
 	return ciphertext, nil
 }
 
-func broadCastMessage(messageToSend []byte) {
+func BroadCastMessage(messageToSend []byte) {
 	// The key should be 16, 24, or 32 bytes long for AES-128, AES-192, or AES-256, respectively.
 	err := godotenv.Load()
 	AesKey := os.Getenv("AES_KEY")
@@ -132,6 +132,6 @@ func send(message []byte) {
 }
 func main() {
 
-	broadCastMessage([]byte("testing the stuff"))
+	BroadCastMessage([]byte("testing the stuff"))
 
 }

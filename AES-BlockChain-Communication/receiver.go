@@ -1,4 +1,4 @@
-package main
+package send
 
 import (
 	"CMPSC488SP24SecTuesday/blockchain"

@@ -53,6 +53,7 @@ func CreateBlock(data string) Block {
 		PrevHash:  chain.Chain[len(chain.Chain)-1].Hash,
 		Hash:      "",
 	}
+	//testing
 	newBlock.Hash = CalculateHash(newBlock)
 	fmt.Println(newBlock)
 	return newBlock

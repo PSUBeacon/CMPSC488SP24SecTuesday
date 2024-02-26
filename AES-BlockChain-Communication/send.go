@@ -94,7 +94,7 @@ func broadCastMessage(messageToSend []byte) {
 
 		fmt.Println("This is before delim added", encryptedBlockChain)
 		delimiter := []byte{0xE2, 0x99, 0xB4}
-		encryptedBlockChain = append(delimiter)
+		encryptedBlockChain = append(encryptedBlockChain, delimiter...)
 		fmt.Println("This is after delim is added", encryptedBlockChain)
 
 		// Send a message to the server

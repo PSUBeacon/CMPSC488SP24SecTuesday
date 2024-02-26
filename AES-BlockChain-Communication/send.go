@@ -101,7 +101,7 @@ func send(message []byte) {
 	mode := &serial.Mode{
 		BaudRate: 9600,
 	}
-	fmt.Println("This is in the send function", message)
+	//fmt.Println("This is in the send function", message)
 	port, err := serial.Open("/dev/ttyUSB0", mode)
 	if err != nil {
 		log.Fatal("Error opening XBee module:", err)
@@ -112,10 +112,10 @@ func send(message []byte) {
 
 		}
 	}(port)
-
+	fmt.Println("This is before delim added")
 	delimiter := []byte{0xE2, 0x99, 0xB4}
 	message = append(delimiter)
-	fmt.Println(message)
+	fmt.Println("This is after delim is added", message)
 	// Send a message to the server
 	fmt.Println(len(message))
 	_, err = port.Write(message)

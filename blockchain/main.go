@@ -55,7 +55,7 @@ func CreateBlock(data string) Block {
 	}
 	//testing
 	newBlock.Hash = CalculateHash(newBlock)
-	fmt.Println(newBlock)
+	fmt.Println("this is in the blockchain file", newBlock)
 	return newBlock
 }
 

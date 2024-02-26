@@ -65,12 +65,6 @@ func broadCastMessage(messageToSend []byte) {
 			panic(err)
 		}
 		chainlen++
-		//fmt.Println("This is the chain before encyption: ", string(jsonChainData))
-		//encryptedBlockChain, err := encryptAES([]byte(AesKey), jsonChainData)
-		//if err != nil {
-		//log.Fatal("Error encrypting block:", err)
-		//}
-		//send(encryptedBlockChain)
 	}
 
 	if chainlen > 0 {

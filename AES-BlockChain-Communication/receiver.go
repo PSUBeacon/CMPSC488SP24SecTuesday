@@ -127,6 +127,7 @@ func blockReceiver() {
 			if err != nil {
 				panic(err)
 			}
+			return
 
 		}
 
@@ -153,6 +154,7 @@ func blockReceiver() {
 			if verify == false {
 				fmt.Println("Invalid Block")
 			}
+			return
 		}
 
 	}

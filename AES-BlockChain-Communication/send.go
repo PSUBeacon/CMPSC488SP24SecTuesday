@@ -46,14 +46,18 @@ func broadCastMessage(messageToSend string) {
 	AesKey := os.Getenv("AES_KEY")
 
 	jsonChainData, err := os.ReadFile("chain.json")
+	chainlen := len(jsonChainData)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println("This is the length of whats in the file: ", len(jsonChainData))
 
 	//Checks if there is an existing chain or if this is the start of the chain
-	if len(jsonChainData) == 0 {
+	if chainlen == 0 {
 		chain := blockchain.NewBlockchain()
+		block := blockchain.CreateBlock(messageToSend)
+		chain.Chain = append(chain.Chain, block)
+
 		fmt.Println("This is the chain: ", chain)
 		// Marshal the chain struct to JSON
 		jsonChainData, err = json.Marshal(chain)
@@ -72,25 +76,25 @@ func broadCastMessage(messageToSend string) {
 		}
 
 		send(encryptedBlockChain)
+		return
 
 	}
-	/*
-		if len(jsonChainData) > 0 {
-			block := blockchain.CreateBlock(messageToSend)
-			jsonBlock, err := json.Marshal(block)
-			err = os.WriteFile("chain.json", jsonBlock, 0644)
-			if err != nil {
-				panic(err)
-			}
-			fmt.Println("This is the block before encryption: ", jsonBlock)
-			encryptedBlock, err := encryptAES([]byte(AesKey), jsonBlock)
-			if err != nil {
-				log.Fatal("Error encrypting block:", err)
-			}
-
-			send(encryptedBlock)
+	if chainlen > 0 {
+		block := blockchain.CreateBlock(messageToSend)
+		jsonBlock, err := json.Marshal(block)
+		err = os.WriteFile("chain.json", jsonBlock, 0644)
+		if err != nil {
+			panic(err)
 		}
-	*/
+		fmt.Println("This is the block before encryption: ", jsonBlock)
+		encryptedBlock, err := encryptAES([]byte(AesKey), jsonBlock)
+		if err != nil {
+			log.Fatal("Error encrypting block:", err)
+		}
+
+		send(encryptedBlock)
+		return
+	}
 }
 func send(message []byte) {
 	// Open the XBee module for communication

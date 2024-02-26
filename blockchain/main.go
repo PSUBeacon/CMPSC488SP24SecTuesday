@@ -35,6 +35,7 @@ func CalculateHash(block Block) string {
 
 // CreateBlock creates a new block in the blockchain.
 func CreateBlock(data string) Block {
+	//Gets previous block data
 	var chain Blockchain
 	jsonChainData, err := os.ReadFile("chain.json")
 	if err != nil {

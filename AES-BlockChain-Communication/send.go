@@ -101,7 +101,7 @@ func send(message []byte) {
 	mode := &serial.Mode{
 		BaudRate: 9600,
 	}
-
+	fmt.Println("This is in the send function", message)
 	port, err := serial.Open("/dev/ttyUSB0", mode)
 	if err != nil {
 		log.Fatal("Error opening XBee module:", err)

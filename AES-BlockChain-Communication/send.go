@@ -130,8 +130,11 @@ func send(message []byte) {
 	}
 	return
 }
+
+/*
 func main() {
 
 	BroadCastMessage([]byte("testing the stuff"))
 
 }
+*/

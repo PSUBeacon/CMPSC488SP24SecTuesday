@@ -55,18 +55,7 @@ func broadCastMessage(messageToSend []byte) {
 	//Checks if there is an existing chain or if this is the start of the chain
 	if chainlen == 0 {
 		chain := blockchain.NewBlockchain()
-		// Marshal the chain struct to JSON
-		jsonChainData, err = json.MarshalIndent(chain, "", "  ")
-		if err != nil {
-			panic(err)
-		}
-		// Write the JSON data to a file
-		err = os.WriteFile("chain.json", jsonChainData, 0644)
-		if err != nil {
-			panic(err)
-		}
-
-		block := blockchain.CreateBlock(string(messageToSend))
+		block := blockchain.CreateBlock(string(messageToSend), chain)
 		jsonChainData, err = json.MarshalIndent(block, "", "  ")
 		if err != nil {
 			panic(err)

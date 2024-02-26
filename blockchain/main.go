@@ -7,7 +7,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"os"
 	"time"
 )
 
@@ -34,17 +33,8 @@ func CalculateHash(block Block) string {
 }
 
 // CreateBlock creates a new block in the blockchain.
-func CreateBlock(data string) Block {
+func CreateBlock(data string, chain Blockchain) Blockchain {
 	//Gets previous block data
-	var chain Blockchain
-	jsonChainData, err := os.ReadFile("chain.json")
-	if err != nil {
-		panic(err)
-	}
-	err = json.Unmarshal(jsonChainData, &chain)
-	if err != nil {
-		return Block{}
-	}
 
 	newBlock := Block{
 		Index:     chain.Chain[len(chain.Chain)-1].Index + 1,
@@ -56,7 +46,8 @@ func CreateBlock(data string) Block {
 	//testing
 	newBlock.Hash = CalculateHash(newBlock)
 	fmt.Println("this is in the blockchain file", newBlock)
-	return newBlock
+	chain.Chain = append(chain.Chain, newBlock)
+	return chain
 }
 
 // NewBlockchain creates a new blockchain with a genesis block.

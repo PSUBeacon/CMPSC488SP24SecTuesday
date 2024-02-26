@@ -112,7 +112,7 @@ func send(message []byte) {
 
 		}
 	}(port)
-	fmt.Println("This is before delim added")
+	fmt.Println("This is before delim added", message)
 	delimiter := []byte{0xE2, 0x99, 0xB4}
 	message = append(delimiter)
 	fmt.Println("This is after delim is added", message)

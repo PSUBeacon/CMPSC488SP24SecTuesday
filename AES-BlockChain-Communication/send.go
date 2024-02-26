@@ -55,8 +55,7 @@ func broadCastMessage(messageToSend []byte) {
 	//Checks if there is an existing chain or if this is the start of the chain
 	if chainlen == 0 {
 		chain := blockchain.NewBlockchain()
-		block := blockchain.CreateBlock(string(messageToSend), chain)
-		jsonChainData, err = json.MarshalIndent(block, "", "  ")
+		jsonChainData, err = json.MarshalIndent(chain, "", "  ")
 		if err != nil {
 			panic(err)
 		}
@@ -65,33 +64,48 @@ func broadCastMessage(messageToSend []byte) {
 		if err != nil {
 			panic(err)
 		}
+		chainlen++
+		//fmt.Println("This is the chain before encyption: ", string(jsonChainData))
+		//encryptedBlockChain, err := encryptAES([]byte(AesKey), jsonChainData)
+		//if err != nil {
+		//log.Fatal("Error encrypting block:", err)
+		//}
+		//send(encryptedBlockChain)
+	}
 
-		fmt.Println("This is the chain before encyption: ", string(jsonChainData))
-		encryptedBlockChain, err := encryptAES([]byte(AesKey), jsonChainData)
+	if chainlen > 0 {
+		var jsonChain blockchain.Blockchain
+		err := json.Unmarshal(jsonChainData, &jsonChain)
+		if err != nil {
+			log.Fatal("Error unmarshalling chain data:", err)
+		}
+
+		// Pass the hash of the last block in the chain as the prevHash for the new block
+		lastBlock := jsonChain.Chain[len(jsonChain.Chain)-1]
+		newBlock := blockchain.CreateBlock(string(messageToSend), lastBlock.Hash)
+
+		// Add the new block to the chain
+		jsonChain.Chain = append(jsonChain.Chain, newBlock)
+
+		// Marshal the entire blockchain with the new block added
+		jsonBlock, err := json.MarshalIndent(jsonChain, "", "  ")
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.WriteFile("chain.json", jsonBlock, 0644)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("This is the block before encryption: ", jsonBlock)
+		encryptedBlock, err := encryptAES([]byte(AesKey), jsonBlock)
 		if err != nil {
 			log.Fatal("Error encrypting block:", err)
 		}
-		send(encryptedBlockChain)
 
+		send(encryptedBlock)
+		return
 	}
-	/*
-		if chainlen > 0 {
-			block := blockchain.CreateBlock(messageToSend)
-			jsonBlock, err := json.Marshal(block)
-			err = os.WriteFile("chain.json", jsonBlock, 0644)
-			if err != nil {
-				panic(err)
-			}
-			fmt.Println("This is the block before encryption: ", jsonBlock)
-			encryptedBlock, err := encryptAES([]byte(AesKey), jsonBlock)
-			if err != nil {
-				log.Fatal("Error encrypting block:", err)
-			}
-
-			send(encryptedBlock)
-			return
-		}
-	*/
 }
 func send(message []byte) {
 	// Open the XBee module for communication

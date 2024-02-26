@@ -33,21 +33,20 @@ func CalculateHash(block Block) string {
 }
 
 // CreateBlock creates a new block in the blockchain.
-func CreateBlock(data string, chain Blockchain) Blockchain {
-	//Gets previous block data
-
+func CreateBlock(data string, prevHash string) Block {
 	newBlock := Block{
-		Index:     chain.Chain[len(chain.Chain)-1].Index + 1,
+		Index:     0, // This will be set to the correct index when adding to the blockchain
 		Timestamp: time.Now().String(),
 		Data:      data,
-		PrevHash:  chain.Chain[len(chain.Chain)-1].Hash,
-		Hash:      "",
+		PrevHash:  prevHash, // This is the hash of the last block in the blockchain
+		Hash:      "",       // This will be set after the block is created
 	}
-	//testing
+
+	// The hash of the new block should be calculated with all the block data including the PrevHash
 	newBlock.Hash = CalculateHash(newBlock)
-	fmt.Println("this is in the blockchain file", newBlock)
-	chain.Chain = append(chain.Chain, newBlock)
-	return chain
+
+	// Now return the new block, ready to be added to the blockchain
+	return newBlock
 }
 
 // NewBlockchain creates a new blockchain with a genesis block.

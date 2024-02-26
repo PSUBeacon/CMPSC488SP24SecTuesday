@@ -1,6 +1,8 @@
 package main
 
 import (
+	"CMPSC488SP24SecTuesday/blockchain"
+	_ "CMPSC488SP24SecTuesday/blockchain"
 	"bufio"
 	"crypto/aes"
 	"crypto/cipher"
@@ -11,19 +13,6 @@ import (
 	"log"
 	"os"
 )
-
-type Block struct {
-	Index     int    `json:"index"`
-	Timestamp string `json:"timestamp"`
-	Data      string `json:"data"`
-	PrevHash  string `json:"prevhash"`
-	Hash      string `json:"hash"`
-}
-
-// Blockchain is a simple blockchain structure.
-type Blockchain struct {
-	Chain []Block `json:"chain"`
-}
 
 func decryptAES(key, ciphertext []byte) ([]byte, error) {
 	//ciphertext = []byte(strings.Trim(string(ciphertext), "*"))
@@ -64,8 +53,8 @@ func decryptAES(key, ciphertext []byte) ([]byte, error) {
 
 func blockReceiver() {
 	// Open the XBee module for communication
-	var chain Blockchain
-	var block Block
+	var chain blockchain.Blockchain
+	var block blockchain.Block
 	mode := &serial.Mode{
 		BaudRate: 9600,
 	}
@@ -169,14 +158,14 @@ func blockReceiver() {
 	}
 }
 
-func verifyBlockchain(currentblock Block) bool {
+func verifyBlockchain(currentblock blockchain.Block) bool {
 	// Read the JSON file
 	jsonChainData, err := os.ReadFile("chain.json")
 	if err != nil {
 		panic(err)
 	}
 
-	var readBlockchain Blockchain
+	var readBlockchain blockchain.Blockchain
 	err = json.Unmarshal(jsonChainData, &readBlockchain)
 	if err != nil {
 		panic(err)

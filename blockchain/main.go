@@ -54,6 +54,7 @@ func CreateBlock(data string) Block {
 		Hash:      "",
 	}
 	newBlock.Hash = CalculateHash(newBlock)
+	fmt.Println(newBlock)
 	return newBlock
 }
 

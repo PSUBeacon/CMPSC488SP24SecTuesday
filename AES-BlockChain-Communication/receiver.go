@@ -85,7 +85,7 @@ func blockReceiver() {
 			}
 			// Check for the UTF-8 encoding of '♄' the hex value is (E2 99 B4)
 			if len(message) >= 2 && message[len(message)-2] == 0xE2 && message[len(message)-1] == 0x99 && b == 0xB4 {
-				fmt.Println(message)
+				//fmt.Println(message)
 				message = message[:len(message)-2] // Remove the delimiter from the message
 				break
 			}

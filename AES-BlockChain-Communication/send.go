@@ -35,7 +35,7 @@ func encryptAES(key, plaintext []byte) ([]byte, error) {
 	mode := cipher.NewCBCEncrypter(block, iv)
 	mode.CryptBlocks(ciphertext[aes.BlockSize:], plaintext)
 
-	fmt.Printf("Ciphertext length after encryption: %d\n", len(ciphertext))
+	//fmt.Printf("Ciphertext length after encryption: %d\n", len(ciphertext))
 
 	return ciphertext, nil
 }
@@ -91,7 +91,7 @@ func broadCastMessage(messageToSend []byte) {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println("This is the block before encryption: ", jsonBlock)
+		//fmt.Println("This is the block before encryption: ", jsonBlock)
 		encryptedBlock, err := encryptAES([]byte(AesKey), jsonBlock)
 		if err != nil {
 			log.Fatal("Error encrypting block:", err)

@@ -1,4 +1,4 @@
-package send
+package main
 
 import (
 	"CMPSC488SP24SecTuesday/blockchain"
@@ -130,11 +130,9 @@ func send(message []byte) {
 	}
 	return
 }
-
-/*
 func main() {
 
 	BroadCastMessage([]byte("testing the stuff"))
+	BroadCastMessage([]byte("this is another one"))
 
 }
-*/

@@ -33,9 +33,9 @@ func CalculateHash(block Block) string {
 }
 
 // CreateBlock creates a new block in the blockchain.
-func CreateBlock(data string, prevHash string) Block {
+func CreateBlock(data string, prevHash string, index int) Block {
 	newBlock := Block{
-		Index:     0, // This will be set to the correct index when adding to the blockchain
+		Index:     index, // This will be set to the correct index when adding to the blockchain
 		Timestamp: time.Now().String(),
 		Data:      data,
 		PrevHash:  prevHash, // This is the hash of the last block in the blockchain

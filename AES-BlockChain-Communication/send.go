@@ -82,7 +82,7 @@ func broadCastMessage(messageToSend []byte) {
 
 		// Pass the hash of the last block in the chain as the prevHash for the new block
 		lastBlock := jsonChain.Chain[len(jsonChain.Chain)-1]
-		newBlock := blockchain.CreateBlock(string(messageToSend), lastBlock.Hash)
+		newBlock := blockchain.CreateBlock(string(messageToSend), lastBlock.Hash, lastBlock.Index+1)
 
 		// Add the new block to the chain
 		jsonChain.Chain = append(jsonChain.Chain, newBlock)

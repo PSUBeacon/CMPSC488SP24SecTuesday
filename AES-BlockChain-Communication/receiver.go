@@ -133,7 +133,7 @@ func blockReceiver() {
 
 		//Checks if the incoming block is not the first block in a chain
 		if chainlen > 0 {
-			blockTojson := json.Unmarshal(decryptedText, &chain)
+			blockTojson := json.Unmarshal(decryptedText, &block)
 			if blockTojson != nil {
 				fmt.Println(blockTojson)
 			}

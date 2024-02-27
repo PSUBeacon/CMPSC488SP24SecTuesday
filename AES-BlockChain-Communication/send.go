@@ -82,14 +82,8 @@ func BroadCastMessage(messageToSend []byte) {
 			panic(err)
 		}
 
-		// Marshal only the new block
-		jsonBlock, err := json.MarshalIndent(firstBlock, "", "  ")
-		if err != nil {
-			panic(err)
-		}
-
 		// Encrypt and send the new block
-		encryptedBlock, err := encryptAES([]byte(AesKey), jsonBlock)
+		encryptedBlock, err := encryptAES([]byte(AesKey), updatedChain)
 		if err != nil {
 			log.Fatal("Error encrypting block:", err)
 		}

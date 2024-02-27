@@ -53,70 +53,93 @@ func decryptAES(key, ciphertext []byte) ([]byte, error) {
 
 func blockReceiver() {
 	// Open the XBee module for communication
-	for {
-		var chain blockchain.Blockchain
-		var block blockchain.Block
-		mode := &serial.Mode{
-			BaudRate: 9600,
-		}
-		port, err := serial.Open("/dev/ttyUSB0", mode)
+	var chain blockchain.Blockchain
+	var block blockchain.Block
+	mode := &serial.Mode{
+		BaudRate: 9600,
+	}
+	port, err := serial.Open("/dev/ttyUSB0", mode)
+	if err != nil {
+		log.Fatal("Error opening XBee module:", err)
+	}
+	defer func(port serial.Port) {
+		err := port.Close()
 		if err != nil {
-			log.Fatal("Error opening XBee module:", err)
+
 		}
-		defer func(port serial.Port) {
-			err := port.Close()
-			if err != nil {
+	}(port) // Ensure the port is closed when the function returns
 
-			}
-		}(port) // Ensure the port is closed when the function returns
+	// Wrap the port in a bufio.Reader
+	const bufferSize = 4096 // Adjust this value as needed
+	reader := bufio.NewReaderSize(port, bufferSize)
 
-		// Wrap the port in a bufio.Reader
-		const bufferSize = 4096 // Adjust this value as needed
-		reader := bufio.NewReaderSize(port, bufferSize)
-
-		fmt.Println("Waiting for incoming messages...")
-		// Use ReadBytes or ReadString to dynamically handle incoming data
+	fmt.Println("Waiting for incoming messages...")
+	// Use ReadBytes or ReadString to dynamically handle incoming data
+	for {
+		// Read and parse the data manually
+		var message []byte
 		for {
-			// Read and parse the data manually
-			var message []byte
-			for {
-				b, err := reader.ReadByte()
-				if err != nil {
-					log.Fatal("Error reading byte:", err)
-				}
-				// Check for the UTF-8 encoding of '♄' the hex value is (E2 99 B4)
-				if len(message) >= 2 && message[len(message)-2] == 0xE2 && message[len(message)-1] == 0x99 && b == 0xB4 {
-					//fmt.Println(message)
-					message = message[:len(message)-2] // Remove the delimiter from the message
-					break
-				}
-				message = append(message, b)
-			}
-
-			//loads file and pulls the key from there
-			err = godotenv.Load()
-			AesKey := os.Getenv("AES_KEY")
-
-			//Decrypt the message.
-			decryptedText, err := decryptAES([]byte(AesKey), message)
+			b, err := reader.ReadByte()
 			if err != nil {
-				fmt.Println("Error decrypting:", err)
-				return
+				log.Fatal("Error reading byte:", err)
 			}
-			fmt.Printf("Decrypted text: %s\n", decryptedText)
+			// Check for the UTF-8 encoding of '♄' the hex value is (E2 99 B4)
+			if len(message) >= 2 && message[len(message)-2] == 0xE2 && message[len(message)-1] == 0x99 && b == 0xB4 {
+				//fmt.Println(message)
+				message = message[:len(message)-2] // Remove the delimiter from the message
+				break
+			}
+			message = append(message, b)
+		}
 
-			jsonChainData, err := os.ReadFile("chain.json")
+		//loads file and pulls the key from there
+		err = godotenv.Load()
+		AesKey := os.Getenv("AES_KEY")
+
+		//Decrypt the message.
+		decryptedText, err := decryptAES([]byte(AesKey), message)
+		if err != nil {
+			fmt.Println("Error decrypting:", err)
+			return
+		}
+		fmt.Printf("Decrypted text: %s\n", decryptedText)
+
+		jsonChainData, err := os.ReadFile("chain.json")
+		chainlen := len(jsonChainData)
+		if err != nil {
+			panic(err)
+		}
+
+		//Checks if there is an existing chain or if this is the start of the chain
+		if chainlen == 0 {
+			chainTojson := json.Unmarshal(decryptedText, &chain)
+			if chainTojson != nil {
+				// if error is not nil
+				fmt.Println(chainTojson)
+			}
+			// Marshal the chain struct to JSON
+			jsonChainData, err = json.MarshalIndent(chain, "", "    ")
 			if err != nil {
 				panic(err)
 			}
+			// Write the JSON data to a file
+			err = os.WriteFile("chain.json", jsonChainData, 0644)
+			if err != nil {
+				panic(err)
+			}
+			continue
 
-			//Checks if there is an existing chain or if this is the start of the chain
-			if len(jsonChainData) == 0 {
-				chainTojson := json.Unmarshal(decryptedText, &chain)
-				if chainTojson != nil {
-					// if error is not nil
-					fmt.Println(chainTojson)
-				}
+		}
+
+		//Checks if the incoming block is not the first block in a chain
+		if chainlen > 0 {
+			blockTojson := json.Unmarshal(decryptedText, &block)
+			if blockTojson != nil {
+				fmt.Println(blockTojson)
+			}
+			verify := verifyBlockchain(block)
+			if verify == true {
+				chain.Chain = append(chain.Chain, block)
 				// Marshal the chain struct to JSON
 				jsonChainData, err = json.MarshalIndent(chain, "", "    ")
 				if err != nil {
@@ -127,36 +150,10 @@ func blockReceiver() {
 				if err != nil {
 					panic(err)
 				}
-				return
-
 			}
-
-			//Checks if the incoming block is not the first block in a chain
-			if len(jsonChainData) > 0 {
-				blockTojson := json.Unmarshal(decryptedText, &block)
-				if blockTojson != nil {
-					fmt.Println(blockTojson)
-				}
-				verify := verifyBlockchain(block)
-				if verify == true {
-					chain.Chain = append(chain.Chain, block)
-					// Marshal the chain struct to JSON
-					jsonChainData, err = json.MarshalIndent(chain, "", "    ")
-					if err != nil {
-						panic(err)
-					}
-					// Write the JSON data to a file
-					err = os.WriteFile("chain.json", jsonChainData, 0644)
-					if err != nil {
-						panic(err)
-					}
-				}
-				if verify == false {
-					fmt.Println("Invalid Block")
-				}
-				return
+			if verify == false {
+				fmt.Println("Invalid Block")
 			}
-
 		}
 	}
 }

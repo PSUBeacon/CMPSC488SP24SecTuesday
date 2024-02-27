@@ -169,6 +169,6 @@ func send(message []byte) {
 func main() {
 
 	BroadCastMessage([]byte("testing the stuff"))
-	BroadCastMessage([]byte("this is another one"))
+	//BroadCastMessage([]byte("this is another one"))
 
 }

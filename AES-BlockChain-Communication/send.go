@@ -54,17 +54,48 @@ func BroadCastMessage(messageToSend []byte) {
 
 	//Checks if there is an existing chain or if this is the start of the chain
 	if chainlen == 0 {
+		// Create a new blockchain
 		chain := blockchain.NewBlockchain()
-		jsonChainData, err = json.MarshalIndent(chain, "", "  ")
+		theChain, err := json.MarshalIndent(chain, "", "  ")
 		if err != nil {
 			panic(err)
 		}
-		// Write the JSON data to a file
-		err = os.WriteFile("chain.json", jsonChainData, 0644)
+		err = os.WriteFile("chain.json", theChain, 0644)
 		if err != nil {
 			panic(err)
 		}
-		chainlen++
+		// Create the first block with messageToSend
+		firstBlock := blockchain.CreateBlock(string(messageToSend), chain.Chain[0].Hash, chain.Chain[0].Index+1)
+
+		// Add the first block to the chain
+		chain.Chain = append(chain.Chain, firstBlock)
+
+		// Marshal the entire blockchain with the new block added
+		updatedChain, err := json.MarshalIndent(chain, "", "  ")
+		if err != nil {
+			panic(err)
+		}
+
+		// Write the updated chain data to a file
+		err = os.WriteFile("chain.json", updatedChain, 0644)
+		if err != nil {
+			panic(err)
+		}
+
+		// Marshal only the new block
+		jsonBlock, err := json.MarshalIndent(firstBlock, "", "  ")
+		if err != nil {
+			panic(err)
+		}
+
+		// Encrypt and send the new block
+		encryptedBlock, err := encryptAES([]byte(AesKey), jsonBlock)
+		if err != nil {
+			log.Fatal("Error encrypting block:", err)
+		}
+
+		send(encryptedBlock)
+		return
 	}
 
 	if chainlen > 0 {

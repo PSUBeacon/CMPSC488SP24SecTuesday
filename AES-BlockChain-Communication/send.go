@@ -82,12 +82,17 @@ func BroadCastMessage(messageToSend []byte) {
 		jsonChain.Chain = append(jsonChain.Chain, newBlock)
 
 		// Marshal the entire blockchain with the new block added
-		jsonBlock, err := json.MarshalIndent(jsonChain, "", "  ")
+		jsonBlock, err := json.MarshalIndent(newBlock, "", "  ")
 		if err != nil {
 			panic(err)
 		}
 
-		err = os.WriteFile("chain.json", jsonBlock, 0644)
+		updatedChain, err := json.MarshalIndent(jsonChain, "", "  ")
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.WriteFile("chain.json", updatedChain, 0644)
 		if err != nil {
 			panic(err)
 		}

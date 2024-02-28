@@ -5,9 +5,7 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"fmt"
-	"github.com/joho/godotenv"
 	"io"
-	"log"
 	"os"
 )
 
@@ -39,7 +37,7 @@ func getEncryptionKey() []byte {
 }
 
 // function to encrypt a message
-func encrypt(plaintext []byte) ([]byte, error) {
+func Encrypt(plaintext []byte) ([]byte, error) {
 	// get the encryption key from the environment variable
 	key := getEncryptionKey()
 	block, err := aes.NewCipher(key)
@@ -59,7 +57,7 @@ func encrypt(plaintext []byte) ([]byte, error) {
 }
 
 // function to decrypt a message
-func decrypt(ciphertext []byte) ([]byte, error) {
+func Decrypt(ciphertext []byte) ([]byte, error) {
 	// get the encryption key from the environment variable
 	key := getEncryptionKey()
 	block, err := aes.NewCipher(key)
@@ -79,29 +77,29 @@ func decrypt(ciphertext []byte) ([]byte, error) {
 	return ciphertext, nil
 }
 
-func main() {
-	// load .env file which is in gitignore
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
-	// message to encrypt, and later decrypt
-	plaintext := []byte("Hello, Golang Encryption!")
-
-	ciphertext, err := encrypt(plaintext)
-	if err != nil {
-		fmt.Println("Encryption error:", err)
-		return
-	}
-
-	decrypted, err := decrypt(ciphertext)
-	if err != nil {
-		fmt.Println("Decryption error:", err)
-		return
-	}
-
-	fmt.Printf("Encrypted: %x\n", ciphertext)
-	fmt.Println("Decrypted:", string(decrypted))
-	fmt.Println("Encryption key:", string(getEncryptionKey()))
-}
+//func main() {
+//	// load .env file which is in gitignore
+//	err := godotenv.Load(".env")
+//	if err != nil {
+//		log.Fatal("Error loading .env file")
+//	}
+//
+//	// message to encrypt, and later decrypt
+//	plaintext := []byte("Hello, Golang Encryption!")
+//
+//	ciphertext, err := encrypt(plaintext)
+//	if err != nil {
+//		fmt.Println("Encryption error:", err)
+//		return
+//	}
+//
+//	decrypted, err := decrypt(ciphertext)
+//	if err != nil {
+//		fmt.Println("Decryption error:", err)
+//		return
+//	}
+//
+//	fmt.Printf("Encrypted: %x\n", ciphertext)
+//	fmt.Println("Decrypted:", string(decrypted))
+//	fmt.Println("Encryption key:", string(getEncryptionKey()))
+//}

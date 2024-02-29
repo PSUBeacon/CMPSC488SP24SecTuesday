@@ -13,3 +13,4 @@ vendor/
 /go.sum
 /go.mod
 .DS_Store
+crypto/.env

@@ -7,7 +7,7 @@ import (
 	"github.com/google/gopacket/pcap"
 )
 
-func main() {
+func networkAdapters() {
 	// Get a list of available network interfaces
 	interfaces, err := pcap.FindAllDevs()
 	if err != nil {

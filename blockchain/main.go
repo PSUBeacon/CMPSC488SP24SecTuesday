@@ -1,4 +1,6 @@
-package main
+package blockchain
+
+//package main
 
 import (
 	"crypto/sha256"
@@ -10,16 +12,16 @@ import (
 
 // Block represents a single block in the blockchain.
 type Block struct {
-	Index     int
-	Timestamp string
-	Data      string
-	PrevHash  string
-	Hash      string
+	Index     int    `json:"index"`
+	Timestamp string `json:"timestamp"`
+	Data      string `json:"data"`
+	PrevHash  string `json:"prevhash"`
+	Hash      string `json:"hash"`
 }
 
 // Blockchain is a simple blockchain structure.
 type Blockchain struct {
-	Chain []Block
+	Chain []Block `json:"chain"`
 }
 
 // CalculateHash calculates the SHA-256 hash of a block.
@@ -31,21 +33,24 @@ func CalculateHash(block Block) string {
 }
 
 // CreateBlock creates a new block in the blockchain.
-func (bc *Blockchain) CreateBlock(data string) {
-	prevBlock := bc.Chain[len(bc.Chain)-1]
+func CreateBlock(data string, prevHash string, index int) Block {
 	newBlock := Block{
-		Index:     prevBlock.Index + 1,
+		Index:     index, // This will be set to the correct index when adding to the blockchain
 		Timestamp: time.Now().String(),
 		Data:      data,
-		PrevHash:  prevBlock.Hash,
-		Hash:      "",
+		PrevHash:  prevHash, // This is the hash of the last block in the blockchain
+		Hash:      "",       // This will be set after the block is created
 	}
+
+	// The hash of the new block should be calculated with all the block data including the PrevHash
 	newBlock.Hash = CalculateHash(newBlock)
-	bc.Chain = append(bc.Chain, newBlock)
+
+	// Now return the new block, ready to be added to the blockchain
+	return newBlock
 }
 
 // NewBlockchain creates a new blockchain with a genesis block.
-func NewBlockchain() *Blockchain {
+func NewBlockchain() Blockchain {
 	genesisBlock := Block{
 		Index:     0,
 		Timestamp: time.Now().String(),
@@ -54,7 +59,12 @@ func NewBlockchain() *Blockchain {
 		Hash:      "",
 	}
 	genesisBlock.Hash = CalculateHash(genesisBlock)
-	return &Blockchain{Chain: []Block{genesisBlock}}
+	chain := Blockchain{
+		Chain: []Block{genesisBlock},
+	}
+
+	return chain
+
 }
 
 func main() {
@@ -62,9 +72,8 @@ func main() {
 	blockchain := NewBlockchain()
 
 	// Add some blocks to the blockchain
-	blockchain.CreateBlock("Block 1 Data")
-	blockchain.CreateBlock("Block 2 Data")
-
+	//blockchain.CreateBlock("Block 1 Data")
+	//blockchain.CreateBlock("Block 2 Data")
 	// Print the blockchain
 	blockchainJSON, _ := json.MarshalIndent(blockchain, "", "  ")
 	fmt.Println(string(blockchainJSON))

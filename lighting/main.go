@@ -1,54 +1,70 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"time"
 )
 
-// Lighting represents a lighting fixture with on/off and brightness control.
+// Lighting represents the state of a smart light in the system.
 type Lighting struct {
-	Name       string
-	State      bool
-	Brightness int // 0-100 (0% to 100% brightness)
+	UUID              string `json:"uuid"`              // Unique identifier for the light
+	Location          string `json:"location"`          // Location of the light (e.g., "Living Room", "Kitchen").
+	Brightness        string `json:"brightness"`        // Brightness level as a string to include numeric value.
+	Status            bool   `json:"status"`            // true for on, false for off.
+	EnergyConsumption int    `json:"energyConsumption"` // Energy consumption in kilowatts.
+	LastChanged       string `json:"lastChanged"`       // Timestamp of the last change in ISODate format.
 }
 
-// NewLighting creates a new Lighting instance with the given name and initial state.
-func NewLighting(name string, initialState bool) *Lighting {
+// NewLighting creates a new Lighting instance with the given parameters.
+func NewLighting(uuid, location string, status bool, brightness string, energyConsumption int) *Lighting {
 	return &Lighting{
-		Name:       name,
-		State:      initialState,
-		Brightness: 0, // Initialize with 0% brightness
+		UUID:              uuid,
+		Location:          location,
+		Status:            status,
+		Brightness:        brightness,
+		EnergyConsumption: energyConsumption,
+		LastChanged:       time.Now().Format(time.RFC3339), // Capture the creation time in ISO 8601 format
 	}
 }
 
-// TurnOn turns the lighting on.
-func (l *Lighting) TurnOn() {
-	l.State = true
-	fmt.Printf("%s is now turned ON\n", l.Name)
-}
-
-// TurnOff turns the lighting off.
-func (l *Lighting) TurnOff() {
-	l.State = false
-	fmt.Printf("%s is now turned OFF\n", l.Name)
-}
-
-// SetBrightness sets the brightness of the lighting.
-func (l *Lighting) SetBrightness(brightness int) {
-	if brightness < 0 {
-		brightness = 0
-	} else if brightness > 100 {
-		brightness = 100
+// serializeLight converts a Lighting object to a JSON string.
+func serializeLight(light *Lighting) (string, error) {
+	lightJSON, err := json.Marshal(light)
+	if err != nil {
+		return "", err
 	}
-	l.Brightness = brightness
-	fmt.Printf("%s brightness is set to %d%%\n", l.Name, l.Brightness)
+	return string(lightJSON), nil
+}
+
+// deserializeLight converts a JSON string back into a Lighting object.
+func deserializeLight(lightJSON string) (*Lighting, error) {
+	var light Lighting
+	err := json.Unmarshal([]byte(lightJSON), &light)
+	if err != nil {
+		return nil, err
+	}
+	return &light, nil
 }
 
 func main() {
-	// Create a new lighting fixture
-	livingRoomLight := NewLighting("Living Room Light", false)
+	// Example usage:
+	lightUUID := "123e4567-e89b-12d3-a456-426614174000" // Example UUID
+	light := NewLighting(lightUUID, "Living Room", false, "50", 10)
 
-	// Use the lighting fixture
-	livingRoomLight.TurnOn()
-	livingRoomLight.SetBrightness(75)
-	livingRoomLight.TurnOff()
+	// Serialize the Lighting object
+	lightJSON, err := serializeLight(light)
+	if err != nil {
+		fmt.Println("Error serializing light:", err)
+		return
+	}
+	fmt.Println("Serialized light:", lightJSON)
+
+	// Deserialize the JSON back into a Lighting object
+	deserializedLight, err := deserializeLight(lightJSON)
+	if err != nil {
+		fmt.Println("Error deserializing light:", err)
+		return
+	}
+	fmt.Printf("Deserialized light: %+v\n", deserializedLight)
 }

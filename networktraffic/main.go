@@ -13,8 +13,16 @@ import (
 )
 
 func main() {
+	networkAdapters()
+
+	// Call the function to configure XBee as a controller
+	go ConfigureController()
+
+	// Call the function to send messages from XBee client
+	go SendMessagesToServer()
+
 	// Define the network interface you want to capture packets from
-	device := "\\Device\\NPF_{285EEC32-9286-4AB7-83F9-0C2E8BDE60FC}"
+	device := "lo0"
 
 	// Open the network device for packet capture
 	handle, err := pcap.OpenLive(device, 1600, true, pcap.BlockForever)

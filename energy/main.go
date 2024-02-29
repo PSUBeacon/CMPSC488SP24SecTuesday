@@ -1,8 +1,27 @@
-package main
+package energy
 
 import (
 	"fmt"
+	"time"
 )
+
+type Device struct {
+	DeviceID int // 0 = Solar, 1 = Battery, 2 = Security Systems, 4 = Lighting, 5 = Other
+	Name     string
+	Power    int
+	State    bool
+	Sector   int
+}
+
+func newDevice(deviceID int, name string, power int, state bool, sector int) *Device {
+	return &Device{
+		DeviceID: deviceID,
+		Name:     name,
+		Power:    power,
+		State:    state,
+		Sector:   sector,
+	}
+}
 
 // SolarPanel represents a solar panel as a power source.
 type SolarPanel struct {
@@ -62,29 +81,53 @@ func (a *Appliance) TurnOff() {
 	fmt.Printf("%s is turned OFF\n", a.Name)
 }
 
-func main() {
+func monitor() {
+	solarPanel := newDevice(0, "Solar 1", 1500, false, -1)
+	houseBattery := newDevice(1, "Battery 1", 3000, true, 0)
+	solarEnergy := solarPanel.Power
+	houseBattery.Power += solarEnergy
+}
+
+// !FOR DEMO ONLY NOT FOR FINAL PROD
+func demoMonitoring() {
 	// Create a solar panel, battery, and appliances
 	solarPanel := NewSolarPanel("Solar Panel", 500)         // 500 watts of power output
 	houseBattery := NewBattery("House Battery", 2000)       // 2000 watt-hours capacity
 	fridge := NewAppliance("Fridge", 200)                   // 200 watts
 	airConditioner := NewAppliance("Air Conditioner", 1500) // 1500 watts
 
-	// Simulate powering the appliances with solar energy
-	solarEnergy := solarPanel.PowerOutput
-	houseBattery.Charge += solarEnergy
+	// TODO: showing gain and subtract per 10 sec
+	i := 1
+	for i <= 6 {
 
-	// Turn on appliances
-	fridge.TurnOn()
-	airConditioner.TurnOn()
+		time.Sleep(10000)
+		i += 1
+		// Simulate powering the appliances with solar energy
+		solarEnergy := solarPanel.PowerOutput
+		houseBattery.Charge += solarEnergy
 
-	// Simulate appliance power consumption
-	if fridge.IsOn {
-		houseBattery.Charge -= fridge.PowerRating
+		// Turn on appliances
+		fridge.TurnOn()
+		airConditioner.TurnOn()
+
+		// Simulate appliance power consumption
+		if fridge.IsOn {
+			houseBattery.Charge -= fridge.PowerRating
+		}
+		if airConditioner.IsOn {
+			houseBattery.Charge -= airConditioner.PowerRating
+		}
+
+		// Check battery charge level
+		fmt.Printf("House Battery Charge Level: %d Wh\n", houseBattery.Charge)
 	}
-	if airConditioner.IsOn {
-		houseBattery.Charge -= airConditioner.PowerRating
-	}
 
-	// Check battery charge level
-	fmt.Printf("House Battery Charge Level: %d Wh\n", houseBattery.Charge)
+}
+
+func main() {
+
+	// *This is using Goroutines, multithreading.
+	// Though it isn't being put to actually use yet it will be useful for monitoring multiple devices.
+	go demoMonitoring()
+	demoMonitoring()
 }

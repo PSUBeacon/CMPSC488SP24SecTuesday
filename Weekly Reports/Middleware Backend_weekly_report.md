@@ -10,7 +10,7 @@ Each weekly report has to be linked so it is easy to find!
 Exact copy of the third section from last week (goals from a week ago)
 
 1. Mohamed Chikani:
-   + start here
+   + Familiarize myself with restful API architecture as well as Swagger API template.
 
 2. Nicanor Sanderson:
    - Worked on technical requirements
@@ -31,7 +31,9 @@ The section below should report on progress and issues: ...what did we actually 
 In the final section outline your plans and goals for the following week Use bullet points. If tasks from last week aren't complete, roll them over into tasks for the next week with an updated time estimate for time to completion
 # ***Weekly Report 02/01***
 1. Mohamed Chikani:
-   + start here
+   + Familiarize myself with restful API architecture as well as Swagger API template.
+   + initial testing with postman
+   + Research JWT bearer token
 
 2. Nicanor Sanderson:
    - Familiarize myself with restful API architecture as well as Swagger API template.

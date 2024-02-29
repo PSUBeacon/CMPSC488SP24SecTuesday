@@ -1,4 +1,4 @@
-package main
+package appliances
 
 import (
 	"fmt"
@@ -8,13 +8,15 @@ import (
 type Appliance struct {
 	Name  string
 	State bool
+	Temp  int
 }
 
 // NewAppliance creates a new Appliance instance with the given name and initial state.
-func NewAppliance(name string, initialState bool) *Appliance {
+func NewAppliance(name string, initialState bool, temp int) *Appliance {
 	return &Appliance{
 		Name:  name,
 		State: initialState,
+		Temp:  temp,
 	}
 }
 
@@ -30,11 +32,7 @@ func (a *Appliance) TurnOff() {
 	fmt.Printf("%s is now turned OFF\n", a.Name)
 }
 
-func main() {
-	// Create a new light switch appliance
-	lightSwitch := NewAppliance("Light Switch", false)
-
-	// Use the appliance
-	lightSwitch.TurnOn()
-	lightSwitch.TurnOff()
+func (a *Appliance) AdjustTemp(setTemp int) {
+	a.Temp = setTemp
+	fmt.Printf("%s temperature is now set to %d degrees farenheit\n", a.Name, a.Temp)
 }

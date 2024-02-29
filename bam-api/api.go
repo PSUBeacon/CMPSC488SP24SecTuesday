@@ -1,21 +1,35 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
-	"github.com/joho/godotenv"
-	"golang.org/x/crypto/bcrypt"
+	//"github.com/joho/godotenv"
+	"CMPSC488SP24SecTuesday/dal"
 	"log"
 	"net/http"
 	"os"
 	"strings"
 	"time"
 )
+import "github.com/gin-contrib/cors"
 
 func main() {
-
 	r := gin.Default()
+
+	// Configure CORS
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"}, //for open access
+		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		AllowOriginFunc: func(origin string) bool {
+			return origin == "*"
+		},
+		MaxAge: 12 * time.Hour,
+	}))
 
 	// unprotected endpoints no auth needed
 	r.GET("/status", statusResp)
@@ -42,7 +56,10 @@ func main() {
 		// Add more user-only routes as needed
 	}
 
-	r.Run()
+	err := r.Run(":8081")
+	if err != nil {
+		log.Fatal("Server startup error:", err)
+	}
 }
 
 func statusResp(c *gin.Context) {
@@ -62,21 +79,6 @@ func getJwtKey() string {
 var jwtKey = []byte(getJwtKey())
 
 func loginHandler(c *gin.Context) {
-	//  authentication logic goes here
-	// if authentication is successful, create a JWT token.
-
-	// load .env file which is in gitignore
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
-	tmpUsername := os.Getenv("TMP_USERNAME")      // get this from mongodb
-	tmpPasswordHash := os.Getenv("TMP_PASS_HASH") // get this from mongodb
-
-	fmt.Printf("tmpUsername: %s\n", tmpUsername)
-	fmt.Printf("tmpPasswordHash: %s\n", tmpPasswordHash)
-
 	var loginData struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
@@ -87,24 +89,34 @@ func loginHandler(c *gin.Context) {
 		return
 	}
 
-	if loginData.Username != tmpUsername {
-		//fmt.Printf("Received username: %s\n", loginData.Username)
-		//fmt.Printf("Received password: %s\n", loginData.Password)
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
+	// Connect to MongoDB
+	client, err := dal.ConnectToMongoDB()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to MongoDB"})
+		return
+	}
+	defer client.Disconnect(context.Background())
+
+	// Fetch user by username from MongoDB
+	fetchedUser, err := dal.FetchUser(client, "name", loginData.Username)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username (not found in DB"})
 		return
 	}
 
-	// Check the password hash using bcrypt.CompareHashAndPassword
-	err = bcrypt.CompareHashAndPassword([]byte(tmpPasswordHash), []byte(loginData.Password))
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
+	// Compare the password hash using bcrypt.CompareHashAndPassword
+	//err = bcrypt.CompareHashAndPassword([]byte(fetchedUser.Password), []byte(loginData.Password))
+	//if err != nil {
+	if fetchedUser.Password != loginData.Password {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid  password"})
 		return
 	}
-	// jwt token creation:
+
+	// JWT token creation
 	claims := jwt.MapClaims{
-		"username": loginData.Username,                    // replace with matching value from mongoDB users table
-		"role":     "admin",                               // !!!!! temporary !!!!!! get actual role from mongoDB
-		"exp":      time.Now().Add(time.Hour * 24).Unix(), // token expiration time
+		"username": fetchedUser.Name,
+		"role":     "admin",                               // Replace with the actual role from MongoDB
+		"exp":      time.Now().Add(time.Hour * 24).Unix(), // Token expiration time
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(jwtKey)
@@ -115,7 +127,6 @@ func loginHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"token": tokenString})
-
 }
 
 // check jwt auth and set user role

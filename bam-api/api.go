@@ -7,6 +7,8 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
+	"go.mongodb.org/mongo-driver/mongo"
+	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
 	"os"
@@ -95,7 +97,12 @@ func loginHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to MongoDB"})
 		return
 	}
-	defer client.Disconnect(context.Background())
+	defer func(client *mongo.Client, ctx context.Context) {
+		err := client.Disconnect(ctx)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(client, context.Background())
 
 	// Fetch user by username from MongoDB
 	fetchedUser, err := dal.FetchUser(client, "name", loginData.Username)
@@ -105,12 +112,14 @@ func loginHandler(c *gin.Context) {
 	}
 
 	// Compare the password hash using bcrypt.CompareHashAndPassword
-	//err = bcrypt.CompareHashAndPassword([]byte(fetchedUser.Password), []byte(loginData.Password))
-	//if err != nil {
-	if fetchedUser.Password != loginData.Password {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid  password"})
+	if err := bcrypt.CompareHashAndPassword([]byte(fetchedUser.Password), []byte(loginData.Password)); err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid password"})
 		return
 	}
+	//if fetchedUser.Password != loginData.Password {
+	//	c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid  password"})
+	//	return
+	//}
 
 	// JWT token creation
 	claims := jwt.MapClaims{

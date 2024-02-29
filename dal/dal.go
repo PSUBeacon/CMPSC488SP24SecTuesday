@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
+	"golang.org/x/crypto/bcrypt"
 	"log"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -74,12 +75,21 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer client.Disconnect(context.Background())
+	defer func(client *mongo.Client, ctx context.Context) {
+		err := client.Disconnect(ctx)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(client, context.Background())
 
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte("user_password"), bcrypt.DefaultCost)
+	if err != nil {
+		log.Fatal(err)
+	}
 	// Example: Creating a new user
 	newUser := User{
-		Name:     "john_doess",
-		Password: "passlel",
+		Name:     "john",
+		Password: string(hashedPassword),
 		Email:    "john@example.com",
 	}
 
@@ -91,10 +101,10 @@ func main() {
 	fmt.Println("User created successfully!")
 
 	// Example: Fetching a user by username
-	fetchedUser, err := FetchUser(client, "name", "john_doess")
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(fetchedUser)
-	fmt.Println(fetchedUser.Name)
+	//fetchedUser, err := FetchUser(client, "name", "john")
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//fmt.Println(fetchedUser)
+	//fmt.Println(fetchedUser.Name)
 }

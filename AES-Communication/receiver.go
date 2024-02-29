@@ -4,17 +4,26 @@ import (
 	"bufio"
 	"crypto/aes"
 	"crypto/cipher"
+	"encoding/json"
 	"fmt"
 	"github.com/joho/godotenv"
 	"go.bug.st/serial"
-	"io"
 	"log"
 	"os"
-	"strings"
 )
 
+type Block struct {
+	Index     int
+	Timestamp string
+	Data      string
+	PrevHash  string
+	Hash      string
+}
+
 func decryptAES(key, ciphertext []byte) ([]byte, error) {
+	//ciphertext = []byte(strings.Trim(string(ciphertext), "*"))
 	block, err := aes.NewCipher(key)
+
 	if err != nil {
 		return nil, err
 	}
@@ -23,8 +32,16 @@ func decryptAES(key, ciphertext []byte) ([]byte, error) {
 		return nil, fmt.Errorf("ciphertext too short")
 	}
 
+	fmt.Printf("Ciphertext length (including IV): %d\n", len(ciphertext))
+
 	iv := ciphertext[:aes.BlockSize]
 	ciphertext = ciphertext[aes.BlockSize:]
+
+	fmt.Printf("Ciphertext length (excluding IV): %d\n", len(ciphertext))
+
+	if len(ciphertext)%aes.BlockSize != 0 {
+		return nil, fmt.Errorf("ciphertext is not a multiple of the block size")
+	}
 
 	mode := cipher.NewCBCDecrypter(block, iv)
 	mode.CryptBlocks(ciphertext, ciphertext)
@@ -46,6 +63,7 @@ func decryptAES(key, ciphertext []byte) ([]byte, error) {
 
 func ConfigureController() {
 	// Open the XBee module for communication
+	var block []Block
 	mode := &serial.Mode{
 		BaudRate: 9600,
 	}
@@ -61,7 +79,8 @@ func ConfigureController() {
 	}(port) // Ensure the port is closed when the function returns
 
 	// Wrap the port in a bufio.Reader
-	reader := bufio.NewReader(port)
+	const bufferSize = 4096 // Adjust this value as needed
+	reader := bufio.NewReaderSize(port, bufferSize)
 
 	fmt.Println("Waiting for incoming messages...")
 	for {
@@ -76,16 +95,30 @@ func ConfigureController() {
 				log.Fatal("Error receiving message:", err)
 			}
 		}
+
 		err = godotenv.Load()
 		AesKey := os.Getenv("AES_KEY") //This key is for testing, will be switched later
-		message = []byte(strings.Trim(string(message), "\n"))
-		// Decrypt the message.
-		decryptedText, err := decryptAES([]byte(AesKey), message)
+		//Decrypt the message.
+		decryptedText, err := decryptAES([]byte(AesKey), []byte(message))
+		//decryptedText := message
+
 		if err != nil {
 			fmt.Println("Error decrypting:", err)
 			return
 		}
 		fmt.Printf("Decrypted text: %s\n", decryptedText)
+
+		tojson := json.Unmarshal(decryptedText, &block)
+		if tojson != nil {
+
+			// if error is not nil
+			// print error
+			fmt.Println(tojson)
+		}
+		//fmt.Println(tojson)
+		for i := range block {
+			fmt.Println(string(rune(block[i].Index)) + " - " + block[i].Timestamp + " - " + block[i].Data + " - " + block[i].PrevHash + " - " + block[i].Hash)
+		}
 	}
 }
 

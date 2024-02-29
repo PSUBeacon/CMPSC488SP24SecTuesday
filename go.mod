@@ -1,6 +1,6 @@
 module CMPSC488SP24SecTuesday
 
-go 1.21.3
+go 1.23
 
 require (
 	github.com/bytedance/sonic v1.10.1 // indirect
@@ -19,6 +19,12 @@ require (
 	github.com/google/gopacket v1.1.19 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
+	github.com/google/gopacket v1.1.19
+	github.com/joho/godotenv v1.5.1
+	go.bug.st/serial v1.6.2
+	go.mongodb.org/mongo-driver v1.13.1
+	github.com/creack/goselect v0.1.2 // indirect
+	github.com/golang/snappy v0.0.1 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
@@ -42,4 +48,8 @@ require (
 	golang.org/x/text v0.13.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d // indirect
+	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4 // indirect
+	golang.org/x/sys v0.0.0-20220829200755-d48e67d00261 // indirect
+	golang.org/x/text v0.7.0 // indirect
 )

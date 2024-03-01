@@ -43,13 +43,13 @@ jobs:
       - name: Build for Raspberry Pi 3
         run: |
           for folder in bam-api blockchain; do
-            env GOOS=linux GOARCH=arm GOARM=7 go build -o  ${{ folder }}_pi3_${{ steps.slug.outputs.sha7 }} "$folder/main.go"
+            env GOOS=linux GOARCH=arm GOARM=7 go build -o  "$folder"_pi3_${{ steps.slug.outputs.sha7 }} "$folder/main.go"
           done
 
       - name: Build for Raspberry Pi 4
         run: |
           for folder in bam-api blockchain; do
-            env GOOS=linux GOARCH=arm64 go build -o ${{ github.ref_slug }}_pi4_${{ steps.get_commit_hash.outputs.commit_hash }} "$folder/main.go"
+            env GOOS=linux GOARCH=arm64 go build -o "$folder"_pi4_${{ steps.slug.outputs.sha7 }} "$folder/main.go"
           done
 
       - name: Archive artifacts

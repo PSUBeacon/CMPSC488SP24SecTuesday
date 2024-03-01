@@ -1,4 +1,5 @@
 bam-api/api
+bam-api/api.exe
 bam-api/.env
 pkg/
 *.test

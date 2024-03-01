@@ -36,13 +36,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gcc-arm-linux-gnueabihf libc6-armhf-cross libc6-dev-armhf-cross
 
-      - name: Get shortened Git commit hash
-        run: echo ::set-output name=commit_hash::$(git rev-parse --short HEAD)
+      - name: Get Short SHA
+        id: slug
+        run: echo "::set-output name=sha7::$(echo ${{ github.sha }} | cut -c1-7)"
 
       - name: Build for Raspberry Pi 3
         run: |
           for folder in bam-api blockchain; do
-            env GOOS=linux GOARCH=arm GOARM=7 go build -o ${{ github.ref_slug }}_pi3_${{ steps.get_commit_hash.outputs.commit_hash }} "$folder/main.go"
+            env GOOS=linux GOARCH=arm GOARM=7 go build -o  ${{ folder }}_pi3_${{ steps.slug.outputs.sha7 }} "$folder/main.go"
           done
 
       - name: Build for Raspberry Pi 4

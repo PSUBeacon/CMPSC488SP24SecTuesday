@@ -7,13 +7,14 @@ import (
 	"github.com/golang-jwt/jwt"
 	//"github.com/joho/godotenv"
 	"CMPSC488SP24SecTuesday/dal"
+	"github.com/gin-contrib/cors"
+	//"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
 	"os"
 	"strings"
 	"time"
 )
-import "github.com/gin-contrib/cors"
 
 func main() {
 	r := gin.Default()

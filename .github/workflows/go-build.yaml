@@ -63,5 +63,7 @@ jobs:
         with:
           name: smarthome_artifacts
           path: |
-            ${{ github.ref_slug }}_pi3_${{ steps.get_commit_hash.outputs.commit_hash }}
-            ${{ github.ref_slug }}_pi4_${{ steps.get_commit_hash.outputs.commit_hash }}
+            bam-api_pi3_${{ steps.slug.outputs.sha7 }}
+            bam-api_pi4_${{ steps.slug.outputs.sha7 }}
+            blockchain_pi3_${{ steps.slug.outputs.sha7 }}
+            blockchain_pi4_${{ steps.slug.outputs.sha7 }}

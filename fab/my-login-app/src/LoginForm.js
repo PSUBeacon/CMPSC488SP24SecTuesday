@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate, Link } from 'react-router-dom'; // Import Link
 import 'bootstrap/dist/css/bootstrap.min.css';
 import loginImage from './loginImage.png';
 import logoImage from './logo.webp'; 
@@ -100,8 +100,8 @@ const LoginForm = () => {
                   <a href="#" className="text-white mr-3" style={{ textDecoration: 'none' }}>Forgot your password?</a>
                 </div>
                 <div style={{ marginBottom: '50px' }}>
-                  <a href="#" className="text-white mr-3" style={{ textDecoration: 'none' }}>Don't Have An Account?</a>
-                  <button type="button" className="btn btn-link text-uppercase font-weight-bold shadow-none" style={{ color: '#50BCC0', textDecoration: 'none', fontWeight: 'bold' }}>Sign up</button>
+                  <span className="text-white mr-3">Don't Have An Account?</span>
+                  <Link to="/signup" className="btn btn-link text-uppercase font-weight-bold shadow-none" style={{ color: '#50BCC0', textDecoration: 'none', fontWeight: 'bold' }}>Sign up</Link> {/* Link to the sign-up page */}
                 </div>
                 </div>
               </form>
@@ -111,8 +111,6 @@ const LoginForm = () => {
       </div>
     </div>
   );
-  
 };
 
 export default LoginForm;
-

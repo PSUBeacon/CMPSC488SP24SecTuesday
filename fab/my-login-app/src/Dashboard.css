@@ -1,3 +1,69 @@
 body {
     color: white;
+    background-color: #0E2237;
+}
+
+/* Base styles for the side navbar 
+aside {
+other styles 
+  }
+*/ 
+
+
+  /* Styles for screens smaller than 768px */
+  @media (max-width: 400px) {
+    aside {
+      width: 100%; /* Full width */
+      height: auto; /* Auto height */
+      position: fixed; /* Fixed position */
+      z-index: 1000; /* Above other content */
+      top: 0; /* Stick to the top */
+      left: 0; /* Stick to the left */
+    }
+  }
+  
+  /* Side Nav Button Styles */
+.nav-button {
+    transition: background-color 0.3s ease; /* This creates the smooth transition effect */
+    padding: 0.5rem;
+    margin: 0.5rem 0;
+    display: block; /* Make the anchor fill the list item for a larger clickable area */
+    color: white;
+    text-decoration: none;
+  }
+  
+  .nav-button:hover {
+    background-color: #0294A5; /* New background color on hover */
+  }
+
+  #circle {
+    max-width: 150px;
+    height: auto;
+    width: 60px; /* Adjust the width and height according to your needs */
+    height: 60px;
+    overflow: hidden;
+    border-radius: 50%; /* Ensures the container is a circle */
+  }
+
+  #menuText {
+    font-size: 25px;
+  }
+
+  .houseInfo{
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  #circle2 {
+    max-width: 150px;
+    height: auto;
+    width: 90px; /* Adjust the width and height according to your needs */
+    height: 90px;
+    overflow: hidden;
+    border-radius: 50%; /* Ensures the container is a circle */
+    margin-bottom: 10px;
+}
+
+#menuIcon {
+    max-width: 30px;
 }

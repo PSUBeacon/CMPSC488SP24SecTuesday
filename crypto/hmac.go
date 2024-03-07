@@ -11,7 +11,7 @@ import (
 // function to get  HMAC secret key from an environment variable
 func getHMACSecretKey() []byte {
 	// get the secret key from an environment variable
-	key := os.Getenv("HMAC_SECRET_KEY")
+	key := os.Getenv("HMAC_KEY")
 
 	// generate a random key if the key is not available in an environment variable
 	if key == "" {

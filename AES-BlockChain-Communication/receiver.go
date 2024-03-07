@@ -106,10 +106,11 @@ func blockReceiver() {
 
 		//Verify the HMAC
 		isValid, receivedMessage := crypto.VerifyHMAC(decryptedText)
+		receivedMessage = receivedMessage[:len(receivedMessage)-64]
 		//if valid will check the blockchain
 		if isValid {
 			fmt.Println("Message integrity verified successfully.")
-			fmt.Println("This is the message sent with hmac", string(receivedMessage))
+			fmt.Println("This is the message sent with hmac", receivedMessage)
 
 			jsonChainData, err := os.ReadFile("chain.json")
 			chainlen := len(jsonChainData)

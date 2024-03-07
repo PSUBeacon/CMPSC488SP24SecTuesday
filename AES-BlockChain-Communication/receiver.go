@@ -110,7 +110,7 @@ func blockReceiver() {
 		//if valid will check the blockchain
 		if isValid {
 			fmt.Println("Message integrity verified successfully.")
-			fmt.Println("This is the message sent with hmac", receivedMessage)
+			fmt.Println("This is the message sent with hmac", string(receivedMessage))
 
 			jsonChainData, err := os.ReadFile("chain.json")
 			chainlen := len(jsonChainData)

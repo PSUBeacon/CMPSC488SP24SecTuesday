@@ -84,10 +84,10 @@ func BroadCastMessage(messageToSend []byte) {
 		}
 
 		//creating the HMAC with unencrypted data
-		crypto.AddHMAC(updatedChain)
+		hmacChain := crypto.AddHMAC(updatedChain)
 
 		// Encrypt and send the new block
-		encryptedBlock, err := encryptAES([]byte(AesKey), updatedChain)
+		encryptedBlock, err := encryptAES([]byte(AesKey), hmacChain)
 		if err != nil {
 			log.Fatal("Error encrypting block:", err)
 		}
@@ -128,9 +128,9 @@ func BroadCastMessage(messageToSend []byte) {
 		//fmt.Println("This is the block before encryption: ", jsonBlock)
 
 		//creating the HMAC with unencrypted data
-		crypto.AddHMAC(jsonBlock)
+		hmacBlock := crypto.AddHMAC(jsonBlock)
 
-		encryptedBlock, err := encryptAES([]byte(AesKey), jsonBlock)
+		encryptedBlock, err := encryptAES([]byte(AesKey), hmacBlock)
 		if err != nil {
 			log.Fatal("Error encrypting block:", err)
 		}

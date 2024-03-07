@@ -1,10 +1,14 @@
 package crypto
 
+//package main
+
 import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	_ "github.com/joho/godotenv"
+	_ "log"
 	"os"
 )
 
@@ -78,7 +82,7 @@ func VerifyHMAC(payload []byte) (bool, []byte) {
 //	// Print the verification result
 //	if isValid {
 //		fmt.Println("Message integrity verified successfully.")
-//		fmt.Println(string(receivedMessage))
+//		fmt.Println(receivedMessage)
 //	} else {
 //		fmt.Println("Message integrity verification failed.")
 //	}

@@ -1,5 +1,7 @@
 package crypto
 
+//package main
+
 import (
 	"crypto/aes"
 	"crypto/cipher"

@@ -102,7 +102,7 @@ func blockReceiver() {
 			fmt.Println("Error decrypting:", err)
 			return
 		}
-		fmt.Printf("Decrypted text: %s\n", decryptedText)
+		//fmt.Printf("Decrypted text: %s\n", decryptedText)
 
 		//Verify the HMAC
 		isValid, receivedMessage := crypto.VerifyHMAC(decryptedText)
@@ -114,9 +114,6 @@ func blockReceiver() {
 			if err != nil {
 				panic(err)
 			}
-
-			men, _ := json.MarshalIndent(jsonChainData, "", "    ")
-			fmt.Println("Men: ", string(men))
 
 			//Checks if there is an existing chain or if this is the start of the chain
 			if chainlen == 0 {
@@ -156,7 +153,7 @@ func blockReceiver() {
 					chain.Chain = append(chain.Chain, block)
 					// Marshal the chain struct to JSON
 					jsonChainData, err = json.MarshalIndent(chain, "", "    ")
-					fmt.Println("This is the chain after its been appended: ", string(jsonChainData))
+					//fmt.Println("This is the chain after its been appended: ", string(jsonChainData))
 					if err != nil {
 						panic(err)
 					}

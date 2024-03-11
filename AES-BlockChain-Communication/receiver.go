@@ -115,6 +115,9 @@ func blockReceiver() {
 				panic(err)
 			}
 
+			men, _ := json.MarshalIndent(jsonChainData, "", "    ")
+			fmt.Println("Men: ", men)
+
 			//Checks if there is an existing chain or if this is the start of the chain
 			if chainlen == 0 {
 				chainTojson := json.Unmarshal(receivedMessage, &chain)

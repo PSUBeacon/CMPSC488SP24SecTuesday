@@ -6,7 +6,6 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
 	_ "github.com/joho/godotenv"
 	_ "log"
 	"os"
@@ -18,14 +17,14 @@ func getHMACSecretKey() []byte {
 	key := os.Getenv("HMAC_KEY")
 
 	// generate a random key if the key is not available in an environment variable
-	if key == "" {
-		// if environment variable doesn't work, use this key - fallback value
-		key = "405196174e9ac81268eadaba6bacea0fcbdd6446bccea9642c6bc3b53a47b8b3"
-		err := os.Setenv("HMAC_SECRET_KEY", key)
-		if err != nil {
-			fmt.Println("Error setting environment variable:", err)
-		}
-	}
+	//if key == "" {
+	//	// if environment variable doesn't work, use this key - fallback value
+	//	key = "405196174e9ac81268eadaba6bacea0fcbdd6446bccea9642c6bc3b53a47b8b3"
+	//	err := os.Setenv("HMAC_SECRET_KEY", key)
+	//	if err != nil {
+	//		fmt.Println("Error setting environment variable:", err)
+	//	}
+	//}
 
 	return []byte(key)
 }

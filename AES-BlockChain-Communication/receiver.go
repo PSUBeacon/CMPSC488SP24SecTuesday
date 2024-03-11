@@ -147,7 +147,7 @@ func blockReceiver() {
 					chain.Chain = append(chain.Chain, block)
 					// Marshal the chain struct to JSON
 					jsonChainData, err = json.MarshalIndent(chain, "", "    ")
-					fmt.Println("This is the chain after its been appended: ", jsonChainData)
+					fmt.Println("This is the chain after its been appended: ", string(jsonChainData))
 					if err != nil {
 						panic(err)
 					}

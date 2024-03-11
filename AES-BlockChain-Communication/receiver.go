@@ -147,6 +147,12 @@ func blockReceiver() {
 				}
 				verify := verifyBlockchain(block)
 				if verify == true {
+
+					err := json.Unmarshal(jsonChainData, &chain)
+					if err != nil {
+						return
+					}
+
 					chain.Chain = append(chain.Chain, block)
 					// Marshal the chain struct to JSON
 					jsonChainData, err = json.MarshalIndent(chain, "", "    ")

@@ -177,7 +177,7 @@ func blockReceiver() {
 
 func verifyBlockchain(currentblock blockchain.Block) bool {
 	// Read the JSON file
-	fmt.Println("verfiy got this: ", currentblock)
+	//fmt.Println("verfiy got this: ", currentblock)
 	jsonChainData, err := os.ReadFile("chain.json")
 	if err != nil {
 		panic(err)

@@ -30,7 +30,7 @@ func NewLighting(uuid, location string, status bool, brightness string, energyCo
 
 // serializeLight converts a Lighting object to a JSON string.
 func serializeLight(light *Lighting) (string, error) {
-	lightJSON, err := json.Marshal(light)
+	lightJSON, err := json.MarshalIndent(light, "", " ")
 	if err != nil {
 		return "", err
 	}

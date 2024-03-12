@@ -7,14 +7,14 @@ import (
 
 // HVAC represents an HVAC system with temperature control, fan speed, and mode.
 type HVAC struct {
-	Name              string
-	Temperature       int    // Desired temperature in Celsius
-	FanSpeed          string // Fan speed ("Off" , "Low", "Medium", "High")
-	Humidity          int    // Humidity %
-	Status            string // HVAC mode (e.g., "Cool", "Heat", "Fan", "Off")
-	Location          string // Location of device
-	EnergyConsumption int
-	LastChanged       string
+	Name              string `json:"Name"`
+	Temperature       int    `json:"Temperature"`       // Desired temperature in Celsius
+	FanSpeed          string `json:"FanSpeed"`          // Fan speed ("Off" , "Low", "Medium", "High")
+	Humidity          int    `json:"Humidity"`          // Humidity %
+	Status            string `json:"Status"`            // HVAC mode (e.g., "Cool", "Heat", "Fan", "Off")
+	Location          string `json:"Location"`          // Location of device
+	EnergyConsumption int    `json:"EnergyConsumption"` // Energy Consumption
+	LastChanged       string `json:"LastChanged"`       // Last Changed (date)
 }
 
 // NewHVAC creates a new HVAC instance with the given name and initial settings.
@@ -69,7 +69,7 @@ func main() {
 	hvac.SetHumidity(45)
 
 	// Serialize the HVAC instance to JSON
-	jsonData, err := json.Marshal(hvac)
+	jsonData, err := json.MarshalIndent(hvac, "", " ")
 	if err != nil {
 		fmt.Println("Error serializing HVAC to JSON:", err)
 		return

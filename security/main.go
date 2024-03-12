@@ -162,35 +162,35 @@ func main() {
 	//Serializations---------------------------------
 
 	//security
-	securityJSON, err := json.Marshal(securitySystem)
+	securityJSON, err := json.MarshalIndent(securitySystem, "", " ")
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
 
 	//motionSensor
-	motionSensorJSON, err := json.Marshal(motionSensor)
+	motionSensorJSON, err := json.MarshalIndent(motionSensor, "", " ")
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
 
 	//security alarm
-	securityAlarmJSON, err := json.Marshal(securityAlarm)
+	securityAlarmJSON, err := json.MarshalIndent(securityAlarm, "", " ")
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
 
 	//padlock
-	padLockJSON, err := json.Marshal(padLock1)
+	padLockJSON, err := json.MarshalIndent(padLock1, "", " ")
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
 
-	frontDoorJSON, err := json.Marshal(frontdoor)
+	frontDoorJSON, err := json.MarshalIndent(frontdoor, "", " ")
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
 
-	backDoorJSON, err := json.Marshal(backdoor)
+	backDoorJSON, err := json.MarshalIndent(backdoor, "", " ")
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
@@ -365,3 +365,4 @@ func main() {
 	// ends------------------------------------------------
 
 }
+

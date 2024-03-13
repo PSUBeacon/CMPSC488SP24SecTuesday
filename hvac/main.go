@@ -58,6 +58,24 @@ func (h *HVAC) SetHumidity(humidity int) {
 	h.Humidity = humidity
 	fmt.Printf("%s humidity is set to %d%%\n", h.Name, h.Humidity)
 }
+
+func serializeHvac(hvac *HVAC) (string, error) {
+	hvacJSON, err := json.MarshalIndent(hvac, "", " ")
+	if err != nil {
+		return "", err
+	}
+	return string(hvacJSON), nil
+}
+
+func deserializeHvac(hvacJSON string) (*HVAC, error) {
+	var hvac HVAC
+	err := json.Unmarshal([]byte(hvacJSON), &hvac)
+	if err != nil {
+		return nil, err
+	}
+	return &hvac, nil
+}
+
 func main() {
 	// Create a new HVAC instance
 	hvac := NewHVAC("My HVAC")
@@ -68,13 +86,15 @@ func main() {
 	hvac.SetStatus("Cool")
 	hvac.SetHumidity(45)
 
-	// Serialize the HVAC instance to JSON
-	jsonData, err := json.MarshalIndent(hvac, "", " ")
+	// Serialize the Hvac instance to JSON
+	hvacJSON, err := serializeHvac(hvac)
 	if err != nil {
-		fmt.Println("Error serializing HVAC to JSON:", err)
+		fmt.Println("Error serializing APPLIANCES to JSON:", err)
 		return
 	}
 
 	// Print the serialized JSON string
-	fmt.Println(string(jsonData))
+	fmt.Println(string(hvacJSON))
+
 }
+

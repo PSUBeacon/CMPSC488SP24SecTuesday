@@ -5,8 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
-	//"github.com/joho/godotenv"
-	"CMPSC488SP24SecTuesday/dal"
+
 	"github.com/gin-contrib/cors"
 	//"golang.org/x/crypto/bcrypt"
 	"log"
@@ -98,25 +97,30 @@ func loginHandler(c *gin.Context) {
 	}
 	defer client.Disconnect(context.Background())
 
+	//ADJUSTMENT:Changed fetchUser parameters to reflect updated DAL
 	// Fetch user by username from MongoDB
-	fetchedUser, err := dal.FetchUser(client, "name", loginData.Username)
+	fetchedUser, err := dal.FetchUser(client, loginData.Username)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username (not found in DB"})
 		return
 	}
 
+	//ADJUSTMENT: Changed function for password
 	// Compare the password hash using bcrypt.CompareHashAndPassword
 	//err = bcrypt.CompareHashAndPassword([]byte(fetchedUser.Password), []byte(loginData.Password))
 	//if err != nil {
-	if fetchedUser.Password != loginData.Password {
+	if fetchedUser.CustomData["password"] != loginData.Password {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid  password"})
 		return
 	}
 
+	//ADJUSTMENT:Changed JWT generated payload
 	// JWT token creation
 	claims := jwt.MapClaims{
-		"username": fetchedUser.Name,
-		"role":     "admin",                               // Replace with the actual role from MongoDB
+
+		"username": fetchedUser.User,
+		"userID":   fetchedUser.UserID.Data,
+		"role":     fetchedUser.Role.Role,                 // Replace with the actual role from MongoDB
 		"exp":      time.Now().Add(time.Hour * 24).Unix(), // Token expiration time
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

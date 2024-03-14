@@ -1,4 +1,4 @@
-package main
+package dal
 
 import (
 	"context"
@@ -131,7 +131,7 @@ type smartHomeDB struct {
 	Toaster        *Toaster
 }
 
-func fetchCollections(client *mongo.Client, dbName string) (*smartHomeDB, error) {
+func FetchCollections(client *mongo.Client, dbName string) (*smartHomeDB, error) {
 	smartHomeDB := &smartHomeDB{}
 
 	// Define a helper function to fetch and decode documents
@@ -225,6 +225,21 @@ func FetchUser(client *mongo.Client, userName string) (User, error) {
 	return User{}, fmt.Errorf("no user found with username: %s", userName)
 }
 
+func PrintSmartHomeDBContents(smartHomeDB *smartHomeDB) string {
+	return fmt.Sprintf(
+		"Dishwasher: %+v\nFridge: %+v\nHVAC: %+v\nLighting: %+v\nMicrowave: %+v\nOven: %+v\nSecuritySystem: %+v\nSolarPanel: %+v\nToaster: %+v\n",
+		*smartHomeDB.Dishwasher,
+		*smartHomeDB.Fridge,
+		*smartHomeDB.HVAC,
+		*smartHomeDB.Lighting,
+		*smartHomeDB.Microwave,
+		*smartHomeDB.Oven,
+		*smartHomeDB.SecuritySystem,
+		*smartHomeDB.SolarPanel,
+		*smartHomeDB.Toaster,
+	)
+}
+
 // connect to db if exists, else return error log
 func main() {
 	client, err := ConnectToMongoDB()
@@ -247,7 +262,7 @@ func main() {
 
 	//Testing IoT functions
 	// Fetch the IoT system data
-	smartHomeDB, err := fetchCollections(client, dbName) // Fetches and populates data
+	smartHomeDB, err := FetchCollections(client, dbName) // Fetches and populates data
 	if err != nil {
 		log.Fatalf("Error fetching IoT data: %v", err)
 	}
@@ -257,5 +272,8 @@ func main() {
 	fmt.Printf("Dishwasher Status: %s\n", smartHomeDB.Dishwasher.Status)
 
 	fmt.Printf("Oven UUID: %s\n", smartHomeDB.Oven.UUID)
+
+	// Print the contents of smartHomeDB
+	fmt.Printf(PrintSmartHomeDBContents(smartHomeDB))
 
 }

@@ -22,10 +22,15 @@ const LoginForm = () => {
         username,
         password
       });
+
       const jwtToken = response.data.token; // Assuming the token is returned in a field named 'token'
+      const welcomeMessage = response.data.message; // Capture the message
+
       console.log('JWT Token:', jwtToken);
+      console.log('Message:', welcomeMessage);
 
       localStorage.setItem('token', jwtToken);
+      localStorage.setItem('welcomeMessage', welcomeMessage); // Store the message
 
       // Redirect user to the dashboard page
       navigate('/dashboard'); // Use navigate to redirect

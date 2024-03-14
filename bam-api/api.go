@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
-
+	//"github.com/joho/godotenv"
+	"CMPSC488SP24SecTuesday/dal"
 	"github.com/gin-contrib/cors"
 	//"golang.org/x/crypto/bcrypt"
 	"log"
@@ -109,10 +110,28 @@ func loginHandler(c *gin.Context) {
 	// Compare the password hash using bcrypt.CompareHashAndPassword
 	//err = bcrypt.CompareHashAndPassword([]byte(fetchedUser.Password), []byte(loginData.Password))
 	//if err != nil {
+	fmt.Printf("%s\n", fetchedUser.UserID.Data)
 	if fetchedUser.CustomData["password"] != loginData.Password {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid  password"})
 		return
 	}
+
+	// Example of fetching the smartHomeDB data, adjust based on actual implementation
+	// For simplicity, we're assuming this function exists and is callable here
+
+	// Fetch smart home data
+	smartHomeDB, err := dal.FetchCollections(client, "smartHomeDB")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch smart home data"})
+		return
+	}
+
+	// Print smart home data
+	smartHomeData := dal.PrintSmartHomeDBContents(smartHomeDB)
+
+	//Delete later
+	fmt.Printf(smartHomeData)
+	//////////////////////////
 
 	//ADJUSTMENT:Changed JWT generated payload
 	// JWT token creation
@@ -131,7 +150,10 @@ func loginHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": tokenString})
+	////////////////////
+
+	c.JSON(http.StatusOK, gin.H{"token": tokenString,
+		"message": smartHomeDB.HVAC.Temperature})
 }
 
 // check jwt auth and set user role

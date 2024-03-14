@@ -6,6 +6,8 @@
 // Arduino versioning.
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "Arduino.h"
+#else
+#include "WProgram.h"
 #endif
 
 // bperrybap - Thanks for a well reasoned argument and the following macro(s).

@@ -2,7 +2,8 @@
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
 
-# define pins
+#* define pins
+#define DHT_PIN_DATA	4  #! Same pin diff machine please comment accordingly
 #define BUZZER_PIN_SIG	4
 #define KEYPADMEM3X4_PIN_ROW1	22
 #define KEYPADMEM3X4_PIN_ROW2	23
@@ -15,5 +16,6 @@ GPIO.setmode(GPIO.BCM)
 #define LEDMATRIX_PIN_CLK	10
 #define LEDMATRIX_PIN_CS	4
 #define PIR_PIN_SIG	11
+#define PCFAN_PIN_COIL1	18
 
 

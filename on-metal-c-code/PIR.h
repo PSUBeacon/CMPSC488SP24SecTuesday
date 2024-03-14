@@ -1,37 +1,19 @@
-#ifndef _SWITCHABLE_H_
-#define _SWITCHABLE_H_
+/** \addtogroup PIRGeneric
+ *  @{
+ */
 
-//Base class for output that can be switched on/off via single digital pin:
-class Switchable  
+#ifndef PIR_H
+#define PIR_H
+
+#include <Arduino.h>
+
+class PIR
 {
 	public:
-
-		// Consturcutor accepts pin number for output
-	    Switchable(const int pin);
-		
-		// Turn pin on
-		void on();
-	    
-	    // Turn pin off
-		void off();
-		
-		// Toggle pin
-		void toggle();
-		
-		// dim pin
-		void dim(int dimVal);
-		
-		// Get current state
-		bool getState();
-		
-		// Set state with bool variable
-		void setState(bool state);
-	
+		PIR(int PIRPin);
+		bool read();             
 	private:
-	
-		const int m_pin; 	//output pin
-		bool m_state;		//current state
+		const int signalPin;
 };
-
-#endif // _SWITCHABLE_H_
- 
+#endif //PIR_H
+/** @}*/

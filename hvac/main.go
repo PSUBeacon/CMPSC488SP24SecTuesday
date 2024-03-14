@@ -89,12 +89,21 @@ func main() {
 	// Serialize the Hvac instance to JSON
 	hvacJSON, err := serializeHvac(hvac)
 	if err != nil {
-		fmt.Println("Error serializing APPLIANCES to JSON:", err)
+		fmt.Println("Error serializing HVAC to JSON:", err)
 		return
 	}
 
 	// Print the serialized JSON string
 	fmt.Println(string(hvacJSON))
+
+	//Deserialize
+	deserializeHvac, err := deserializeHvac(hvacJSON)
+	if err != nil {
+		fmt.Println("Error deserializing HVAC:", err)
+		return
+	}
+
+	fmt.Printf("\nDeserialized HVAC:\n %+v\n", deserializeHvac)
 
 }
 

@@ -2,7 +2,7 @@ package main
 
 import (
 	"CMPSC488SP24SecTuesday/blockchain"
-	_ "CMPSC488SP24SecTuesday/blockchain"
+	"CMPSC488SP24SecTuesday/crypto"
 	"bufio"
 	"crypto/aes"
 	"crypto/cipher"
@@ -102,44 +102,26 @@ func blockReceiver() {
 			fmt.Println("Error decrypting:", err)
 			return
 		}
-		fmt.Printf("Decrypted text: %s\n", decryptedText)
+		//fmt.Printf("Decrypted text: %s\n", decryptedText)
 
-		jsonChainData, err := os.ReadFile("chain.json")
-		chainlen := len(jsonChainData)
-		if err != nil {
-			panic(err)
-		}
-
-		//Checks if there is an existing chain or if this is the start of the chain
-		if chainlen == 0 {
-			chainTojson := json.Unmarshal(decryptedText, &chain)
-			if chainTojson != nil {
-				// if error is not nil
-				fmt.Println(chainTojson)
-			}
-			// Marshal the chain struct to JSON
-			jsonChainData, err = json.MarshalIndent(chain, "", "    ")
+		//Verify the HMAC
+		isValid, receivedMessage := crypto.VerifyHMAC(decryptedText)
+		//if valid will check the blockchain
+		if isValid {
+			fmt.Println("Message integrity verified successfully.")
+			jsonChainData, err := os.ReadFile("chain.json")
+			chainlen := len(jsonChainData)
 			if err != nil {
 				panic(err)
 			}
-			// Write the JSON data to a file
-			err = os.WriteFile("chain.json", jsonChainData, 0644)
-			if err != nil {
-				panic(err)
-			}
-			continue
 
-		}
-
-		//Checks if the incoming block is not the first block in a chain
-		if chainlen > 0 {
-			blockTojson := json.Unmarshal(decryptedText, &block)
-			if blockTojson != nil {
-				fmt.Println(blockTojson)
-			}
-			verify := verifyBlockchain(block)
-			if verify == true {
-				chain.Chain = append(chain.Chain, block)
+			//Checks if there is an existing chain or if this is the start of the chain
+			if chainlen == 0 {
+				chainTojson := json.Unmarshal(receivedMessage, &chain)
+				if chainTojson != nil {
+					// if error is not nil
+					fmt.Println(chainTojson)
+				}
 				// Marshal the chain struct to JSON
 				jsonChainData, err = json.MarshalIndent(chain, "", "    ")
 				if err != nil {
@@ -150,16 +132,52 @@ func blockReceiver() {
 				if err != nil {
 					panic(err)
 				}
+				continue
+
 			}
-			if verify == false {
-				fmt.Println("Invalid Block")
+
+			//Checks if the incoming block is not the first block in a chain
+			if chainlen > 0 {
+				blockTojson := json.Unmarshal(receivedMessage, &block)
+				if blockTojson != nil {
+					fmt.Println(blockTojson)
+				}
+				verify := verifyBlockchain(block)
+				if verify == true {
+
+					err := json.Unmarshal(jsonChainData, &chain)
+					if err != nil {
+						return
+					}
+
+					chain.Chain = append(chain.Chain, block)
+					// Marshal the chain struct to JSON
+					jsonChainData, err = json.MarshalIndent(chain, "", "    ")
+					//fmt.Println("This is the chain after its been appended: ", string(jsonChainData))
+					if err != nil {
+						panic(err)
+					}
+					// Write the JSON data to a file
+					err = os.WriteFile("chain.json", jsonChainData, 0644)
+					if err != nil {
+						panic(err)
+					}
+				}
+				if verify == false {
+					fmt.Println("Invalid Block")
+				}
 			}
+		} else {
+			fmt.Println("Message integrity verification failed.")
+			continue
+
 		}
 	}
 }
 
 func verifyBlockchain(currentblock blockchain.Block) bool {
 	// Read the JSON file
+	//fmt.Println("verfiy got this: ", currentblock)
 	jsonChainData, err := os.ReadFile("chain.json")
 	if err != nil {
 		panic(err)

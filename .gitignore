@@ -1,0 +1,17 @@
+bam-api/api
+bam-api/api.exe
+bam-api/.env
+pkg/
+*.test
+*.prof
+*.out
+build/
+bin/
+vendor/
+.cache/
+.idea/
+*.iml
+/go.sum
+/go.mod
+.DS_Store
+crypto/.env

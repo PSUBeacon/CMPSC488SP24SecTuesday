@@ -2,6 +2,7 @@ package main
 
 import (
 	"CMPSC488SP24SecTuesday/blockchain"
+	"CMPSC488SP24SecTuesday/crypto"
 	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
@@ -82,8 +83,10 @@ func BroadCastMessage(messageToSend []byte) {
 			panic(err)
 		}
 
+		//creating the HMAC with unencrypted data
+		hmacChain := crypto.AddHMAC(updatedChain)
 		// Encrypt and send the new block
-		encryptedBlock, err := encryptAES([]byte(AesKey), updatedChain)
+		encryptedBlock, err := encryptAES([]byte(AesKey), hmacChain)
 		if err != nil {
 			log.Fatal("Error encrypting block:", err)
 		}
@@ -122,7 +125,11 @@ func BroadCastMessage(messageToSend []byte) {
 			panic(err)
 		}
 		//fmt.Println("This is the block before encryption: ", jsonBlock)
-		encryptedBlock, err := encryptAES([]byte(AesKey), jsonBlock)
+
+		//creating the HMAC with unencrypted data
+		hmacBlock := crypto.AddHMAC(jsonBlock)
+
+		encryptedBlock, err := encryptAES([]byte(AesKey), hmacBlock)
 		if err != nil {
 			log.Fatal("Error encrypting block:", err)
 		}

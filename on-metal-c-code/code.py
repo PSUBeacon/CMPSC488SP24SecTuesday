@@ -17,5 +17,3 @@ GPIO.setmode(GPIO.BCM)
 #define LEDMATRIX_PIN_CS	4
 #define PIR_PIN_SIG	11
 #define PCFAN_PIN_COIL1	18
-
-

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom for navigation
 import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure Bootstrap CSS is imported to use its grid system and components
@@ -14,6 +14,8 @@ import placeholderImage2 from './placeholderImage2.jpg'; // Replace with the pat
 
 // Define the Dashboard component using a functional component pattern
 const Dashboard = () => {
+
+
 
   const navigate = useNavigate(); // Instantiate useNavigate hook
   const [isNavVisible, setIsNavVisible] = useState(false);
@@ -46,29 +48,8 @@ const Dashboard = () => {
   const toggleAccountPopup = () => {
     setIsAccountPopupVisible(!isAccountPopupVisible);
   };
-  
-  const AccountPopup = ({ isVisible, onClose }) => {
-    if (!isVisible) return null;
-  
-    return (
-      <div class = "accountPop"style={{
-        position: 'absolute',
-        top: '100%', // Position it right below the button
-        right: '0', // Align it with the right edge of the container
-        backgroundColor: '#08192B',
-        padding: '20px',
-        zIndex: 100,
-        color: 'white',
-        borderRadius: '2px',
-        // Add box-shadow or borders as needed for better visibility
-      }}>
-        <p>John Doe</p> {/* Replace with actual user name */}
-        <p>Admin</p> {/* Dynamically display user role */}
-        <button onClick={signOut} class="signout">Sign Out</button>
-      </div>
-    );
-  };
-  
+
+
   const CameraWidget = () => {
     const [cameraView, setCameraView] = useState('livingroom'); // Default view
     
@@ -92,6 +73,80 @@ const Dashboard = () => {
       </div>
     );
   };
+
+
+
+  
+  const AccountPopup = ({ isVisible, onClose }) => {
+    if (!isVisible) return null;
+  
+    return (
+      <div class = "accountPop"style={{
+        position: 'absolute',
+        top: '100%', // Position it right below the button
+        right: '0', // Align it with the right edge of the container
+        backgroundColor: '#08192B',
+        padding: '20px',
+        zIndex: 100,
+        color: 'white',
+        borderRadius: '2px',
+        // Add box-shadow or borders as needed for better visibility
+      }}>
+        <p>John Doe</p> {/* Replace with actual user name */}
+        <p>Admin</p> {/* Dynamically display user role */}
+        <button onClick={signOut} class="signout">Sign Out</button>
+      </div>
+    );
+  };
+  
+  const [dashboardMessage, setDashboardMessage] = useState('');
+  const [accountType ,setAccountType] = useState('')
+  // States for each device
+  const [deviceData, setDeviceData] = useState({
+      HVAC: {},
+      Dishwasher: {},
+      Fridge: {},
+      Lighting: {},
+      Microwave: {},
+      Oven: {},
+      SecuritySystem: {},
+      SolarPanel: {},
+      Toaster: {},
+  });
+
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        const url = 'http://localhost:8081/dashboard';
+
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                // Update state for each device if present in response
+                const updatedDeviceData = { ...deviceData };
+                Object.keys(updatedDeviceData).forEach(device => {
+                    if (data[device]) {
+                        localStorage.setItem(device, JSON.stringify(data[device]));
+                        updatedDeviceData[device] = data[device];
+                    }
+                });
+                setDeviceData(updatedDeviceData);
+                setDashboardMessage(data.message);
+
+                // Store accountType in session storage
+                setAccountType(data.accountType);
+                sessionStorage.setItem('accountType', data.accountType);
+            })
+            .catch(error => console.error('Fetch operation error:', error));
+    }, []);
+
 
   // This is the JSX return statement where we layout our component's HTML structure
   return (

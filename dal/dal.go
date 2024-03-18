@@ -60,7 +60,7 @@ type HVAC struct {
 	Temperature       string    `bson:"Temperature"`
 	Humidity          string    `bson:"Humidity"`
 	FanSpeed          string    `bson:"FanSpeed"`
-	Status            bool      `bson:"Status"`
+	Status            string    `bson:"Status"`
 	EnergyConsumption int       `bson:"EnergyConsumption"`
 	LastChanged       time.Time `bson:"LastChanged"`
 }
@@ -69,7 +69,7 @@ type Lighting struct {
 	UUID              string    `bson:"UUID"`
 	Location          string    `bson:"Location"`
 	Brightness        string    `bson:"Brightness"`
-	Status            bool      `bson:"Status"`
+	Status            string    `bson:"Status"`
 	EnergyConsumption int       `bson:"EnergyConsumption"`
 	LastChanged       time.Time `bson:"LastChanged"`
 }
@@ -96,7 +96,7 @@ type SecuritySystem struct {
 	UUID              string    `bson:"UUID"`
 	Location          string    `bson:"Location"`
 	SensorType        string    `bson:"SensorType"`
-	Status            bool      `bson:"Status"`
+	Status            string    `bson:"Status"`
 	EnergyConsumption int       `bson:"EnergyConsumption"`
 	LastTriggered     time.Time `bson:"LastTriggered"`
 }
@@ -104,7 +104,7 @@ type SecuritySystem struct {
 type SolarPanel struct {
 	UUID                 string    `bson:"UUID"`
 	PanelID              string    `bson:"PanelID"`
-	Status               bool      `bson:"Status"`
+	Status               string    `bson:"Status"`
 	EnergyGeneratedToday int       `bson:"EnergyGeneratedToday"`
 	PowerOutput          int       `bson:"PowerOutput"`
 	LastChanged          time.Time `bson:"LastChanged"`
@@ -129,6 +129,14 @@ type smartHomeDB struct {
 	SecuritySystem *SecuritySystem
 	SolarPanel     *SolarPanel
 	Toaster        *Toaster
+}
+
+// messaging struct to send update requests to IoT devices
+type messagingStruct struct {
+	UUID     string `bson:"UUID"`
+	Name     string `bson:"Name"`
+	Function string `bson:"Function"`
+	Change   string `bson:"Change"`
 }
 
 func FetchCollections(client *mongo.Client, dbName string) (*smartHomeDB, error) {

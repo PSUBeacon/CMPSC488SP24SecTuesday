@@ -5,17 +5,24 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
+<<<<<<< Updated upstream
 	//"github.com/joho/godotenv"
 	"CMPSC488SP24SecTuesday/dal"
 	"github.com/gin-contrib/cors"
 	"go.mongodb.org/mongo-driver/mongo"
 	//"golang.org/x/crypto/bcrypt"
+=======
+	"github.com/joho/godotenv"
+	"golang.org/x/crypto/bcrypt"
+>>>>>>> Stashed changes
 	"log"
 	"net/http"
 	"os"
 	"strings"
 	"time"
 )
+import "github.com/gin-contrib/cors"
+
 
 var client *mongo.Client
 
@@ -46,7 +53,7 @@ func main() {
 		},
 		MaxAge: 12 * time.Hour,
 	}))
-
+	
 	// unprotected endpoints no auth needed
 	r.GET("/status", statusResp)
 	r.POST("/login", loginHandler)
@@ -63,7 +70,22 @@ func main() {
 		dashboardGroup.GET("", dashboardHandler) // Use an empty string for the base path of the group
 	}
 
+<<<<<<< Updated upstream
 	err := r.Run(":8081")
+=======
+	// Route group for user endpoints
+	userGroup := r.Group("/user")
+	userGroup.Use(userMiddleware())
+	{
+		// Example route for user profile
+		userGroup.GET("/dashboard", userProfileHandler)
+		// Add more user-only routes as needed
+	}
+
+	
+
+	err := r.Run(":8080")
+>>>>>>> Stashed changes
 	if err != nil {
 		log.Fatal("Server startup error:", err)
 	}
@@ -87,11 +109,31 @@ func getJwtKey() string {
 var jwtKey = []byte(getJwtKey())
 
 func loginHandler(c *gin.Context) {
+<<<<<<< Updated upstream
+=======
+	//  authentication logic goes here
+	// if authentication is successful, create a JWT token.
+
+	// load .env file which is in gitignore
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	
+	tmpUsername := os.Getenv("TMP_USERNAME")      // get this from .env file
+	tmpPasswordHash := os.Getenv("TMP_PASS_HASH") // get this from .env file
+	
+	fmt.Printf("tmpUsername: %s\n", tmpUsername)
+	fmt.Printf("tmpPasswordHash: %s\n", tmpPasswordHash)
+	
+>>>>>>> Stashed changes
 	var loginData struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
 	}
+	
 
+<<<<<<< Updated upstream
 	if err := c.BindJSON(&loginData); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON"})
 		return
@@ -154,6 +196,49 @@ func loginHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"token": tokenString,
 		"HVAC": smartHomeDB.HVAC.Temperature})
+=======
+	
+
+    fmt.Printf("tmpUsername: %s\n", tmpUsername)
+    fmt.Printf("tmpPasswordHash: %s\n", tmpPasswordHash)
+
+    var loginData struct {
+        Username string `json:"username"`
+        Password string `json:"password"`
+    }
+
+    // BindJSON will return an error if the JSON is invalid
+    if err := c.BindJSON(&loginData); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON"})
+        return
+    }
+
+    if loginData.Username != tmpUsername {
+        c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
+        return
+    }
+
+    // CompareHashAndPassword will return an error if the password does not match the hash
+    if err := bcrypt.CompareHashAndPassword([]byte(tmpPasswordHash), []byte(loginData.Password)); err != nil {
+        c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
+        return
+    }
+
+    // jwt token creation:
+    claims := jwt.MapClaims{
+        "username": loginData.Username,                    // replace with matching value from mongoDB users table
+        "role":     "admin",                               // temporary role
+        "exp":      time.Now().Add(time.Hour * 24).Unix(), // token expiration time
+    }
+    token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+    tokenString, err := token.SignedString(jwtKey)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{"token": tokenString})
+>>>>>>> Stashed changes
 }
 
 // check jwt auth and set user role

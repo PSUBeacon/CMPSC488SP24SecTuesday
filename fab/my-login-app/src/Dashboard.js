@@ -19,6 +19,53 @@ const Dashboard = () => {
 
   const navigate = useNavigate(); // Instantiate useNavigate hook
   const [isNavVisible, setIsNavVisible] = useState(false);
+    const [dashboardMessage, setDashboardMessage] = useState('');
+    const [accountType ,setAccountType] = useState('')
+    // States for each device
+    const [deviceData, setDeviceData] = useState({
+        HVAC: {},
+        Dishwasher: {},
+        Fridge: {},
+        Lighting: {},
+        Microwave: {},
+        Oven: {},
+        SecuritySystem: {},
+        SolarPanel: {},
+        Toaster: {},
+    });
+
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        const url = 'http://localhost:8081/dashboard';
+
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                // Update state for each device if present in response
+                const updatedDeviceData = { ...deviceData };
+                Object.keys(updatedDeviceData).forEach(device => {
+                    if (data[device]) {
+                        localStorage.setItem(device, JSON.stringify(data[device]));
+                        updatedDeviceData[device] = data[device];
+                    }
+                });
+                setDeviceData(updatedDeviceData);
+                setDashboardMessage(data.message);
+
+                // Store accountType in session storage
+                setAccountType(data.accountType);
+                sessionStorage.setItem('accountType', data.accountType);
+            })
+            .catch(error => console.error('Fetch operation error:', error));
+    }, []);
 
   const toggleNav = () => {
     setIsNavVisible(!isNavVisible);
@@ -81,7 +128,7 @@ const Dashboard = () => {
     if (!isVisible) return null;
   
     return (
-      <div class = "accountPop"style={{
+      <div className = "accountPop"style={{
         position: 'absolute',
         top: '100%', // Position it right below the button
         right: '0', // Align it with the right edge of the container
@@ -93,66 +140,20 @@ const Dashboard = () => {
         // Add box-shadow or borders as needed for better visibility
       }}>
         <p>John Doe</p> {/* Replace with actual user name */}
-        <p>Admin</p> {/* Dynamically display user role */}
-        <button onClick={signOut} class="signout">Sign Out</button>
+          {accountType && <p>{accountType}</p>} {/* Dynamically display user role */}
+        <button onClick={signOut} className="signout">Sign Out</button>
       </div>
     );
   };
   
-  const [dashboardMessage, setDashboardMessage] = useState('');
-  const [accountType ,setAccountType] = useState('')
-  // States for each device
-  const [deviceData, setDeviceData] = useState({
-      HVAC: {},
-      Dishwasher: {},
-      Fridge: {},
-      Lighting: {},
-      Microwave: {},
-      Oven: {},
-      SecuritySystem: {},
-      SolarPanel: {},
-      Toaster: {},
-  });
 
-
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        const url = 'http://localhost:8081/dashboard';
-
-        fetch(url, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            },
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-                // Update state for each device if present in response
-                const updatedDeviceData = { ...deviceData };
-                Object.keys(updatedDeviceData).forEach(device => {
-                    if (data[device]) {
-                        localStorage.setItem(device, JSON.stringify(data[device]));
-                        updatedDeviceData[device] = data[device];
-                    }
-                });
-                setDeviceData(updatedDeviceData);
-                setDashboardMessage(data.message);
-
-                // Store accountType in session storage
-                setAccountType(data.accountType);
-                sessionStorage.setItem('accountType', data.accountType);
-            })
-            .catch(error => console.error('Fetch operation error:', error));
-    }, []);
 
 
   // This is the JSX return statement where we layout our component's HTML structure
   return (
     <div style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column', backgroundColor: '#081624' }}>
       {/* Top Navbar */}
-      <nav class="topNav" style={{ backgroundColor: '#081624', color: 'white', padding: '0.5rem 1rem' }}>
+      <nav className="topNav" style={{ backgroundColor: '#081624', color: 'white', padding: '0.5rem 1rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
           <img src={menuIcon} alt="Menu" onClick={toggleNav} className="hamburger-menu"/>
@@ -266,7 +267,11 @@ const Dashboard = () => {
       {/* Status by Units Widget */}
       <div className="widget" style={{ flex: '1', minWidth: '250px', backgroundColor: '#173350', padding: '20px', borderRadius: '1px', margin: '10px', boxSizing: 'border-box' }}>
         <h3>Status by Units</h3>
-        {/* Content of the status by units widget */}
+          {/* Content of the status by units widget */}
+          {deviceData.HVAC.Temperature && (
+              <p>{deviceData.HVAC.Temperature}</p>
+          )}
+
       </div>
       
       {/* Scheduled Activity Widget */}

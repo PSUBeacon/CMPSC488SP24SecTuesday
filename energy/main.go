@@ -1,16 +1,17 @@
 package energy
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 )
 
 type Device struct {
-	DeviceID int // 0 = Solar, 1 = Battery, 2 = Security Systems, 4 = Lighting, 5 = Other
-	Name     string
-	Power    int
-	State    bool
-	Sector   int
+	DeviceID int    `json:"DeviceID"` // 0 = Solar, 1 = Battery, 2 = Security Systems, 4 = Lighting, 5 = Other
+	Name     string `json:"Name"`
+	Power    int    `json:"Power"`
+	State    bool   `json:"State"`
+	Sector   int    `json:"Sector"`
 }
 
 func newDevice(deviceID int, name string, power int, state bool, sector int) *Device {
@@ -81,6 +82,24 @@ func (a *Appliance) TurnOff() {
 	fmt.Printf("%s is turned OFF\n", a.Name)
 }
 
+func serializeDevice(device *Device) (string, error) {
+	deviceJSON, err := json.MarshalIndent(device, "", " ")
+	if err != nil {
+		return "", err
+	}
+	return string(deviceJSON), nil
+}
+
+// deserializeDevice deserializes a JSON string into a Device instance.
+func deserializeDevice(deviceJSON string) (*Device, error) {
+	var device Device
+	err := json.Unmarshal([]byte(deviceJSON), &device)
+	if err != nil {
+		return nil, err
+	}
+	return &device, nil
+}
+
 func monitor() {
 	solarPanel := newDevice(0, "Solar 1", 1500, false, -1)
 	houseBattery := newDevice(1, "Battery 1", 3000, true, 0)
@@ -125,6 +144,26 @@ func demoMonitoring() {
 }
 
 func main() {
+	myDevice := newDevice(0, "Solar Panel", 1500, true, 1)
+
+	// Serialize the Device instance to a JSON string
+	deviceJSON, err := serializeDevice(myDevice)
+	if err != nil {
+		fmt.Println("Error serializing DEVICE to JSON:", err)
+		return
+	}
+
+	// Print the serialized JSON string
+	fmt.Println("\nSerialized device: \n" + deviceJSON)
+
+	// Deserialize the JSON back into a Device object
+	deserializedDevice, err := deserializeDevice(deviceJSON)
+	if err != nil {
+		fmt.Println("Error deserializing device:", err)
+		return
+	}
+
+	fmt.Printf("\nDeserialized Device:\n %+v\n", deserializedDevice)
 
 	// *This is using Goroutines, multithreading.
 	// Though it isn't being put to actually use yet it will be useful for monitoring multiple devices.

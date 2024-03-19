@@ -144,7 +144,12 @@ func send(message []byte) {
 		BaudRate: 9600,
 	}
 	//fmt.Println("This is in the send function", message)
-	port, err := serial.Open("/dev/ttyUSB0", mode)
+
+	//port, err := serial.Open("/dev/ttyUSB0", mode)
+
+	//The port code below is for sending from computer to pi
+	port, err := serial.Open("COM4", mode)
+
 	if err != nil {
 		log.Fatal("Error opening XBee module:", err)
 	}

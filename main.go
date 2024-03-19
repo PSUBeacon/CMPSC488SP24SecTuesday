@@ -16,7 +16,6 @@ func main() {
 	if ReceivedVal == "oven off" {
 		oven.TurnOff()
 	}
-
 	if ReceivedVal == "oven on" {
 		oven.TurnOn()
 	}

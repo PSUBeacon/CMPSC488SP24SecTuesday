@@ -1,5 +1,7 @@
 package dal
 
+//package main
+
 //go get go.mongodb.org/mongo-driver/mongo
 
 import (
@@ -18,6 +20,13 @@ type User struct {
 	Name     string `bson:"name"`
 	Password string `bson:"password"`
 	Email    string `bson:"email"`
+}
+
+type messagingStruct struct {
+	UUID     string `json:"UUID"`
+	Name     string `json:"Name"`
+	Function string `json:"Function"`
+	Change   byte   `json:"Change"`
 }
 
 // MongoDB configuration

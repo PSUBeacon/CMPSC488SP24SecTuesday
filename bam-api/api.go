@@ -1,7 +1,6 @@
 package main
 
 import (
-	messaging "CMPSC488SP24SecTuesday/AES-BlockChain-Communication"
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -37,8 +36,9 @@ func main() {
 	r.GET("/status", statusResp)
 	r.POST("/login", loginHandler)
 
+	r.POST("/lighting", updateLighting)
 	//Messaging stuff
-	r.GET("/lighting", messaging.BroadCastMessage())
+	//r.GET("/lighting", messageHandler)
 
 	// use JWT middleware for all protected routes
 	r.Use(authMiddleware())
@@ -65,6 +65,26 @@ func main() {
 	if err != nil {
 		log.Fatal("Server startup error:", err)
 	}
+}
+
+type UpdateLightingRequest struct {
+	UUID       string `json:"uuid"`
+	Status     string `json:"status"`
+	Brightness string `json:"dim"`
+}
+
+func updateLighting(c *gin.Context) {
+	var req UpdateLightingRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Call the Iotlighting function
+	dal.Iotlighting([]byte(req.UUID), req.Status, req.Brightness)
+
+	// Respond to the request indicating success.
+	c.JSON(http.StatusOK, gin.H{"message": "Lighting updated successfully"})
 }
 
 func statusResp(c *gin.Context) {

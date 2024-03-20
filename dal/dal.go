@@ -1,7 +1,12 @@
 package dal
 
+//package main
+
 import (
+	messaging "CMPSC488SP24SecTuesday/AES-BlockChain-Communication"
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"log"
@@ -66,12 +71,12 @@ type HVAC struct {
 }
 
 type Lighting struct {
-	UUID              string    `bson:"UUID"`
-	Location          string    `bson:"Location"`
-	Brightness        string    `bson:"Brightness"`
-	Status            string    `bson:"Status"`
-	EnergyConsumption int       `bson:"EnergyConsumption"`
-	LastChanged       time.Time `bson:"LastChanged"`
+	UUID              string    `json:"UUID"`
+	Location          string    `json:"Location"`
+	Brightness        string    `json:"Brightness"`
+	Status            string    `json:"Status"`
+	EnergyConsumption int       `json:"EnergyConsumption"`
+	LastChanged       time.Time `json:"LastChanged"`
 }
 
 type Microwave struct {
@@ -119,28 +124,27 @@ type Toaster struct {
 	LastChanged         time.Time `bson:"LastChanged"`
 }
 
-type smartHomeDB struct {
-	Dishwasher     *Dishwasher
-	Fridge         *Fridge
-	HVAC           *HVAC
-	Lighting       *Lighting
-	Microwave      *Microwave
-	Oven           *Oven
-	SecuritySystem *SecuritySystem
-	SolarPanel     *SolarPanel
-	Toaster        *Toaster
+type SmartHomeDB struct {
+	Dishwasher     []Dishwasher
+	Fridge         []Fridge
+	HVAC           []HVAC
+	Lighting       []Lighting
+	Microwave      []Microwave
+	Oven           []Oven
+	SecuritySystem []SecuritySystem
+	SolarPanel     []SolarPanel
+	Toaster        []Toaster
 }
 
 // messaging struct to send update requests to IoT devices
 type messagingStruct struct {
-	UUID     string `bson:"UUID"`
-	Name     string `bson:"Name"`
-	Function string `bson:"Function"`
-	Change   string `bson:"Change"`
+	UUID     string `json:"UUID"`
+	Function string `json:"Function"`
+	Change   string `json:"Change"`
 }
 
-func FetchCollections(client *mongo.Client, dbName string) (*smartHomeDB, error) {
-	smartHomeDB := &smartHomeDB{}
+func FetchCollections(client *mongo.Client, dbName string) (*SmartHomeDB, error) {
+	smartHomeDB := &SmartHomeDB{}
 
 	// Define a helper function to fetch and decode documents
 	fetchAndDecode := func(collectionName string, result interface{}) error {
@@ -233,20 +237,52 @@ func FetchUser(client *mongo.Client, userName string) (User, error) {
 	return User{}, fmt.Errorf("no user found with username: %s", userName)
 }
 
-func PrintSmartHomeDBContents(smartHomeDB *smartHomeDB) string {
-	return fmt.Sprintf(
-		"Dishwasher: %+v\nFridge: %+v\nHVAC: %+v\nLighting: %+v\nMicrowave: %+v\nOven: %+v\nSecuritySystem: %+v\nSolarPanel: %+v\nToaster: %+v\n",
-		*smartHomeDB.Dishwasher,
-		*smartHomeDB.Fridge,
-		*smartHomeDB.HVAC,
-		*smartHomeDB.Lighting,
-		*smartHomeDB.Microwave,
-		*smartHomeDB.Oven,
-		*smartHomeDB.SecuritySystem,
-		*smartHomeDB.SolarPanel,
-		*smartHomeDB.Toaster,
-	)
+func Iotlighting(UUID []byte, status string, dim string) {
+
+	client, err := ConnectToMongoDB()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer func(client *mongo.Client, ctx context.Context) {
+		err := client.Disconnect(ctx)
+		if err != nil {
+
+		}
+	}(client, context.Background())
+	smartHomeDB, err := FetchCollections(client, dbName) // Fetches and populates data
+
+	if err != nil {
+		log.Fatalf("Error fetching IoT data: %v", err)
+	}
+	for _, light := range smartHomeDB.Lighting {
+		if bytes.Equal([]byte(light.UUID), UUID) {
+			light.Status = status
+			light.Brightness = dim
+			var infoChange messagingStruct
+			infoChange.UUID = string(UUID)
+			infoChange.Function = "status"
+			infoChange.Change = status
+			message, _ := json.MarshalIndent(infoChange, "", "  ")
+			messaging.BroadCastMessage(message)
+
+		}
+	}
 }
+
+//func PrintSmartHomeDBContents(smartHomeDB *SmartHomeDB) string {
+//	return fmt.Sprintf(
+//		"Dishwasher: %+v\nFridge: %+v\nHVAC: %+v\nLighting: %+v\nMicrowave: %+v\nOven: %+v\nSecuritySystem: %+v\nSolarPanel: %+v\nToaster: %+v\n",
+//		*smartHomeDB.Dishwasher,
+//		*smartHomeDB.Fridge,
+//		*smartHomeDB.HVAC,
+//		*smartHomeDB.Lighting,
+//		*smartHomeDB.Microwave,
+//		*smartHomeDB.Oven,
+//		*smartHomeDB.SecuritySystem,
+//		*smartHomeDB.SolarPanel,
+//		*smartHomeDB.Toaster,
+//	)
+//}
 
 // connect to db if exists, else return error log
 func main() {
@@ -256,7 +292,7 @@ func main() {
 	}
 	defer client.Disconnect(context.Background())
 
-	//Testing fetchedUser function
+	////Testing fetchedUser function
 	fetchedUser, err := FetchUser(client, "Owner")
 	if err != nil {
 		log.Fatal(err)
@@ -270,18 +306,18 @@ func main() {
 
 	//Testing IoT functions
 	// Fetch the IoT system data
-	smartHomeDB, err := FetchCollections(client, dbName) // Fetches and populates data
+	//smartHomeDB, err := FetchCollections(client, dbName) // Fetches and populates data
 	if err != nil {
 		log.Fatalf("Error fetching IoT data: %v", err)
 	}
 
-	fmt.Printf("HVAC Temperature: %s\n", smartHomeDB.HVAC.Temperature)
+	//fmt.Printf("HVAC Temperature: %s\n", smartHomeDB.HVAC.Temperature)
 
-	fmt.Printf("Dishwasher Status: %s\n", smartHomeDB.Dishwasher.Status)
+	//fmt.Printf("Dishwasher Status: %s\n", smartHomeDB.Dishwasher.Status)
 
-	fmt.Printf("Oven UUID: %s\n", smartHomeDB.Oven.UUID)
+	//fmt.Printf("Oven UUID: %s\n", smartHomeDB.Oven.UUID)
 
 	// Print the contents of smartHomeDB
-	fmt.Printf(PrintSmartHomeDBContents(smartHomeDB))
+	//fmt.Printf(PrintSmartHomeDBContents(smartHomeDB))
 
 }

@@ -7,12 +7,51 @@ import lightbulbIcon from './lightbulbIcon.png';
 import bedroomIcon from './bedroomIcon.jpg';
 import livingroomIcon from './livingroomIcon.jpg';
 import './Lighting.css';
-
+import axios from "axios";
 const Lighting = () => {
-
-  const handleLighting = () => {
+  const [isLightOn, setIsLightOn] = useState(false);
+  const handleTurnOn = () => {
     setIsLightOn(true);
-    // Add logic to turn the light on
+    const serverUrl = 'http://localhost:8081/lighting';
+
+    // Define the body of the request based on your Go server's expected input.
+    const requestBody = {
+      uuid: 'your-uuid-here', // Replace with the actual UUID
+      status: true, // Since this is the turn on function
+      dim: 100, // Set this to your desired default dimmer value for "on"
+    };
+
+    // Send a POST request to turn the light on.
+    axios.post(serverUrl, requestBody)
+        .then(response => {
+          console.log(response.data);
+          // Handle the response here, if needed.
+        })
+        .catch(error => {
+          console.error('There was an error!', error);
+        });
+  };
+
+  const handleTurnOff = () => {
+    setIsLightOn(false);
+    const serverUrl = 'http://localhost:8081/lighting';
+
+    // Define the body of the request similar to the handleTurnOn function.
+    const requestBody = {
+      uuid: 'your-uuid-here', // Replace with the actual UUID
+      status: false, // Since this is the turn off function
+      dim: 0, // Assuming 0 represents "off" for the dimmer
+    };
+
+    // Send a POST request to turn the light off.
+    axios.post(serverUrl, requestBody)
+        .then(response => {
+          console.log(response.data);
+          // Handle the response here, if needed.
+        })
+        .catch(error => {
+          console.error('There was an error!', error);
+        });
   };
 
   return (
@@ -132,7 +171,7 @@ const Lighting = () => {
 
             {/* Turn On/Off Button */}
             <div className="lightControls">
-              <button onClick={isLightOn ? handleLighting : handleLighting}>
+              <button onClick={isLightOn ? handleTurnOff : handleTurnOn}>
                 {isLightOn ? 'Turn Off' : 'Turn On'}
               </button>
             </div>

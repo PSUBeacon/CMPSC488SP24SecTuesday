@@ -263,6 +263,7 @@ func Iotlighting(UUID []byte, status string, dim string) {
 			infoChange.Function = "status"
 			infoChange.Change = status
 			message, _ := json.MarshalIndent(infoChange, "", "  ")
+			fmt.Printf("This is the message: ", message)
 			messaging.BroadCastMessage(message)
 
 		}

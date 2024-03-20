@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
+	"golang.org/x/crypto/bcrypt"
+
 	//"github.com/joho/godotenv"
 	"CMPSC488SP24SecTuesday/dal"
 	"github.com/gin-contrib/cors"
@@ -38,7 +40,6 @@ func main() {
 
 	r.POST("/lighting", updateLighting)
 	//Messaging stuff
-	//r.GET("/lighting", messageHandler)
 
 	// use JWT middleware for all protected routes
 	r.Use(authMiddleware())
@@ -123,34 +124,42 @@ func loginHandler(c *gin.Context) {
 	defer client.Disconnect(context.Background())
 
 	// Fetch user by username from MongoDB
-	fetchedUser, err := dal.FetchUser(client, "name", loginData.Username)
+	fetchedUser, err := dal.FetchUser(client, loginData.Username)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username (not found in DB"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"}) // Use generic error message
+		return
+	}
+
+	// Extract password from customData
+	passwordFromDB, ok := fetchedUser.CustomData["password"].(string)
+	if !ok {
+		// handle missing or non-string password in customData
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "An internal error occurred"})
 		return
 	}
 
 	// Compare the password hash using bcrypt.CompareHashAndPassword
-	//err = bcrypt.CompareHashAndPassword([]byte(fetchedUser.Password), []byte(loginData.Password))
-	//if err != nil {
-	if fetchedUser.Password != loginData.Password {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid  password"})
+	err = bcrypt.CompareHashAndPassword([]byte(passwordFromDB), []byte(loginData.Password))
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"}) // Use generic error message
 		return
 	}
 
 	// JWT token creation
 	claims := jwt.MapClaims{
-		"username": fetchedUser.Name,
-		"role":     "admin",                               // Replace with the actual role from MongoDB
+		"username": fetchedUser.User,
+		"role":     fetchedUser.Role.Role,                 // Use the actual role from the fetched user
 		"exp":      time.Now().Add(time.Hour * 24).Unix(), // Token expiration time
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(jwtKey)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create the token"})
 		return
 	}
 
+	// Return the JWT token in the response
 	c.JSON(http.StatusOK, gin.H{"token": tokenString})
 }
 

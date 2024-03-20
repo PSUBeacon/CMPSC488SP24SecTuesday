@@ -172,9 +172,10 @@ func send(message []byte) {
 	}
 	return
 }
-func main() {
 
-	BroadCastMessage([]byte("testing the stuff"))
-	BroadCastMessage([]byte("this is another one"))
-
-}
+//func main() {
+//
+//	BroadCastMessage([]byte("testing the stuff"))
+//	BroadCastMessage([]byte("this is another one"))
+//
+//}

@@ -16,9 +16,9 @@ const Lighting = () => {
 
     // Define the body of the request based on your Go server's expected input.
     const requestBody = {
-      uuid: 'your-uuid-here', // Replace with the actual UUID
-      status: true, // Since this is the turn on function
-      dim: 100, // Set this to your desired default dimmer value for "on"
+      uuid: '417293', // Replace with the actual UUID
+      status: "On", // Since this is the turn on function
+      dim: "100", // Set this to your desired default dimmer value for "on"
     };
 
     // Send a POST request to turn the light on.
@@ -38,9 +38,9 @@ const Lighting = () => {
 
     // Define the body of the request similar to the handleTurnOn function.
     const requestBody = {
-      uuid: 'your-uuid-here', // Replace with the actual UUID
-      status: false, // Since this is the turn off function
-      dim: 0, // Assuming 0 represents "off" for the dimmer
+      uuid: '417293', // Replace with the actual UUID
+      status: "off", // Since this is the turn off function
+      dim: "10", // Assuming 0 represents "off" for the dimmer
     };
 
     // Send a POST request to turn the light off.

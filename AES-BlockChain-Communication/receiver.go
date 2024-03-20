@@ -204,6 +204,7 @@ func verifyBlockchain(currentblock blockchain.Block) bool {
 	return true
 }
 
-func main() {
-	BlockReceiver()
-}
+//
+//func main() {
+//	BlockReceiver()
+//}

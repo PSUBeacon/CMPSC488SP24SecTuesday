@@ -38,7 +38,7 @@ func main() {
 	r.GET("/status", statusResp)
 	r.POST("/login", loginHandler)
 
-	r.POST("/lighting", updateLighting)
+	r.GET("/lighting", updateLighting)
 	//Messaging stuff
 
 	// use JWT middleware for all protected routes

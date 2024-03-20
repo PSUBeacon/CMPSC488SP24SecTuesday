@@ -9,16 +9,10 @@ import livingroomIcon from './livingroomIcon.jpg';
 import './Lighting.css';
 
 const Lighting = () => {
-  const [isLightOn, setIsLightOn] = useState(false);
 
-  const handleTurnOn = () => {
+  const handleLighting = () => {
     setIsLightOn(true);
     // Add logic to turn the light on
-  };
-
-  const handleTurnOff = () => {
-    setIsLightOn(false);
-    // Add logic to turn the light off
   };
 
   return (
@@ -138,7 +132,7 @@ const Lighting = () => {
 
             {/* Turn On/Off Button */}
             <div className="lightControls">
-              <button onClick={isLightOn ? handleTurnOff : handleTurnOn}>
+              <button onClick={isLightOn ? handleLighting : handleLighting}>
                 {isLightOn ? 'Turn Off' : 'Turn On'}
               </button>
             </div>

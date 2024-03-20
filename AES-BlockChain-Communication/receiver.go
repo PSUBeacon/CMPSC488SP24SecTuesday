@@ -1,4 +1,4 @@
-package main
+package messaging
 
 import (
 	"CMPSC488SP24SecTuesday/blockchain"
@@ -51,7 +51,7 @@ func decryptAES(key, ciphertext []byte) ([]byte, error) {
 	return ciphertext, nil
 }
 
-func blockReceiver() {
+func BlockReceiver() {
 	// Open the XBee module for communication
 	var chain blockchain.Blockchain
 	var block blockchain.Block
@@ -205,5 +205,5 @@ func verifyBlockchain(currentblock blockchain.Block) bool {
 }
 
 func main() {
-	blockReceiver()
+	BlockReceiver()
 }

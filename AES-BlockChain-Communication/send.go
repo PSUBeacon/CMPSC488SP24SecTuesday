@@ -1,4 +1,4 @@
-package main
+package messaging
 
 import (
 	"CMPSC488SP24SecTuesday/blockchain"

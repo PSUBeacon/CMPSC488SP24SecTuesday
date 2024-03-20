@@ -1,6 +1,7 @@
 package main
 
 import (
+	messaging "CMPSC488SP24SecTuesday/AES-BlockChain-Communication"
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -35,6 +36,9 @@ func main() {
 	// unprotected endpoints no auth needed
 	r.GET("/status", statusResp)
 	r.POST("/login", loginHandler)
+
+	//Messaging stuff
+	r.GET("/lighting", messaging.BroadCastMessage())
 
 	// use JWT middleware for all protected routes
 	r.Use(authMiddleware())

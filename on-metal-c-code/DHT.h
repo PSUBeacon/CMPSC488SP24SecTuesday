@@ -7,9 +7,9 @@ written by Adafruit Industries
 #define DHT_H
 
 #if ARDUINO >= 100
- #include "Arduino.h"
+ #include "Arduino.h" // Arduino lib
 #else
- #include "WProgram.h"
+ #include "WProgram.h" // This is the name of Arduino's previous Lib
 #endif
 
 

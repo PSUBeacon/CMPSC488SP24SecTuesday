@@ -7,14 +7,14 @@ import (
 
 // HVAC represents an HVAC system with temperature control, fan speed, and mode.
 type HVAC struct {
-	Name              string
-	Temperature       int    // Desired temperature in Celsius
-	FanSpeed          string // Fan speed ("Off" , "Low", "Medium", "High")
-	Humidity          int    // Humidity %
-	Status            string // HVAC mode (e.g., "Cool", "Heat", "Fan", "Off")
-	Location          string // Location of device
-	EnergyConsumption int
-	LastChanged       string
+	Name              string `json:"Name"`
+	Temperature       int    `json:"Temperature"`       // Desired temperature in Celsius
+	FanSpeed          string `json:"FanSpeed"`          // Fan speed ("Off" , "Low", "Medium", "High")
+	Humidity          int    `json:"Humidity"`          // Humidity %
+	Status            string `json:"Status"`            // HVAC mode (e.g., "Cool", "Heat", "Fan", "Off")
+	Location          string `json:"Location"`          // Location of device
+	EnergyConsumption int    `json:"EnergyConsumption"` // Energy Consumption
+	LastChanged       string `json:"LastChanged"`       // Last Changed (date)
 }
 
 // NewHVAC creates a new HVAC instance with the given name and initial settings.
@@ -58,6 +58,24 @@ func (h *HVAC) SetHumidity(humidity int) {
 	h.Humidity = humidity
 	fmt.Printf("%s humidity is set to %d%%\n", h.Name, h.Humidity)
 }
+
+func serializeHvac(hvac *HVAC) (string, error) {
+	hvacJSON, err := json.MarshalIndent(hvac, "", " ")
+	if err != nil {
+		return "", err
+	}
+	return string(hvacJSON), nil
+}
+
+func deserializeHvac(hvacJSON string) (*HVAC, error) {
+	var hvac HVAC
+	err := json.Unmarshal([]byte(hvacJSON), &hvac)
+	if err != nil {
+		return nil, err
+	}
+	return &hvac, nil
+}
+
 func main() {
 	// Create a new HVAC instance
 	hvac := NewHVAC("My HVAC")
@@ -68,13 +86,23 @@ func main() {
 	hvac.SetStatus("Cool")
 	hvac.SetHumidity(45)
 
-	// Serialize the HVAC instance to JSON
-	jsonData, err := json.Marshal(hvac)
+	// Serialize the Hvac instance to JSON
+	hvacJSON, err := serializeHvac(hvac)
 	if err != nil {
 		fmt.Println("Error serializing HVAC to JSON:", err)
 		return
 	}
 
 	// Print the serialized JSON string
-	fmt.Println(string(jsonData))
+	fmt.Println(string(hvacJSON))
+
+	//Deserialize
+	deserializeHvac, err := deserializeHvac(hvacJSON)
+	if err != nil {
+		fmt.Println("Error deserializing HVAC:", err)
+		return
+	}
+
+	fmt.Printf("\nDeserialized HVAC:\n %+v\n", deserializeHvac)
+
 }

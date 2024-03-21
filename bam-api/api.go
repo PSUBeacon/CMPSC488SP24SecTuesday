@@ -2,11 +2,14 @@ package main
 
 import (
 	"CMPSC488SP24SecTuesday/dal"
+	"bytes"
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
+	"io/ioutil"
+
 	//"github.com/joho/godotenv"
 
 	"github.com/gin-contrib/cors"
@@ -37,6 +40,7 @@ func main() {
 	// unprotected endpoints no auth needed
 	r.GET("/status", statusResp)
 	r.POST("/login", loginHandler)
+	r.POST("/lighting", updateLighting)
 
 	//r.GET("/lighting", updateLighting)
 	//Messaging stuff
@@ -50,6 +54,7 @@ func main() {
 	{
 		// Example route requiring admin role
 		adminGroup.GET("/admin-dashboard", adminDashboardHandler)
+		adminGroup.POST("/lighting", updateLighting)
 		// Add more admin-only routes as needed
 	}
 
@@ -59,7 +64,7 @@ func main() {
 	{
 		// Example route for user profile
 		userGroup.GET("/dashboard", userProfileHandler)
-		userGroup.GET("/lighting", updateLighting)
+		userGroup.POST("/lighting", updateLighting)
 		// Add more user-only routes as needed
 	}
 
@@ -77,7 +82,13 @@ type UpdateLightingRequest struct {
 
 func updateLighting(c *gin.Context) {
 	var req UpdateLightingRequest
+	requestBody, _ := ioutil.ReadAll(c.Request.Body)
+	fmt.Printf("Received request body: %s\n", string(requestBody))
+	// Reset the request body to be able to parse it again
+	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
 	if err := c.ShouldBindJSON(&req); err != nil {
+		fmt.Printf("Error binding JSON: %v\n", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}

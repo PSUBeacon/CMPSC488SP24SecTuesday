@@ -19,7 +19,7 @@ import (
 
 // Secure connection to DB through admin user
 var (
-	mongoURI = "mongodb://10.0.0.102"
+	mongoURI = "mongodb://localhost:27017"
 	dbName   = "smartHomeDB"
 )
 
@@ -53,7 +53,7 @@ type Dishwasher struct {
 type Fridge struct {
 	UUID                string    `json:"UUID"`
 	Status              bool      `json:"Status"`
-	TemperatureSettings string    `json:"TemperatureSettings"`
+	TemperatureSettings int       `json:"TemperatureSettings"`
 	EnergyConsumption   int       `json:"EnergyConsumption"`
 	LastChanged         time.Time `json:"LastChanged"`
 	EnergySaveMode      bool      `json:"EnergySaveMode"`
@@ -91,7 +91,7 @@ type Microwave struct {
 type Oven struct {
 	UUID                string    `json:"UUID"`
 	Status              bool      `json:"Status"`
-	TemperatureSettings string    `json:"TemperatureSettings"`
+	TemperatureSettings int       `json:"TemperatureSettings"`
 	TimerStopTime       time.Time `json:"TimerStopTime"`
 	EnergyConsumption   int       `json:"EnergyConsumption"`
 	LastChanged         time.Time `json:"LastChanged"`
@@ -118,7 +118,7 @@ type SolarPanel struct {
 type Toaster struct {
 	UUID                string    `json:"UUID"`
 	Status              bool      `json:"Status"`
-	TemperatureSettings string    `json:"TemperatureSettings"`
+	TemperatureSettings int       `json:"TemperatureSettings"`
 	TimerStopTime       time.Time `json:"TimerStopTime"`
 	EnergyConsumption   int       `json:"EnergyConsumption"`
 	LastChanged         time.Time `json:"LastChanged"`
@@ -149,8 +149,16 @@ func FetchCollections(client *mongo.Client, dbName string) (*SmartHomeDB, error)
 	smartHomeDB := &SmartHomeDB{}
 
 	// Define a helper function to fetch and decode documents
-	fetchAndDecode := func(collectionName string, result interface{}) error {
-		return client.Database(dbName).Collection(collectionName).FindOne(context.Background(), bson.D{}).Decode(result)
+	fetchAndDecode := func(collectionName string, results interface{}) error {
+		cursor, err := client.Database(dbName).Collection(collectionName).Find(context.Background(), bson.D{})
+		if err != nil {
+			return err
+		}
+		defer cursor.Close(context.Background())
+		if err = cursor.All(context.Background(), results); err != nil {
+			return err
+		}
+		return nil
 	}
 
 	// Fetch each collection
@@ -245,7 +253,8 @@ func Iotlighting(UUID []byte, status bool, brightness int) {
 
 			message, _ := json.MarshalIndent(infoChange, "", "  ")
 			fmt.Printf("This is the message: ", message)
-			messaging.BroadCastMessage(message)
+			//messaging.BroadCastMessage(message)
+			messaging.BroadCastMessage([]byte("I got to here"))
 		}
 	}
 }

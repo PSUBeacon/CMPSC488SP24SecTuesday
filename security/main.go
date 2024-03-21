@@ -1,4 +1,4 @@
-package main
+package security
 
 import (
 	"encoding/json"
@@ -15,12 +15,12 @@ type SecuritySystem struct {
 }
 
 // creates new security system. I gotta figure out how to connect sensor type with sensor or location with the door strucute
-func NewSecuirtySystem(location string, sensorType string, status bool, energyConsuption int, lastTriggered string) *SecuritySystem {
+func NewSecuritySystem(location string, sensorType string, status bool, energyConsumption int, lastTriggered string) *SecuritySystem {
 	return &SecuritySystem{
 		Location:          location,
 		SensorType:        sensorType,
 		Status:            status,
-		EnergyConsumption: energyConsuption,
+		EnergyConsumption: energyConsumption,
 		LastTriggered:     lastTriggered,
 	}
 }
@@ -150,9 +150,95 @@ func (a *PadLock) Verify(pin string) {
 	}
 }
 
+// security system structure
+func serializeSecuritySystem(security *SecuritySystem) (string, error) {
+	securitySystemJSON, err := json.MarshalIndent(security, "", " ")
+	if err != nil {
+		return "", err
+	}
+	return string(securitySystemJSON), nil
+}
+
+func deserializeSecuritySystem(securitySystemJSON string) (*SecuritySystem, error) {
+	var securitySystem SecuritySystem
+	err := json.Unmarshal([]byte(securitySystemJSON), &securitySystem)
+	if err != nil {
+		return nil, err
+	}
+	return &securitySystem, nil
+}
+
+func serializeMotionSensor(motionSensor *MotionSensor) (string, error) {
+	motionSensorJSON, err := json.MarshalIndent(motionSensor, "", " ")
+	if err != nil {
+		return "", err
+	}
+	return string(motionSensorJSON), nil
+}
+
+func deserializeMotionSensor(motionSensorJSON string) (*MotionSensor, error) {
+	var motionSensor MotionSensor
+	err := json.Unmarshal([]byte(motionSensorJSON), &motionSensor)
+	if err != nil {
+		return nil, err
+	}
+	return &motionSensor, nil
+}
+
+func serializeAlarm(alarm *Alarm) (string, error) {
+	alarmJSON, err := json.MarshalIndent(alarm, "", " ")
+	if err != nil {
+		return "", err
+	}
+	return string(alarmJSON), nil
+}
+
+func deserializeAlarm(alarmJSON string) (*Alarm, error) {
+	var alarm Alarm
+	err := json.Unmarshal([]byte(alarmJSON), &alarm)
+	if err != nil {
+		return nil, err
+	}
+	return &alarm, nil
+}
+
+func serializeDoorLock(doorLock *DoorLock) (string, error) {
+	doorLockJSON, err := json.MarshalIndent(doorLock, "", " ")
+	if err != nil {
+		return "", err
+	}
+	return string(doorLockJSON), nil
+}
+
+func deserializeDoorLock(doorLockJSON string) (*DoorLock, error) {
+	var doorLock DoorLock
+	err := json.Unmarshal([]byte(doorLockJSON), &doorLock)
+	if err != nil {
+		return nil, err
+	}
+	return &doorLock, nil
+}
+
+func serializePadLock(padLock *PadLock) (string, error) {
+	padLockJSON, err := json.MarshalIndent(padLock, "", " ")
+	if err != nil {
+		return "", err
+	}
+	return string(padLockJSON), nil
+}
+
+func deserializePadLock(padLockJSON string) (*PadLock, error) {
+	var padLock PadLock
+	err := json.Unmarshal([]byte(padLockJSON), &padLock)
+	if err != nil {
+		return nil, err
+	}
+	return &padLock, nil
+}
+
 func main() {
 	// Create a security system, motion sensor, alarm, padlock, frontdoor, backdoor
-	securitySystem := NewSecuirtySystem("House1", "imaginary sensor", true, 3, "02/21 10:32:05PM '24 -0700")
+	securitySystem := NewSecuritySystem("House1", "imaginary sensor", true, 3, "02/21 10:32:05PM '24 -0700")
 	motionSensor := NewMotionSensor("Motion Sensor")
 	securityAlarm := NewAlarm("Security Alarm")
 	padLock1 := NewPadlock("PadLock1", "1234")
@@ -162,35 +248,35 @@ func main() {
 	//Serializations---------------------------------
 
 	//security
-	securityJSON, err := json.Marshal(securitySystem)
+	securitySystemJSON, err := serializeSecuritySystem(securitySystem)
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
 
 	//motionSensor
-	motionSensorJSON, err := json.Marshal(motionSensor)
+	motionSensorJSON, err := serializeMotionSensor(motionSensor)
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
 
 	//security alarm
-	securityAlarmJSON, err := json.Marshal(securityAlarm)
+	securityAlarmJSON, err := serializeAlarm(securityAlarm)
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
 
 	//padlock
-	padLockJSON, err := json.Marshal(padLock1)
+	padLockJSON, err := serializePadLock(padLock1)
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
 
-	frontDoorJSON, err := json.Marshal(frontdoor)
+	frontDoorJSON, err := serializeDoorLock(frontdoor)
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
 
-	backDoorJSON, err := json.Marshal(backdoor)
+	backDoorJSON, err := serializeDoorLock(backdoor)
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
@@ -247,48 +333,43 @@ func main() {
 	// Deserializations -----------------------------
 
 	// security
-	var loadedSecurity SecuritySystem
-	err = json.Unmarshal(securityJSON, &loadedSecurity)
+	// Deserialize the JSON back into a Appliance object
+	deserializeSecuritySystem, err := deserializeSecuritySystem(securitySystemJSON)
 	if err != nil {
-		fmt.Println("Error", err)
+		fmt.Println("Error deserializing Security System:", err)
 		return
 	}
 
 	// Motion Sensor
-	var loadedMotionSensor MotionSensor
-	err = json.Unmarshal(motionSensorJSON, &loadedMotionSensor)
+	deserializeMotionSensor, err := deserializeMotionSensor(motionSensorJSON)
 	if err != nil {
 		fmt.Println("Error", err)
 		return
 	}
 
 	// Security Alarm
-	var loadedSecurityAlarm Alarm
-	err = json.Unmarshal(securityAlarmJSON, &loadedSecurityAlarm)
+	deserializeSecurityAlarm, err := deserializeAlarm(securityAlarmJSON)
 	if err != nil {
 		fmt.Println("Error", err)
 		return
 	}
 
 	// PadLock
-	var loadedPadLock PadLock
-	err = json.Unmarshal(padLockJSON, &loadedPadLock)
+	deserializePadLock, err := deserializePadLock(padLockJSON)
 	if err != nil {
 		fmt.Println("Error", err)
 		return
 	}
 
 	// Front Door
-	var loadedFrontDoor DoorLock
-	err = json.Unmarshal(frontDoorJSON, &loadedFrontDoor)
+	deserializeFrontDoorLock, err := deserializeDoorLock(frontDoorJSON)
 	if err != nil {
 		fmt.Println("Error", err)
 		return
 	}
 
-	// Front Door
-	var loadedBackDoor DoorLock
-	err = json.Unmarshal(backDoorJSON, &loadedFrontDoor)
+	// Back Door
+	deserializeBackDoorLock, err := deserializeDoorLock(backDoorJSON)
 	if err != nil {
 		fmt.Println("Error", err)
 		return
@@ -299,7 +380,7 @@ func main() {
 	// serialization prints-------------------------------
 
 	fmt.Println("\n\nHere are the Serializations:\n\nSecurity Object Serialization")
-	fmt.Println(string(securityJSON))
+	fmt.Println(string(securitySystemJSON))
 	fmt.Println()
 
 	fmt.Println("Motion Sensor Object Serialization")
@@ -325,41 +406,37 @@ func main() {
 	// ends------------------------------------------
 
 	//Deserialization prints---------------------------
-	fmt.Println("Deserialization Prints:\n\n")
+	fmt.Println("Deserialization Prints:\n")
 
 	//Security
 	fmt.Println("Deserialization Security System")
-	fmt.Println("Location: ", loadedSecurity.Location)
-	fmt.Println("SensorType: ", loadedSecurity.SensorType)
-	fmt.Println("Status: ", loadedSecurity.Status)
-	fmt.Println("EnergyConsumption: ", loadedSecurity.EnergyConsumption)
-	fmt.Println("LastTriggred: ", loadedSecurity.LastTriggered)
+	fmt.Printf("%+v\n", deserializeSecuritySystem)
+	//to get the structures one by one you would have to do deserializeSecuritySystem.Location etc etc.
 	fmt.Println()
 
 	//Motion Sensor
 	fmt.Println("Deserialization Motion Sensor")
-	fmt.Println("Name: ", loadedMotionSensor.Name)
-	fmt.Println("MotionDetected: ", loadedMotionSensor.MotionDetected)
+	fmt.Printf("%+v\n", deserializeMotionSensor)
 	fmt.Println()
 
 	//Alarm
 	fmt.Println("Deserialization Alarm")
-	fmt.Println("Name: ", loadedSecurityAlarm.Name)
-	fmt.Println("Armed: ", loadedSecurityAlarm.Armed)
-	fmt.Println("Sounded: ", loadedSecurityAlarm.Sounded)
-	fmt.Println("Energy: ", loadedSecurityAlarm.Energy)
+	fmt.Printf("%+v\n", deserializeSecurityAlarm)
+	fmt.Println()
+
+	//PadLock
+	fmt.Println("Deserializarion PadLock")
+	fmt.Printf("%+v\n", deserializePadLock)
 	fmt.Println()
 
 	//FrontDoor
 	fmt.Println("Deserialization Front Door")
-	fmt.Println("Location: ", loadedFrontDoor.Location)
-	fmt.Println("Lock: ", loadedFrontDoor.Lock)
+	fmt.Printf("%+v\n", deserializeFrontDoorLock)
 	fmt.Println()
 
 	//BackDoor
 	fmt.Println("Deserialization Back Door")
-	fmt.Println("Location: ", loadedBackDoor.Location)
-	fmt.Println("Lock: ", loadedBackDoor.Lock)
+	fmt.Printf("%+v\n", deserializeBackDoorLock)
 	fmt.Println()
 
 	// ends------------------------------------------------

@@ -213,7 +213,7 @@ func FetchUser(client *mongo.Client, userName string) (User, error) {
 		return User{}, err
 	}
 
-	fmt.Printf("Found user: Username: %s, Role: %s\n", user.Username, user.Role)
+	fmt.Printf("Username: %s, Role: %s\n", user.Username, user.Role)
 	return user, nil
 }
 

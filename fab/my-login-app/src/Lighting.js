@@ -18,15 +18,16 @@ const Lighting = () => {
     // Define the body of the request based on your Go server's expected input.
     const requestBody = {
       uuid: '417293', // Replace with the actual UUID
-      status: "On", // Since this is the turn on function
-      dim: "100", // Set this to your desired default dimmer value for "on"
+      status: 1, // Since this is the turn on function
+      brightness: "100", // Set this to your desired default dimmer value for "on"
     };
-
+    const token = localStorage.getItem('token')
     // Send a POST request to turn the light on.
-    axios.post(serverUrl, requestBody)
+    axios.post(serverUrl, requestBody,{headers: {'Authorization': `Bearer ${token}`}})
+        .then(response => {
+        })
         .then(response => {
           console.log(response.data);
-          // Handle the response here, if needed.
         })
         .catch(error => {
           console.error('There was an error!', error);
@@ -40,7 +41,7 @@ const Lighting = () => {
     // Define the body of the request similar to the handleTurnOn function.
     const requestBody = {
       uuid: '417293', // Replace with the actual UUID
-      status: "off", // Since this is the turn off function
+      status: 0, // Since this is the turn off function
       dim: "10", // Assuming 0 represents "off" for the dimmer
     };
 

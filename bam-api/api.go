@@ -38,7 +38,7 @@ func main() {
 	r.GET("/status", statusResp)
 	r.POST("/login", loginHandler)
 
-	r.GET("/lighting", updateLighting)
+	//r.GET("/lighting", updateLighting)
 	//Messaging stuff
 
 	// use JWT middleware for all protected routes
@@ -59,6 +59,7 @@ func main() {
 	{
 		// Example route for user profile
 		userGroup.GET("/dashboard", userProfileHandler)
+		userGroup.GET("/lighting", updateLighting)
 		// Add more user-only routes as needed
 	}
 
@@ -132,12 +133,13 @@ func loginHandler(c *gin.Context) {
 		return
 	}
 
-	// Extract password from customData
 	passwordFromDB := fetchedUser.Password
+	fmt.Printf("Password: %s\n", passwordFromDB)
 
 	// Compare the password hash using bcrypt.CompareHashAndPassword
 	err = bcrypt.CompareHashAndPassword([]byte(passwordFromDB), []byte(loginData.Password))
 	if err != nil {
+		fmt.Printf("Error: password")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"}) // Use generic error message
 		return
 	}

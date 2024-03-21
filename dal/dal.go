@@ -7,19 +7,19 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"log"
 	"time"
 
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // Secure connection to DB through admin user
 var (
-	mongoURI = "mongodb://adminDB:%2525R37%3DLA%5EZX@localhost/admin"
+	mongoURI = "mongodb://10.0.0.102"
 	dbName   = "smartHomeDB"
 )
 
@@ -134,13 +134,15 @@ type SmartHomeDB struct {
 	SecuritySystem []SecuritySystem
 	SolarPanel     []SolarPanel
 	Toaster        []Toaster
+	Users          []User
 }
 
 // messaging struct to send update requests to IoT devices
 type messagingStruct struct {
-	UUID     string `json:"UUID"`
-	Function string `json:"Function"`
-	Change   string `json:"Change"`
+	UUID         string `json:"UUID"`
+	Function     string `json:"Function"`
+	Change       string `json:"Change"`
+	StatusChange bool   `json:"StatusChange"`
 }
 
 func FetchCollections(client *mongo.Client, dbName string) (*SmartHomeDB, error) {
@@ -187,57 +189,35 @@ func FetchCollections(client *mongo.Client, dbName string) (*SmartHomeDB, error)
 
 // User structure to fit system Info
 type User struct {
-	User       string                 `json:"user"`
-	UserID     primitive.Binary       `json:"userId"`
-	CustomData map[string]interface{} `json:"customData"`
-	Role       struct {
-		Role string `json:"role"`
-		DB   string `json:"db"`
-	} `json:"role"`
+	Username string `json:"Username"`
+	Password string `json:"Password"`
+	Role     string `json:"Role"`
 }
 
 func FetchUser(client *mongo.Client, userName string) (User, error) {
-	var tempResult struct {
-		Users []struct {
-			User       string                 `bson:"user"`
-			UserID     primitive.Binary       `bson:"userId"`
-			CustomData map[string]interface{} `bson:"customData"`
-			Roles      []struct {
-				Role string `bson:"role"`
-				DB   string `bson:"db"`
-			} `bson:"roles"`
-		} `bson:"users"`
-	}
 
-	cmd := bson.D{
-		{Key: "usersInfo", Value: bson.M{
-			"user": userName,
-			"db":   dbName,
-		}},
-	}
+	collection := client.Database(dbName).Collection("Users")
 
-	err := client.Database(dbName).RunCommand(context.Background(), cmd).Decode(&tempResult)
+	// Create a filter to specify the criteria of the query
+	filter := bson.M{"username": userName}
+
+	// Finding multiple documents returns a cursor
+	var user User
+	err := collection.FindOne(context.TODO(), filter).Decode(&user)
 	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			// User was not found
+			return User{}, fmt.Errorf("no user found with username: %s", userName)
+		}
+		// Some other error occurred
 		return User{}, err
 	}
 
-	if len(tempResult.Users) > 0 {
-		user := tempResult.Users[0]
-		var simplifiedUser User
-		simplifiedUser.User = user.User
-		simplifiedUser.UserID = user.UserID
-		simplifiedUser.CustomData = user.CustomData
-		if len(user.Roles) > 0 {
-			simplifiedUser.Role.Role = user.Roles[0].Role
-			simplifiedUser.Role.DB = user.Roles[0].DB
-		}
-		return simplifiedUser, nil
-	}
-
-	return User{}, fmt.Errorf("no user found with username: %s", userName)
+	fmt.Printf("Found user: Username: %s, Role: %s\n", user.Username, user.Role)
+	return user, nil
 }
 
-func Iotlighting(UUID []byte, status string, dim string) {
+func Iotlighting(UUID []byte, status bool, brightness int) {
 
 	client, err := ConnectToMongoDB()
 	if err != nil {
@@ -256,16 +236,16 @@ func Iotlighting(UUID []byte, status string, dim string) {
 	}
 	for _, light := range smartHomeDB.Lighting {
 		if bytes.Equal([]byte(light.UUID), UUID) {
-			light.Status = status
-			light.Brightness = dim
 			var infoChange messagingStruct
+
 			infoChange.UUID = string(UUID)
 			infoChange.Function = "status"
-			infoChange.Change = status
+			infoChange.Change = ""
+			infoChange.StatusChange = status
+
 			message, _ := json.MarshalIndent(infoChange, "", "  ")
 			fmt.Printf("This is the message: ", message)
 			messaging.BroadCastMessage(message)
-
 		}
 	}
 }
@@ -294,23 +274,23 @@ func main() {
 	defer client.Disconnect(context.Background())
 
 	////Testing fetchedUser function
-	fetchedUser, err := FetchUser(client, "Owner")
+	//fetchedUser, err := FetchUser(client, "Owner")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("User name: %s\n", fetchedUser.User)
-	fmt.Printf("Password: %v\n", fetchedUser.CustomData["password"])
-	fmt.Printf("UserID: %x\n", fetchedUser.UserID.Data)
-	fmt.Printf("Role: %s\n", fetchedUser.Role.Role)
-	fmt.Printf("Role DB: %s\n", fetchedUser.Role.DB)
+	//fmt.Printf("User name: %s\n", fetchedUser.User)
+	//fmt.Printf("Password: %v\n", fetchedUser.CustomData["password"])
+	//fmt.Printf("UserID: %x\n", fetchedUser.UserID.Data)
+	//fmt.Printf("Role: %s\n", fetchedUser.Role.Role)
+	//fmt.Printf("Role DB: %s\n", fetchedUser.Role.DB)
 
 	//Testing IoT functions
 	// Fetch the IoT system data
 	//smartHomeDB, err := FetchCollections(client, dbName) // Fetches and populates data
-	if err != nil {
-		log.Fatalf("Error fetching IoT data: %v", err)
-	}
+	//if err != nil {
+	//	log.Fatalf("Error fetching IoT data: %v", err)
+	//}
 
 	//fmt.Printf("HVAC Temperature: %s\n", smartHomeDB.HVAC.Temperature)
 
@@ -320,5 +300,7 @@ func main() {
 
 	// Print the contents of smartHomeDB
 	//fmt.Printf(PrintSmartHomeDBContents(smartHomeDB))
+
+	fmt.Println(FetchUser(client, "beaconuser"))
 
 }

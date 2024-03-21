@@ -1,14 +1,14 @@
 package main
 
 import (
+	"CMPSC488SP24SecTuesday/dal"
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
-
 	//"github.com/joho/godotenv"
-	"CMPSC488SP24SecTuesday/dal"
+
 	"github.com/gin-contrib/cors"
 	//"golang.org/x/crypto/bcrypt"
 	"log"
@@ -69,9 +69,9 @@ func main() {
 }
 
 type UpdateLightingRequest struct {
-	UUID       string `json:"uuid"`
-	Status     string `json:"status"`
-	Brightness string `json:"dim"`
+	UUID       string `json:"UUID"`
+	Status     bool   `json:"Status"`
+	Brightness int    `json:"Brightness"`
 }
 
 func updateLighting(c *gin.Context) {
@@ -117,6 +117,7 @@ func loginHandler(c *gin.Context) {
 
 	// Connect to MongoDB
 	client, err := dal.ConnectToMongoDB()
+	//fmt.Printf("This is the client: ", client)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to MongoDB"})
 		return
@@ -125,18 +126,14 @@ func loginHandler(c *gin.Context) {
 
 	// Fetch user by username from MongoDB
 	fetchedUser, err := dal.FetchUser(client, loginData.Username)
+	fmt.Printf("Username:", fetchedUser.Username)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"}) // Use generic error message
 		return
 	}
 
 	// Extract password from customData
-	passwordFromDB, ok := fetchedUser.CustomData["password"].(string)
-	if !ok {
-		// handle missing or non-string password in customData
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "An internal error occurred"})
-		return
-	}
+	passwordFromDB := fetchedUser.Password
 
 	// Compare the password hash using bcrypt.CompareHashAndPassword
 	err = bcrypt.CompareHashAndPassword([]byte(passwordFromDB), []byte(loginData.Password))
@@ -147,8 +144,8 @@ func loginHandler(c *gin.Context) {
 
 	// JWT token creation
 	claims := jwt.MapClaims{
-		"username": fetchedUser.User,
-		"role":     fetchedUser.Role.Role,                 // Use the actual role from the fetched user
+		"username": fetchedUser.Username,
+		"role":     fetchedUser.Role,                      // Use the actual role from the fetched user
 		"exp":      time.Now().Add(time.Hour * 24).Unix(), // Token expiration time
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

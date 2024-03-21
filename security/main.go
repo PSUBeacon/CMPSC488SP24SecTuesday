@@ -1,4 +1,4 @@
-package main
+package security
 
 import (
 	"encoding/json"
@@ -15,12 +15,12 @@ type SecuritySystem struct {
 }
 
 // creates new security system. I gotta figure out how to connect sensor type with sensor or location with the door strucute
-func NewSecuirtySystem(location string, sensorType string, status bool, energyConsuption int, lastTriggered string) *SecuritySystem {
+func NewSecuritySystem(location string, sensorType string, status bool, energyConsumption int, lastTriggered string) *SecuritySystem {
 	return &SecuritySystem{
 		Location:          location,
 		SensorType:        sensorType,
 		Status:            status,
-		EnergyConsumption: energyConsuption,
+		EnergyConsumption: energyConsumption,
 		LastTriggered:     lastTriggered,
 	}
 }
@@ -238,7 +238,7 @@ func deserializePadLock(padLockJSON string) (*PadLock, error) {
 
 func main() {
 	// Create a security system, motion sensor, alarm, padlock, frontdoor, backdoor
-	securitySystem := NewSecuirtySystem("House1", "imaginary sensor", true, 3, "02/21 10:32:05PM '24 -0700")
+	securitySystem := NewSecuritySystem("House1", "imaginary sensor", true, 3, "02/21 10:32:05PM '24 -0700")
 	motionSensor := NewMotionSensor("Motion Sensor")
 	securityAlarm := NewAlarm("Security Alarm")
 	padLock1 := NewPadlock("PadLock1", "1234")
@@ -442,5 +442,3 @@ func main() {
 	// ends------------------------------------------------
 
 }
-
-

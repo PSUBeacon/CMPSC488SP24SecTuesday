@@ -1,4 +1,4 @@
-package appliances
+package security
 
 import (
 	"bufio"

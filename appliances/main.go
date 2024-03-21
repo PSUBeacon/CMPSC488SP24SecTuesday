@@ -1,4 +1,4 @@
-package appliances
+package main
 
 import (
 	"encoding/json"

@@ -42,86 +42,86 @@ func ConnectToMongoDB() (*mongo.Client, error) {
 
 // IOT Structure to fit system info
 type Dishwasher struct {
-	UUID              string    `bson:"UUID"`
-	Status            string    `bson:"Status"`
-	WashTime          string    `bson:"WashTime"`
-	TimerStopTime     time.Time `bson:"TimerStopTime"`
-	EnergyConsumption int       `bson:"EnergyConsumption"`
-	LastChanged       time.Time `bson:"LastChanged"`
+	UUID              string    `json:"UUID"`
+	Status            bool      `json:"Status"`
+	WashTime          int       `json:"WashTime"`
+	TimerStopTime     time.Time `json:"TimerStopTime"`
+	EnergyConsumption int       `json:"EnergyConsumption"`
+	LastChanged       time.Time `json:"LastChanged"`
 }
 
 type Fridge struct {
-	UUID                string    `bson:"UUID"`
-	Status              string    `bson:"Status"`
-	TemperatureSettings string    `bson:"TemperatureSettings"`
-	EnergyConsumption   int       `bson:"EnergyConsumption"`
-	LastChanged         time.Time `bson:"LastChanged"`
-	EnergySaveMode      bool      `bson:"EnergySaveMode"`
+	UUID                string    `json:"UUID"`
+	Status              bool      `json:"Status"`
+	TemperatureSettings string    `json:"TemperatureSettings"`
+	EnergyConsumption   int       `json:"EnergyConsumption"`
+	LastChanged         time.Time `json:"LastChanged"`
+	EnergySaveMode      bool      `json:"EnergySaveMode"`
 }
 
 type HVAC struct {
-	UUID              string    `bson:"UUID"`
-	Location          string    `bson:"Location"`
-	Temperature       string    `bson:"Temperature"`
-	Humidity          string    `bson:"Humidity"`
-	FanSpeed          string    `bson:"FanSpeed"`
-	Status            string    `bson:"Status"`
-	EnergyConsumption int       `bson:"EnergyConsumption"`
-	LastChanged       time.Time `bson:"LastChanged"`
+	UUID              string    `json:"UUID"`
+	Location          string    `json:"Location"`
+	Temperature       int       `json:"Temperature"`
+	Humidity          int       `json:"Humidity"`
+	FanSpeed          int       `json:"FanSpeed"`
+	Status            bool      `json:"Status"`
+	EnergyConsumption int       `json:"EnergyConsumption"`
+	LastChanged       time.Time `json:"LastChanged"`
 }
 
 type Lighting struct {
 	UUID              string    `json:"UUID"`
 	Location          string    `json:"Location"`
-	Brightness        string    `json:"Brightness"`
-	Status            string    `json:"Status"`
+	Brightness        int       `json:"Brightness"`
+	Status            bool      `json:"Status"`
 	EnergyConsumption int       `json:"EnergyConsumption"`
 	LastChanged       time.Time `json:"LastChanged"`
 }
 
 type Microwave struct {
-	UUID              string    `bson:"UUID"`
-	Status            string    `bson:"Status"`
-	Power             string    `bson:"Power"`
-	TimerStopTime     time.Time `bson:"TimerStopTime"`
-	EnergyConsumption int       `bson:"EnergyConsumption"`
-	LastChanged       time.Time `bson:"LastChanged"`
+	UUID              string    `json:"UUID"`
+	Status            bool      `json:"Status"`
+	Power             int       `json:"Power"`
+	TimerStopTime     time.Time `json:"TimerStopTime"`
+	EnergyConsumption int       `json:"EnergyConsumption"`
+	LastChanged       time.Time `json:"LastChanged"`
 }
 
 type Oven struct {
-	UUID                string    `bson:"UUID"`
-	Status              string    `bson:"Status"`
-	TemperatureSettings string    `bson:"TemperatureSettings"`
-	TimerStopTime       time.Time `bson:"TimerStopTime"`
-	EnergyConsumption   int       `bson:"EnergyConsumption"`
-	LastChanged         time.Time `bson:"LastChanged"`
+	UUID                string    `json:"UUID"`
+	Status              bool      `json:"Status"`
+	TemperatureSettings string    `json:"TemperatureSettings"`
+	TimerStopTime       time.Time `json:"TimerStopTime"`
+	EnergyConsumption   int       `json:"EnergyConsumption"`
+	LastChanged         time.Time `json:"LastChanged"`
 }
 
 type SecuritySystem struct {
-	UUID              string    `bson:"UUID"`
-	Location          string    `bson:"Location"`
-	SensorType        string    `bson:"SensorType"`
-	Status            string    `bson:"Status"`
-	EnergyConsumption int       `bson:"EnergyConsumption"`
-	LastTriggered     time.Time `bson:"LastTriggered"`
+	UUID              string    `json:"UUID"`
+	Location          string    `json:"Location"`
+	SensorType        string    `json:"SensorType"`
+	Status            bool      `json:"Status"`
+	EnergyConsumption int       `json:"EnergyConsumption"`
+	LastTriggered     time.Time `json:"LastTriggered"`
 }
 
 type SolarPanel struct {
-	UUID                 string    `bson:"UUID"`
-	PanelID              string    `bson:"PanelID"`
-	Status               string    `bson:"Status"`
-	EnergyGeneratedToday int       `bson:"EnergyGeneratedToday"`
-	PowerOutput          int       `bson:"PowerOutput"`
-	LastChanged          time.Time `bson:"LastChanged"`
+	UUID                 string    `json:"UUID"`
+	PanelID              string    `json:"PanelID"`
+	Status               bool      `json:"Status"`
+	EnergyGeneratedToday int       `json:"EnergyGeneratedToday"`
+	PowerOutput          int       `json:"PowerOutput"`
+	LastChanged          time.Time `json:"LastChanged"`
 }
 
 type Toaster struct {
-	UUID                string    `bson:"UUID"`
-	Status              string    `bson:"Status"`
-	TemperatureSettings string    `bson:"TemperatureSettings"`
-	TimerStopTime       time.Time `bson:"TimerStopTime"`
-	EnergyConsumption   int       `bson:"EnergyConsumption"`
-	LastChanged         time.Time `bson:"LastChanged"`
+	UUID                string    `json:"UUID"`
+	Status              bool      `json:"Status"`
+	TemperatureSettings string    `json:"TemperatureSettings"`
+	TimerStopTime       time.Time `json:"TimerStopTime"`
+	EnergyConsumption   int       `json:"EnergyConsumption"`
+	LastChanged         time.Time `json:"LastChanged"`
 }
 
 type SmartHomeDB struct {
@@ -187,13 +187,13 @@ func FetchCollections(client *mongo.Client, dbName string) (*SmartHomeDB, error)
 
 // User structure to fit system Info
 type User struct {
-	User       string                 `bson:"user"`
-	UserID     primitive.Binary       `bson:"userId"`
-	CustomData map[string]interface{} `bson:"customData"`
+	User       string                 `json:"user"`
+	UserID     primitive.Binary       `json:"userId"`
+	CustomData map[string]interface{} `json:"customData"`
 	Role       struct {
-		Role string `bson:"role"`
-		DB   string `bson:"db"`
-	} `bson:"role"`
+		Role string `json:"role"`
+		DB   string `json:"db"`
+	} `json:"role"`
 }
 
 func FetchUser(client *mongo.Client, userName string) (User, error) {

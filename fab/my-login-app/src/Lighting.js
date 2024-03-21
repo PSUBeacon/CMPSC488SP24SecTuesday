@@ -8,6 +8,7 @@ import bedroomIcon from './bedroomIcon.jpg';
 import livingroomIcon from './livingroomIcon.jpg';
 import './Lighting.css';
 import axios from "axios";
+
 const Lighting = () => {
   const [isLightOn, setIsLightOn] = useState(false);
   const handleTurnOn = () => {

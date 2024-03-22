@@ -32,6 +32,7 @@ const Lighting = () => {
         .catch(error => {
           console.error('There was an error!', error);
         });
+
   };
 
   const handleTurnOff = () => {

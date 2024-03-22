@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"log"
@@ -135,7 +136,7 @@ type SmartHomeDB struct {
 	SolarPanel     []SolarPanel
 	Toaster        []Toaster
 	Users          []User
-}
+
 
 // messaging struct to send update requests to IoT devices
 type messagingStruct struct {
@@ -282,7 +283,7 @@ func main() {
 		log.Fatal(err)
 	}
 	defer client.Disconnect(context.Background())
-
+  
 	////Testing fetchedUser function
 	//fetchedUser, err := FetchUser(client, "Owner")
 	if err != nil {

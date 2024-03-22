@@ -1,12 +1,15 @@
 package main
 
 import (
+
 	"CMPSC488SP24SecTuesday/dal"
 	"bytes"
+
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
+
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
@@ -14,6 +17,7 @@ import (
 	//"github.com/joho/godotenv"
 
 	"github.com/gin-contrib/cors"
+
 	//"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
@@ -74,6 +78,7 @@ func main() {
 		log.Fatal("Server startup error:", err)
 	}
 
+
 }
 
 type UpdateLightingRequest struct {
@@ -100,6 +105,7 @@ func updateLighting(c *gin.Context) {
 
 	// Respond to the request indicating success.
 	c.JSON(http.StatusOK, gin.H{"message": "Lighting updated successfully"})
+
 }
 
 func statusResp(c *gin.Context) {
@@ -129,6 +135,7 @@ func loginHandler(c *gin.Context) {
 		return
 	}
 
+
 	// Fetch user by username from MongoDB
 	fetchedUser, err := dal.FetchUser(client, loginData.Username)
 	fmt.Printf("Username:", fetchedUser.Username)
@@ -145,13 +152,19 @@ func loginHandler(c *gin.Context) {
 	if err != nil {
 		fmt.Printf("Error: password")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"}) // Use generic error message
+
 		return
 	}
+	//c.Set("smartHomeDB", smartHomeDB)
+
+	// Print smart home data
+	smartHomeData := dal.PrintSmartHomeDBContents(smartHomeDB)
 
 	// JWT token creation
 	claims := jwt.MapClaims{
 		"username": fetchedUser.Username,
 		"role":     fetchedUser.Role,                      // Use the actual role from the fetched user
+
 		"exp":      time.Now().Add(time.Hour * 24).Unix(), // Token expiration time
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -162,8 +175,10 @@ func loginHandler(c *gin.Context) {
 		return
 	}
 
+
 	// Return the JWT token in the response
 	c.JSON(http.StatusOK, gin.H{"token": tokenString})
+
 }
 
 // check jwt auth and set user role
@@ -213,7 +228,6 @@ func authMiddleware() gin.HandlerFunc {
 	}
 }
 
-// Combined dashboard handler for both admin or user
 func dashboardHandler(c *gin.Context) {
 	// Retrieve user claims from the request context
 	userClaims, exists := c.Get("user")
@@ -244,13 +258,16 @@ func dashboardHandler(c *gin.Context) {
 
 	// Determine the response based on the user's role
 	switch role {
+
 	case "admin": //admin
+
 		if smartHomeDB == nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch smart home data"})
 			return
 		}
 		c.JSON(http.StatusOK, gin.H{
 			"message":     "Welcome to the Owner dashboard",
+
 			"accountType": "Admin",
 		})
 
@@ -258,8 +275,11 @@ func dashboardHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message":     "Welcome to the Owner dashboard",
 			"accountType": "User",
+
 		})
 	default:
 		c.JSON(http.StatusForbidden, gin.H{"error": "Invalid role or insufficient privileges"})
 	}
+
 }
+

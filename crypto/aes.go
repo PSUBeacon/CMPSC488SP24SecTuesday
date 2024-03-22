@@ -1,4 +1,6 @@
-package main
+package crypto
+
+//package main
 
 import (
 	"crypto/aes"

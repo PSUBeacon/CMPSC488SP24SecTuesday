@@ -1,0 +1,167 @@
+/* Lighting.css */
+.lightingPage {
+  color: rgb(250, 246, 246); 
+  background-color: #0E2237;/* This is being overidden by the react component in the js file. So if we change it to see if the css file 
+  is being called properly we won't see anything change because of the set background color in the Lighting.js */
+
+   /* These are the lines of code that overrides this:
+  
+  <div className="lightingPage" style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column', backgroundColor: '#081624' }}>
+    
+  {/* Top Navbar }
+    <nav style={{ backgroundColor: '#081624', color: 'white', padding: '0.5rem 1rem' }}> 
+  */
+}
+
+/* Common styles for the icons in the navbar */
+.fas {
+  margin-right: '10px';
+}
+/* Container for the room and light selection, using flexbox to align them side by side */
+.lightingPage .lightsControl {
+  display: flex;
+  justify-content: flex-start; /* This will space out the room and light selections */
+}
+
+/* Room and Light Cards common styles */
+.lightingPage .card {
+  border-radius: 10px;
+  padding: 1rem;
+  margin: 0.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #2c2525;
+}
+
+/* Room Selection Styles */
+.lightingPage .roomSelection {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centers the title */
+  max-width: 100%;
+  margin: 0 auto; /* Center the .roomSelection block */
+  margin-left: 200px; /* This and the next line center the .lightSelection in its flex container */
+  margin-right: 100px;
+}
+
+.lightingPage .roomSelection h3 {
+  color: #fefeff;
+  text-align: center; /* Center the title text */
+  margin-bottom: 1rem;
+  
+}
+.lightingPage .lightSelection h3 {
+  color: #fefeff;
+  margin-bottom: 1rem;
+}
+
+.lightingPage .roomCards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Creates a 2-column grid */
+  grid-gap: 0.5rem; /* Adjust the gap between the grid items */
+  justify-items: center; /* Center the grid items horizontally */
+}
+
+.lightingPage .roomCards .card {
+  background-color: #ffffff;
+  width: 150px;
+  height: 100px;
+}
+
+.lightingPage .roomCards .card img {
+  max-width: 150px; /* Adjust the size as needed */
+  height: 150px; /* Maintain the aspect ratio */
+}
+
+/* Light Selection Styles */
+.lightingPage .lightSelection {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* This centers the title and the grid container on the cross axis */
+  max-width: 20%;
+  margin-left: 200px; /* This and the next line center the .lightSelection in its flex container */
+  margin-right: 100px;
+}
+
+.lightingPage .lightCards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* This creates a 2-column grid */
+  grid-gap: 0.5rem; /* Adjust the gap as needed */
+  width: 100%; /* Adjust the width as needed */
+}
+
+.lightingPage .lightCards .card {
+  background-color: transparent; /* No background color, showing the .lightingPage's */
+  border: 2px solid black; /* Black border around each card */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  aspect-ratio: 1; /* Keeps the width and height the same */
+}
+
+
+.lightingPage .lightCards .card img {
+  max-width: 80%; /* Adjust the size as needed */
+  height: auto; /* Maintain the aspect ratio */
+}
+
+
+/* Dimmer Control Styles */
+.lightingPage .dimmerControl {
+  margin-top: 2rem;
+  display: flex;
+  align-items: center;
+}
+
+.lightingPage .dimmerControl label {
+  margin-left: 10px;
+}
+
+/* Styles for the input[type=range] (the slider) */
+.lightingPage .dimmerControl input[type=range] {
+  -webkit-appearance: none; /* Override default appearance */
+  appearance: none;
+  width: 100%; /* Full-width */
+  height: 15px; /* Specified height */
+  background: #d3d3d3; /* Grey background */
+  outline: none; /* Remove outline */
+  opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+  -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+  transition: opacity .2s;
+}
+
+.lightingPage .dimmerControl input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default look */
+  appearance: none;
+  width: 25px; /* Set a specific slider handle width */
+  height: 25px; /* Slider handle height */
+  background: #4CAF50; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+
+.lightingPage .dimmerControl input[type=range]::-moz-range-thumb {
+  width: 25px; /* Set a specific slider handle width */
+  height: 25px; /* Slider handle height */
+  background: #4CAF50; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .lightingPage .roomSelection,
+  .lightingPage .lightSelection {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 400px) {
+  .lightingPage aside {
+    width: 100%;
+    height: auto;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+  }
+}

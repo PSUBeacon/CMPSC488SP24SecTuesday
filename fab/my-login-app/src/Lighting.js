@@ -17,9 +17,9 @@ const Lighting = () => {
 
     // Define the body of the request based on your Go server's expected input.
     const requestBody = {
-      uuid: '417293', // Replace with the actual UUID
-      status: true, // Since this is the turn on function
-      brightness: 100, // Set this to your desired default dimmer value for "on"
+      uuid: '417293',
+      status: true,
+      brightness: 100,
     };
     const token = localStorage.getItem('token')
     // Send a POST request to turn the light on.
@@ -40,10 +40,11 @@ const Lighting = () => {
 
     // Define the body of the request based on your Go server's expected input.
     const requestBody = {
-      uuid: '417293', // Replace with the actual UUID
-      status: false, // Since this is the turn on function
-      brightness: 100, // Set this to your desired default dimmer value for "on"
+      uuid: '417293',
+      status: false,
+      brightness: 100,
     };
+
     const token = localStorage.getItem('token')
     // Send a POST request to turn the light on.
     axios.post(serverUrl, requestBody,{headers: {'Authorization': `Bearer ${token}`}})

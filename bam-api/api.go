@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
+	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
 
@@ -21,7 +22,21 @@ import (
 	"time"
 )
 
+var client *mongo.Client
+
 func main() {
+	//connect to mongo server
+	var er error
+	client, er = dal.ConnectToMongoDB()
+	if er != nil {
+		log.Fatalf("Failed to connect to MongoDB: %v", er)
+	}
+	defer func() {
+		if er = client.Disconnect(context.Background()); er != nil {
+			log.Fatalf("Failed to disconnect from MongoDB: %v", er)
+		}
+	}()
+
 	r := gin.Default()
 
 	// Configure CORS
@@ -42,36 +57,23 @@ func main() {
 	r.POST("/login", loginHandler)
 	r.POST("/lighting", updateLighting)
 
-	//r.GET("/lighting", updateLighting)
-	//Messaging stuff
-
 	// use JWT middleware for all protected routes
 	r.Use(authMiddleware())
 
-	// route group for admin endpoints
-	adminGroup := r.Group("/admin")
-	adminGroup.Use(adminMiddleware())
+	//ADJUSTMENT:
+	// Combined route group for both admin and user dashboards
+	dashboardGroup := r.Group("/dashboard")
+	dashboardGroup.Use(authMiddleware()) // Apply authMiddleware to protect the route
 	{
-		// Example route requiring admin role
-		adminGroup.GET("/admin-dashboard", adminDashboardHandler)
-		adminGroup.POST("/lighting", updateLighting)
-		// Add more admin-only routes as needed
-	}
-
-	// Route group for user endpoints
-	userGroup := r.Group("/user")
-	userGroup.Use(userMiddleware())
-	{
-		// Example route for user profile
-		userGroup.GET("/dashboard", userProfileHandler)
-		userGroup.POST("/lighting", updateLighting)
-		// Add more user-only routes as needed
+		// Combined dashboard route for admin and user
+		dashboardGroup.GET("", dashboardHandler) // Use an empty string for the base path of the group
 	}
 
 	err := r.Run(":8081")
 	if err != nil {
 		log.Fatal("Server startup error:", err)
 	}
+
 }
 
 type UpdateLightingRequest struct {
@@ -126,15 +128,6 @@ func loginHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON"})
 		return
 	}
-
-	// Connect to MongoDB
-	client, err := dal.ConnectToMongoDB()
-	//fmt.Printf("This is the client: ", client)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to MongoDB"})
-		return
-	}
-	defer client.Disconnect(context.Background())
 
 	// Fetch user by username from MongoDB
 	fetchedUser, err := dal.FetchUser(client, loginData.Username)
@@ -220,145 +213,53 @@ func authMiddleware() gin.HandlerFunc {
 	}
 }
 
-// handle admin
-func adminMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		// Retrieve user claims from the request context
-		userClaims, exists := c.Get("user")
-		if !exists {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "User claims not found"})
-			c.Abort()
-			return
-		}
-
-		// Extract role from user claims
-		role, ok := userClaims.(jwt.MapClaims)["role"].(string)
-		if !ok {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Role not found in user claims"})
-			c.Abort()
-			return
-		}
-
-		// Perform role-based authorization check
-		if role != "admin" {
-			c.JSON(http.StatusForbidden, gin.H{"error": "Insufficient privileges"})
-			c.Abort()
-			return
-		}
-
-		// Proceed to the next middleware or route handler
-		c.Next()
-	}
-}
-
-// handle user
-func userMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		// Retrieve user claims from the request context
-		userClaims, exists := c.Get("user")
-		if !exists {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "User claims not found"})
-			c.Abort()
-			return
-		}
-
-		// Extract role from user claims
-		role, ok := userClaims.(jwt.MapClaims)["role"].(string)
-		if !ok {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Role not found in user claims"})
-			c.Abort()
-			return
-		}
-
-		// Perform role-based authorization check
-		if role != "user" {
-			c.JSON(http.StatusForbidden, gin.H{"error": "Insufficient privileges"})
-			c.Abort()
-			return
-		}
-
-		// Proceed to the next middleware or route handler
-		c.Next()
-	}
-}
-
-// handle admin dashboard
-func adminDashboardHandler(c *gin.Context) {
+// Combined dashboard handler for both admin or user
+func dashboardHandler(c *gin.Context) {
 	// Retrieve user claims from the request context
 	userClaims, exists := c.Get("user")
 	if !exists {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "User claims not found"})
+		return
+	}
+
+	claims, ok := userClaims.(jwt.MapClaims)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error processing user claims"})
 		return
 	}
 
 	// Extract role from user claims
-	role, ok := userClaims.(jwt.MapClaims)["role"].(string)
-	if !ok {
+	role, roleExists := claims["role"].(string)
+	if !roleExists {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Role not found in user claims"})
 		return
 	}
 
-	// Perform role-based authorization check
-	if role != "admin" {
-		c.JSON(http.StatusForbidden, gin.H{"error": "Insufficient privileges"})
+	// Fetch smart home data
+	smartHomeDB, err := dal.FetchCollections(client, "smartHomeDB")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch smart home data"})
 		return
 	}
 
-	// Proceed with the handler logic for admin dashboard
-	// For example, return information specific to the admin dashboard
-	c.JSON(http.StatusOK, gin.H{"message": "Welcome to the admin dashboard!"})
-}
+	// Determine the response based on the user's role
+	switch role {
+	case "admin": //admin
+		if smartHomeDB == nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch smart home data"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"message":     "Welcome to the Owner dashboard",
+			"accountType": "Admin",
+		})
 
-// handle user dashboard
-func userProfileHandler(c *gin.Context) {
-	// Retrieve user claims from the request context
-	userClaims, exists := c.Get("user")
-	if !exists {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "User claims not found"})
-		return
+	case "user": //user
+		c.JSON(http.StatusOK, gin.H{
+			"message":     "Welcome to the Owner dashboard",
+			"accountType": "User",
+		})
+	default:
+		c.JSON(http.StatusForbidden, gin.H{"error": "Invalid role or insufficient privileges"})
 	}
-
-	// Extract username from user claims
-	username, ok := userClaims.(jwt.MapClaims)["username"].(string)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Username not found in user claims"})
-		return
-	}
-
-	// Proceed with the handler logic for user profile
-	// For example, return user-specific data or render a page
-	userProfile := getUserProfile(username)
-	if userProfile == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "User profile not found"})
-		return
-	}
-
-	// Return user profile data
-	c.JSON(http.StatusOK, gin.H{"username": userProfile.Username, "email": userProfile.Email})
-}
-
-func getUserProfile(username string) *UserProfile {
-	// Example implementation to fetch user profile from the database
-	// You should replace this with your actual implementation
-	// This function should query the database to retrieve the user profile based on the provided username
-	// Return nil if user profile not found or an error occurs
-
-	// Example:
-	// userProfile, err := db.GetUserProfileByUsername(username)
-	// if err != nil {
-	//     return nil
-	// }
-	// return userProfile
-
-	// For demonstration purposes, return a hardcoded user profile
-	return &UserProfile{
-		Username: username,
-		Email:    "user@example.com",
-	}
-}
-
-// struct to represent user profile data
-type UserProfile struct {
-	Username string `json:"username"`
-	Email    string `json:"email"`
 }

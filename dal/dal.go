@@ -237,6 +237,7 @@ func Iotlighting(UUID []byte, status bool, brightness int) {
 
 		}
 	}(client, context.Background())
+
 	smartHomeDB, err := FetchCollections(client, dbName) // Fetches and populates data
 
 	if err != nil {
@@ -251,10 +252,10 @@ func Iotlighting(UUID []byte, status bool, brightness int) {
 			infoChange.Change = ""
 			infoChange.StatusChange = status
 
-			message, _ := json.MarshalIndent(infoChange, "", "  ")
-			fmt.Printf("This is the message: ", message)
-			//messaging.BroadCastMessage(message)
-			messaging.BroadCastMessage([]byte("I got to here"))
+			message, _ := json.Marshal(infoChange)
+			//fmt.Printf("This is the message: ", message)
+			messaging.BroadCastMessage(message)
+			//messaging.BroadCastMessage([]byte("I got to here"))
 		}
 	}
 }

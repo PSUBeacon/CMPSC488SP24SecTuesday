@@ -7,18 +7,56 @@ import lightbulbIcon from './lightbulbIcon.png';
 import bedroomIcon from './bedroomIcon.jpg';
 import livingroomIcon from './livingroomIcon.jpg';
 import './Lighting.css';
+import axios from "axios";
 
 const Lighting = () => {
   const [isLightOn, setIsLightOn] = useState(false);
-
   const handleTurnOn = () => {
     setIsLightOn(true);
-    // Add logic to turn the light on
+    const serverUrl = 'http://localhost:8081/lighting';
+
+    // Define the body of the request based on your Go server's expected input.
+    const requestBody = {
+      uuid: '417293',
+      status: true,
+      brightness: 100,
+    };
+    const token = localStorage.getItem('token')
+    // Send a POST request to turn the light on.
+    axios.post(serverUrl, requestBody,{headers: {'Authorization': `Bearer ${token}`}})
+        .then(response => {
+        })
+        .then(response => {
+          console.log(response.data);
+        })
+        .catch(error => {
+          console.error('There was an error!', error);
+        });
+
   };
 
   const handleTurnOff = () => {
     setIsLightOn(false);
-    // Add logic to turn the light off
+    const serverUrl = 'http://localhost:8081/lighting';
+
+    // Define the body of the request based on your Go server's expected input.
+    const requestBody = {
+      uuid: '417293',
+      status: false,
+      brightness: 100,
+    };
+
+    const token = localStorage.getItem('token')
+    // Send a POST request to turn the light on.
+    axios.post(serverUrl, requestBody,{headers: {'Authorization': `Bearer ${token}`}})
+        .then(response => {
+        })
+        .then(response => {
+          console.log(response.data);
+        })
+        .catch(error => {
+          console.error('There was an error!', error);
+        });
   };
 
   return (

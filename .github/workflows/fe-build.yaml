@@ -50,7 +50,7 @@ jobs:
           username: psu
           key: ${{ secrets.RSP_SSH_KEY }}
           port: ${{ secrets.FE_RSP_PORT  }}
-          source: "build/"
+          source: "fab/my-login-app/build/"
           target: "/var/www/html/beacon"
 
       - name: Restart Nginx

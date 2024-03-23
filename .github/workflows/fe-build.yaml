@@ -34,7 +34,9 @@ jobs:
           node-version: '18.18.2'
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          cd fab/my-login-app
+          npm install
 
       - name: Build
         run: |

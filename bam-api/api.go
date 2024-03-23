@@ -1,7 +1,6 @@
 package main
 
 import (
-
 	"CMPSC488SP24SecTuesday/dal"
 	"bytes"
 
@@ -78,7 +77,6 @@ func main() {
 		log.Fatal("Server startup error:", err)
 	}
 
-
 }
 
 type UpdateLightingRequest struct {
@@ -135,7 +133,6 @@ func loginHandler(c *gin.Context) {
 		return
 	}
 
-
 	// Fetch user by username from MongoDB
 	fetchedUser, err := dal.FetchUser(client, loginData.Username)
 	fmt.Printf("Username:", fetchedUser.Username)
@@ -158,14 +155,14 @@ func loginHandler(c *gin.Context) {
 	//c.Set("smartHomeDB", smartHomeDB)
 
 	// Print smart home data
-	smartHomeData := dal.PrintSmartHomeDBContents(smartHomeDB)
+	//smartHomeData := dal.PrintSmartHomeDBContents(smartHomeDB)
 
 	// JWT token creation
 	claims := jwt.MapClaims{
 		"username": fetchedUser.Username,
-		"role":     fetchedUser.Role,                      // Use the actual role from the fetched user
+		"role":     fetchedUser.Role, // Use the actual role from the fetched user
 
-		"exp":      time.Now().Add(time.Hour * 24).Unix(), // Token expiration time
+		"exp": time.Now().Add(time.Hour * 24).Unix(), // Token expiration time
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(jwtKey)
@@ -174,7 +171,6 @@ func loginHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create the token"})
 		return
 	}
-
 
 	// Return the JWT token in the response
 	c.JSON(http.StatusOK, gin.H{"token": tokenString})
@@ -266,7 +262,7 @@ func dashboardHandler(c *gin.Context) {
 			return
 		}
 		c.JSON(http.StatusOK, gin.H{
-			"message":     "Welcome to the Owner dashboard",
+			"message": "Welcome to the Owner dashboard",
 
 			"accountType": "Admin",
 		})
@@ -275,11 +271,9 @@ func dashboardHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message":     "Welcome to the Owner dashboard",
 			"accountType": "User",
-
 		})
 	default:
 		c.JSON(http.StatusForbidden, gin.H{"error": "Invalid role or insufficient privileges"})
 	}
 
 }
-

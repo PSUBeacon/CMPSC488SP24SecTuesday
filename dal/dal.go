@@ -8,9 +8,9 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"go.mongodb.org/mongo-driver/bson"
 
 	"fmt"
-	"go.mongodb.org/mongo-driver/bson"
 	"log"
 	"time"
 
@@ -125,6 +125,12 @@ type Toaster struct {
 	LastChanged         time.Time `json:"LastChanged"`
 }
 
+type User struct {
+	Username string `json:"Username"`
+	Password string `json:"Password"`
+	Role     string `json:"Role"`
+}
+
 type SmartHomeDB struct {
 	Dishwasher     []Dishwasher
 	Fridge         []Fridge
@@ -136,7 +142,7 @@ type SmartHomeDB struct {
 	SolarPanel     []SolarPanel
 	Toaster        []Toaster
 	Users          []User
-
+}
 
 // messaging struct to send update requests to IoT devices
 type messagingStruct struct {
@@ -195,13 +201,6 @@ func FetchCollections(client *mongo.Client, dbName string) (*SmartHomeDB, error)
 }
 
 ///////////////////////////////////////////////////////////
-
-// User structure to fit system Info
-type User struct {
-	Username string `json:"Username"`
-	Password string `json:"Password"`
-	Role     string `json:"Role"`
-}
 
 func FetchUser(client *mongo.Client, userName string) (User, error) {
 
@@ -283,7 +282,7 @@ func main() {
 		log.Fatal(err)
 	}
 	defer client.Disconnect(context.Background())
-  
+
 	////Testing fetchedUser function
 	//fetchedUser, err := FetchUser(client, "Owner")
 	if err != nil {

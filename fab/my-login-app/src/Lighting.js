@@ -11,6 +11,7 @@ import axios from "axios";
 
 const Lighting = () => {
   const [isLightOn, setIsLightOn] = useState(false);
+  const [dimmerValue, setDimmerValue] = useState(75); // State for dimmer value
   const handleTurnOn = () => {
     setIsLightOn(true);
     const serverUrl = 'http://localhost:8081/lighting';
@@ -23,16 +24,24 @@ const Lighting = () => {
     };
     const token = localStorage.getItem('token')
     // Send a POST request to turn the light on.
-    axios.post(serverUrl, requestBody,{headers: {'Authorization': `Bearer ${token}`}})
+    axios.post(serverUrl, requestBody, { headers: { 'Authorization': `Bearer ${token}` } })
         .then(response => {
-        })
-        .then(response => {
-          console.log(response.data);
+          // Check if response is successful (status code 2xx)
+          if (response.status >= 200 && response.status < 300) {
+            console.log('Request succeeded');
+            // Access response data if available
+            if (response.data) {
+              console.log(response.data);
+            }
+          } else {
+            // Handle unsuccessful response
+            console.error('Request failed with status:', response.status);
+          }
         })
         .catch(error => {
+          // Handle error
           console.error('There was an error!', error);
         });
-
   };
 
   const handleTurnOff = () => {
@@ -50,13 +59,15 @@ const Lighting = () => {
     // Send a POST request to turn the light on.
     axios.post(serverUrl, requestBody,{headers: {'Authorization': `Bearer ${token}`}})
         .then(response => {
-        })
-        .then(response => {
           console.log(response.data);
         })
         .catch(error => {
           console.error('There was an error!', error);
         });
+  };
+
+  const handleDimmerChange = (event) => {
+    setDimmerValue(parseInt(event.target.value)); // Parse to integer
   };
 
   return (
@@ -170,8 +181,8 @@ const Lighting = () => {
 
             {/* Light Dimmer Control */}
             <div className="dimmerControl">
-              <input type="range" id="dimmer" name="dimmer" min="0" max="100" />
-              <label htmlFor="dimmer">75%</label>
+              <input type="range" id="dimmer" name="dimmer" min="0" max="100" value={dimmerValue} onChange={handleDimmerChange} />
+              <label htmlFor="dimmer">{dimmerValue}%</label>
             </div>
 
             {/* Turn On/Off Button */}

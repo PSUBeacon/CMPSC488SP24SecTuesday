@@ -52,6 +52,9 @@ const Lighting = () => {
           // Handle error
           console.error('There was an error!', error);
         });
+    setTimeout(() => {
+      console.log('Light turned on');
+    }, 1000); //
   };
 
   const handleTurnOff = () => {
@@ -74,6 +77,9 @@ const Lighting = () => {
         .catch(error => {
           console.error('There was an error!', error);
         });
+    setTimeout(() => {
+      console.log('Light turned off');
+    }, 1000);
   };
 
   const handleDimmerChange = (event) => {

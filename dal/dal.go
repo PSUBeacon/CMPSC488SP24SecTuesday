@@ -141,40 +141,20 @@ type SmartHomeDB struct {
 	Users          []User
 }
 
-type UpdateLightingRequest struct {
-	UUID       string `json:"UUID"`
-	Status     bool   `json:"Status"`
-	Brightness int    `json:"Brightness"`
+type UUIDsConfig struct {
+	LightingUUIDs   []string
+	HvacUUIDs       []string
+	SecurityUUIDs   []string
+	AppliancesUUIDs []string
+	EnergyUUIDs     []string
 }
 
-type UpdateHVACRequest struct {
-	UUID        string `json:"UUID"`
-	Temperature int    `json:"Temperature"`
-	FanSpeed    int    `json:"FanSpeed"`
-	Status      bool   `json:"Status"`
-	Mode        string `json:"Mode"`
-}
-
-type UpdateSecurityRequest struct {
-	UUID   string `json:"UUID"`
-	Status bool   `json:"Status"`
-}
-
-type UpdateAppliancesRequest struct {
-	UUID           string    `json:"UUID"`
-	Status         bool      `json:"Status"`
-	Temperature    int       `json:"Temperature"`
-	TimerStopTime  time.Time `json:"TimerStopTime"`
-	Power          int       `json:"Power"`
-	EnergySaveMode bool      `json:"EnergySaveMode"`
-	WashTime       int       `json:"WashTime"`
-}
-
-type UpdateEnergyRequest struct {
-	UUID        string `json:"UUID"`
-	Status      bool   `json:"Status"`
-	PanelID     string `json:"PanelID"`
-	PowerOutput int    `json:"PowerOutput"`
+type MessagingStruct struct {
+	UUID         string `json:"UUID"`
+	Name         string `json:"Name"`         //type item being changes ex(lighting) or (oven)
+	Function     string `json:"Function"`     //function being changed ex(brightness)
+	Change       string `json:"Change"`       //actual change being made ex(100) for brightness
+	StatusChange bool   `json:"StatusChange"` //if changing status this would be the status change
 }
 
 func FetchCollections(client *mongo.Client, dbName string) (*SmartHomeDB, error) {
@@ -250,77 +230,14 @@ func FetchUser(client *mongo.Client, userName string) (User, error) {
 	return user, nil
 }
 
-func IotLighting(UUID []byte, status bool, brightness int) {
-
-	var lightingChange UpdateLightingRequest
-	lightingChange.UUID = string(UUID)
-	lightingChange.Status = status
-	lightingChange.Brightness = brightness
-
-	message, _ := json.Marshal(lightingChange)
-	messaging.BroadCastMessage(message)
-	return
-}
-
-func IotHVAC(UUID []byte, status bool, temperature int, fanSpeed int, mode string) {
-
-	var HVACChange UpdateHVACRequest
-	HVACChange.UUID = string(UUID)
-	HVACChange.Status = status
-	HVACChange.Temperature = temperature
-	HVACChange.FanSpeed = fanSpeed
-	HVACChange.Mode = mode
-	message, err := json.Marshal(HVACChange)
-	if err != nil {
-		log.Printf("Error marshaling JSON message: %v", err)
-		return
-	}
-	messaging.BroadCastMessage(message)
-	return
-}
-
-func IotSecurity(UUID []byte, status bool) {
-
-	var securityChange UpdateSecurityRequest
-	securityChange.UUID = string(UUID)
-	securityChange.Status = status
-
-	message, err := json.Marshal(securityChange)
-	if err != nil {
-		log.Printf("Error marshaling JSON message: %v", err)
-		return
-	}
-	messaging.BroadCastMessage(message)
-	return
-}
-
-func IotAppliance(UUID []byte, status bool, temperature int, timerStopTime time.Time, power int, energySaveMode bool, washTime int) {
-	var applianceChange UpdateAppliancesRequest
-	applianceChange.UUID = string(UUID)
-	applianceChange.Status = status
-	applianceChange.Temperature = temperature
-	applianceChange.TimerStopTime = timerStopTime
-	applianceChange.Power = power
-	applianceChange.EnergySaveMode = energySaveMode
-	applianceChange.WashTime = washTime
-
-	message, err := json.Marshal(applianceChange)
-	if err != nil {
-		log.Printf("Error marshaling JSON message: %v", err)
-		return
-	}
-	messaging.BroadCastMessage(message)
-	return
-}
-
-func IotEnergy(UUID []byte, status bool, panelID string, powerOutput int) {
-	var energyChange UpdateEnergyRequest
-	energyChange.UUID = string(UUID)
-	energyChange.Status = status
-	energyChange.PanelID = panelID
-	energyChange.PowerOutput = powerOutput
-
-	message, err := json.Marshal(energyChange)
+func UpdateMessaging(UUID []byte, name string, function string, change string, statuschange bool) {
+	var messageRequest MessagingStruct
+	messageRequest.UUID = string(UUID)
+	messageRequest.Name = name
+	messageRequest.Function = function
+	messageRequest.Change = change
+	messageRequest.StatusChange = statuschange
+	message, err := json.Marshal(messageRequest)
 	if err != nil {
 		log.Printf("Error marshaling JSON message: %v", err)
 		return

@@ -29,8 +29,10 @@ const Lighting = () => {
     // Define the body of the request based on your Go server's expected input.
     const requestBody = {
       uuid: '417293',
-      status: true,
-      brightness: 100,
+      name: "lighting",
+      function: "status",
+      change: null,
+      statusChange: true
     };
     const token = localStorage.getItem('token')
     // Send a POST request to turn the light on.
@@ -64,8 +66,10 @@ const Lighting = () => {
     // Define the body of the request based on your Go server's expected input.
     const requestBody = {
       uuid: '417293',
-      status: false,
-      brightness: 100,
+      name: "lighting",
+      function: "status",
+      change: null,
+      statusChange: false
     };
 
     const token = localStorage.getItem('token')

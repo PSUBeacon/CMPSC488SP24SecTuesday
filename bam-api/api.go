@@ -3,21 +3,14 @@ package main
 import (
 	"CMPSC488SP24SecTuesday/dal"
 	"bytes"
-
 	"context"
 	"fmt"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
-
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
-
-	//"github.com/joho/godotenv"
-
-	"github.com/gin-contrib/cors"
-
-	//"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
 	"os"
@@ -28,7 +21,6 @@ import (
 var client *mongo.Client
 
 func main() {
-	//connect to mongo server
 	var er error
 	client, er = dal.ConnectToMongoDB()
 	if er != nil {
@@ -44,7 +36,7 @@ func main() {
 
 	// Configure CORS
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"}, //for open access
+		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
@@ -56,18 +48,22 @@ func main() {
 	}))
 
 	// unprotected endpoints no auth needed
-	r.GET("/status", statusResp)
+	//r.GET("/status", statusResp)
 	r.POST("/login", loginHandler)
 
-	// these ones should be protected
-	r.POST("/lighting", updateLighting)
-	r.POST("/hvac", updateHVAC)
-	r.POST("/security", updateSecurity)
-	r.POST("/appliances", updateAppliances)
-	r.POST("/energy", updateEnergy)
+	// Apply JWT middleware to protected routes
+	protectedRoutes := r.Group("/")
+	protectedRoutes.Use(authMiddleware())
+
+	// This ones should be protected
+	protectedRoutes.POST("/lighting", updateIoT)
+	protectedRoutes.POST("/hvac", updateIoT)
+	protectedRoutes.POST("/security", updateIoT)
+	//protectedRoutes.POST("/appliances", updateAppliances)
+	protectedRoutes.POST("/energy", updateIoT)
 
 	// use JWT middleware for all protected routes
-	r.Use(authMiddleware())
+	//r.Use(authMiddleware())
 
 	//ADJUSTMENT:
 	// Combined route group for both admin and user dashboards
@@ -85,9 +81,9 @@ func main() {
 
 }
 
-func updateLighting(c *gin.Context) {
+func updateIoT(c *gin.Context) {
 	//var req dal.UpdateLightingRequest
-	var req dal.UpdateLightingRequest
+	var req dal.MessagingStruct
 	requestBody, _ := ioutil.ReadAll(c.Request.Body)
 	fmt.Printf("Received request body: %s\n", string(requestBody))
 	// Reset the request body to be able to parse it again
@@ -99,96 +95,15 @@ func updateLighting(c *gin.Context) {
 		return
 	}
 
-	// Call the Iotlighting function
-	dal.IotLighting([]byte(req.UUID), req.Status, req.Brightness)
+	dal.UpdateMessaging([]byte(req.UUID), req.Name, req.Function, req.Change, req.StatusChange)
 	// Respond to the request indicating success.
 	c.JSON(http.StatusOK, gin.H{"message": "Lighting updated successfully"})
 
 }
 
-func updateHVAC(c *gin.Context) {
-	var req dal.UpdateHVACRequest
-	requestBody, _ := ioutil.ReadAll(c.Request.Body)
-	fmt.Printf("Received request body: %s\n", string(requestBody))
-	// Reset the request body to be able to parse it again
-	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
-
-	if err := c.ShouldBindJSON(&req); err != nil {
-		fmt.Printf("Error binding JSON: %v\n", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	// Call the IotHVAC function
-	dal.IotHVAC([]byte(req.UUID), req.Status, req.Temperature, req.FanSpeed, req.Mode)
-
-	// Respond to the request indicating success.
-	c.JSON(http.StatusOK, gin.H{"message": "HVAC settings updated successfully"})
-}
-
-func updateSecurity(c *gin.Context) {
-	var req dal.UpdateSecurityRequest
-	requestBody, _ := ioutil.ReadAll(c.Request.Body)
-	fmt.Printf("Received request body: %s\n", string(requestBody))
-	// Reset the request body to be able to parse it again
-	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
-
-	if err := c.ShouldBindJSON(&req); err != nil {
-		fmt.Printf("Error binding JSON: %v\n", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	// Call the security update function from the DAL package
-	dal.IotSecurity([]byte(req.UUID), req.Status)
-
-	// Respond to the request indicating success.
-	c.JSON(http.StatusOK, gin.H{"message": "Security settings updated successfully"})
-}
-
-func updateAppliances(c *gin.Context) {
-	var req dal.UpdateAppliancesRequest
-	requestBody, _ := ioutil.ReadAll(c.Request.Body)
-	fmt.Printf("Received request body: %s\n", string(requestBody))
-	// Reset the request body to be able to parse it again
-	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
-
-	if err := c.ShouldBindJSON(&req); err != nil {
-		fmt.Printf("Error binding JSON: %v\n", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	// Call the appliance update function from the DAL package
-	dal.IotAppliance([]byte(req.UUID), req.Status, req.Temperature, req.TimerStopTime, req.Power, req.EnergySaveMode, req.WashTime)
-
-	// Respond to the request indicating success.
-	c.JSON(http.StatusOK, gin.H{"message": "Appliance settings updated successfully"})
-}
-
-func updateEnergy(c *gin.Context) {
-	var req dal.UpdateEnergyRequest
-	requestBody, _ := ioutil.ReadAll(c.Request.Body)
-	fmt.Printf("Received request body: %s\n", string(requestBody))
-	// Reset the request body to be able to parse it again
-	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
-
-	if err := c.ShouldBindJSON(&req); err != nil {
-		fmt.Printf("Error binding JSON: %v\n", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	// Call the energy update function from the DAL package
-	dal.IotEnergy([]byte(req.UUID), req.Status, req.PanelID, req.PowerOutput)
-
-	// Respond to the request indicating success.
-	c.JSON(http.StatusOK, gin.H{"message": "Energy settings updated successfully"})
-}
-
-func statusResp(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"status": "OK"})
-}
+//func statusResp(c *gin.Context) {
+//	c.JSON(http.StatusOK, gin.H{"status": "OK"})
+//}
 
 func getJwtKey() string {
 	key := os.Getenv("JWT_SECRET_KEY")

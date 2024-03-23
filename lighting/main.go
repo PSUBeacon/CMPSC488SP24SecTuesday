@@ -1,4 +1,4 @@
-package main
+package lighting
 
 import (
 	"encoding/json"
@@ -39,30 +39,21 @@ type MoodScene struct {
 }
 
 // NewLighting creates a new Lighting instance with the given parameters.
-func NewLighting(uuid, location string, status bool, brightness string, energyConsumption int) *Lighting {
-	return &Lighting{
-		UUID:              uuid,
-		Location:          location,
-		Status:            status,
-		Brightness:        brightness,
-		EnergyConsumption: energyConsumption,
-		LastChanged:       time.Now().Format(time.RFC3339),
-		MoodScenes:        make(map[string]MoodScene),
-	}
-}
+//func NewLighting(uuid, location string, status bool, brightness string, energyConsumption int) *Lighting {
+//	return &Lighting{
+//		UUID:              uuid,
+//		Location:          location,
+//		Status:            status,
+//		Brightness:        brightness,
+//		EnergyConsumption: energyConsumption,
+//		LastChanged:       time.Now().Format(time.RFC3339),
+//		MoodScenes:        make(map[string]MoodScene),
+//	}
+//}
 
 // TurnOn turns the lighting on.
-func (l *Lighting) TurnOn() {
-	l.Status = true
-	l.LastChanged = time.Now().Format(time.RFC3339)
-	fmt.Printf("%s is now turned ON\n", l.Location)
-}
-
-// TurnOff turns the lighting off.
-func (l *Lighting) TurnOff() {
-	l.Status = false
-	l.LastChanged = time.Now().Format(time.RFC3339)
-	fmt.Printf("%s is now turned OFF\n", l.Location)
+func UpdateStatus(newStatus bool) {
+	fmt.Printf("%s is now turned ON\n", newStatus)
 }
 
 // SetBrightness sets the brightness of the lighting.
@@ -123,34 +114,35 @@ func deserializeLight(lightJSON string) (*Lighting, error) {
 	return &light, nil
 }
 
-func main() {
-	// Example setup and usage
-	lightUUID := "123e4567-e89b-12d3-a456-426614174000"
-	light := NewLighting(lightUUID, "Living Room", false, "50", 10)
-
-	// Adding a timer
-	light.AddTimer(Timer{Time: "2023-10-05T19:00:00Z", State: true})
-
-	// Adding a schedule
-	light.AddSchedule(Schedule{DaysOfWeek: []time.Weekday{time.Monday, time.Wednesday, time.Friday}, Time: "18:00", State: true})
-
-	// Setting and activating a mood scene
-	light.SetMoodScene("Movie Night", MoodScene{Brightness: "30", Color: "Warm White"})
-	light.ActivateMoodScene("Movie Night")
-
-	// Serialization example
-	lightJSON, err := serializeLight(light)
-	if err != nil {
-		fmt.Println("Error serializing light:", err)
-		return
-	}
-	fmt.Println("Serialized light:", lightJSON)
-
-	// Deserialization example
-	deserializedLight, err := deserializeLight(lightJSON)
-	if err != nil {
-		fmt.Println("Error deserializing light:", err)
-		return
-	}
-	fmt.Printf("Deserialized light: %+v\n", deserializedLight)
-}
+//
+//func main() {
+//	// Example setup and usage
+//	lightUUID := "123e4567-e89b-12d3-a456-426614174000"
+//	light := NewLighting(lightUUID, "Living Room", false, "50", 10)
+//
+//	// Adding a timer
+//	light.AddTimer(Timer{Time: "2023-10-05T19:00:00Z", State: true})
+//
+//	// Adding a schedule
+//	light.AddSchedule(Schedule{DaysOfWeek: []time.Weekday{time.Monday, time.Wednesday, time.Friday}, Time: "18:00", State: true})
+//
+//	// Setting and activating a mood scene
+//	light.SetMoodScene("Movie Night", MoodScene{Brightness: "30", Color: "Warm White"})
+//	light.ActivateMoodScene("Movie Night")
+//
+//	// Serialization example
+//	lightJSON, err := serializeLight(light)
+//	if err != nil {
+//		fmt.Println("Error serializing light:", err)
+//		return
+//	}
+//	fmt.Println("Serialized light:", lightJSON)
+//
+//	// Deserialization example
+//	deserializedLight, err := deserializeLight(lightJSON)
+//	if err != nil {
+//		fmt.Println("Error deserializing light:", err)
+//		return
+//	}
+//	fmt.Printf("Deserialized light: %+v\n", deserializedLight)
+//}

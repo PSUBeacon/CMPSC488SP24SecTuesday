@@ -59,11 +59,11 @@ func (q *MessageQueue) Dequeue() ([]byte, bool) {
 }
 
 var messageQueue MessageQueue
+var sendQueue MessageQueue
 
 func BroadCastMessage(messageToSend []byte) {
 
 	messageQueue.Enqueue(messageToSend)
-
 	// The key should be 16, 24, or 32 bytes long for AES-128, AES-192, or AES-256, respectively.
 	err := godotenv.Load()
 	if err != nil {
@@ -71,30 +71,24 @@ func BroadCastMessage(messageToSend []byte) {
 	}
 	AesKey := os.Getenv("AES_KEY")
 
+	jsonChainData, err := os.ReadFile("chain.json")
+	chainlen := len(jsonChainData)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("This is the length of whats in the file: ", len(jsonChainData))
+
 	for {
 		message, ok := messageQueue.Dequeue()
 		if !ok {
 			break // Queue is empty, stop processing
 		}
-		jsonChainData, err := os.ReadFile("chain.json")
-		chainlen := len(jsonChainData)
-		if err != nil {
-			panic(err)
-		}
-		fmt.Println("This is the length of whats in the file: ", len(jsonChainData))
 
 		//Checks if there is an existing chain or if this is the start of the chain
 		if chainlen == 0 {
 			// Create a new blockchain
 			chain := blockchain.NewBlockchain()
-			theChain, err := json.MarshalIndent(chain, "", "  ")
-			if err != nil {
-				panic(err)
-			}
-			err = os.WriteFile("chain.json", theChain, 0644)
-			if err != nil {
-				panic(err)
-			}
+
 			// Create the first block with messageToSend
 			firstBlock := blockchain.CreateBlock(string(message), chain.Chain[0].Hash, chain.Chain[0].Index+1)
 
@@ -121,7 +115,7 @@ func BroadCastMessage(messageToSend []byte) {
 				log.Fatal("Error encrypting block:", err)
 			}
 
-			send(encryptedBlock)
+			sendQueue.Enqueue(encryptedBlock)
 		}
 
 		if chainlen > 0 {
@@ -163,18 +157,20 @@ func BroadCastMessage(messageToSend []byte) {
 				log.Fatal("Error encrypting block:", err)
 			}
 
-			send(encryptedBlock)
+			sendQueue.Enqueue(encryptedBlock)
 		}
+	}
+	for {
+		message, ok := sendQueue.Dequeue()
+		if !ok {
+			break
+		}
+		handleSends(message)
+
 	}
 }
 
-var sendQueue MessageQueue
-
-func send(message []byte) {
-	sendQueue.Enqueue(message)
-}
-
-func handleSends(message []byte) {
+func handleSends(message []byte) string {
 	// Open the XBee module for communication
 	mode := &serial.Mode{
 		BaudRate: 9600,
@@ -202,10 +198,10 @@ func handleSends(message []byte) {
 	// Send a message to the server
 	fmt.Println(len(message))
 	_, err = port.Write(message)
-	fmt.Printf("Sent \n")
 	if err != nil {
 		log.Println("Error sending message:", err)
 	}
+	return "message sent"
 }
 
 //func main() {

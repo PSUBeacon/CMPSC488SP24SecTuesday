@@ -1,34 +1,120 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import logoImage from './logo.webp';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom'; // Import Link from react-router-dom for navigation
+import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure Bootstrap CSS is imported to use its grid system and components
+import logoImage from './logo.webp'; 
 import houseImage from './houseImage.jpg';
-import notificationIcon from './notification.png';
-import lightbulbIcon from './lightbulbIcon.png';
-import bedroomIcon from './bedroomIcon.jpg';
-import livingroomIcon from './livingroomIcon.jpg';
+import notificationIcon from './notification.png'
+import accountIcon from './account.png'
+import settingsIcon from './settings.png'
+import menuIcon from './menu.png'
+import bedroomIcon from './bedroomIcon.jpg'
+import livingroomIcon from './livingroomIcon.jpg'
+import lightbulbIcon from './lightbulbIcon.png'
+import placeholderImage from './placeholderImage.jpg'; // Replace with the path to your placeholder image
+import placeholderImage2 from './placeholderImage2.jpg'; // Replace with the path to your placeholder image
 import './Lighting.css';
 
-const Lighting = () => {
-  const [isLightOn, setIsLightOn] = useState(false);
+// Define the Dashboard component using a functional component pattern
+const Lighting= () => {
 
-  const handleTurnOn = () => {
-    setIsLightOn(true);
-    // Add logic to turn the light on
+
+
+  const navigate = useNavigate(); // Instantiate useNavigate hook
+  const [selectedLight, setSelectedLight] = useState(null);
+
+  // Function to handle card click
+  const handleSelectLight = (lightId) => {
+    setSelectedLight(lightId); // Update the selected light state
+  };
+  
+  const [isNavVisible, setIsNavVisible] = useState(false);
+    const [dashboardMessage, setDashboardMessage] = useState('');
+    const [accountType ,setAccountType] = useState('')
+    // States for each device
+    const [deviceData, setDeviceData] = useState({
+        HVAC: {},
+        Dishwasher: {},
+        Fridge: {},
+        Lighting: {},
+        Microwave: {},
+        Oven: {},
+        SecuritySystem: {},
+        SolarPanel: {},
+        Toaster: {},
+    });
+    const [dimmerValue, setDimmerValue] = useState(75); // State to keep track of dimmer value
+    
+   
+
+  const toggleNav = () => {
+    setIsNavVisible(!isNavVisible);
   };
 
-  const handleTurnOff = () => {
-    setIsLightOn(false);
-    // Add logic to turn the light off
+  const goToSettings = () => {
+    navigate('/settings');
   };
 
+  const signOut = () => {
+    // Add your sign-out logic here
+    setIsAccountPopupVisible(false); // Close the popup
+    navigate('/'); // Use navigate to redirect
+  };
+  
+ 
+
+  const [isAccountPopupVisible, setIsAccountPopupVisible] = useState(false);
+
+  const toggleAccountPopup = () => {
+    setIsAccountPopupVisible(!isAccountPopupVisible);
+  };
+  
+  
+
+    
+    
+        
+      
+  
+
+
+
+  
+  const AccountPopup = ({ isVisible, onClose }) => {
+    if (!isVisible) return null;
+  
+    return (
+      <div className = "accountPop"style={{
+        position: 'absolute',
+        top: '100%', // Position it right below the button
+        right: '0', // Align it with the right edge of the container
+        backgroundColor: '#08192B',
+        padding: '20px',
+        zIndex: 100,
+        color: 'white',
+        borderRadius: '2px',
+        // Add box-shadow or borders as needed for better visibility
+      }}>
+        <p>John Doe</p> {/* Replace with actual user name */}
+          {accountType && <p>{accountType}</p>} {/* Dynamically display user role */}
+        <button onClick={signOut} className="signout">Sign Out</button>
+      </div>
+    );
+  };
+  
+
+
+
+  // This is the JSX return statement where we layout our component's HTML structure
   return (
-    <div className="lightingPage" style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column', backgroundColor: '#081624' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column', backgroundColor: '#081624' }}>
       {/* Top Navbar */}
-      <nav style={{ backgroundColor: '#081624', color: 'white', padding: '0.5rem 1rem' }}>
+      <nav className="topNav" style={{ backgroundColor: '#081624', color: 'white', padding: '0.5rem 1rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            <img src={logoImage} alt="Logo" style={{ marginRight: '10px', width: '40px', height: '40px'}} id='circle'/> {/* Adjust the height as needed */}
-            <span id='menuText'>Beacon</span>
+          <img src={menuIcon} alt="Menu" onClick={toggleNav} className="hamburger-menu"/>
+            <img src={logoImage} alt="Logo" style={{ marginRight: '10px'}} id='circle'/> {/* Adjust the height as needed */}
+            <span id = 'menuText2'>Beacon</span>
           </div>
           <div>
             <span id='menuText'>March 05, 2024</span>
@@ -37,60 +123,65 @@ const Lighting = () => {
             <span id='menuText'>11:48 AM</span>
           </div>
           <div>
-            <img src={notificationIcon} alt="notifications" style={{ marginRight: '10px'}} id="menuIcon"/>
-          </div>
+          <div style={{ position: 'relative' }}>
+          <img src={settingsIcon} alt="Settings" style={{ marginRight: '10px' }} id="menuIcon" onClick={goToSettings} />
+  <button onClick={toggleAccountPopup} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>
+    <img src={accountIcon} alt="account" style={{ marginRight: '10px' }} id = "menuIcon2"/>
+  </button>
+  <AccountPopup isVisible={isAccountPopupVisible} onClose={() => setIsAccountPopupVisible(false)} />
+</div>
+</div>
         </div>
       </nav>
 
       {/* Side Navbar and Dashboard Content */}
       <div style={{ display: 'flex', flex: '1' }}>
         {/* Side Navbar */}
-        <aside style={{ backgroundColor: '#001F3F', color: 'white', width: '250px', padding: '1rem' }}>
-          <div className="houseInfo">
-            <div><img src={houseImage} alt="Logo" style={{ marginRight: '10px'}} id='circle2'/></div>
-            <div>My House</div>
-            <div>State College, PA 16801</div>
+        <aside className={`side-nav ${isNavVisible ? '' : 'hidden'}`} style={{ backgroundColor: '#0E2237', color: 'white', width: '250px', padding: '1rem' }}>          <div class="houseInfo">
+          <div><img src={houseImage} alt="Logo" style={{ marginRight: '10px'}} id='circle2'/></div>
+          <div>My House</div>
+          <div>State College, PA 16801</div>
           </div>
           <nav>
             <ul style={{ listStyle: 'none', padding: 0 }}>
               {/* Apply active style to 'Overview' since it's the current page */}
-              <li style={{margin: '0.5rem 0', padding: '0.5rem' }}>
-                <Link to="/" style={{ color: 'white', textDecoration: 'none' }}>
+              <li className="nav-item"style={{margin: '0.5rem 0', padding: '0.5rem' }}>
+                <Link to="/dashboard" style={{ color: 'white', textDecoration: 'none' }}>
                   <i className="fas fa-home" style={{ marginRight: '10px' }}></i>
                   Overview
                 </Link>
               </li>
-              <li style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
+              <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
                 <Link to="/security" style={{ color: 'white', textDecoration: 'none' }}>
                   <i className="fas fa-lock" style={{ marginRight: '10px' }}></i>
                   Security
                 </Link>
               </li>
-              <li style={{backgroundColor: '#08192B', margin: '0.5rem 0', padding: '0.5rem' }}>
-                <Link to="/lighting" style={{ color: 'white', textDecoration: 'none' }}>
+              <li className="nav-item"style={{ backgroundColor: '#08192B', margin: '0.5rem 0', padding: '0.5rem', borderLeft: '3px solid #0294A5' }}>
+                <Link to="/lighting" style={{ color: '#50BCC0', textDecoration: 'none' }}>
                   <i className="fas fa-lightbulb" style={{ marginRight: '10px' }}></i>
                   Lighting
                 </Link>
               </li>
-              <li style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
+              <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
                 <Link to="/preferences" style={{ color: 'white', textDecoration: 'none' }}>
                   <i className="fas fa-sliders-h" style={{ marginRight: '10px' }}></i>
                   Preferences
                 </Link>
               </li>
-              <li style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
+              <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
                 <Link to="/hvac" style={{ color: 'white', textDecoration: 'none' }}>
                   <i className="fas fa-thermometer-half" style={{ marginRight: '10px' }}></i>
                   HVAC
                 </Link>
               </li>
-              <li style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
+              <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
                 <Link to="/appliances" style={{ color: 'white', textDecoration: 'none' }}>
                   <i className="fas fa-blender" style={{ marginRight: '10px' }}></i>
                   Appliances
                 </Link>
               </li>
-              <li style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
+              <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
                 <Link to="/energy" style={{ color: 'white', textDecoration: 'none' }}>
                   <i className="fas fa-bolt" style={{ marginRight: '10px' }}></i>
                   Energy
@@ -100,47 +191,41 @@ const Lighting = () => {
           </nav>
         </aside>
 
-        {/* Main Content */}
-        <main style={{ flex: '1', padding: '1rem', backgroundColor: '#173350'}}>
-          <h2>Lighting Page</h2>
-          
-          {/* Lights Control Section */}
-          <div className="lightsControl">
-            {/* Room Selection */}
-            <div className="roomSelection">
-              <h3>Selecting A Room</h3>
-              <div className="roomCards">
-                {/* Replace placeholder content with your room cards */}
-                <div className="card"><img src={bedroomIcon} alt="Room 1" /></div>
-                <div className="card"><img src={bedroomIcon} alt="Room 2" /></div>
-                <div className="card"><img src={livingroomIcon} alt="Room 3" /></div>
-                <div className="card"><img src={livingroomIcon} alt="Room 4" /></div>
+    
+        <main style={{ flex: '1', padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: '#0E2237', width: '100%'}}>
+  
+  {/* Content Block */}
+  
+  <div className="contentBlock" style={{ display: 'flex', justifyContent: 'space-around', width: '100%', flexWrap: 'wrap' }}>
+            {/* Lights Control Section */}
+            <div className="lightsControl" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', gap: '20px', width: '100%', flexWrap: 'wrap' }}>
+              {/* Room Selection */}
+              <div className="roomSelection" style={{ flexBasis: '48%'}}>
+              <h3 className="centered-title">Selecting a Room</h3>
+                <div className="RoomCards" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around',  padding:'0px' }}>
+                  {/* Room cards */}
+                  <div className="card" style={{ width: '40%', marginBottom: '20px' }}><img class="images" src={bedroomIcon} alt="Room 1" /></div>
+                  <div className="card" style={{ width: '40%', marginBottom: '20px' }}><img class="images" src={bedroomIcon} alt="Room 2" /></div>
+                  <div className="card" style={{ width: '40%' }}><img class="images" src={livingroomIcon} alt="Room 3" /></div>
+                </div>
               </div>
-            </div>
+                
+                {/* Light Dimmer Control */}
+                <div className="dimmerControl">
+                  <input
+                    type="range"
+                    id="dimmer"
+                    name="dimmer"
+                    min="0"
+                    max="100"
+                    value={dimmerValue}
+                    onChange={(e) => setDimmerValue(e.target.value)}
+                  />
+                  <label htmlFor="dimmer">{dimmerValue}%</label>
+                </div>
+              
 
-            {/* Light Selection */}
-            <div className="lightSelection">
-              <h3>Selecting A Light</h3>
-              <div className="lightCards">
-                {/* Replace placeholder content with your light cards */}
-                <div className="card"><img src={lightbulbIcon} alt="Light 1" /></div>
-                <div className="card"><img src={lightbulbIcon} alt="Light 2" /></div>
-                <div className="card"><img src={lightbulbIcon} alt="Light 3" /></div>
-                <div className="card"><img src={lightbulbIcon} alt="Light 3" /></div>
-              </div>
-            </div>
-
-            {/* Light Dimmer Control */}
-            <div className="dimmerControl">
-              <input type="range" id="dimmer" name="dimmer" min="0" max="100" />
-              <label htmlFor="dimmer">75%</label>
-            </div>
-
-            {/* Turn On/Off Button */}
-            <div className="lightControls">
-              <button onClick={isLightOn ? handleTurnOff : handleTurnOn}>
-                {isLightOn ? 'Turn Off' : 'Turn On'}
-              </button>
+              
             </div>
           </div>
         </main>

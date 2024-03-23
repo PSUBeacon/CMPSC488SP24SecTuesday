@@ -1,14 +1,22 @@
 package main
 
 import (
+	"CMPSC488SP24SecTuesday/dal"
+	"bytes"
+
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
-	//"github.com/joho/godotenv"
-	"CMPSC488SP24SecTuesday/dal"
-	"github.com/gin-contrib/cors"
+
 	"go.mongodb.org/mongo-driver/mongo"
+	"golang.org/x/crypto/bcrypt"
+	"io/ioutil"
+
+	//"github.com/joho/godotenv"
+
+	"github.com/gin-contrib/cors"
+
 	//"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
@@ -50,6 +58,7 @@ func main() {
 	// unprotected endpoints no auth needed
 	r.GET("/status", statusResp)
 	r.POST("/login", loginHandler)
+	r.POST("/lighting", updateLighting)
 
 	// use JWT middleware for all protected routes
 	r.Use(authMiddleware())
@@ -67,6 +76,33 @@ func main() {
 	if err != nil {
 		log.Fatal("Server startup error:", err)
 	}
+
+}
+
+type UpdateLightingRequest struct {
+	UUID       string `json:"UUID"`
+	Status     bool   `json:"Status"`
+	Brightness int    `json:"Brightness"`
+}
+
+func updateLighting(c *gin.Context) {
+	var req UpdateLightingRequest
+	requestBody, _ := ioutil.ReadAll(c.Request.Body)
+	fmt.Printf("Received request body: %s\n", string(requestBody))
+	// Reset the request body to be able to parse it again
+	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		fmt.Printf("Error binding JSON: %v\n", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Call the Iotlighting function
+	dal.Iotlighting([]byte(req.UUID), req.Status, req.Brightness)
+
+	// Respond to the request indicating success.
+	c.JSON(http.StatusOK, gin.H{"message": "Lighting updated successfully"})
 
 }
 
@@ -97,63 +133,48 @@ func loginHandler(c *gin.Context) {
 		return
 	}
 
-	//ADJUSTMENT:Changed fetchUser parameters to reflect updated DAL
 	// Fetch user by username from MongoDB
 	fetchedUser, err := dal.FetchUser(client, loginData.Username)
-
+	fmt.Printf("Username:", fetchedUser.Username)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username (not found in DB"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"}) // Use generic error message
 		return
 	}
 
-	//ADJUSTMENT: Changed function for password
+	passwordFromDB := fetchedUser.Password
+	fmt.Printf("Password: %s\n", passwordFromDB)
+
 	// Compare the password hash using bcrypt.CompareHashAndPassword
-	//err = bcrypt.CompareHashAndPassword([]byte(fetchedUser.Password), []byte(loginData.Password))
-	//if err != nil {
-	fmt.Printf("%s\n", fetchedUser.UserID.Data)
-	if fetchedUser.CustomData["password"] != loginData.Password {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid  password"})
-		return
-	}
-
-	// Example of fetching the smartHomeDB data, adjust based on actual implementation
-
-	// Fetch smart home data
-	smartHomeDB, err := dal.FetchCollections(client, "smartHomeDB")
+	err = bcrypt.CompareHashAndPassword([]byte(passwordFromDB), []byte(loginData.Password))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch smart home data"})
+		fmt.Printf("Error: password")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"}) // Use generic error message
+
 		return
 	}
 	//c.Set("smartHomeDB", smartHomeDB)
 
 	// Print smart home data
-	smartHomeData := dal.PrintSmartHomeDBContents(smartHomeDB)
+	//smartHomeData := dal.PrintSmartHomeDBContents(smartHomeDB)
 
-	//Delete later
-	fmt.Printf(smartHomeData)
-	//////////////////////////
-
-	//ADJUSTMENT:Changed JWT generated payload
 	// JWT token creation
 	claims := jwt.MapClaims{
+		"username": fetchedUser.Username,
+		"role":     fetchedUser.Role, // Use the actual role from the fetched user
 
-		"username": fetchedUser.User,
-		"userID":   fetchedUser.UserID.Data,
-		"role":     fetchedUser.Role.Role,                 // Replace with the actual role from MongoDB
-		"exp":      time.Now().Add(time.Hour * 24).Unix(), // Token expiration time
+		"exp": time.Now().Add(time.Hour * 24).Unix(), // Token expiration time
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(jwtKey)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create the token"})
 		return
 	}
 
-	////////////////////
+	// Return the JWT token in the response
+	c.JSON(http.StatusOK, gin.H{"token": tokenString})
 
-	c.JSON(http.StatusOK, gin.H{"token": tokenString,
-		"HVAC": smartHomeDB.HVAC.Temperature})
 }
 
 // check jwt auth and set user role
@@ -203,7 +224,6 @@ func authMiddleware() gin.HandlerFunc {
 	}
 }
 
-// Combined dashboard handler for both admin and child.
 func dashboardHandler(c *gin.Context) {
 	// Retrieve user claims from the request context
 	userClaims, exists := c.Get("user")
@@ -234,170 +254,26 @@ func dashboardHandler(c *gin.Context) {
 
 	// Determine the response based on the user's role
 	switch role {
-	case "readWrite": //owner role
+
+	case "admin": //admin
+
 		if smartHomeDB == nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch smart home data"})
 			return
 		}
 		c.JSON(http.StatusOK, gin.H{
-			"message":     "Welcome to the Owner dashboard",
-			"accountType": "Owner",
-			"Dishwasher": gin.H{
-				"UUID":              smartHomeDB.Dishwasher.UUID,
-				"Status":            smartHomeDB.Dishwasher.Status,
-				"WashTime":          smartHomeDB.Dishwasher.WashTime,
-				"TimerStopTime":     smartHomeDB.Dishwasher.TimerStopTime,
-				"EnergyConsumption": smartHomeDB.Dishwasher.EnergyConsumption,
-				"LastChanged":       smartHomeDB.Dishwasher.LastChanged,
-			},
-			"Fridge": gin.H{
-				"UUID":                smartHomeDB.Fridge.UUID,
-				"Status":              smartHomeDB.Fridge.Status,
-				"TemperatureSettings": smartHomeDB.Fridge.TemperatureSettings,
-				"EnergyConsumption":   smartHomeDB.Fridge.EnergyConsumption,
-				"LastChanged":         smartHomeDB.Fridge.LastChanged,
-				"EnergySaveMode":      smartHomeDB.Fridge.EnergySaveMode,
-			},
-			"HVAC": gin.H{
-				"UUID":              smartHomeDB.HVAC.UUID,
-				"Location":          smartHomeDB.HVAC.Location,
-				"Temperature":       smartHomeDB.HVAC.Temperature,
-				"Humidity":          smartHomeDB.HVAC.Humidity,
-				"FanSpeed":          smartHomeDB.HVAC.FanSpeed,
-				"Status":            smartHomeDB.HVAC.Status,
-				"EnergyConsumption": smartHomeDB.HVAC.EnergyConsumption,
-				"LastChanged":       smartHomeDB.HVAC.LastChanged,
-			},
-			"Lighting": gin.H{
-				"UUID":              smartHomeDB.Lighting.UUID,
-				"Location":          smartHomeDB.Lighting.Location,
-				"Brightness":        smartHomeDB.Lighting.Brightness,
-				"Status":            smartHomeDB.Lighting.Status,
-				"EnergyConsumption": smartHomeDB.Lighting.EnergyConsumption,
-				"LastChanged":       smartHomeDB.Lighting.LastChanged,
-			},
-			"Microwave": gin.H{
-				"UUID":              smartHomeDB.Microwave.UUID,
-				"Status":            smartHomeDB.Microwave.Status,
-				"Power":             smartHomeDB.Microwave.Power,
-				"TimerStopTime":     smartHomeDB.Microwave.TimerStopTime,
-				"EnergyConsumption": smartHomeDB.Microwave.EnergyConsumption,
-				"LastChanged":       smartHomeDB.Microwave.LastChanged,
-			},
-			"Oven": gin.H{
-				"UUID":                smartHomeDB.Oven.UUID,
-				"Status":              smartHomeDB.Oven.Status,
-				"TemperatureSettings": smartHomeDB.Oven.TemperatureSettings,
-				"TimerStopTime":       smartHomeDB.Oven.TimerStopTime,
-				"EnergyConsumption":   smartHomeDB.Oven.EnergyConsumption,
-				"LastChanged":         smartHomeDB.Oven.LastChanged,
-			},
-			"SecuritySystem": gin.H{
-				"UUID":              smartHomeDB.SecuritySystem.UUID,
-				"Location":          smartHomeDB.SecuritySystem.Location,
-				"SensorType":        smartHomeDB.SecuritySystem.SensorType,
-				"Status":            smartHomeDB.SecuritySystem.Status,
-				"EnergyConsumption": smartHomeDB.SecuritySystem.EnergyConsumption,
-				"LastTriggered":     smartHomeDB.SecuritySystem.LastTriggered,
-			},
-			"SolarPanel": gin.H{
-				"UUID":                 smartHomeDB.SolarPanel.UUID,
-				"PanelID":              smartHomeDB.SolarPanel.PanelID,
-				"Status":               smartHomeDB.SolarPanel.Status,
-				"EnergyGeneratedToday": smartHomeDB.SolarPanel.EnergyGeneratedToday,
-				"PowerOutput":          smartHomeDB.SolarPanel.PowerOutput,
-				"LastChanged":          smartHomeDB.SolarPanel.LastChanged,
-			},
-			"Toaster": gin.H{
-				"UUID":                smartHomeDB.Toaster.UUID,
-				"Status":              smartHomeDB.Toaster.Status,
-				"TemperatureSettings": smartHomeDB.Toaster.TemperatureSettings,
-				"TimerStopTime":       smartHomeDB.Toaster.TimerStopTime,
-				"EnergyConsumption":   smartHomeDB.Toaster.EnergyConsumption,
-				"LastChanged":         smartHomeDB.Toaster.LastChanged,
-			},
+			"message": "Welcome to the Owner dashboard",
+
+			"accountType": "Admin",
 		})
 
-	case "read": //child role
+	case "user": //user
 		c.JSON(http.StatusOK, gin.H{
 			"message":     "Welcome to the Owner dashboard",
-			"accountType": "Child",
-			"Dishwasher": gin.H{
-				"UUID":              smartHomeDB.Dishwasher.UUID,
-				"Status":            smartHomeDB.Dishwasher.Status,
-				"WashTime":          smartHomeDB.Dishwasher.WashTime,
-				"TimerStopTime":     smartHomeDB.Dishwasher.TimerStopTime,
-				"EnergyConsumption": smartHomeDB.Dishwasher.EnergyConsumption,
-				"LastChanged":       smartHomeDB.Dishwasher.LastChanged,
-			},
-			"Fridge": gin.H{
-				"UUID":                smartHomeDB.Fridge.UUID,
-				"Status":              smartHomeDB.Fridge.Status,
-				"TemperatureSettings": smartHomeDB.Fridge.TemperatureSettings,
-				"EnergyConsumption":   smartHomeDB.Fridge.EnergyConsumption,
-				"LastChanged":         smartHomeDB.Fridge.LastChanged,
-				"EnergySaveMode":      smartHomeDB.Fridge.EnergySaveMode,
-			},
-			"HVAC": gin.H{
-				"UUID":              smartHomeDB.HVAC.UUID,
-				"Location":          smartHomeDB.HVAC.Location,
-				"Temperature":       smartHomeDB.HVAC.Temperature,
-				"Humidity":          smartHomeDB.HVAC.Humidity,
-				"FanSpeed":          smartHomeDB.HVAC.FanSpeed,
-				"Status":            smartHomeDB.HVAC.Status,
-				"EnergyConsumption": smartHomeDB.HVAC.EnergyConsumption,
-				"LastChanged":       smartHomeDB.HVAC.LastChanged,
-			},
-			"Lighting": gin.H{
-				"UUID":              smartHomeDB.Lighting.UUID,
-				"Location":          smartHomeDB.Lighting.Location,
-				"Brightness":        smartHomeDB.Lighting.Brightness,
-				"Status":            smartHomeDB.Lighting.Status,
-				"EnergyConsumption": smartHomeDB.Lighting.EnergyConsumption,
-				"LastChanged":       smartHomeDB.Lighting.LastChanged,
-			},
-			"Microwave": gin.H{
-				"UUID":              smartHomeDB.Microwave.UUID,
-				"Status":            smartHomeDB.Microwave.Status,
-				"Power":             smartHomeDB.Microwave.Power,
-				"TimerStopTime":     smartHomeDB.Microwave.TimerStopTime,
-				"EnergyConsumption": smartHomeDB.Microwave.EnergyConsumption,
-				"LastChanged":       smartHomeDB.Microwave.LastChanged,
-			},
-			"Oven": gin.H{
-				"UUID":                smartHomeDB.Oven.UUID,
-				"Status":              smartHomeDB.Oven.Status,
-				"TemperatureSettings": smartHomeDB.Oven.TemperatureSettings,
-				"TimerStopTime":       smartHomeDB.Oven.TimerStopTime,
-				"EnergyConsumption":   smartHomeDB.Oven.EnergyConsumption,
-				"LastChanged":         smartHomeDB.Oven.LastChanged,
-			},
-			"SecuritySystem": gin.H{
-				"UUID":              smartHomeDB.SecuritySystem.UUID,
-				"Location":          smartHomeDB.SecuritySystem.Location,
-				"SensorType":        smartHomeDB.SecuritySystem.SensorType,
-				"Status":            smartHomeDB.SecuritySystem.Status,
-				"EnergyConsumption": smartHomeDB.SecuritySystem.EnergyConsumption,
-				"LastTriggered":     smartHomeDB.SecuritySystem.LastTriggered,
-			},
-			"SolarPanel": gin.H{
-				"UUID":                 smartHomeDB.SolarPanel.UUID,
-				"PanelID":              smartHomeDB.SolarPanel.PanelID,
-				"Status":               smartHomeDB.SolarPanel.Status,
-				"EnergyGeneratedToday": smartHomeDB.SolarPanel.EnergyGeneratedToday,
-				"PowerOutput":          smartHomeDB.SolarPanel.PowerOutput,
-				"LastChanged":          smartHomeDB.SolarPanel.LastChanged,
-			},
-			"Toaster": gin.H{
-				"UUID":                smartHomeDB.Toaster.UUID,
-				"Status":              smartHomeDB.Toaster.Status,
-				"TemperatureSettings": smartHomeDB.Toaster.TemperatureSettings,
-				"TimerStopTime":       smartHomeDB.Toaster.TimerStopTime,
-				"EnergyConsumption":   smartHomeDB.Toaster.EnergyConsumption,
-				"LastChanged":         smartHomeDB.Toaster.LastChanged,
-			},
+			"accountType": "User",
 		})
 	default:
 		c.JSON(http.StatusForbidden, gin.H{"error": "Invalid role or insufficient privileges"})
 	}
+
 }

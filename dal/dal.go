@@ -1,20 +1,26 @@
 package dal
 
+//package main
+
 import (
+	messaging "CMPSC488SP24SecTuesday/AES-BlockChain-Communication"
+	"bytes"
 	"context"
-	"fmt"
+	"encoding/json"
+	"errors"
 	"go.mongodb.org/mongo-driver/bson"
+
+	"fmt"
 	"log"
 	"time"
 
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // Secure connection to DB through admin user
 var (
-	mongoURI = "mongodb://adminDB:%2525R37%3DLA%5EZX@localhost/admin"
+	mongoURI = "mongodb://localhost:27017"
 	dbName   = "smartHomeDB"
 )
 
@@ -37,114 +43,123 @@ func ConnectToMongoDB() (*mongo.Client, error) {
 
 // IOT Structure to fit system info
 type Dishwasher struct {
-	UUID              string    `bson:"UUID"`
-	Status            string    `bson:"Status"`
-	WashTime          string    `bson:"WashTime"`
-	TimerStopTime     time.Time `bson:"TimerStopTime"`
-	EnergyConsumption int       `bson:"EnergyConsumption"`
-	LastChanged       time.Time `bson:"LastChanged"`
+	UUID              string    `json:"UUID"`
+	Status            bool      `json:"Status"`
+	WashTime          int       `json:"WashTime"`
+	TimerStopTime     time.Time `json:"TimerStopTime"`
+	EnergyConsumption int       `json:"EnergyConsumption"`
+	LastChanged       time.Time `json:"LastChanged"`
 }
 
 type Fridge struct {
-	UUID                string    `bson:"UUID"`
-	Status              string    `bson:"Status"`
-	TemperatureSettings string    `bson:"TemperatureSettings"`
-	EnergyConsumption   int       `bson:"EnergyConsumption"`
-	LastChanged         time.Time `bson:"LastChanged"`
-	EnergySaveMode      bool      `bson:"EnergySaveMode"`
+	UUID                string    `json:"UUID"`
+	Status              bool      `json:"Status"`
+	TemperatureSettings int       `json:"TemperatureSettings"`
+	EnergyConsumption   int       `json:"EnergyConsumption"`
+	LastChanged         time.Time `json:"LastChanged"`
+	EnergySaveMode      bool      `json:"EnergySaveMode"`
 }
 
 type HVAC struct {
-	UUID              string    `bson:"UUID"`
-	Location          string    `bson:"Location"`
-	Temperature       string    `bson:"Temperature"`
-	Humidity          string    `bson:"Humidity"`
-	FanSpeed          string    `bson:"FanSpeed"`
-	Status            string    `bson:"Status"`
-	EnergyConsumption int       `bson:"EnergyConsumption"`
-	LastChanged       time.Time `bson:"LastChanged"`
+	UUID              string    `json:"UUID"`
+	Location          string    `json:"Location"`
+	Temperature       int       `json:"Temperature"`
+	Humidity          int       `json:"Humidity"`
+	FanSpeed          int       `json:"FanSpeed"`
+	Status            bool      `json:"Status"`
+	EnergyConsumption int       `json:"EnergyConsumption"`
+	LastChanged       time.Time `json:"LastChanged"`
 }
 
 type Lighting struct {
-	UUID              string    `bson:"UUID"`
-	Location          string    `bson:"Location"`
-	Brightness        string    `bson:"Brightness"`
-	Status            string    `bson:"Status"`
-	EnergyConsumption int       `bson:"EnergyConsumption"`
-	LastChanged       time.Time `bson:"LastChanged"`
+	UUID              string    `json:"UUID"`
+	Location          string    `json:"Location"`
+	Brightness        int       `json:"Brightness"`
+	Status            bool      `json:"Status"`
+	EnergyConsumption int       `json:"EnergyConsumption"`
+	LastChanged       time.Time `json:"LastChanged"`
 }
 
 type Microwave struct {
-	UUID              string    `bson:"UUID"`
-	Status            string    `bson:"Status"`
-	Power             string    `bson:"Power"`
-	TimerStopTime     time.Time `bson:"TimerStopTime"`
-	EnergyConsumption int       `bson:"EnergyConsumption"`
-	LastChanged       time.Time `bson:"LastChanged"`
+	UUID              string    `json:"UUID"`
+	Status            bool      `json:"Status"`
+	Power             int       `json:"Power"`
+	TimerStopTime     time.Time `json:"TimerStopTime"`
+	EnergyConsumption int       `json:"EnergyConsumption"`
+	LastChanged       time.Time `json:"LastChanged"`
 }
 
 type Oven struct {
-	UUID                string    `bson:"UUID"`
-	Status              string    `bson:"Status"`
-	TemperatureSettings string    `bson:"TemperatureSettings"`
-	TimerStopTime       time.Time `bson:"TimerStopTime"`
-	EnergyConsumption   int       `bson:"EnergyConsumption"`
-	LastChanged         time.Time `bson:"LastChanged"`
+	UUID                string    `json:"UUID"`
+	Status              bool      `json:"Status"`
+	TemperatureSettings int       `json:"TemperatureSettings"`
+	TimerStopTime       time.Time `json:"TimerStopTime"`
+	EnergyConsumption   int       `json:"EnergyConsumption"`
+	LastChanged         time.Time `json:"LastChanged"`
 }
 
 type SecuritySystem struct {
-	UUID              string    `bson:"UUID"`
-	Location          string    `bson:"Location"`
-	SensorType        string    `bson:"SensorType"`
-	Status            string    `bson:"Status"`
-	EnergyConsumption int       `bson:"EnergyConsumption"`
-	LastTriggered     time.Time `bson:"LastTriggered"`
+	UUID              string    `json:"UUID"`
+	Location          string    `json:"Location"`
+	SensorType        string    `json:"SensorType"`
+	Status            bool      `json:"Status"`
+	EnergyConsumption int       `json:"EnergyConsumption"`
+	LastTriggered     time.Time `json:"LastTriggered"`
 }
 
 type SolarPanel struct {
-	UUID                 string    `bson:"UUID"`
-	PanelID              string    `bson:"PanelID"`
-	Status               string    `bson:"Status"`
-	EnergyGeneratedToday int       `bson:"EnergyGeneratedToday"`
-	PowerOutput          int       `bson:"PowerOutput"`
-	LastChanged          time.Time `bson:"LastChanged"`
+	UUID                 string    `json:"UUID"`
+	PanelID              string    `json:"PanelID"`
+	Status               bool      `json:"Status"`
+	EnergyGeneratedToday int       `json:"EnergyGeneratedToday"`
+	PowerOutput          int       `json:"PowerOutput"`
+	LastChanged          time.Time `json:"LastChanged"`
 }
 
 type Toaster struct {
-	UUID                string    `bson:"UUID"`
-	Status              string    `bson:"Status"`
-	TemperatureSettings string    `bson:"TemperatureSettings"`
-	TimerStopTime       time.Time `bson:"TimerStopTime"`
-	EnergyConsumption   int       `bson:"EnergyConsumption"`
-	LastChanged         time.Time `bson:"LastChanged"`
+	UUID                string    `json:"UUID"`
+	Status              bool      `json:"Status"`
+	TemperatureSettings int       `json:"TemperatureSettings"`
+	TimerStopTime       time.Time `json:"TimerStopTime"`
+	EnergyConsumption   int       `json:"EnergyConsumption"`
+	LastChanged         time.Time `json:"LastChanged"`
 }
 
-type smartHomeDB struct {
-	Dishwasher     *Dishwasher
-	Fridge         *Fridge
-	HVAC           *HVAC
-	Lighting       *Lighting
-	Microwave      *Microwave
-	Oven           *Oven
-	SecuritySystem *SecuritySystem
-	SolarPanel     *SolarPanel
-	Toaster        *Toaster
+type SmartHomeDB struct {
+	Dishwasher     []Dishwasher
+	Fridge         []Fridge
+	HVAC           []HVAC
+	Lighting       []Lighting
+	Microwave      []Microwave
+	Oven           []Oven
+	SecuritySystem []SecuritySystem
+	SolarPanel     []SolarPanel
+	Toaster        []Toaster
+	Users          []User
 }
 
 // messaging struct to send update requests to IoT devices
 type messagingStruct struct {
-	UUID     string `bson:"UUID"`
-	Name     string `bson:"Name"`
-	Function string `bson:"Function"`
-	Change   string `bson:"Change"`
+	UUID         string `json:"UUID"`
+	Function     string `json:"Function"`
+	Change       string `json:"Change"`
+	StatusChange bool   `json:"StatusChange"`
 }
 
-func FetchCollections(client *mongo.Client, dbName string) (*smartHomeDB, error) {
-	smartHomeDB := &smartHomeDB{}
+func FetchCollections(client *mongo.Client, dbName string) (*SmartHomeDB, error) {
+	smartHomeDB := &SmartHomeDB{}
 
 	// Define a helper function to fetch and decode documents
-	fetchAndDecode := func(collectionName string, result interface{}) error {
-		return client.Database(dbName).Collection(collectionName).FindOne(context.Background(), bson.D{}).Decode(result)
+	fetchAndDecode := func(collectionName string, results interface{}) error {
+		cursor, err := client.Database(dbName).Collection(collectionName).Find(context.Background(), bson.D{})
+		if err != nil {
+			return err
+		}
+		defer cursor.Close(context.Background())
+		if err = cursor.All(context.Background(), results); err != nil {
+			return err
+		}
+		return nil
 	}
 
 	// Fetch each collection
@@ -183,70 +198,83 @@ func FetchCollections(client *mongo.Client, dbName string) (*smartHomeDB, error)
 
 // User structure to fit system Info
 type User struct {
-	User       string                 `bson:"user"`
-	UserID     primitive.Binary       `bson:"userId"`
-	CustomData map[string]interface{} `bson:"customData"`
-	Role       struct {
-		Role string `bson:"role"`
-		DB   string `bson:"db"`
-	} `bson:"role"`
+	Username string `json:"Username"`
+	Password string `json:"Password"`
+	Role     string `json:"Role"`
 }
 
 func FetchUser(client *mongo.Client, userName string) (User, error) {
-	var tempResult struct {
-		Users []struct {
-			User       string                 `bson:"user"`
-			UserID     primitive.Binary       `bson:"userId"`
-			CustomData map[string]interface{} `bson:"customData"`
-			Roles      []struct {
-				Role string `bson:"role"`
-				DB   string `bson:"db"`
-			} `bson:"roles"`
-		} `bson:"users"`
-	}
 
-	cmd := bson.D{
-		{Key: "usersInfo", Value: bson.M{
-			"user": userName,
-			"db":   dbName,
-		}},
-	}
+	collection := client.Database(dbName).Collection("Users")
 
-	err := client.Database(dbName).RunCommand(context.Background(), cmd).Decode(&tempResult)
+	// Create a filter to specify the criteria of the query
+	filter := bson.M{"username": userName}
+
+	// Finding multiple documents returns a cursor
+	var user User
+	err := collection.FindOne(context.TODO(), filter).Decode(&user)
 	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			// User was not found
+			return User{}, fmt.Errorf("no user found with username: %s", userName)
+		}
+		// Some other error occurred
 		return User{}, err
 	}
 
-	if len(tempResult.Users) > 0 {
-		user := tempResult.Users[0]
-		var simplifiedUser User
-		simplifiedUser.User = user.User
-		simplifiedUser.UserID = user.UserID
-		simplifiedUser.CustomData = user.CustomData
-		if len(user.Roles) > 0 {
-			simplifiedUser.Role.Role = user.Roles[0].Role
-			simplifiedUser.Role.DB = user.Roles[0].DB
-		}
-		return simplifiedUser, nil
+	fmt.Printf("Username: %s, Role: %s\n", user.Username, user.Role)
+	return user, nil
+}
+
+func Iotlighting(UUID []byte, status bool, brightness int) {
+
+	client, err := ConnectToMongoDB()
+	if err != nil {
+		log.Fatal(err)
 	}
+	defer func(client *mongo.Client, ctx context.Context) {
+		err := client.Disconnect(ctx)
+		if err != nil {
 
-	return User{}, fmt.Errorf("no user found with username: %s", userName)
+		}
+	}(client, context.Background())
+
+	smartHomeDB, err := FetchCollections(client, dbName) // Fetches and populates data
+
+	if err != nil {
+		log.Fatalf("Error fetching IoT data: %v", err)
+	}
+	for _, light := range smartHomeDB.Lighting {
+		if bytes.Equal([]byte(light.UUID), UUID) {
+			var infoChange messagingStruct
+
+			infoChange.UUID = string(UUID)
+			infoChange.Function = "status"
+			infoChange.Change = ""
+			infoChange.StatusChange = status
+
+			message, _ := json.Marshal(infoChange)
+			//fmt.Printf("This is the message: ", message)
+			messaging.BroadCastMessage(message)
+			//messaging.BroadCastMessage([]byte("I got to here"))
+		}
+	}
 }
 
-func PrintSmartHomeDBContents(smartHomeDB *smartHomeDB) string {
-	return fmt.Sprintf(
-		"Dishwasher: %+v\nFridge: %+v\nHVAC: %+v\nLighting: %+v\nMicrowave: %+v\nOven: %+v\nSecuritySystem: %+v\nSolarPanel: %+v\nToaster: %+v\n",
-		*smartHomeDB.Dishwasher,
-		*smartHomeDB.Fridge,
-		*smartHomeDB.HVAC,
-		*smartHomeDB.Lighting,
-		*smartHomeDB.Microwave,
-		*smartHomeDB.Oven,
-		*smartHomeDB.SecuritySystem,
-		*smartHomeDB.SolarPanel,
-		*smartHomeDB.Toaster,
-	)
-}
+//func PrintSmartHomeDBContents(smartHomeDB *SmartHomeDB) string {
+//	return fmt.Sprintf(
+//		"Dishwasher: %+v\nFridge: %+v\nHVAC: %+v\nLighting: %+v\nMicrowave: %+v\nOven: %+v\nSecuritySystem: %+v\nSolarPanel: %+v\nToaster: %+v\n",
+//		*smartHomeDB.Dishwasher,
+//		*smartHomeDB.Fridge,
+//		*smartHomeDB.HVAC,
+//		*smartHomeDB.Lighting,
+//		*smartHomeDB.Microwave,
+//		*smartHomeDB.Oven,
+//		*smartHomeDB.SecuritySystem,
+//		*smartHomeDB.SolarPanel,
+//		*smartHomeDB.Toaster,
+//	)
+//}
 
 // connect to db if exists, else return error log
 func main() {
@@ -256,32 +284,34 @@ func main() {
 	}
 	defer client.Disconnect(context.Background())
 
-	//Testing fetchedUser function
-	fetchedUser, err := FetchUser(client, "Owner")
+	////Testing fetchedUser function
+	//fetchedUser, err := FetchUser(client, "Owner")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("User name: %s\n", fetchedUser.User)
-	fmt.Printf("Password: %v\n", fetchedUser.CustomData["password"])
-	fmt.Printf("UserID: %x\n", fetchedUser.UserID.Data)
-	fmt.Printf("Role: %s\n", fetchedUser.Role.Role)
-	fmt.Printf("Role DB: %s\n", fetchedUser.Role.DB)
+	//fmt.Printf("User name: %s\n", fetchedUser.User)
+	//fmt.Printf("Password: %v\n", fetchedUser.CustomData["password"])
+	//fmt.Printf("UserID: %x\n", fetchedUser.UserID.Data)
+	//fmt.Printf("Role: %s\n", fetchedUser.Role.Role)
+	//fmt.Printf("Role DB: %s\n", fetchedUser.Role.DB)
 
 	//Testing IoT functions
 	// Fetch the IoT system data
-	smartHomeDB, err := FetchCollections(client, dbName) // Fetches and populates data
-	if err != nil {
-		log.Fatalf("Error fetching IoT data: %v", err)
-	}
+	//smartHomeDB, err := FetchCollections(client, dbName) // Fetches and populates data
+	//if err != nil {
+	//	log.Fatalf("Error fetching IoT data: %v", err)
+	//}
 
-	fmt.Printf("HVAC Temperature: %s\n", smartHomeDB.HVAC.Temperature)
+	//fmt.Printf("HVAC Temperature: %s\n", smartHomeDB.HVAC.Temperature)
 
-	fmt.Printf("Dishwasher Status: %s\n", smartHomeDB.Dishwasher.Status)
+	//fmt.Printf("Dishwasher Status: %s\n", smartHomeDB.Dishwasher.Status)
 
-	fmt.Printf("Oven UUID: %s\n", smartHomeDB.Oven.UUID)
+	//fmt.Printf("Oven UUID: %s\n", smartHomeDB.Oven.UUID)
 
 	// Print the contents of smartHomeDB
-	fmt.Printf(PrintSmartHomeDBContents(smartHomeDB))
+	//fmt.Printf(PrintSmartHomeDBContents(smartHomeDB))
+
+	fmt.Println(FetchUser(client, "beaconuser"))
 
 }

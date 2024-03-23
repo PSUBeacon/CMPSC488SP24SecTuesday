@@ -14,98 +14,21 @@ import lightbulbIcon from './lightbulbIcon.png'
 import placeholderImage from './placeholderImage.jpg'; // Replace with the path to your placeholder image
 import placeholderImage2 from './placeholderImage2.jpg'; // Replace with the path to your placeholder image
 import './Lighting.css';
+import axios from "axios";
 
-// Define the Dashboard component using a functional component pattern
-const Lighting= () => {
+const Lighting = () => {
+  const [isLightOn, setIsLightOn] = useState(false);
 
-
-
-  const navigate = useNavigate(); // Instantiate useNavigate hook
-  const [selectedLight, setSelectedLight] = useState(null);
-
-  // Function to handle card click
-  const handleSelectLight = (lightId) => {
-    setSelectedLight(lightId); // Update the selected light state
-  };
-  
-  const [isNavVisible, setIsNavVisible] = useState(false);
-    const [dashboardMessage, setDashboardMessage] = useState('');
-    const [accountType ,setAccountType] = useState('')
-    // States for each device
-    const [deviceData, setDeviceData] = useState({
-        HVAC: {},
-        Dishwasher: {},
-        Fridge: {},
-        Lighting: {},
-        Microwave: {},
-        Oven: {},
-        SecuritySystem: {},
-        SolarPanel: {},
-        Toaster: {},
-    });
-    const [dimmerValue, setDimmerValue] = useState(75); // State to keep track of dimmer value
-    
-   
-
-  const toggleNav = () => {
-    setIsNavVisible(!isNavVisible);
+  const handleTurnOn = () => {
+    setIsLightOn(true);
+    // Add logic to turn the light on
   };
 
-  const goToSettings = () => {
-    navigate('/settings');
+  const handleTurnOff = () => {
+    setIsLightOn(false);
+    // Add logic to turn the light off
   };
 
-  const signOut = () => {
-    // Add your sign-out logic here
-    setIsAccountPopupVisible(false); // Close the popup
-    navigate('/'); // Use navigate to redirect
-  };
-  
- 
-
-  const [isAccountPopupVisible, setIsAccountPopupVisible] = useState(false);
-
-  const toggleAccountPopup = () => {
-    setIsAccountPopupVisible(!isAccountPopupVisible);
-  };
-  
-  
-
-    
-    
-        
-      
-  
-
-
-
-  
-  const AccountPopup = ({ isVisible, onClose }) => {
-    if (!isVisible) return null;
-  
-    return (
-      <div className = "accountPop"style={{
-        position: 'absolute',
-        top: '100%', // Position it right below the button
-        right: '0', // Align it with the right edge of the container
-        backgroundColor: '#08192B',
-        padding: '20px',
-        zIndex: 100,
-        color: 'white',
-        borderRadius: '2px',
-        // Add box-shadow or borders as needed for better visibility
-      }}>
-        <p>John Doe</p> {/* Replace with actual user name */}
-          {accountType && <p>{accountType}</p>} {/* Dynamically display user role */}
-        <button onClick={signOut} className="signout">Sign Out</button>
-      </div>
-    );
-  };
-  
-
-
-
-  // This is the JSX return statement where we layout our component's HTML structure
   return (
     <div style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column', backgroundColor: '#081624' }}>
       {/* Top Navbar */}

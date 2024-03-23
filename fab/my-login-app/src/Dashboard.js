@@ -5,17 +5,16 @@ import { Link } from 'react-router-dom'; // Import Link from react-router-dom fo
 import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure Bootstrap CSS is imported to use its grid system and components
 import logoImage from './logo.webp'; 
 import houseImage from './houseImage.jpg';
-import notificationIcon from './notification.png'
+import doorLockIcon from './doorLockIcon.png'
 import settingsIcon from './settings.png'
 import accountIcon from './account.png'
 import menuIcon from './menu.png'
+import bulbIcon from './bulb-icon.png'
 import placeholderImage from './placeholderImage.jpg'; // Replace with the path to your placeholder image
 import placeholderImage2 from './placeholderImage2.jpg'; // Replace with the path to your placeholder image
 
 // Define the Dashboard component using a functional component pattern
 const Dashboard = () => {
-
-
 
   const navigate = useNavigate(); // Instantiate useNavigate hook
   const [isNavVisible, setIsNavVisible] = useState(false);
@@ -121,6 +120,87 @@ const Dashboard = () => {
     );
   };
 
+  // Assuming you have a state to track the locks' statuses
+  const [locksStatus, setLocksStatus] = useState({
+    frontDoor: 'Locked',
+    backDoor: 'Locked',
+  });
+
+  // Locks Widget JSX
+  const LocksWidget = () => (
+    <div>
+    <div className="widget" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: '#173350', padding: '20px', paddingRight:"0px", borderRadius: '10px', margin: '0px' }}>
+      {/* Front Door Lock */}
+      <div style={{ flex: '1', maxWidth:'250px' }}>
+      <p style={{color:"#95A4B6"}}>Front Door</p>
+        <img src={doorLockIcon} alt="Front Door" style={{ width: '50%', height: 'auto', marginBottom:'10px' }} /> {/* Replace with lock icon */}
+        
+        <p>{locksStatus.frontDoor}</p>
+      </div>
+      
+      {/* Back Door Lock */}
+      <div style={{ flex: '1', maxWidth:'250px' }}>
+      <p style={{color:"#95A4B6"}}>Back Door</p>
+        <img src={doorLockIcon} alt="Back Door" style={{ width: '50%', height: 'auto', marginBottom:'10px' }} /> {/* Replace with lock icon */}
+        
+        <p>{locksStatus.backDoor}</p>
+      </div>
+    </div>
+    <div>
+      <h3 style={{color:"#95A4B6", marginBottom:'20px'}}>Lights</h3>
+       {/* Bedroom Light Status */}
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
+      <img src={bulbIcon} alt="Bedroom Light" style={{ width: '80px', height: 'auto', marginRight: '10px', marginBottom:'10px' }} /> {/* Replace with light icon */}
+      <div style={{ textAlign: 'center' }}>
+        <span style={{ color:"#95A4B6", fontSize:'20px' }}>Bedroom light:</span>
+        <p style={{marginTop:'10px'}}>{deviceData.Lighting.Status}</p>
+      </div>
+    </div>
+    </div>
+    </div>
+  );
+
+
+ // Appliances Widget JSX
+const AppliancesWidget = () => {
+  return (
+    <div>
+    <div className="widget" style={{ flex: '1', minWidth: '200px', backgroundColor: '#173350', padding: '0px', borderRadius: '1px', margin: '10px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-around' }}>
+      {/* Fridge Status */}
+      <div style={{ textAlign: 'center' }}>
+        <span style={{ color:"#95A4B6", margin:'6px' }}>Fridge</span>
+        <p>{deviceData.Fridge.Status}</p>
+      </div>
+
+      {/* Dishwasher Status */}
+      <div style={{ textAlign: 'center' }}>
+        <span style={{ color:"#95A4B6", margin:'6px' }}>Dishwasher</span>
+        <p>{deviceData.Dishwasher.Status}</p>
+      </div>
+
+      {/* Oven Status */}
+      <div style={{ textAlign: 'center' }}>
+        <span style={{ color:"#95A4B6", margin:'6px' }}>Oven</span>
+        <p>{deviceData.Oven.Status}</p>
+      </div>
+
+      {/* Toaster Status */}
+      <div style={{ textAlign: 'center' }}>
+        <span style={{ color:"#95A4B6", margin:'6px' }}>Toaster</span>
+        <p>{deviceData.Toaster.Status}</p>
+      </div>
+      
+    </div>
+    <div> <div>
+      <button onClick={() => navigate('/appliances')} style={{ marginTop: '20px', backgroundColor: '#0294A5', color: 'white', border: 'none', borderRadius: '5px', padding: '10px 20px', cursor: 'pointer', display: 'block', marginLeft: 'auto', marginRight: 'auto' }}>
+        See More
+      </button>
+      </div></div>
+    </div>
+    
+  );
+};
+
 
 
   
@@ -196,37 +276,37 @@ const Dashboard = () => {
                 </Link>
               </li>
               <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
-                <Link to="/security" style={{ color: 'white', textDecoration: 'none' }}>
+                <Link to="/security" style={{ color: '#95A4B6', textDecoration: 'none' }}>
                   <i className="fas fa-lock" style={{ marginRight: '10px' }}></i>
                   Security
                 </Link>
               </li>
               <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
-                <Link to="/lighting" style={{ color: 'white', textDecoration: 'none' }}>
+                <Link to="/lighting" style={{ color: '#95A4B6', textDecoration: 'none' }}>
                   <i className="fas fa-lightbulb" style={{ marginRight: '10px' }}></i>
                   Lighting
                 </Link>
               </li>
               <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
-                <Link to="/preferences" style={{ color: 'white', textDecoration: 'none' }}>
+                <Link to="/settings" style={{ color: '#95A4B6', textDecoration: 'none' }}>
                   <i className="fas fa-sliders-h" style={{ marginRight: '10px' }}></i>
-                  Preferences
+                  Settings
                 </Link>
               </li>
               <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
-                <Link to="/hvac" style={{ color: 'white', textDecoration: 'none' }}>
+                <Link to="/hvac" style={{ color: '#95A4B6', textDecoration: 'none' }}>
                   <i className="fas fa-thermometer-half" style={{ marginRight: '10px' }}></i>
                   HVAC
                 </Link>
               </li>
               <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
-                <Link to="/appliances" style={{ color: 'white', textDecoration: 'none' }}>
+                <Link to="/appliances" style={{ color: '#95A4B6', textDecoration: 'none' }}>
                   <i className="fas fa-blender" style={{ marginRight: '10px' }}></i>
                   Appliances
                 </Link>
               </li>
               <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
-                <Link to="/energy" style={{ color: 'white', textDecoration: 'none' }}>
+                <Link to="/energy" style={{ color: '#95A4B6', textDecoration: 'none' }}>
                   <i className="fas fa-bolt" style={{ marginRight: '10px' }}></i>
                   Energy
                 </Link>
@@ -245,7 +325,7 @@ const Dashboard = () => {
       {/* Camera Widget */}
       <div className="camera-widget" style={{ position: 'relative', maxWidth: '60%', backgroundColor: '#173350', borderRadius: '1px', overflow: 'hidden', flexBasis: '100%', padding:'12px' }}>
               {/* Camera Feed */}
-              <img src={cameraFeeds[cameraView]} alt="Camera feed" style={{ width: '100%', height: 'auto' }} />
+              <img src={cameraFeeds[cameraView]} alt="Camera feed" style={{ width: '100%', height: '100%' }} />
               
               {/* Camera View Buttons */}
               <div style={{ position: 'absolute', top: '10px', left: '10px', display: 'flex', gap: '5px' }}>
@@ -256,28 +336,50 @@ const Dashboard = () => {
       </div>
       
       {/* Locks Widget */}
-      <div className="widget" style={{ flex: '1', minWidth: '250px', backgroundColor: '#173350', padding: '20px', borderRadius: '1px', margin: '10px', boxSizing: 'border-box' }}>
-        <h3>Locks</h3>
-        {/* Content of the locks widget */}
+      <div className="widget" style={{ flex: '1', backgroundColor: '#173350', padding: '20px', borderRadius: '1px', margin: '10px', boxSizing: 'border-box' }}>
+        <h3 style={{color:"#95A4B6"}}>Locks</h3>
+        <LocksWidget />
       </div>
     </div>
 
     {/* Another Row for More Widgets */}
     <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: '20px' }}>
       {/* Status by Units Widget */}
-      <div className="widget" style={{ flex: '1', minWidth: '250px', backgroundColor: '#173350', padding: '20px', borderRadius: '1px', margin: '10px', boxSizing: 'border-box' }}>
-        <h3>Status by Units</h3>
+      <div className="widget" style={{ flex: '1', minWidth: '290px', backgroundColor: '#173350', padding: '20px', borderRadius: '1px', margin: '10px', boxSizing: 'border-box' }}>
+        <h3 style={{ marginBottom: '20px', color:"#95A4B6"}}>Status by Units</h3>
           {/* Content of the status by units widget */}
+          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around'}}>
+          <div style={{ textAlign:"center", margin:'6px'}}>
+            <p style={{ color:"#95A4B6"}}>Power</p>
           {deviceData.HVAC.Temperature && (
-              <p>{deviceData.HVAC.Temperature}</p>
-          )}
+              <p style={{ fontSize:'22px'}}>{deviceData.SolarPanel.EnergyGeneratedToday}kw</p>
+          )}</div>
+          <div style={{ textAlign:"center",  margin:'6px'}}>
+            <p style={{ color:"#95A4B6"}}>Temperature</p>
+          {deviceData.HVAC.Temperature && (
+              <p style={{ fontSize:'22px'}}>{deviceData.HVAC.Temperature}</p>
+          )}</div>
+
+          <div style={{ textAlign:"center",  margin:'6px'}}>
+            <p style={{ color:"#95A4B6"}}> Humidity</p>
+          {deviceData.HVAC.Temperature && (
+              <p style={{ fontSize:'22px'}}>{deviceData.HVAC.Humidity}</p>
+          )}</div>
+
+          <div style={{ textAlign:"center",  margin:'6px'}}>
+            <p style={{ color:"#95A4B6"}}>Security</p>
+          {deviceData.HVAC.Temperature && (
+              <p style={{ color: 'green', fontWeight:'bold', fontSize:'22px'}}>{deviceData.SecuritySystem.Status}</p>
+          )}</div>
+          </div>
 
       </div>
       
       {/* Scheduled Activity Widget */}
       <div className="widget" style={{ flex: '1', minWidth: '250px', backgroundColor: '#173350', padding: '20px', borderRadius: '1px', margin: '10px', boxSizing: 'border-box' }}>
-        <h3>Scheduled Activity</h3>
+        <h3 style={{color:"#95A4B6"}}>Active Appliances</h3>
         {/* Content of the scheduled activity widget */}
+        <AppliancesWidget />
       </div>
     </div>
   </div>

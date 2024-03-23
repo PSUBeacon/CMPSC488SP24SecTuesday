@@ -1,6 +1,6 @@
 body {
     color: white;
-    background-color: #0E2237;
+    background-color: #081624;
 }
 
 #title {
@@ -94,6 +94,7 @@ body {
   .houseInfo{
     text-align: center;
     margin-bottom: 20px;
+    color:#95A4B6
   }
 
   #circle2 {
@@ -144,4 +145,24 @@ body {
 .nav-item:hover {
   padding-left: 30px; /* Indent text to create sliding effect */
   border-left: 3px solid #0294A5; /* Visible border on hover */
+}
+
+/* Base styles for cards */
+.card {
+  width: 48%; /* Allows 2 cards to fit side by side with some space in between */
+  margin-bottom: 20px;
+}
+
+/* Ensure container flex properties are set correctly */
+.roomCards, .lightCards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+/* Adjust when screen width is too small for two cards side by side */
+@media (max-width: 300px) {
+  #menuIcon {
+   display:none;
+  }
 }

@@ -30,6 +30,7 @@ const Lighting = () => {
     const requestBody = {
       uuid: '417293',
       name: "Lighting",
+      apptype: "Lighting",
       function: "Status",
       change: null,
       statusChange: true

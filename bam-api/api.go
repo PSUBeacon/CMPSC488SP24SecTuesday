@@ -6,6 +6,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -19,6 +21,10 @@ import (
 )
 
 var client *mongo.Client
+
+const userkey = "user"
+
+var secret = []byte("secret")
 
 func main() {
 	var er error
@@ -47,9 +53,12 @@ func main() {
 		MaxAge: 12 * time.Hour,
 	}))
 
+	r.Use(sessions.Sessions("mysession", cookie.NewStore(secret)))
+
 	// unprotected endpoints no auth needed
-	//r.GET("/status", statusResp)
+	r.GET("/status", statusResp)
 	r.POST("/login", loginHandler)
+	r.GET("/logout", logout)
 
 	// Apply JWT middleware to protected routes
 	protectedRoutes := r.Group("/")
@@ -67,11 +76,12 @@ func main() {
 
 	//ADJUSTMENT:
 	// Combined route group for both admin and user dashboards
-	dashboardGroup := r.Group("/dashboard")
-	dashboardGroup.Use(authMiddleware()) // Apply authMiddleware to protect the route
+	dashboardGroup := r.Group("/dashboard", dashboardHandler)
+	dashboardGroup.Use(AuthRequired) // Apply authMiddleware to protect the route
 	{
 		// Combined dashboard route for admin and user
-		dashboardGroup.GET("", dashboardHandler) // Use an empty string for the base path of the group
+		dashboardGroup.GET("/me", me) // Use an empty string for the base path of the group
+		dashboardGroup.GET("/status", statusResp)
 	}
 
 	err := r.Run(":8081")
@@ -101,9 +111,9 @@ func updateIoT(c *gin.Context) {
 
 }
 
-//func statusResp(c *gin.Context) {
-//	c.JSON(http.StatusOK, gin.H{"status": "OK"})
-//}
+func statusResp(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"status": "OK"})
+}
 
 func getJwtKey() string {
 	key := os.Getenv("JWT_SECRET_KEY")
@@ -118,6 +128,7 @@ func getJwtKey() string {
 var jwtKey = []byte(getJwtKey())
 
 func loginHandler(c *gin.Context) {
+	session := sessions.Default(c)
 	var loginData struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
@@ -128,16 +139,16 @@ func loginHandler(c *gin.Context) {
 		return
 	}
 
+	fmt.Printf("user: %s", loginData.Username)
+	fmt.Printf("pass: %s", loginData.Password)
 	// Fetch user by username from MongoDB
 	fetchedUser, err := dal.FetchUser(client, loginData.Username)
-	fmt.Printf("Username:", fetchedUser.Username)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"}) // Use generic error message
 		return
 	}
 
 	passwordFromDB := fetchedUser.Password
-	fmt.Printf("Password: %s\n", passwordFromDB)
 
 	// Compare the password hash using bcrypt.CompareHashAndPassword
 	err = bcrypt.CompareHashAndPassword([]byte(passwordFromDB), []byte(loginData.Password))
@@ -166,10 +177,47 @@ func loginHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create the token"})
 		return
 	}
-
+	session.Set(userkey, loginData.Username)
+	if err := session.Save(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save session"})
+		return
+	}
 	// Return the JWT token in the response
 	c.JSON(http.StatusOK, gin.H{"token": tokenString})
 
+}
+
+func logout(c *gin.Context) {
+	session := sessions.Default(c)
+	user := session.Get(userkey)
+	if user == nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid session token"})
+		return
+	}
+	session.Delete(userkey)
+	if err := session.Save(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save session"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Successfully logged out"})
+}
+
+func AuthRequired(c *gin.Context) {
+	session := sessions.Default(c)
+	user := session.Get(userkey)
+	if user == nil {
+		// Abort the request with the appropriate error code
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+	// Continue down the chain to handler etc
+	c.Next()
+}
+
+func me(c *gin.Context) {
+	session := sessions.Default(c)
+	user := session.Get(userkey)
+	c.JSON(http.StatusOK, gin.H{"user": user})
 }
 
 // check jwt auth and set user role
@@ -271,4 +319,170 @@ func dashboardHandler(c *gin.Context) {
 		c.JSON(http.StatusForbidden, gin.H{"error": "Invalid role or insufficient privileges"})
 	}
 
+	// Determine the response based on the user's role
+	switch role {
+	case "readWrite": //owner role
+		if smartHomeDB == nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch smart home data"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"message":     "Welcome to the Owner dashboard",
+			"accountType": "Owner",
+			"Dishwasher": gin.H{
+				"UUID":              smartHomeDB.Dishwasher[0].UUID,
+				"Status":            smartHomeDB.Dishwasher[0].Status,
+				"WashTime":          smartHomeDB.Dishwasher[0].WashTime,
+				"TimerStopTime":     smartHomeDB.Dishwasher[0].TimerStopTime,
+				"EnergyConsumption": smartHomeDB.Dishwasher[0].EnergyConsumption,
+				"LastChanged":       smartHomeDB.Dishwasher[0].LastChanged,
+			},
+			"Fridge": gin.H{
+				"UUID":                smartHomeDB.Fridge[0].UUID,
+				"Status":              smartHomeDB.Fridge[0].Status,
+				"TemperatureSettings": smartHomeDB.Fridge[0].TemperatureSettings,
+				"EnergyConsumption":   smartHomeDB.Fridge[0].EnergyConsumption,
+				"LastChanged":         smartHomeDB.Fridge[0].LastChanged,
+				"EnergySaveMode":      smartHomeDB.Fridge[0].EnergySaveMode,
+			},
+			"HVAC": gin.H{
+				"UUID":              smartHomeDB.HVAC[0].UUID,
+				"Location":          smartHomeDB.HVAC[0].Location,
+				"Temperature":       smartHomeDB.HVAC[0].Temperature,
+				"Humidity":          smartHomeDB.HVAC[0].Humidity,
+				"FanSpeed":          smartHomeDB.HVAC[0].FanSpeed,
+				"Status":            smartHomeDB.HVAC[0].Status,
+				"EnergyConsumption": smartHomeDB.HVAC[0].EnergyConsumption,
+				"LastChanged":       smartHomeDB.HVAC[0].LastChanged,
+			},
+			"Lighting": gin.H{
+				"UUID":              smartHomeDB.Lighting[0].UUID,
+				"Location":          smartHomeDB.Lighting[0].Location,
+				"Brightness":        smartHomeDB.Lighting[0].Brightness,
+				"Status":            smartHomeDB.Lighting[0].Status,
+				"EnergyConsumption": smartHomeDB.Lighting[0].EnergyConsumption,
+				"LastChanged":       smartHomeDB.Lighting[0].LastChanged,
+			},
+			"Microwave": gin.H{
+				"UUID":              smartHomeDB.Microwave[0].UUID,
+				"Status":            smartHomeDB.Microwave[0].Status,
+				"Power":             smartHomeDB.Microwave[0].Power,
+				"TimerStopTime":     smartHomeDB.Microwave[0].TimerStopTime,
+				"EnergyConsumption": smartHomeDB.Microwave[0].EnergyConsumption,
+				"LastChanged":       smartHomeDB.Microwave[0].LastChanged,
+			},
+			"Oven": gin.H{
+				"UUID":                smartHomeDB.Oven[0].UUID,
+				"Status":              smartHomeDB.Oven[0].Status,
+				"TemperatureSettings": smartHomeDB.Oven[0].TemperatureSettings,
+				"TimerStopTime":       smartHomeDB.Oven[0].TimerStopTime,
+				"EnergyConsumption":   smartHomeDB.Oven[0].EnergyConsumption,
+				"LastChanged":         smartHomeDB.Oven[0].LastChanged,
+			},
+			"SecuritySystem": gin.H{
+				"UUID":              smartHomeDB.SecuritySystem[0].UUID,
+				"Location":          smartHomeDB.SecuritySystem[0].Location,
+				"Status":            smartHomeDB.SecuritySystem[0].Status,
+				"EnergyConsumption": smartHomeDB.SecuritySystem[0].EnergyConsumption,
+				"LastTriggered":     smartHomeDB.SecuritySystem[0].LastTriggered,
+			},
+			"SolarPanel": gin.H{
+				"UUID":                 smartHomeDB.SolarPanel[0].UUID,
+				"PanelID":              smartHomeDB.SolarPanel[0].PanelID,
+				"Status":               smartHomeDB.SolarPanel[0].Status,
+				"EnergyGeneratedToday": smartHomeDB.SolarPanel[0].EnergyGeneratedToday,
+				"PowerOutput":          smartHomeDB.SolarPanel[0].PowerOutput,
+				"LastChanged":          smartHomeDB.SolarPanel[0].LastChanged,
+			},
+			"Toaster": gin.H{
+				"UUID":                smartHomeDB.Toaster[0].UUID,
+				"Status":              smartHomeDB.Toaster[0].Status,
+				"TemperatureSettings": smartHomeDB.Toaster[0].TemperatureSettings,
+				"TimerStopTime":       smartHomeDB.Toaster[0].TimerStopTime,
+				"EnergyConsumption":   smartHomeDB.Toaster[0].EnergyConsumption,
+				"LastChanged":         smartHomeDB.Toaster[0].LastChanged,
+			},
+		})
+
+	case "read": //child role
+		c.JSON(http.StatusOK, gin.H{
+			"message":     "Welcome to the Owner dashboard",
+			"accountType": "Child",
+			"Dishwasher": gin.H{
+				"UUID":              smartHomeDB.Dishwasher[0].UUID,
+				"Status":            smartHomeDB.Dishwasher[0].Status,
+				"WashTime":          smartHomeDB.Dishwasher[0].WashTime,
+				"TimerStopTime":     smartHomeDB.Dishwasher[0].TimerStopTime,
+				"EnergyConsumption": smartHomeDB.Dishwasher[0].EnergyConsumption,
+				"LastChanged":       smartHomeDB.Dishwasher[0].LastChanged,
+			},
+			"Fridge": gin.H{
+				"UUID":                smartHomeDB.Fridge[0].UUID,
+				"Status":              smartHomeDB.Fridge[0].Status,
+				"TemperatureSettings": smartHomeDB.Fridge[0].TemperatureSettings,
+				"EnergyConsumption":   smartHomeDB.Fridge[0].EnergyConsumption,
+				"LastChanged":         smartHomeDB.Fridge[0].LastChanged,
+				"EnergySaveMode":      smartHomeDB.Fridge[0].EnergySaveMode,
+			},
+			"HVAC": gin.H{
+				"UUID":              smartHomeDB.HVAC[0].UUID,
+				"Location":          smartHomeDB.HVAC[0].Location,
+				"Temperature":       smartHomeDB.HVAC[0].Temperature,
+				"Humidity":          smartHomeDB.HVAC[0].Humidity,
+				"FanSpeed":          smartHomeDB.HVAC[0].FanSpeed,
+				"Status":            smartHomeDB.HVAC[0].Status,
+				"EnergyConsumption": smartHomeDB.HVAC[0].EnergyConsumption,
+				"LastChanged":       smartHomeDB.HVAC[0].LastChanged,
+			},
+			"Lighting": gin.H{
+				"UUID":              smartHomeDB.Lighting[0].UUID,
+				"Location":          smartHomeDB.Lighting[0].Location,
+				"Brightness":        smartHomeDB.Lighting[0].Brightness,
+				"Status":            smartHomeDB.Lighting[0].Status,
+				"EnergyConsumption": smartHomeDB.Lighting[0].EnergyConsumption,
+				"LastChanged":       smartHomeDB.Lighting[0].LastChanged,
+			},
+			"Microwave": gin.H{
+				"UUID":              smartHomeDB.Microwave[0].UUID,
+				"Status":            smartHomeDB.Microwave[0].Status,
+				"Power":             smartHomeDB.Microwave[0].Power,
+				"TimerStopTime":     smartHomeDB.Microwave[0].TimerStopTime,
+				"EnergyConsumption": smartHomeDB.Microwave[0].EnergyConsumption,
+				"LastChanged":       smartHomeDB.Microwave[0].LastChanged,
+			},
+			"Oven": gin.H{
+				"UUID":                smartHomeDB.Oven[0].UUID,
+				"Status":              smartHomeDB.Oven[0].Status,
+				"TemperatureSettings": smartHomeDB.Oven[0].TemperatureSettings,
+				"TimerStopTime":       smartHomeDB.Oven[0].TimerStopTime,
+				"EnergyConsumption":   smartHomeDB.Oven[0].EnergyConsumption,
+				"LastChanged":         smartHomeDB.Oven[0].LastChanged,
+			},
+			"SecuritySystem": gin.H{
+				"UUID":              smartHomeDB.SecuritySystem[0].UUID,
+				"Location":          smartHomeDB.SecuritySystem[0].Location,
+				"Status":            smartHomeDB.SecuritySystem[0].Status,
+				"EnergyConsumption": smartHomeDB.SecuritySystem[0].EnergyConsumption,
+				"LastTriggered":     smartHomeDB.SecuritySystem[0].LastTriggered,
+			},
+			"SolarPanel": gin.H{
+				"UUID":                 smartHomeDB.SolarPanel[0].UUID,
+				"PanelID":              smartHomeDB.SolarPanel[0].PanelID,
+				"Status":               smartHomeDB.SolarPanel[0].Status,
+				"EnergyGeneratedToday": smartHomeDB.SolarPanel[0].EnergyGeneratedToday,
+				"PowerOutput":          smartHomeDB.SolarPanel[0].PowerOutput,
+				"LastChanged":          smartHomeDB.SolarPanel[0].LastChanged,
+			},
+			"Toaster": gin.H{
+				"UUID":                smartHomeDB.Toaster[0].UUID,
+				"Status":              smartHomeDB.Toaster[0].Status,
+				"TemperatureSettings": smartHomeDB.Toaster[0].TemperatureSettings,
+				"TimerStopTime":       smartHomeDB.Toaster[0].TimerStopTime,
+				"EnergyConsumption":   smartHomeDB.Toaster[0].EnergyConsumption,
+				"LastChanged":         smartHomeDB.Toaster[0].LastChanged,
+			},
+		})
+	default:
+		c.JSON(http.StatusForbidden, gin.H{"error": "Invalid role or insufficient privileges"})
+	}
 }

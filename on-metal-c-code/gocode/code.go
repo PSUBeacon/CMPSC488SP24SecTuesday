@@ -1,5 +1,9 @@
 package gocode
 
+// #include Fan.h
+//
+//
+import "C"
 import (
 	"fmt"
 	"github.com/stianeikeland/go-rpio/v4"

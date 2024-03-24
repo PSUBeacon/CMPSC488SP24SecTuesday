@@ -26,8 +26,9 @@ const LoginForm = () => {
       localStorage.setItem('token', jwtToken);
 
       // Redirect user to the dashboard page
-      navigate('/dashboard'); // Use navigate to redirect
-
+      // Use navigate to redirect
+      navigate('/dashboard');
+      
     } catch (error) {
       setError('Failed to login. Please check your network connection and credentials.');
       console.error('Login error:', error.toJSON());

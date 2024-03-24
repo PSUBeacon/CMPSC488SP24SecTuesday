@@ -12,6 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
+	"strconv"
 	"time"
 )
 
@@ -241,18 +242,46 @@ func UpdateMessaging(client *mongo.Client, UUID []byte, name string, apptype str
 	messageRequest.StatusChange = statuschange
 	message, err := json.Marshal(messageRequest)
 	if err != nil {
-		log.Printf("Error marshaling JSON message: %v", err)
+		fmt.Printf("Error marshaling JSON message: %v", err)
 		return
 	}
 	messaging.BroadCastMessage(message)
 
-	// Update the MongoDB collection
+	// Update the MongoDB collection using JSON
 	collection := client.Database("smartHomeDB").Collection(apptype)
-	filter := map[string]interface{}{"UUID": messageRequest.UUID}
-	update := map[string]interface{}{"$set": map[string]interface{}{function: change}}
-	_, err = collection.UpdateOne(context.Background(), filter, update)
+	filter := bson.M{"UUID": messageRequest.UUID}
+
+	var updatedValue interface{}
+	switch function {
+	case "Status":
+		updatedValue = statuschange
+	case "WashTime", "TemperatureSettings", "EnergyConsumption", "Brightness", "Power":
+		updatedValue, _ = strconv.Atoi(change)
+	default:
+		updatedValue = change
+	}
+
+	update := map[string]interface{}{
+		"$set": map[string]interface{}{
+			function: updatedValue,
+		},
+	}
+
+	updateJSON, err := json.Marshal(update)
 	if err != nil {
-		log.Printf("Error updating document: %v", err)
+		fmt.Printf("Error marshaling update JSON: %v", err)
+		return
+	}
+
+	var updateDoc bson.M
+	if err := bson.UnmarshalExtJSON(updateJSON, true, &updateDoc); err != nil {
+		fmt.Printf("Error unmarshaling update JSON: %v", err)
+		return
+	}
+
+	_, err = collection.UpdateOne(context.Background(), filter, updateDoc)
+	if err != nil {
+		fmt.Printf("Error updating document: %v", err)
 		return
 	}
 	return

@@ -26,6 +26,7 @@ func UpdateStatus(status bool) {
 }
 
 func UpdateTemperature(temp int) {
+	//Add microwave
 	fmt.Printf("%s Temperature is now set to %d degrees farenheit\n", temp)
 }
 

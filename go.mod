@@ -8,6 +8,7 @@ require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/gopacket v1.1.19
 	github.com/joho/godotenv v1.5.1
+	github.com/stianeikeland/go-rpio/v4 v4.6.0
 	go.bug.st/serial v1.6.2
 	go.mongodb.org/mongo-driver v1.13.1
 	golang.org/x/crypto v0.14.0

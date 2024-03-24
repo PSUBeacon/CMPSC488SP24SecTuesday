@@ -240,73 +240,73 @@ func handleFunctionality() {
 		panic(err)
 	}
 	messageChange, _ := strconv.Atoi(messageData.Change)
-	if messageData.Name == "lighting" {
+	if messageData.Name == "Lighting" {
 		for i := 0; i < len(UUIDsData.LightingUUIDs); i++ {
 			if UUIDsData.LightingUUIDs[i] == messageData.UUID {
-				if messageData.Function == "status" {
+				if messageData.Function == "Status" {
 					lighting.UpdateStatus(messageData.StatusChange)
 				}
-				if messageData.Function == "brightness" {
+				if messageData.Function == "Brightness" {
 					lighting.SetBrightness(messageChange)
 				}
 			}
 		}
 	}
-	if messageData.Name == "hvac" {
+	if messageData.Name == "HVAC" {
 		for i := 0; i < len(UUIDsData.HvacUUIDs); i++ {
 			if UUIDsData.HvacUUIDs[i] == messageData.UUID {
-				if messageData.Function == "status" {
+				if messageData.Function == "Status" {
 					hvac.UpdateStatus(messageData.StatusChange)
 				}
-				if messageData.Function == "fan" {
+				if messageData.Function == "Fan" {
 					hvac.UpdateFanSpeed(messageChange)
 				}
-				if messageData.Function == "temerature" {
+				if messageData.Function == "Temperature" {
 					hvac.UpdateTemperature(messageChange)
 				}
-				if messageData.Function == "mode" {
+				if messageData.Function == "Mode" {
 					hvac.UpdateMode(messageData.Change)
 				}
 			}
 		}
 	}
-	if messageData.Name == "security" {
+	if messageData.Name == "Security" {
 		for i := 0; i < len(UUIDsData.SecurityUUIDs); i++ {
 			if UUIDsData.SecurityUUIDs[i] == messageData.UUID {
-				if messageData.Function == "status" {
+				if messageData.Function == "Status" {
 					security.UpdateAlarmStatus(messageData.StatusChange)
 				}
 			}
 		}
 	}
-	if messageData.Name == "appliances" {
+	if messageData.Name == "Appliances" {
 		for i := 0; i < len(UUIDsData.AppliancesUUIDs); i++ {
 			if UUIDsData.AppliancesUUIDs[i] == messageData.UUID {
-				if messageData.Function == "status" {
+				if messageData.Function == "Status" {
 					appliances.UpdateStatus(messageData.StatusChange)
 				}
-				if messageData.Function == "temperature" {
+				if messageData.Function == "Temperature" {
 					appliances.UpdateTemperature(messageChange)
 				}
-				if messageData.Function == "timerstoptime" {
+				if messageData.Function == "TimerStopTime" {
 					appliances.UpdateTimeStopTime(messageChange)
 				}
-				if messageData.Function == "power" {
+				if messageData.Function == "Power" {
 					appliances.UpdatePower(messageChange)
 				}
-				if messageData.Function == "energysavingmode" {
+				if messageData.Function == "EnergySaveMode" {
 					appliances.UpdateEnergySavingMode(messageData.StatusChange)
 				}
-				if messageData.Function == "washtime" {
+				if messageData.Function == "WashTime" {
 					appliances.UpdateWashTime(messageChange)
 				}
 			}
 		}
 	}
-	if messageData.Name == "energy" {
+	if messageData.Name == "Energy" {
 		for i := 0; i < len(UUIDsData.EnergyUUIDs); i++ {
 			if UUIDsData.EnergyUUIDs[i] == messageData.UUID {
-				if messageData.Function == "status" {
+				if messageData.Function == "Status" {
 					//energy.UpdateAlarmStatus(messageData.StatusChange)
 				}
 			}

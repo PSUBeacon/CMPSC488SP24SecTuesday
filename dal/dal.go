@@ -151,7 +151,8 @@ type UUIDsConfig struct {
 
 type MessagingStruct struct {
 	UUID         string `json:"UUID"`
-	Name         string `json:"Name"`         //type item being changes ex(lighting) or (oven)
+	Name         string `json:"Name"`         //type item being changes ex(Lighting) or (HVAC)
+	AppType      string `json:"AppType"`      //Which Type of appliance it is
 	Function     string `json:"Function"`     //function being changed ex(brightness)
 	Change       string `json:"Change"`       //actual change being made ex(100) for brightness
 	StatusChange bool   `json:"StatusChange"` //if changing status this would be the status change
@@ -230,10 +231,11 @@ func FetchUser(client *mongo.Client, userName string) (User, error) {
 	return user, nil
 }
 
-func UpdateMessaging(UUID []byte, name string, function string, change string, statuschange bool) {
+func UpdateMessaging(client *mongo.Client, UUID []byte, name string, apptype string, function string, change string, statuschange bool) {
 	var messageRequest MessagingStruct
 	messageRequest.UUID = string(UUID)
 	messageRequest.Name = name
+	messageRequest.AppType = apptype
 	messageRequest.Function = function
 	messageRequest.Change = change
 	messageRequest.StatusChange = statuschange
@@ -243,6 +245,16 @@ func UpdateMessaging(UUID []byte, name string, function string, change string, s
 		return
 	}
 	messaging.BroadCastMessage(message)
+
+	// Update the MongoDB collection
+	collection := client.Database("smartHomeDB").Collection(apptype)
+	filter := map[string]interface{}{"UUID": messageRequest.UUID}
+	update := map[string]interface{}{"$set": map[string]interface{}{function: change}}
+	_, err = collection.UpdateOne(context.Background(), filter, update)
+	if err != nil {
+		log.Printf("Error updating document: %v", err)
+		return
+	}
 	return
 }
 

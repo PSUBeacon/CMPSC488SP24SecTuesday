@@ -29,8 +29,8 @@ const Lighting = () => {
     // Define the body of the request based on your Go server's expected input.
     const requestBody = {
       uuid: '417293',
-      name: "lighting",
-      function: "status",
+      name: "Lighting",
+      function: "Status",
       change: null,
       statusChange: true
     };
@@ -66,8 +66,9 @@ const Lighting = () => {
     // Define the body of the request based on your Go server's expected input.
     const requestBody = {
       uuid: '417293',
-      name: "lighting",
-      function: "status",
+      name: "Lighting",
+      apptype: "Lighting",
+      function: "Status",
       change: null,
       statusChange: false
     };

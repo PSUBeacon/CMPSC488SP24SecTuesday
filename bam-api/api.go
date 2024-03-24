@@ -95,7 +95,7 @@ func updateIoT(c *gin.Context) {
 		return
 	}
 
-	dal.UpdateMessaging([]byte(req.UUID), req.Name, req.Function, req.Change, req.StatusChange)
+	dal.UpdateMessaging(client, []byte(req.UUID), req.Name, req.AppType, req.Function, req.Change, req.StatusChange)
 	// Respond to the request indicating success.
 	c.JSON(http.StatusOK, gin.H{"message": "Lighting updated successfully"})
 

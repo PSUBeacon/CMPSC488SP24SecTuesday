@@ -1,1 +1,57 @@
+{
+  "Security": {
+    "Location": "House1",
+    "SensorType": "Motion Sensor",
+    "Status": true,
+    "EnergyConsumption": 3,
+    "LastTriggered": ["02/21 10:32:05PM '24 -0700"]
+  },
+  "Appliance":
+{
+  "Name": "Toaster",
+  "State": false,
+  "Temp": 100
+},
+  "HVAC": {
+    "Name": "My HVAC",
+    "Temperature": 22,
+    "FanSpeed": "Medium",
+    "Humidity": 45,
+    "Status": "Cool",
+    "Location": "Kitchen",
+    "EnergyConsumption": 10,
+    "LastChanged": "2023-10-01T18:30:00Z"
+  },
+  "Lighting":{
+    "uuid": "123e4567-e89b-12d3-a456-426614174000",
+    "location": "Living Room",
+    "brightness": "50",
+    "status": false,
+    "energyConsumption": 10,
+    "lastChanged": "2024-03-24T15:25:16-04:00"
+  },
+  "Device": {
+    "DeviceID": 0,
+    "Name": "Solar 1",
+  "Power": 1500,
+  "State": false,
+  "Sector": -1
+  },
 
+  "Device": {
+    "DeviceID": 1,
+    "Name": "Battery 1",
+    "Power": 3000,
+    "State": true,
+    "Sector": 0
+  },
+  "SolarPanel":{
+    "Name": "Solar Panel",
+    "PowerOutput": 500
+  },
+  "Battery": {
+    "Name": "House Battery",
+    "Capacity": 2000
+  }
+          
+}

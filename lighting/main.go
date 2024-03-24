@@ -57,15 +57,13 @@ func UpdateStatus(newStatus bool) {
 }
 
 // SetBrightness sets the brightness of the lighting.
-func (l *Lighting) SetBrightness(brightness int) {
+func SetBrightness(brightness int) {
 	if brightness < 0 {
 		brightness = 0
 	} else if brightness > 100 {
 		brightness = 100
 	}
-	l.Brightness = fmt.Sprintf("%d%%", brightness)
-	l.LastChanged = time.Now().Format(time.RFC3339)
-	fmt.Printf("%s brightness is set to %s\n", l.Location, l.Brightness)
+	fmt.Printf("%s brightness is set to %s\n", brightness)
 }
 
 // AddTimer adds a new timer to the lighting system.

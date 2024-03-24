@@ -21,18 +21,26 @@ func NewAppliance(name string, initialState bool, temp int) *Appliance {
 }
 
 // TurnOn turns the appliance on.
-func (a *Appliance) TurnOn() {
-	a.State = true
-	fmt.Printf("%s is now turned ON\n", a.Name)
+func UpdateStatus(status bool) {
+	fmt.Printf("%s Status is now set to: \n", status)
 }
 
-// TurnOff turns the appliance off.
-func (a *Appliance) TurnOff() {
-	a.State = false
-	fmt.Printf("%s is now turned OFF\n", a.Name)
+func UpdateTemperature(temp int) {
+	fmt.Printf("%s Temperature is now set to %d degrees farenheit\n", temp)
 }
 
-func (a *Appliance) AdjustTemp(setTemp int) {
-	a.Temp = setTemp
-	fmt.Printf("%s temperature is now set to %d degrees farenheit\n", a.Name, a.Temp)
+func UpdateTimeStopTime(timerstop int) {
+	fmt.Printf("%s Timer end time is now set to\n", timerstop)
+}
+
+func UpdatePower(power int) {
+	fmt.Printf("%s Power is now set to\n", power)
+}
+
+func UpdateEnergySavingMode(status bool) {
+	fmt.Printf("%s Energy saving mode is now set to \n", status)
+}
+
+func UpdateWashTime(washtime int) {
+	fmt.Printf("%s Wash time is now set to \n", washtime)
 }

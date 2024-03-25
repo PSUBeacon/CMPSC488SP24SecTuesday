@@ -36,7 +36,7 @@ const Dashboard = () => {
 
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         const url = 'http://localhost:8081/dashboard';
 
         if (!token) {
@@ -62,7 +62,7 @@ const Dashboard = () => {
                     const updatedDeviceData = {...deviceData};
                     Object.keys(updatedDeviceData).forEach(device => {
                         if (response.data[device]) {
-                            localStorage.setItem(device, JSON.stringify(response.data[device]));
+                            sessionStorage.setItem(device, JSON.stringify(response.data[device]));
                             updatedDeviceData[device] = response.data[device];
                         }
                     });

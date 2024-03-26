@@ -191,17 +191,18 @@ func verifyBlockchain(currentblock blockchain.Block) bool {
 
 	if readBlockchain.Chain[len(readBlockchain.Chain)-1].Hash == currentblock.PrevHash {
 		// Verify the rest of the hashes
-		for i := 1; i < len(readBlockchain.Chain); i++ {
-			currBlock := readBlockchain.Chain[i]
-			prevBlock := readBlockchain.Chain[i-1]
+		//for i := 1; i < len(readBlockchain.Chain); i++ {
+		//currBlock := readBlockchain.Chain[i]
+		//prevBlock := readBlockchain.Chain[i-1]
 
-			if currBlock.PrevHash != prevBlock.Hash { //invalid hash
-				return false
-			}
-		}
+		//if currBlock.PrevHash != prevBlock.Hash { //invalid hash
+
+		//checks just the previous block
+		fmt.Println("block and chain is valid")
+		return true
 	}
-	fmt.Println("block and chain is valid")
-	return true
+	//}
+	return false
 }
 
 //

@@ -4,18 +4,15 @@ package dal
 
 import (
 	messaging "CMPSC488SP24SecTuesday/AES-BlockChain-Communication"
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
-	"go.mongodb.org/mongo-driver/bson"
-
 	"fmt"
-	"log"
-	"time"
-
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"log"
+	"time"
 )
 
 // Secure connection to DB through admin user
@@ -67,6 +64,7 @@ type HVAC struct {
 	Humidity          int       `json:"Humidity"`
 	FanSpeed          int       `json:"FanSpeed"`
 	Status            bool      `json:"Status"`
+	Mode              string    `json:"Mode"`
 	EnergyConsumption int       `json:"EnergyConsumption"`
 	LastChanged       time.Time `json:"LastChanged"`
 }
@@ -101,7 +99,6 @@ type Oven struct {
 type SecuritySystem struct {
 	UUID              string    `json:"UUID"`
 	Location          string    `json:"Location"`
-	SensorType        string    `json:"SensorType"`
 	Status            bool      `json:"Status"`
 	EnergyConsumption int       `json:"EnergyConsumption"`
 	LastTriggered     time.Time `json:"LastTriggered"`
@@ -144,12 +141,40 @@ type SmartHomeDB struct {
 	Users          []User
 }
 
-// messaging struct to send update requests to IoT devices
-type messagingStruct struct {
-	UUID         string `json:"UUID"`
-	Function     string `json:"Function"`
-	Change       string `json:"Change"`
-	StatusChange bool   `json:"StatusChange"`
+type UpdateLightingRequest struct {
+	UUID       string `json:"UUID"`
+	Status     bool   `json:"Status"`
+	Brightness int    `json:"Brightness"`
+}
+
+type UpdateHVACRequest struct {
+	UUID        string `json:"UUID"`
+	Temperature int    `json:"Temperature"`
+	FanSpeed    int    `json:"FanSpeed"`
+	Status      bool   `json:"Status"`
+	Mode        string `json:"Mode"`
+}
+
+type UpdateSecurityRequest struct {
+	UUID   string `json:"UUID"`
+	Status bool   `json:"Status"`
+}
+
+type UpdateAppliancesRequest struct {
+	UUID           string    `json:"UUID"`
+	Status         bool      `json:"Status"`
+	Temperature    int       `json:"Temperature"`
+	TimerStopTime  time.Time `json:"TimerStopTime"`
+	Power          int       `json:"Power"`
+	EnergySaveMode bool      `json:"EnergySaveMode"`
+	WashTime       int       `json:"WashTime"`
+}
+
+type UpdateEnergyRequest struct {
+	UUID        string `json:"UUID"`
+	Status      bool   `json:"Status"`
+	PanelID     string `json:"PanelID"`
+	PowerOutput int    `json:"PowerOutput"`
 }
 
 func FetchCollections(client *mongo.Client, dbName string) (*SmartHomeDB, error) {
@@ -225,39 +250,83 @@ func FetchUser(client *mongo.Client, userName string) (User, error) {
 	return user, nil
 }
 
-func Iotlighting(UUID []byte, status bool, brightness int) {
+func IotLighting(UUID []byte, status bool, brightness int) {
 
-	client, err := ConnectToMongoDB()
+	var lightingChange UpdateLightingRequest
+	lightingChange.UUID = string(UUID)
+	lightingChange.Status = status
+	lightingChange.Brightness = brightness
+
+	message, _ := json.Marshal(lightingChange)
+	messaging.BroadCastMessage(message)
+	return
+}
+
+func IotHVAC(UUID []byte, status bool, temperature int, fanSpeed int, mode string) {
+
+	var HVACChange UpdateHVACRequest
+	HVACChange.UUID = string(UUID)
+	HVACChange.Status = status
+	HVACChange.Temperature = temperature
+	HVACChange.FanSpeed = fanSpeed
+	HVACChange.Mode = mode
+	message, err := json.Marshal(HVACChange)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Error marshaling JSON message: %v", err)
+		return
 	}
-	defer func(client *mongo.Client, ctx context.Context) {
-		err := client.Disconnect(ctx)
-		if err != nil {
+	messaging.BroadCastMessage(message)
+	return
+}
 
-		}
-	}(client, context.Background())
+func IotSecurity(UUID []byte, status bool) {
 
-	smartHomeDB, err := FetchCollections(client, dbName) // Fetches and populates data
+	var securityChange UpdateSecurityRequest
+	securityChange.UUID = string(UUID)
+	securityChange.Status = status
 
+	message, err := json.Marshal(securityChange)
 	if err != nil {
-		log.Fatalf("Error fetching IoT data: %v", err)
+		log.Printf("Error marshaling JSON message: %v", err)
+		return
 	}
-	for _, light := range smartHomeDB.Lighting {
-		if bytes.Equal([]byte(light.UUID), UUID) {
-			var infoChange messagingStruct
+	messaging.BroadCastMessage(message)
+	return
+}
 
-			infoChange.UUID = string(UUID)
-			infoChange.Function = "status"
-			infoChange.Change = ""
-			infoChange.StatusChange = status
+func IotAppliance(UUID []byte, status bool, temperature int, timerStopTime time.Time, power int, energySaveMode bool, washTime int) {
+	var applianceChange UpdateAppliancesRequest
+	applianceChange.UUID = string(UUID)
+	applianceChange.Status = status
+	applianceChange.Temperature = temperature
+	applianceChange.TimerStopTime = timerStopTime
+	applianceChange.Power = power
+	applianceChange.EnergySaveMode = energySaveMode
+	applianceChange.WashTime = washTime
 
-			message, _ := json.Marshal(infoChange)
-			//fmt.Printf("This is the message: ", message)
-			messaging.BroadCastMessage(message)
-			//messaging.BroadCastMessage([]byte("I got to here"))
-		}
+	message, err := json.Marshal(applianceChange)
+	if err != nil {
+		log.Printf("Error marshaling JSON message: %v", err)
+		return
 	}
+	messaging.BroadCastMessage(message)
+	return
+}
+
+func IotEnergy(UUID []byte, status bool, panelID string, powerOutput int) {
+	var energyChange UpdateEnergyRequest
+	energyChange.UUID = string(UUID)
+	energyChange.Status = status
+	energyChange.PanelID = panelID
+	energyChange.PowerOutput = powerOutput
+
+	message, err := json.Marshal(energyChange)
+	if err != nil {
+		log.Printf("Error marshaling JSON message: %v", err)
+		return
+	}
+	messaging.BroadCastMessage(message)
+	return
 }
 
 //func PrintSmartHomeDBContents(smartHomeDB *SmartHomeDB) string {

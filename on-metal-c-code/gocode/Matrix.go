@@ -26,7 +26,7 @@ var loadPin rpio.Pin
 var buffer [8]byte
 
 // Initialize initializes the LED matrix.
-func Initialize(loadPinNum uint8) error {
+func Initialize(loadPinNum rpio.Pin) error {
 	if err := rpio.Open(); err != nil {
 		return err
 	}
@@ -38,7 +38,7 @@ func Initialize(loadPinNum uint8) error {
 	rpio.SpiSpeed(10000000)
 	rpio.SpiMode(0, 0)
 
-	loadPin = rpio.Pin(loadPinNum)
+	loadPin = loadPinNum
 	loadPin.Output()
 	loadPin.Low()
 

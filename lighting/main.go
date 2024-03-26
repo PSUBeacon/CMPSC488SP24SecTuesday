@@ -55,10 +55,8 @@ type MoodScene struct {
 // TurnOn turns the lighting on.
 func UpdateStatus(newStatus bool) {
 	fmt.Printf("%s is now turned \n", newStatus)
-	err := gocode.Initialize(4)
-	if err != nil {
-		return
-	}
+	//gocode.Initialize(4)
+	gocode.BuzzerStatus(7, newStatus)
 }
 
 // SetBrightness sets the brightness of the lighting.

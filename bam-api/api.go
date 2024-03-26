@@ -1,7 +1,6 @@
 package main
 
 import (
-
 	"CMPSC488SP24SecTuesday/dal"
 	"bytes"
 
@@ -59,7 +58,13 @@ func main() {
 	// unprotected endpoints no auth needed
 	r.GET("/status", statusResp)
 	r.POST("/login", loginHandler)
+
+	// these ones should be protected
 	r.POST("/lighting", updateLighting)
+	r.POST("/hvac", updateHVAC)
+	r.POST("/security", updateSecurity)
+	r.POST("/appliances", updateAppliances)
+	r.POST("/energy", updateEnergy)
 
 	// use JWT middleware for all protected routes
 	r.Use(authMiddleware())
@@ -78,17 +83,11 @@ func main() {
 		log.Fatal("Server startup error:", err)
 	}
 
-
-}
-
-type UpdateLightingRequest struct {
-	UUID       string `json:"UUID"`
-	Status     bool   `json:"Status"`
-	Brightness int    `json:"Brightness"`
 }
 
 func updateLighting(c *gin.Context) {
-	var req UpdateLightingRequest
+	//var req dal.UpdateLightingRequest
+	var req dal.UpdateLightingRequest
 	requestBody, _ := ioutil.ReadAll(c.Request.Body)
 	fmt.Printf("Received request body: %s\n", string(requestBody))
 	// Reset the request body to be able to parse it again
@@ -101,11 +100,90 @@ func updateLighting(c *gin.Context) {
 	}
 
 	// Call the Iotlighting function
-	dal.Iotlighting([]byte(req.UUID), req.Status, req.Brightness)
-
+	dal.IotLighting([]byte(req.UUID), req.Status, req.Brightness)
 	// Respond to the request indicating success.
 	c.JSON(http.StatusOK, gin.H{"message": "Lighting updated successfully"})
 
+}
+
+func updateHVAC(c *gin.Context) {
+	var req dal.UpdateHVACRequest
+	requestBody, _ := ioutil.ReadAll(c.Request.Body)
+	fmt.Printf("Received request body: %s\n", string(requestBody))
+	// Reset the request body to be able to parse it again
+	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		fmt.Printf("Error binding JSON: %v\n", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Call the IotHVAC function
+	dal.IotHVAC([]byte(req.UUID), req.Status, req.Temperature, req.FanSpeed, req.Mode)
+
+	// Respond to the request indicating success.
+	c.JSON(http.StatusOK, gin.H{"message": "HVAC settings updated successfully"})
+}
+
+func updateSecurity(c *gin.Context) {
+	var req dal.UpdateSecurityRequest
+	requestBody, _ := ioutil.ReadAll(c.Request.Body)
+	fmt.Printf("Received request body: %s\n", string(requestBody))
+	// Reset the request body to be able to parse it again
+	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		fmt.Printf("Error binding JSON: %v\n", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Call the security update function from the DAL package
+	dal.IotSecurity([]byte(req.UUID), req.Status)
+
+	// Respond to the request indicating success.
+	c.JSON(http.StatusOK, gin.H{"message": "Security settings updated successfully"})
+}
+
+func updateAppliances(c *gin.Context) {
+	var req dal.UpdateAppliancesRequest
+	requestBody, _ := ioutil.ReadAll(c.Request.Body)
+	fmt.Printf("Received request body: %s\n", string(requestBody))
+	// Reset the request body to be able to parse it again
+	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		fmt.Printf("Error binding JSON: %v\n", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Call the appliance update function from the DAL package
+	dal.IotAppliance([]byte(req.UUID), req.Status, req.Temperature, req.TimerStopTime, req.Power, req.EnergySaveMode, req.WashTime)
+
+	// Respond to the request indicating success.
+	c.JSON(http.StatusOK, gin.H{"message": "Appliance settings updated successfully"})
+}
+
+func updateEnergy(c *gin.Context) {
+	var req dal.UpdateEnergyRequest
+	requestBody, _ := ioutil.ReadAll(c.Request.Body)
+	fmt.Printf("Received request body: %s\n", string(requestBody))
+	// Reset the request body to be able to parse it again
+	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		fmt.Printf("Error binding JSON: %v\n", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Call the energy update function from the DAL package
+	dal.IotEnergy([]byte(req.UUID), req.Status, req.PanelID, req.PowerOutput)
+
+	// Respond to the request indicating success.
+	c.JSON(http.StatusOK, gin.H{"message": "Energy settings updated successfully"})
 }
 
 func statusResp(c *gin.Context) {
@@ -135,7 +213,6 @@ func loginHandler(c *gin.Context) {
 		return
 	}
 
-
 	// Fetch user by username from MongoDB
 	fetchedUser, err := dal.FetchUser(client, loginData.Username)
 	fmt.Printf("Username:", fetchedUser.Username)
@@ -158,14 +235,14 @@ func loginHandler(c *gin.Context) {
 	//c.Set("smartHomeDB", smartHomeDB)
 
 	// Print smart home data
-	smartHomeData := dal.PrintSmartHomeDBContents(smartHomeDB)
+	//smartHomeData := dal.PrintSmartHomeDBContents(smartHomeDB)
 
 	// JWT token creation
 	claims := jwt.MapClaims{
 		"username": fetchedUser.Username,
-		"role":     fetchedUser.Role,                      // Use the actual role from the fetched user
+		"role":     fetchedUser.Role, // Use the actual role from the fetched user
 
-		"exp":      time.Now().Add(time.Hour * 24).Unix(), // Token expiration time
+		"exp": time.Now().Add(time.Hour * 24).Unix(), // Token expiration time
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(jwtKey)
@@ -174,7 +251,6 @@ func loginHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create the token"})
 		return
 	}
-
 
 	// Return the JWT token in the response
 	c.JSON(http.StatusOK, gin.H{"token": tokenString})
@@ -266,7 +342,7 @@ func dashboardHandler(c *gin.Context) {
 			return
 		}
 		c.JSON(http.StatusOK, gin.H{
-			"message":     "Welcome to the Owner dashboard",
+			"message": "Welcome to the Owner dashboard",
 
 			"accountType": "Admin",
 		})
@@ -275,11 +351,9 @@ func dashboardHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message":     "Welcome to the Owner dashboard",
 			"accountType": "User",
-
 		})
 	default:
 		c.JSON(http.StatusForbidden, gin.H{"error": "Invalid role or insufficient privileges"})
 	}
 
 }
-

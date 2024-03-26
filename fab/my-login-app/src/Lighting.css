@@ -1,167 +1,281 @@
-/* Lighting.css */
-.lightingPage {
-  color: rgb(250, 246, 246); 
-  background-color: #0E2237;/* This is being overidden by the react component in the js file. So if we change it to see if the css file 
-  is being called properly we won't see anything change because of the set background color in the Lighting.js */
-
-   /* These are the lines of code that overrides this:
-  
-  <div className="lightingPage" style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column', backgroundColor: '#081624' }}>
-    
-  {/* Top Navbar }
-    <nav style={{ backgroundColor: '#081624', color: 'white', padding: '0.5rem 1rem' }}> 
-  */
+body {
+  color: white;
+  background-color: #0E2237;
 }
 
-/* Common styles for the icons in the navbar */
-.fas {
-  margin-right: '10px';
-}
-/* Container for the room and light selection, using flexbox to align them side by side */
-.lightingPage .lightsControl {
-  display: flex;
-  justify-content: flex-start; /* This will space out the room and light selections */
+#title {
+color: azure;
+vertical-align:-webkit-baseline-middle;
+font-size: 35px;
+margin-left: 10px;
 }
 
-/* Room and Light Cards common styles */
-.lightingPage .card {
-  border-radius: 10px;
-  padding: 1rem;
-  margin: 0.5rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #2c2525;
+
+/* Initially hide the hamburger menu */
+.hamburger-menu {
+display: none;
 }
 
-/* Room Selection Styles */
-.lightingPage .roomSelection {
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* Centers the title */
-  max-width: 100%;
-  margin: 0 auto; /* Center the .roomSelection block */
-  margin-left: 200px; /* This and the next line center the .lightSelection in its flex container */
-  margin-right: 100px;
+/* Media Query */
+@media (max-width: 720px) {
+.side-nav {
+  display: none; /* Ensure side nav is hidden */
+  z-index: 20; /* Specify z-index for side nav to ensure it's lower than the hamburger menu */
 }
 
-.lightingPage .roomSelection h3 {
-  color: #fefeff;
-  text-align: center; /* Center the title text */
-  margin-bottom: 1rem;
-  
-}
-.lightingPage .lightSelection h3 {
-  color: #fefeff;
-  margin-bottom: 1rem;
-}
-
-.lightingPage .roomCards {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr); /* Creates a 2-column grid */
-  grid-gap: 0.5rem; /* Adjust the gap between the grid items */
-  justify-items: center; /* Center the grid items horizontally */
+.hamburger-menu {
+  display: block; /* Show the hamburger menu */
+  cursor: pointer;
+  /* Adjustments for mobile view */
+  width: 30px;
+  height: 30px;
+  z-index: 30; /* Higher z-index to keep it above the side nav */
+  /* Remove specific positioning to let it flow naturally in the document */
 }
 
-.lightingPage .roomCards .card {
-  background-color: #ffffff;
-  width: 150px;
-  height: 100px;
+#menuText, #menuIcon2 {
+  display: none;
 }
 
-.lightingPage .roomCards .card img {
-  max-width: 150px; /* Adjust the size as needed */
-  height: 150px; /* Maintain the aspect ratio */
+.widget {
+  /* Adjustments for smaller screens */
+  flex-basis: 100%; /* Each widget takes full width of the container */
+  max-width: 100%; /* Prevent widgets from exceeding the container width */
 }
 
-/* Light Selection Styles */
-.lightingPage .lightSelection {
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* This centers the title and the grid container on the cross axis */
-  max-width: 20%;
-  margin-left: 200px; /* This and the next line center the .lightSelection in its flex container */
-  margin-right: 100px;
 }
 
-.lightingPage .lightCards {
+
+.side-nav:not(.hidden) {
+  /* Show side nav when toggled (with your desired styling for the visible state) */
+  display: block;
+  position: fixed; /* Consider using fixed for overlay */
+  left: 0;
+  top: 0;
+  width: 75%; /* Or 100%, depending on desired appearance */
+  height: 100%;
+  z-index: 20; /* Ensure it overlays other content */
+  overflow-y: auto; /* In case of scrolling */
+  background-color: #001F3F; /* Your background color */
+}
+
+
+
+
+
+/* Side Nav Button Styles */
+.nav-button {
+  transition: background-color 0.3s ease; /* This creates the smooth transition effect */
+  padding: 0.5rem;
+  margin: 0.5rem 0;
+  display: block; /* Make the anchor fill the list item for a larger clickable area */
+  color: white;
+  text-decoration: none;
+}
+
+.nav-button:hover {
+  background-color: #0294A5; /* New background color on hover */
+}
+
+#circle {
+  max-width: 150px;
+  height: auto;
+  width: 50px; /* Adjust the width and height according to your needs */
+  height: 50px;
+  overflow: hidden;
+  border-radius: 50%; /* Ensures the container is a circle */
+  margin-left: 5px;
+}
+
+#menuText, #menuText2 {
+  font-size: 25px;
+}
+
+.houseInfo{
+  text-align: center;
+  margin-bottom: 20px;
+}
+.image{
   display: grid;
   grid-template-columns: repeat(2, 1fr); /* This creates a 2-column grid */
   grid-gap: 0.5rem; /* Adjust the gap as needed */
   width: 100%; /* Adjust the width as needed */
-}
-
-.lightingPage .lightCards .card {
-  background-color: transparent; /* No background color, showing the .lightingPage's */
-  border: 2px solid black; /* Black border around each card */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  aspect-ratio: 1; /* Keeps the width and height the same */
+  background-color: black;
 }
 
 
-.lightingPage .lightCards .card img {
-  max-width: 80%; /* Adjust the size as needed */
-  height: auto; /* Maintain the aspect ratio */
+
+/* Adjustments for light cards */
+.lightCards .card {
+  width: 25%; /* Smaller width, like 25%, or whatever fits your design */
+  padding: 10px; /* Adjust padding as needed */
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  background-color: transparent;
+  margin-left: 100px;
+
+}
+
+/* Remove padding and margin from .Limage and set a max-width */
+.Limage {
+  display: block; /* Change to block if this is for individual images */
+  max-width: 150px; /* Set maximum width for images */
+  height: auto; /* Maintain aspect ratio */
+  margin: 0 auto; /* Center in card with no extra margin */
+}
+
+/* Fix for image containers (if .Limage is used on a div around the img) */
+.lightCards .card .Limage {
+  display: flex; /* Use flex to center images */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  height: 140px; /* Set a fixed height for the container */
+  width: 150%; /* Container should take up 100% of .card's width */
+
+}
+
+/* Make sure images inside .Limage are not stretched */
+.lightCards .card .Limage img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto; /* Maintain aspect ratio */
+  height: auto; /* Maintain aspect ratio */
+  
 }
 
 
-/* Dimmer Control Styles */
-.lightingPage .dimmerControl {
-  margin-top: 2rem;
-  display: flex;
-  align-items: center;
+#circle2 {
+  max-width: 150px;
+  height: auto;
+  width: 90px; /* Adjust the width and height according to your needs */
+  height: 90px;
+  overflow: hidden;
+  border-radius: 50%; /* Ensures the container is a circle */
+  margin-bottom: 10px;
 }
 
-.lightingPage .dimmerControl label {
-  margin-left: 10px;
+#menuIcon {
+  max-width: 21px;
 }
 
-/* Styles for the input[type=range] (the slider) */
-.lightingPage .dimmerControl input[type=range] {
-  -webkit-appearance: none; /* Override default appearance */
+#menuIcon2 {
+max-width: 43px;
+margin-left: 10px;
+}
+
+#sideNav {
+background-color: #173350;
+}
+
+.signout {
+color:white;
+background-color:#0294A5;
+width: 90px;
+}
+
+.accountPop {
+font-size: 15px;
+font-weight: bold;
+text-align: center;
+margin-top: 19px;
+border: rgb(20, 66, 103) solid .1px;
+}
+
+/* dashboard.css */
+.nav-item {
+padding: 10px 15px;
+cursor: pointer;
+border-left: 3px solid transparent; /* Invisible border to avoid shifting content */
+transition: all 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.nav-item:hover {
+padding-left: 30px; /* Indent text to create sliding effect */
+border-left: 3px solid #0294A5; /* Visible border on hover */
+}
+
+.images{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* This creates a 2-column grid */
+  grid-gap: 0.5rem; /* Adjust the gap as needed */
+  width: 100%; /* Adjust the width as needed */
+  background-color: black;
+}
+
+
+.centered-title {
+  text-align: center;
+}
+
+
+
+@media (max-width: 600px) {
+  .card {
+    flex-basis: 70%; /* Forces stacking */
+  }
+  html {
+    max-width: 100%;
+  }
+}
+
+
+/* Style for dimmer control, adding more space at the top */
+.dimmerControl {
+  margin-top: 20px; /* Add more margin at the top to move the dimmer down */
+}
+
+/* Styles for the slider track. there are so many different styles because it appears differently on different web browser */
+input[type='range'] {
+  -webkit-appearance: none; /* Override default CSS styles */
   appearance: none;
   width: 100%; /* Full-width */
-  height: 15px; /* Specified height */
+  height: 10px; /* Specified height */
   background: #d3d3d3; /* Grey background */
   outline: none; /* Remove outline */
-  opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
-  -webkit-transition: .2s; /* 0.2 seconds transition on hover */
-  transition: opacity .2s;
+  opacity: 0.7; /* Set transparency (cross-browser) */
+  -webkit-transition: 0.2s; /* 0.2 seconds transition on hover */
+  transition: opacity 0.2s;
 }
 
-.lightingPage .dimmerControl input[type=range]::-webkit-slider-thumb {
+/* Mouse-over effect */
+input[type='range']:hover {
+  opacity: 1; /* Fully opaque on hover */
+}
+
+/* Styles for the slider thumb */
+input[type='range']::-webkit-slider-thumb {
   -webkit-appearance: none; /* Override default look */
   appearance: none;
   width: 25px; /* Set a specific slider handle width */
   height: 25px; /* Slider handle height */
   background: #4CAF50; /* Green background */
   cursor: pointer; /* Cursor on hover */
+  border-radius: 50%; /* Circular border */
 }
 
-.lightingPage .dimmerControl input[type=range]::-moz-range-thumb {
+input[type='range']::-moz-range-thumb {
   width: 25px; /* Set a specific slider handle width */
   height: 25px; /* Slider handle height */
   background: #4CAF50; /* Green background */
   cursor: pointer; /* Cursor on hover */
+  border-radius: 50%; /* Circular border */
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .lightingPage .roomSelection,
-  .lightingPage .lightSelection {
-    max-width: 100%;
-  }
+/* Style for the slider thumb (for IE) */
+input[type='range']::-ms-thumb {
+  width: 25px; /* Set a specific slider handle width */
+  height: 25px; /* Slider handle height */
+  background: #4CAF50; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+  border-radius: 50%; /* Circular border */
 }
 
-@media (max-width: 400px) {
-  .lightingPage aside {
-    width: 100%;
-    height: auto;
-    position: fixed;
-    z-index: 1000;
-    top: 0;
-    left: 0;
-  }
+/* Styles for the slider track (for IE) */
+input[type='range']::-ms-track {
+  width: 100%; /* Full-width */
+  height: 10px; /* Specified height */
+  background: transparent; /* Translucent track */
+  border-color: transparent; /* Transparent border */
+  color: transparent; /* Transparent slider thumb */
 }
+
+

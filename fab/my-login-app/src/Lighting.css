@@ -1,12 +1,281 @@
-/* Lighting.css */
-.lightingPage {
-    display: flex;
-    flex-direction: column;
-    height: 100vh; /* This makes the div take the full height of the viewport */
-    width: 100vw; /* This makes the div take the full width of the viewport */
-    background-color: #c86249; /* Example background color */
-    color: #faf6f6; /* Example text color */
-    margin: 0; /* Removes default margin */
-    padding: 0; /* Removes default padding */
-  }
+body {
+  color: white;
+  background-color: #0E2237;
+}
+
+#title {
+color: azure;
+vertical-align:-webkit-baseline-middle;
+font-size: 35px;
+margin-left: 10px;
+}
+
+
+/* Initially hide the hamburger menu */
+.hamburger-menu {
+display: none;
+}
+
+/* Media Query */
+@media (max-width: 720px) {
+.side-nav {
+  display: none; /* Ensure side nav is hidden */
+  z-index: 20; /* Specify z-index for side nav to ensure it's lower than the hamburger menu */
+}
+
+.hamburger-menu {
+  display: block; /* Show the hamburger menu */
+  cursor: pointer;
+  /* Adjustments for mobile view */
+  width: 30px;
+  height: 30px;
+  z-index: 30; /* Higher z-index to keep it above the side nav */
+  /* Remove specific positioning to let it flow naturally in the document */
+}
+
+#menuText, #menuIcon2 {
+  display: none;
+}
+
+.widget {
+  /* Adjustments for smaller screens */
+  flex-basis: 100%; /* Each widget takes full width of the container */
+  max-width: 100%; /* Prevent widgets from exceeding the container width */
+}
+
+}
+
+
+.side-nav:not(.hidden) {
+  /* Show side nav when toggled (with your desired styling for the visible state) */
+  display: block;
+  position: fixed; /* Consider using fixed for overlay */
+  left: 0;
+  top: 0;
+  width: 75%; /* Or 100%, depending on desired appearance */
+  height: 100%;
+  z-index: 20; /* Ensure it overlays other content */
+  overflow-y: auto; /* In case of scrolling */
+  background-color: #001F3F; /* Your background color */
+}
+
+
+
+
+
+/* Side Nav Button Styles */
+.nav-button {
+  transition: background-color 0.3s ease; /* This creates the smooth transition effect */
+  padding: 0.5rem;
+  margin: 0.5rem 0;
+  display: block; /* Make the anchor fill the list item for a larger clickable area */
+  color: white;
+  text-decoration: none;
+}
+
+.nav-button:hover {
+  background-color: #0294A5; /* New background color on hover */
+}
+
+#circle {
+  max-width: 150px;
+  height: auto;
+  width: 50px; /* Adjust the width and height according to your needs */
+  height: 50px;
+  overflow: hidden;
+  border-radius: 50%; /* Ensures the container is a circle */
+  margin-left: 5px;
+}
+
+#menuText, #menuText2 {
+  font-size: 25px;
+}
+
+.houseInfo{
+  text-align: center;
+  margin-bottom: 20px;
+}
+.image{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* This creates a 2-column grid */
+  grid-gap: 0.5rem; /* Adjust the gap as needed */
+  width: 100%; /* Adjust the width as needed */
+  background-color: black;
+}
+
+
+
+/* Adjustments for light cards */
+.lightCards .card {
+  width: 25%; /* Smaller width, like 25%, or whatever fits your design */
+  padding: 10px; /* Adjust padding as needed */
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  background-color: transparent;
+  margin-left: 100px;
+
+}
+
+/* Remove padding and margin from .Limage and set a max-width */
+.Limage {
+  display: block; /* Change to block if this is for individual images */
+  max-width: 150px; /* Set maximum width for images */
+  height: auto; /* Maintain aspect ratio */
+  margin: 0 auto; /* Center in card with no extra margin */
+}
+
+/* Fix for image containers (if .Limage is used on a div around the img) */
+.lightCards .card .Limage {
+  display: flex; /* Use flex to center images */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  height: 140px; /* Set a fixed height for the container */
+  width: 150%; /* Container should take up 100% of .card's width */
+
+}
+
+/* Make sure images inside .Limage are not stretched */
+.lightCards .card .Limage img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto; /* Maintain aspect ratio */
+  height: auto; /* Maintain aspect ratio */
   
+}
+
+
+#circle2 {
+  max-width: 150px;
+  height: auto;
+  width: 90px; /* Adjust the width and height according to your needs */
+  height: 90px;
+  overflow: hidden;
+  border-radius: 50%; /* Ensures the container is a circle */
+  margin-bottom: 10px;
+}
+
+#menuIcon {
+  max-width: 21px;
+}
+
+#menuIcon2 {
+max-width: 43px;
+margin-left: 10px;
+}
+
+#sideNav {
+background-color: #173350;
+}
+
+.signout {
+color:white;
+background-color:#0294A5;
+width: 90px;
+}
+
+.accountPop {
+font-size: 15px;
+font-weight: bold;
+text-align: center;
+margin-top: 19px;
+border: rgb(20, 66, 103) solid .1px;
+}
+
+/* dashboard.css */
+.nav-item {
+padding: 10px 15px;
+cursor: pointer;
+border-left: 3px solid transparent; /* Invisible border to avoid shifting content */
+transition: all 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.nav-item:hover {
+padding-left: 30px; /* Indent text to create sliding effect */
+border-left: 3px solid #0294A5; /* Visible border on hover */
+}
+
+.images{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* This creates a 2-column grid */
+  grid-gap: 0.5rem; /* Adjust the gap as needed */
+  width: 100%; /* Adjust the width as needed */
+  background-color: black;
+}
+
+
+.centered-title {
+  text-align: center;
+}
+
+
+
+@media (max-width: 600px) {
+  .card {
+    flex-basis: 70%; /* Forces stacking */
+  }
+  html {
+    max-width: 100%;
+  }
+}
+
+
+/* Style for dimmer control, adding more space at the top */
+.dimmerControl {
+  margin-top: 20px; /* Add more margin at the top to move the dimmer down */
+}
+
+/* Styles for the slider track. there are so many different styles because it appears differently on different web browser */
+input[type='range'] {
+  -webkit-appearance: none; /* Override default CSS styles */
+  appearance: none;
+  width: 100%; /* Full-width */
+  height: 10px; /* Specified height */
+  background: #d3d3d3; /* Grey background */
+  outline: none; /* Remove outline */
+  opacity: 0.7; /* Set transparency (cross-browser) */
+  -webkit-transition: 0.2s; /* 0.2 seconds transition on hover */
+  transition: opacity 0.2s;
+}
+
+/* Mouse-over effect */
+input[type='range']:hover {
+  opacity: 1; /* Fully opaque on hover */
+}
+
+/* Styles for the slider thumb */
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default look */
+  appearance: none;
+  width: 25px; /* Set a specific slider handle width */
+  height: 25px; /* Slider handle height */
+  background: #4CAF50; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+  border-radius: 50%; /* Circular border */
+}
+
+input[type='range']::-moz-range-thumb {
+  width: 25px; /* Set a specific slider handle width */
+  height: 25px; /* Slider handle height */
+  background: #4CAF50; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+  border-radius: 50%; /* Circular border */
+}
+
+/* Style for the slider thumb (for IE) */
+input[type='range']::-ms-thumb {
+  width: 25px; /* Set a specific slider handle width */
+  height: 25px; /* Slider handle height */
+  background: #4CAF50; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+  border-radius: 50%; /* Circular border */
+}
+
+/* Styles for the slider track (for IE) */
+input[type='range']::-ms-track {
+  width: 100%; /* Full-width */
+  height: 10px; /* Specified height */
+  background: transparent; /* Translucent track */
+  border-color: transparent; /* Transparent border */
+  color: transparent; /* Transparent slider thumb */
+}
+
+

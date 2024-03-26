@@ -6,6 +6,7 @@ import accountIcon from './account.png'
 import menuIcon from './menu.png'
 
 
+
 const SettingsPage = () => {
   // Initialize theme state from local storage if available, otherwise default to 'dark'
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
@@ -41,6 +42,7 @@ const SettingsPage = () => {
       setTheme(storedTheme);
     }
   }, []);
+
 
 
     // Example user data (replace with actual data as necessary)
@@ -112,6 +114,7 @@ const handleAccountInfoChange = (e) => {
         </div>
       </div>
     );
+
       // ... other cases remain unchanged
       case 'Theme':
         return (
@@ -130,6 +133,7 @@ const handleAccountInfoChange = (e) => {
         );
       case 'Notification Settings':
         return <div>Notification Settings Content Here</div>;
+
         // Update the 'Account Settings' case in your renderContent function
   case 'Account Settings':
     return (
@@ -173,6 +177,7 @@ const handleAccountInfoChange = (e) => {
       </div>
     );
       
+
     }
   };
 

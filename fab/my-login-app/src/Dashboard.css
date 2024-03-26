@@ -166,3 +166,51 @@ body {
    display:none;
   }
 }
+
+
+/* CSS for sliding toggle buttons */
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+.toggle input[type="checkbox"] {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #0294A5;
+  border-radius: 34px;
+  transition: background-color 0.4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.4s;
+}
+
+.toggle input:checked + .slider {
+  background-color: #ccc;
+}
+
+.toggle input:checked + .slider:before {
+  transform: translateX(20px);
+}

@@ -9,7 +9,6 @@ import HVAC from './HVAC'; // Import HVAC component
 import Appliances from './Appliances'; // Import Appliances component
 import Energy from './Energy'; // Import Energy component
 import Settings from './Settings'; // Import your settings page component
-
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './login.css';
 

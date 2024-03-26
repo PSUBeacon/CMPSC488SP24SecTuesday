@@ -120,45 +120,70 @@ const Dashboard = () => {
     );
   };
 
+ // Locks Widget JSX
+const LocksWidget = () => {
   // Assuming you have a state to track the locks' statuses
   const [locksStatus, setLocksStatus] = useState({
     frontDoor: 'Locked',
     backDoor: 'Locked',
   });
 
-  // Locks Widget JSX
-  const LocksWidget = () => (
+  // Function to toggle the lock status
+  const toggleLockStatus = (door) => {
+    setLocksStatus(prevStatus => ({
+      ...prevStatus,
+      [door]: prevStatus[door] === 'Locked' ? 'Unlocked' : 'Locked',
+    }));
+  };
+
+  return (
     <div>
-    <div className="widget" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: '#173350', padding: '20px', paddingRight:"0px", borderRadius: '10px', margin: '0px' }}>
-      {/* Front Door Lock */}
-      <div style={{ flex: '1', maxWidth:'250px' }}>
-      <p style={{color:"#95A4B6"}}>Front Door</p>
-        <img src={doorLockIcon} alt="Front Door" style={{ width: '50%', height: 'auto', marginBottom:'10px' }} /> {/* Replace with lock icon */}
+      <div className="widget" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: '#173350', padding: '20px', paddingRight:"0px", borderRadius: '10px', margin: '0px' }}>
+        {/* Front Door Lock */}
+        <div style={{ flex: '1', maxWidth:'250px', textAlign: 'center' }}>
+          <p style={{color:"#95A4B6", marginRight:'20px'}}>Front Door</p>
+          <img src={doorLockIcon} alt="Front Door" style={{ width: '50%', height: 'auto', marginBottom:'10px' }} /> {/* Replace with lock icon */}
+          <p style={{color:"#95A4B6", marginRight:'20px'}}>{locksStatus.frontDoor === 'Unlocked' ? 'Unlocked' : 'Locked'}</p>
+          <label className="toggle" style={{ display: 'block', margin: 'auto',  }}>
+            <input
+              type="checkbox"
+              checked={locksStatus.frontDoor === 'Unlocked'}
+              onChange={() => toggleLockStatus('frontDoor')}
+            />
+            <span className="slider"></span>
+          </label>
+        </div>
         
-        <p>{locksStatus.frontDoor}</p>
+        {/* Back Door Lock */}
+        <div style={{ flex: '1', maxWidth:'250px', textAlign: 'center' }}>
+          <p style={{color:"#95A4B6", marginRight:'20px'}}>Back Door</p>
+          <img src={doorLockIcon} alt="Back Door" style={{ width: '50%', height: 'auto', marginBottom:'10px' }} /> {/* Replace with lock icon */}
+          <p style={{color:"#95A4B6", marginRight:'20px'}}>{locksStatus.backDoor === 'Unlocked' ? 'Unlocked' : 'Locked'}</p>
+          <label className="toggle" style={{ display: 'block', margin: 'auto' }}>
+            <input
+              type="checkbox"
+              checked={locksStatus.backDoor === 'Unlocked'}
+              onChange={() => toggleLockStatus('backDoor')}
+            />
+            <span className="slider"></span>
+          </label>
+        </div>
       </div>
-      
-      {/* Back Door Lock */}
-      <div style={{ flex: '1', maxWidth:'250px' }}>
-      <p style={{color:"#95A4B6"}}>Back Door</p>
-        <img src={doorLockIcon} alt="Back Door" style={{ width: '50%', height: 'auto', marginBottom:'10px' }} /> {/* Replace with lock icon */}
-        
-        <p>{locksStatus.backDoor}</p>
+      <div>
+        <h3 style={{color:"#95A4B6", marginBottom:'20px'}}>Lights</h3>
+         {/* Bedroom Light Status */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
+          <img src={bulbIcon} alt="Bedroom Light" style={{ width: '80px', height: 'auto', marginRight: '10px', marginBottom:'10px' }} /> {/* Replace with light icon */}
+          <div style={{ textAlign: 'center' }}>
+            <span style={{ color:"#95A4B6", fontSize:'20px' }}>Bedroom light:</span>
+            <p style={{marginTop:'10px'}}>{deviceData.Lighting.Status}</p>
+          </div>
+        </div>
       </div>
-    </div>
-    <div>
-      <h3 style={{color:"#95A4B6", marginBottom:'20px'}}>Lights</h3>
-       {/* Bedroom Light Status */}
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
-      <img src={bulbIcon} alt="Bedroom Light" style={{ width: '80px', height: 'auto', marginRight: '10px', marginBottom:'10px' }} /> {/* Replace with light icon */}
-      <div style={{ textAlign: 'center' }}>
-        <span style={{ color:"#95A4B6", fontSize:'20px' }}>Bedroom light:</span>
-        <p style={{marginTop:'10px'}}>{deviceData.Lighting.Status}</p>
-      </div>
-    </div>
-    </div>
     </div>
   );
+};
+
 
 
  // Appliances Widget JSX

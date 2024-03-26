@@ -1,7 +1,6 @@
 package gocode
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -104,27 +103,28 @@ func (k *Keypad) UpdateKeyState(key *Key, newState KeyState) {
 	}
 }
 
-func main() {
-	// Example usage
-	rowPins := []int{1, 2, 3, 4}
-	columnPins := []int{5, 6, 7}
-	keys := [][]Key{
-		{{'1', 0, IDLE, false}, {'2', 1, IDLE, false}, {'3', 2, IDLE, false}},
-		{{'4', 3, IDLE, false}, {'5', 4, IDLE, false}, {'6', 5, IDLE, false}},
-		{{'7', 6, IDLE, false}, {'8', 7, IDLE, false}, {'9', 8, IDLE, false}},
-		{{'*', 9, IDLE, false}, {'0', 10, IDLE, false}, {'#', 11, IDLE, false}},
-	}
-	keypad := NewKeypad(rowPins, columnPins, keys)
-	keypad.Begin()
-
-	// Set an event listener
-	keypad.AddEventListener(func(char rune) {
-		fmt.Printf("Key pressed: %c\n", char)
-	})
-
-	// Main loop
-	for {
-		keypad.GetKeys()
-		time.Sleep(100 * time.Millisecond)
-	}
-}
+//
+//func main() {
+//	// Example usage
+//	rowPins := []int{1, 2, 3, 4}
+//	columnPins := []int{5, 6, 7}
+//	keys := [][]Key{
+//		{{'1', 0, IDLE, false}, {'2', 1, IDLE, false}, {'3', 2, IDLE, false}},
+//		{{'4', 3, IDLE, false}, {'5', 4, IDLE, false}, {'6', 5, IDLE, false}},
+//		{{'7', 6, IDLE, false}, {'8', 7, IDLE, false}, {'9', 8, IDLE, false}},
+//		{{'*', 9, IDLE, false}, {'0', 10, IDLE, false}, {'#', 11, IDLE, false}},
+//	}
+//	keypad := NewKeypad(rowPins, columnPins, keys)
+//	keypad.Begin()
+//
+//	// Set an event listener
+//	keypad.AddEventListener(func(char rune) {
+//		fmt.Printf("Key pressed: %c\n", char)
+//	})
+//
+//	// Main loop
+//	for {
+//		keypad.GetKeys()
+//		time.Sleep(100 * time.Millisecond)
+//	}
+//}

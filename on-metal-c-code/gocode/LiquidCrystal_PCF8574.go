@@ -226,26 +226,26 @@ func (lcd *LiquidCrystal) pulseEnable(value byte) {
 	time.Sleep(50 * time.Microsecond)
 }
 
-func main() {
-	lcd := NewLiquidCrystal(0x27) // Set the I2C address of the PCF8574
-	err := lcd.Begin(16, 2, LCD_5x8DOTS)
-	if err != nil {
-		log.Fatalf("Failed to initialize LCD: %v", err)
-	}
-
-	lcd.Clear()
-	lcd.SetCursor(0, 0)
-	lcd.Write('H')
-	lcd.Write('e')
-	lcd.Write('l')
-	lcd.Write('l')
-	lcd.Write('o')
-	lcd.Write(',')
-	lcd.SetCursor(0, 1)
-	lcd.Write('W')
-	lcd.Write('o')
-	lcd.Write('r')
-	lcd.Write('l')
-	lcd.Write('d')
-	lcd.Write('!')
-}
+//func main() {
+//	lcd := NewLiquidCrystal(0x27) // Set the I2C address of the PCF8574
+//	err := lcd.Begin(16, 2, LCD_5x8DOTS)
+//	if err != nil {
+//		log.Fatalf("Failed to initialize LCD: %v", err)
+//	}
+//
+//	lcd.Clear()
+//	lcd.SetCursor(0, 0)
+//	lcd.Write('H')
+//	lcd.Write('e')
+//	lcd.Write('l')
+//	lcd.Write('l')
+//	lcd.Write('o')
+//	lcd.Write(',')
+//	lcd.SetCursor(0, 1)
+//	lcd.Write('W')
+//	lcd.Write('o')
+//	lcd.Write('r')
+//	lcd.Write('l')
+//	lcd.Write('d')
+//	lcd.Write('!')
+//}

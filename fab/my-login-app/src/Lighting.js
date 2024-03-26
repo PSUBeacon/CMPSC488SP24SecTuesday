@@ -67,8 +67,8 @@ const Lighting = () => {
             name: "Lighting",
             apptype: "Lighting",
             function: "Status",
-            change: null,
-            statusChange: true
+            change: "true"
+
         };
         const token = sessionStorage.getItem('token')
         // Send a POST request to turn the light on.
@@ -105,8 +105,8 @@ const Lighting = () => {
             name: "Lighting",
             apptype: "Lighting",
             function: "Status",
-            change: null,
-            statusChange: false
+            change: "false",
+
         };
 
         const token = sessionStorage.getItem('token')

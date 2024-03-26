@@ -151,12 +151,18 @@ type UUIDsConfig struct {
 }
 
 type MessagingStruct struct {
-	UUID         string `json:"UUID"`
-	Name         string `json:"Name"`         //type item being changes ex(Lighting) or (HVAC)
-	AppType      string `json:"AppType"`      //Which Type of appliance it is
-	Function     string `json:"Function"`     //function being changed ex(brightness)
-	Change       string `json:"Change"`       //actual change being made ex(100) for brightness
-	StatusChange bool   `json:"StatusChange"` //if changing status this would be the status change
+	UUID     string `json:"UUID"`
+	Name     string `json:"Name"`     //type item being changes ex(Lighting) or (HVAC)
+	AppType  string `json:"AppType"`  //Which Type of appliance it is
+	Function string `json:"Function"` //function being changed ex(brightness)
+	Change   string `json:"Change"`   //actual change being made ex(100) for brightness
+}
+
+type LoggingStruct struct {
+	DeviceID string    `json:"DeviceID"`
+	Function string    `json:"Function"`
+	Change   string    `json:"Change"`
+	Time     time.Time `json:"Time"`
 }
 
 func FetchCollections(client *mongo.Client, dbName string) (*SmartHomeDB, error) {
@@ -232,14 +238,13 @@ func FetchUser(client *mongo.Client, userName string) (User, error) {
 	return user, nil
 }
 
-func UpdateMessaging(client *mongo.Client, UUID []byte, name string, apptype string, function string, change string, statuschange bool) {
+func UpdateMessaging(client *mongo.Client, UUID []byte, name string, apptype string, function string, change string) {
 	var messageRequest MessagingStruct
 	messageRequest.UUID = string(UUID)
 	messageRequest.Name = name
 	messageRequest.AppType = apptype
 	messageRequest.Function = function
 	messageRequest.Change = change
-	messageRequest.StatusChange = statuschange
 	message, err := json.Marshal(messageRequest)
 	if err != nil {
 		fmt.Printf("Error marshaling JSON message: %v", err)
@@ -247,14 +252,14 @@ func UpdateMessaging(client *mongo.Client, UUID []byte, name string, apptype str
 	}
 	messaging.BroadCastMessage(message)
 
+	var logg LoggingStruct
 	// Update the MongoDB collection using JSON
 	collection := client.Database("smartHomeDB").Collection(apptype)
+	Logging := client.Database("smartHomeDB").Collection("Logging")
 	filter := bson.M{"UUID": messageRequest.UUID}
 
 	var updatedValue interface{}
 	switch function {
-	case "Status":
-		updatedValue = statuschange
 	case "WashTime", "TemperatureSettings", "EnergyConsumption", "Brightness", "Power":
 		updatedValue, _ = strconv.Atoi(change)
 	default:
@@ -284,6 +289,13 @@ func UpdateMessaging(client *mongo.Client, UUID []byte, name string, apptype str
 		fmt.Printf("Error updating document: %v", err)
 		return
 	}
+
+	logg.DeviceID = name
+	logg.Function = function
+	logg.Change = change
+	logg.Time = time.Now()
+	_, err = Logging.InsertOne(context.Background(), logg)
+
 	return
 }
 

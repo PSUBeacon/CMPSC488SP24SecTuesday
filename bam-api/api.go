@@ -97,7 +97,7 @@ func updateIoT(c *gin.Context) {
 	//var req dal.UpdateLightingRequest
 	var req dal.MessagingStruct
 	requestBody, _ := ioutil.ReadAll(c.Request.Body)
-	fmt.Printf("Received request body: %s\n", string(requestBody))
+	//fmt.Printf("Received request body: %s\n", string(requestBody))
 	// Reset the request body to be able to parse it again
 	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
 
@@ -107,7 +107,7 @@ func updateIoT(c *gin.Context) {
 		return
 	}
 
-	dal.UpdateMessaging(client, []byte(req.UUID), req.Name, req.AppType, req.Function, req.Change, req.StatusChange)
+	dal.UpdateMessaging(client, []byte(req.UUID), req.Name, req.AppType, req.Function, req.Change)
 	// Respond to the request indicating success.
 	c.JSON(http.StatusOK, gin.H{"message": "Lighting updated successfully"})
 

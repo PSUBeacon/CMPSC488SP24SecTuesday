@@ -244,7 +244,12 @@ func handleFunctionality() {
 		for i := 0; i < len(UUIDsData.LightingUUIDs); i++ {
 			if UUIDsData.LightingUUIDs[i] == messageData.UUID {
 				if messageData.Function == "Status" {
-					lighting.UpdateStatus(messageData.StatusChange)
+					if messageData.Change == "false" {
+						lighting.UpdateStatus(false)
+					}
+					if messageData.Change == "true" {
+						lighting.UpdateStatus(true)
+					}
 				}
 				if messageData.Function == "Brightness" {
 					lighting.SetBrightness(messageChange)
@@ -255,8 +260,11 @@ func handleFunctionality() {
 	if messageData.Name == "HVAC" {
 		for i := 0; i < len(UUIDsData.HvacUUIDs); i++ {
 			if UUIDsData.HvacUUIDs[i] == messageData.UUID {
-				if messageData.Function == "Status" {
-					hvac.UpdateStatus(messageData.StatusChange)
+				if messageData.Change == "false" {
+					hvac.UpdateStatus(false)
+				}
+				if messageData.Change == "true" {
+					hvac.UpdateStatus(true)
 				}
 				if messageData.Function == "Fan" {
 					hvac.UpdateFanSpeed(messageChange)
@@ -274,7 +282,12 @@ func handleFunctionality() {
 		for i := 0; i < len(UUIDsData.SecurityUUIDs); i++ {
 			if UUIDsData.SecurityUUIDs[i] == messageData.UUID {
 				if messageData.Function == "Status" {
-					security.UpdateAlarmStatus(messageData.StatusChange)
+					if messageData.Change == "false" {
+						security.UpdateAlarmStatus(false)
+					}
+					if messageData.Change == "true" {
+						security.UpdateAlarmStatus(true)
+					}
 				}
 			}
 		}
@@ -283,7 +296,12 @@ func handleFunctionality() {
 		for i := 0; i < len(UUIDsData.AppliancesUUIDs); i++ {
 			if UUIDsData.AppliancesUUIDs[i] == messageData.UUID {
 				if messageData.Function == "Status" {
-					appliances.UpdateStatus(messageData.StatusChange)
+					if messageData.Change == "false" {
+						appliances.UpdateStatus(false)
+					}
+					if messageData.Change == "true" {
+						appliances.UpdateStatus(true)
+					}
 				}
 				if messageData.Function == "Temperature" {
 					appliances.UpdateTemperature(messageChange)
@@ -295,7 +313,12 @@ func handleFunctionality() {
 					appliances.UpdatePower(messageChange)
 				}
 				if messageData.Function == "EnergySaveMode" {
-					appliances.UpdateEnergySavingMode(messageData.StatusChange)
+					if messageData.Change == "false" {
+						appliances.UpdateStatus(false)
+					}
+					if messageData.Change == "true" {
+						appliances.UpdateStatus(true)
+					}
 				}
 				if messageData.Function == "WashTime" {
 					appliances.UpdateWashTime(messageChange)

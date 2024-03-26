@@ -1,7 +1,8 @@
-package main
+package messaging
 
 import (
 	"CMPSC488SP24SecTuesday/blockchain"
+	"CMPSC488SP24SecTuesday/crypto"
 	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
@@ -13,6 +14,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"strings"
 )
 
 func encryptAES(key, plaintext []byte) ([]byte, error) {
@@ -41,8 +43,12 @@ func encryptAES(key, plaintext []byte) ([]byte, error) {
 }
 
 func BroadCastMessage(messageToSend []byte) {
+
 	// The key should be 16, 24, or 32 bytes long for AES-128, AES-192, or AES-256, respectively.
 	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
 	AesKey := os.Getenv("AES_KEY")
 
 	jsonChainData, err := os.ReadFile("chain.json")
@@ -51,19 +57,11 @@ func BroadCastMessage(messageToSend []byte) {
 		panic(err)
 	}
 	fmt.Println("This is the length of whats in the file: ", len(jsonChainData))
-
 	//Checks if there is an existing chain or if this is the start of the chain
 	if chainlen == 0 {
 		// Create a new blockchain
 		chain := blockchain.NewBlockchain()
-		theChain, err := json.MarshalIndent(chain, "", "  ")
-		if err != nil {
-			panic(err)
-		}
-		err = os.WriteFile("chain.json", theChain, 0644)
-		if err != nil {
-			panic(err)
-		}
+
 		// Create the first block with messageToSend
 		firstBlock := blockchain.CreateBlock(string(messageToSend), chain.Chain[0].Hash, chain.Chain[0].Index+1)
 
@@ -82,87 +80,118 @@ func BroadCastMessage(messageToSend []byte) {
 			panic(err)
 		}
 
+		//creating the HMAC with unencrypted data
+		hmacChain := crypto.AddHMAC(updatedChain)
 		// Encrypt and send the new block
-		encryptedBlock, err := encryptAES([]byte(AesKey), updatedChain)
+		encryptedBlock, err := encryptAES([]byte(AesKey), hmacChain)
 		if err != nil {
 			log.Fatal("Error encrypting block:", err)
 		}
 
-		send(encryptedBlock)
-		return
+		send(encryptedBlock, "send")
 	}
 
 	if chainlen > 0 {
-		var jsonChain blockchain.Blockchain
-		err := json.Unmarshal(jsonChainData, &jsonChain)
-		if err != nil {
-			log.Fatal("Error unmarshalling chain data:", err)
+		statusCheck := send(nil, "check")
+		fmt.Println("This is the status check part: ", statusCheck)
+		if statusCheck == "sendit" {
+			var jsonChain blockchain.Blockchain
+			err := json.Unmarshal(jsonChainData, &jsonChain)
+			if err != nil {
+				log.Fatal("Error unmarshalling chain data:", err)
+			}
+
+			// Pass the hash of the last block in the chain as the prevHash for the new block
+			lastBlock := jsonChain.Chain[len(jsonChain.Chain)-1]
+			newBlock := blockchain.CreateBlock(string(messageToSend), lastBlock.Hash, lastBlock.Index+1)
+
+			// Add the new block to the chain
+			jsonChain.Chain = append(jsonChain.Chain, newBlock)
+
+			// Marshal the entire blockchain with the new block added
+			jsonBlock, err := json.MarshalIndent(newBlock, "", "  ")
+			if err != nil {
+				panic(err)
+			}
+
+			updatedChain, err := json.MarshalIndent(jsonChain, "", "  ")
+			if err != nil {
+				panic(err)
+			}
+
+			err = os.WriteFile("chain.json", updatedChain, 0644)
+			if err != nil {
+				panic(err)
+			}
+			//fmt.Println("This is the block before encryption: ", jsonBlock)
+
+			//creating the HMAC with unencrypted data
+			hmacBlock := crypto.AddHMAC(jsonBlock)
+
+			encryptedBlock, err := encryptAES([]byte(AesKey), hmacBlock)
+			if err != nil {
+				log.Fatal("Error encrypting block:", err)
+			}
+
+			send(encryptedBlock, "send")
 		}
-
-		// Pass the hash of the last block in the chain as the prevHash for the new block
-		lastBlock := jsonChain.Chain[len(jsonChain.Chain)-1]
-		newBlock := blockchain.CreateBlock(string(messageToSend), lastBlock.Hash, lastBlock.Index+1)
-
-		// Add the new block to the chain
-		jsonChain.Chain = append(jsonChain.Chain, newBlock)
-
-		// Marshal the entire blockchain with the new block added
-		jsonBlock, err := json.MarshalIndent(newBlock, "", "  ")
-		if err != nil {
-			panic(err)
+		if statusCheck == "busy" {
+			fmt.Printf("port busy try again")
+			return
 		}
-
-		updatedChain, err := json.MarshalIndent(jsonChain, "", "  ")
-		if err != nil {
-			panic(err)
-		}
-
-		err = os.WriteFile("chain.json", updatedChain, 0644)
-		if err != nil {
-			panic(err)
-		}
-		//fmt.Println("This is the block before encryption: ", jsonBlock)
-		encryptedBlock, err := encryptAES([]byte(AesKey), jsonBlock)
-		if err != nil {
-			log.Fatal("Error encrypting block:", err)
-		}
-
-		send(encryptedBlock)
-		return
 	}
 }
-func send(message []byte) {
+
+func send(message []byte, statusCheck string) string {
 	// Open the XBee module for communication
 	mode := &serial.Mode{
 		BaudRate: 9600,
 	}
+	canSend := true
 	//fmt.Println("This is in the send function", message)
-	port, err := serial.Open("/dev/ttyUSB0", mode)
-	if err != nil {
-		log.Fatal("Error opening XBee module:", err)
-	}
-	defer func(port serial.Port) {
-		err := port.Close()
+
+	//port, err := serial.Open("/dev/ttyUSB0", mode)
+	//The port code below is for sending from computer to pi
+
+	fmt.Println(statusCheck)
+
+	port, err := serial.Open("COM4", mode)
+	if statusCheck == "check" || statusCheck == "send" {
 		if err != nil {
+			// Check if the error message indicates that the port is busy
+			if strings.Contains(err.Error(), "Serial port busy") {
+				fmt.Printf("Port %s is busy. Specific handling for busy port.\n", "COM4")
 
+			} else {
+				fmt.Printf("Failed to check port %s: %v\n", "COM4", err)
+			}
+			canSend = false
+
+			defer port.Close()
+			return "busy"
 		}
-	}(port)
-
-	delimiter := []byte{0xE2, 0x99, 0xB4}
-	message = append(message, delimiter...)
-
-	// Send a message to the server
-	fmt.Println(len(message))
-	_, err = port.Write(message)
-	fmt.Printf("Sent \n")
-	if err != nil {
-		log.Println("Error sending message:", err)
+		defer port.Close()
 	}
-	return
-}
-func main() {
+	if statusCheck == "send" && canSend == true {
+		defer port.Close()
 
-	BroadCastMessage([]byte("testing the stuff"))
-	BroadCastMessage([]byte("this is another one"))
+		delimiter := []byte{0xE2, 0x99, 0xB4}
+		message = append(message, delimiter...)
 
+		// Send a message to the server
+		fmt.Println(len(message))
+		_, err = port.Write(message)
+		if err != nil {
+			log.Println("Error sending message:", err)
+		}
+		return "message sent"
+	}
+	return "sendit"
 }
+
+//func main() {
+//
+//	BroadCastMessage([]byte("testing the stuff"))
+//	BroadCastMessage([]byte("this is another one"))
+//
+//}

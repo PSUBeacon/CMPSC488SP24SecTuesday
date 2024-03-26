@@ -1,0 +1,12 @@
+/* Preferences.css */
+.preferencesPage {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* This makes the div take the full height of the viewport */
+    width: 100vw; /* This makes the div take the full width of the viewport */
+    background-color: #13370e; /* Example background color */
+    color: #ffffff; /* Example text color */
+    margin: 0; /* Removes default margin */
+    padding: 0; /* Removes default padding */
+  }
+  

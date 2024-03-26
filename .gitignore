@@ -15,3 +15,6 @@ vendor/
 /go.mod
 .DS_Store
 crypto/.env
+.vs/
+.vscode/
+config.json

@@ -100,7 +100,7 @@ const Appliances = () => {
         if (!isVisible) return null;
 
         return (
-            <div class="accountPop" style={{
+            <div className="accountPop" style={{
                 position: 'absolute',
                 top: '100%', // Position it right below the button
                 right: '0', // Align it with the right edge of the container
@@ -113,7 +113,7 @@ const Appliances = () => {
             }}>
                 <p>John Doe</p> {/* Replace with actual user name */}
                 <p>Admin</p> {/* Dynamically display user role */}
-                <button onClick={signOut} class="signout">Sign Out</button>
+                <button onClick={signOut} className="signout">Sign Out</button>
             </div>
         );
     };
@@ -161,7 +161,7 @@ const Appliances = () => {
     return (
         <div style={{display: 'flex', minHeight: '100vh', flexDirection: 'column', backgroundColor: '#081624'}}>
             {/* Top Navbar */}
-            <nav class="topNav" style={{backgroundColor: '#081624', color: 'white', padding: '0.5rem 1rem'}}>
+            <nav className="topNav" style={{backgroundColor: '#081624', color: 'white', padding: '0.5rem 1rem'}}>
                 <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                     <div style={{display: 'flex', alignItems: 'center'}}>
                         <img src={menuIcon} alt="Menu" onClick={toggleNav} className="hamburger-menu"/>
@@ -195,7 +195,7 @@ const Appliances = () => {
                 {/* Side Navbar */}
                 <aside className={`side-nav ${isNavVisible ? '' : 'hidden'}`}
                        style={{backgroundColor: '#0E2237', color: 'white', width: '250px', padding: '1rem'}}>
-                    <div class="houseInfo">
+                    <div className="houseInfo">
                         <div><img src={houseImage} alt="Logo" style={{marginRight: '10px'}} id='circle2'/></div>
                         <div>My House</div>
                         <div>State College, PA 16801</div>

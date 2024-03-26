@@ -54,36 +54,55 @@ func main() {
 	}))
 
 	r.Use(sessions.Sessions("mysession", cookie.NewStore(secret)))
+	/*
+		r.Use(sessions.Sessions("mysession", cookie.NewStore(secret)))
+
+		// unprotected endpoints no auth needed
+		r.GET("/status", statusResp)
+		r.POST("/login", loginHandler)
+		r.GET("/logout", logout)
+
+		// Apply JWT middleware to protected routes
+		protectedRoutes := r.Group("/")
+		protectedRoutes.Use(authMiddleware())
+
+		// This ones should be protected
+		protectedRoutes.POST("/lighting", updateIoT)
+		protectedRoutes.POST("/hvac", updateIoT)
+		protectedRoutes.POST("/security", updateIoT)
+		//protectedRoutes.POST("/appliances", updateAppliances)
+		protectedRoutes.POST("/energy", updateIoT)
+
+		// use JWT middleware for all protected routes
+		//r.Use(authMiddleware())
+
+		//ADJUSTMENT:
+
+		// Combined route group for both admin and user dashboards
+		dashboardGroup := r.Group("/dashboard", dashboardHandler)
+		dashboardGroup.Use(authMiddleware()) // Apply authMiddleware to protect the route
+		{
+			// Combined dashboard route for admin and user
+			dashboardGroup.POST("/", me)
+			dashboardGroup.GET("/me", me) // Use an empty string for the base path of the group
+			dashboardGroup.GET("/status", statusResp)
+		}
+	*/
 
 	// unprotected endpoints no auth needed
 	r.GET("/status", statusResp)
 	r.POST("/login", loginHandler)
-	r.GET("/logout", logout)
-
-	// Apply JWT middleware to protected routes
-	protectedRoutes := r.Group("/")
-	protectedRoutes.Use(authMiddleware())
-
-	// This ones should be protected
-	protectedRoutes.POST("/lighting", updateIoT)
-	protectedRoutes.POST("/hvac", updateIoT)
-	protectedRoutes.POST("/security", updateIoT)
-	//protectedRoutes.POST("/appliances", updateAppliances)
-	protectedRoutes.POST("/energy", updateIoT)
 
 	// use JWT middleware for all protected routes
-	//r.Use(authMiddleware())
+	r.Use(authMiddleware())
 
 	//ADJUSTMENT:
-
 	// Combined route group for both admin and user dashboards
-	dashboardGroup := r.Group("/dashboard", dashboardHandler)
+	dashboardGroup := r.Group("/dashboard")
 	dashboardGroup.Use(authMiddleware()) // Apply authMiddleware to protect the route
 	{
 		// Combined dashboard route for admin and user
-		dashboardGroup.POST("/", me)
-		dashboardGroup.GET("/me", me) // Use an empty string for the base path of the group
-		dashboardGroup.GET("/status", statusResp)
+		dashboardGroup.GET("", dashboardHandler) // Use an empty string for the base path of the group
 	}
 
 	err := r.Run(":8081")
@@ -299,38 +318,14 @@ func dashboardHandler(c *gin.Context) {
 
 	// Determine the response based on the user's role
 	switch role {
-
-	case "admin": //admin
-
-		if smartHomeDB == nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch smart home data"})
-			return
-		}
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Welcome to the Owner dashboard",
-
-			"accountType": "Admin",
-		})
-
-	case "user": //user
-		c.JSON(http.StatusOK, gin.H{
-			"message":     "Welcome to the Owner dashboard",
-			"accountType": "User",
-		})
-	default:
-		c.JSON(http.StatusForbidden, gin.H{"error": "Invalid role or insufficient privileges"})
-	}
-
-	// Determine the response based on the user's role
-	switch role {
-	case "readWrite": //owner role
+	case "admin": //owner role
 		if smartHomeDB == nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch smart home data"})
 			return
 		}
 		c.JSON(http.StatusOK, gin.H{
 			"message":     "Welcome to the Owner dashboard",
-			"accountType": "Owner",
+			"accountType": "admin",
 			"Dishwasher": gin.H{
 				"UUID":              smartHomeDB.Dishwasher[0].UUID,
 				"Status":            smartHomeDB.Dishwasher[0].Status,
@@ -406,10 +401,10 @@ func dashboardHandler(c *gin.Context) {
 			},
 		})
 
-	case "read": //child role
+	case "user": //child role
 		c.JSON(http.StatusOK, gin.H{
 			"message":     "Welcome to the Owner dashboard",
-			"accountType": "Child",
+			"accountType": "user",
 			"Dishwasher": gin.H{
 				"UUID":              smartHomeDB.Dishwasher[0].UUID,
 				"Status":            smartHomeDB.Dishwasher[0].Status,

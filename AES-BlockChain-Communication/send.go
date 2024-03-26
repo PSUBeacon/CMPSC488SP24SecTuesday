@@ -155,7 +155,7 @@ func send(message []byte, statusCheck string) string {
 
 	fmt.Println(statusCheck)
 
-	port, err := serial.Open("COM4", mode)
+	port, err := serial.Open("COM6", mode)
 	if statusCheck == "check" || statusCheck == "send" {
 		if err != nil {
 			// Check if the error message indicates that the port is busy

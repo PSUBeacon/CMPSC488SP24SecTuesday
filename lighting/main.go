@@ -1,6 +1,7 @@
 package lighting
 
 import (
+	"CMPSC488SP24SecTuesday/on-metal-c-code/gocode"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -54,6 +55,10 @@ type MoodScene struct {
 // TurnOn turns the lighting on.
 func UpdateStatus(newStatus bool) {
 	fmt.Printf("%s is now turned \n", newStatus)
+	err := gocode.Initialize(4)
+	if err != nil {
+		return
+	}
 }
 
 // SetBrightness sets the brightness of the lighting.

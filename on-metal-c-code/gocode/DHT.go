@@ -2,43 +2,26 @@ package gocode
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
-	"gobot.io/x/gobot/drivers/gpio"
-	"gobot.io/x/gobot/platforms/raspi"
+	"github.com/stianeikeland/go-rpio/v4"
 )
-
-// DHTType represents the type of DHT sensor.
-type DHTType int
 
 // Constants for different types of DHT sensors.
 const (
-	DHT11 DHTType = 11
-	DHT22 DHTType = 22
+	DHT11 int = 11
+	DHT22 int = 22
 )
 
-// DHT represents a DHT sensor.
-type DHT struct {
-	Pin  string
-	Type DHTType
-}
-
-// NewDHT creates a new DHT sensor instance.
-func NewDHT(pin string, sensorType DHTType) *DHT {
-	return &DHT{
-		Pin:  pin,
-		Type: sensorType,
-	}
-}
-
 // ReadTemperature reads the temperature from the DHT sensor.
-func (d *DHT) ReadTemperature() (float64, error) {
-	data, err := d.readData()
+func ReadTemperature(pin int, inType int) (float64, error) {
+	data, err := readData(pin)
 	if err != nil {
 		return 0, err
 	}
 
-	switch d.Type {
+	switch inType {
 	case DHT11:
 		return float64(data[2]), nil
 	case DHT22:
@@ -53,13 +36,13 @@ func (d *DHT) ReadTemperature() (float64, error) {
 }
 
 // ReadHumidity reads the humidity from the DHT sensor.
-func (d *DHT) ReadHumidity() (float64, error) {
-	data, err := d.readData()
+func ReadHumidity(pin int, inType int) (float64, error) {
+	data, err := readData(pin)
 	if err != nil {
 		return 0, err
 	}
 
-	switch d.Type {
+	switch inType {
 	case DHT11:
 		return float64(data[0]), nil
 	case DHT22:
@@ -71,20 +54,30 @@ func (d *DHT) ReadHumidity() (float64, error) {
 }
 
 // readData handles the communication with the DHT sensor and returns the raw data.
-func (d *DHT) readData() ([5]byte, error) {
+func readData(inPin int) ([5]byte, error) {
 	var data [5]byte
 
-	r := raspi.NewAdaptor()
-	pin := gpio.NewDirectPinDriver(r, d.Pin)
+	if err := rpio.Open(); err != nil {
+		return data, fmt.Errorf("unable to open GPIO: %w", err)
+	}
+	defer func() {
+		err := rpio.Close()
+		if err != nil {
+
+		}
+	}()
+
+	pin := rpio.Pin(inPin)
+	pin.Output()
 
 	// Send start signal
-	pin.DigitalWrite(0)
+	pin.Low()
 	time.Sleep(18 * time.Millisecond)
-	pin.DigitalWrite(1)
+	pin.High()
 	time.Sleep(20 * time.Microsecond)
 
 	// Set pin to input and wait for response
-	pin.DigitalRead()
+	pin.Input()
 	time.Sleep(80 * time.Microsecond)
 
 	// Read data
@@ -92,7 +85,7 @@ func (d *DHT) readData() ([5]byte, error) {
 	for i := 0; i < 40; i++ {
 		// Wait for the pin to go high
 		timeout := time.After(1 * time.Millisecond)
-		for val, _ := pin.DigitalRead(); val == 0; val, _ = pin.DigitalRead() {
+		for pin.Read() == rpio.Low {
 			select {
 			case <-timeout:
 				return data, errors.New("timeout waiting for high signal")
@@ -103,7 +96,7 @@ func (d *DHT) readData() ([5]byte, error) {
 		// Measure the length of the high signal
 		start := time.Now()
 		timeout = time.After(1 * time.Millisecond)
-		for val, _ := pin.DigitalRead(); val == 1; val, _ = pin.DigitalRead() {
+		for pin.Read() == rpio.High {
 			select {
 			case <-timeout:
 				return data, errors.New("timeout waiting for low signal")
@@ -134,20 +127,3 @@ func (d *DHT) readData() ([5]byte, error) {
 
 	return data, nil
 }
-
-//func main() {
-//	// Create a new DHT22 sensor instance.
-//	dhtSensor := NewDHT("4", DHT22) // Assuming the sensor is connected to GPIO pin 4
-//
-//	// Read temperature and humidity.
-//	temp, err := dhtSensor.ReadTemperature()
-//	if err != nil {
-//		log.Fatal("Failed to read temperature:", err)
-//	}
-//	humidity, err := dhtSensor.ReadHumidity()
-//	if err != nil {
-//		log.Fatal("Failed to read humidity:", err)
-//	}
-//
-//	fmt.Printf("Temperature: %.2f°C, Humidity: %.2f%%\n", temp, humidity)
-//}

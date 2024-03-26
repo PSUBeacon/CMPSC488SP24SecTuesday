@@ -75,11 +75,13 @@ func main() {
 	//r.Use(authMiddleware())
 
 	//ADJUSTMENT:
+
 	// Combined route group for both admin and user dashboards
 	dashboardGroup := r.Group("/dashboard", dashboardHandler)
-	dashboardGroup.Use(AuthRequired) // Apply authMiddleware to protect the route
+	dashboardGroup.Use(authMiddleware()) // Apply authMiddleware to protect the route
 	{
 		// Combined dashboard route for admin and user
+		dashboardGroup.POST("/", me)
 		dashboardGroup.GET("/me", me) // Use an empty string for the base path of the group
 		dashboardGroup.GET("/status", statusResp)
 	}

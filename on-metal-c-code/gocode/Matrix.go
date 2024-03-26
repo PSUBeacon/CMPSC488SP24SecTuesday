@@ -1,19 +1,10 @@
 package gocode
 
 import (
-	"errors"
-	"log"
-	"periph.io/x/periph/conn/physic"
-	"time"
-
-	"periph.io/x/periph/conn/gpio"
-	"periph.io/x/periph/conn/gpio/gpioreg"
-	"periph.io/x/periph/conn/spi"
-	"periph.io/x/periph/conn/spi/spireg"
-	"periph.io/x/periph/host"
+	"github.com/stianeikeland/go-rpio/v4"
 )
 
-// MAX7219 registers
+// registers
 const (
 	Max7219RegNoop        = 0x00
 	Max7219RegDigit0      = 0x01
@@ -31,130 +22,75 @@ const (
 	Max7219RegDisplayTest = 0x0f
 )
 
-// MaxMatrix represents a MAX7219 LED matrix.
-type MaxMatrix struct {
-	port    spi.PortCloser
-	conn    spi.Conn
-	loadPin gpio.PinOut
-	buffer  [8]byte
-}
+var loadPin rpio.Pin
+var buffer [8]byte
 
-// NewMaxMatrix creates a new MaxMatrix instance.
-func NewMaxMatrix(spiPort, loadPin string) (*MaxMatrix, error) {
-	if _, err := host.Init(); err != nil {
-		return nil, err
-	}
-
-	port, err := spireg.Open(spiPort)
-	if err != nil {
-		return nil, err
-	}
-
-	conn, err := port.Connect(10*physic.MegaHertz, spi.Mode0, 8)
-	if err != nil {
-		port.Close()
-		return nil, err
-	}
-
-	pin := gpioreg.ByName(loadPin)
-	if pin == nil {
-		port.Close()
-		return nil, errors.New("invalid load pin")
-	}
-	pin.Out(gpio.Low)
-
-	return &MaxMatrix{
-		port:    port,
-		conn:    conn,
-		loadPin: pin,
-	}, nil
-}
-
-// Close releases the resources used by the MaxMatrix.
-func (m *MaxMatrix) Close() error {
-	if err := m.port.Close(); err != nil {
+// Initialize initializes the LED matrix.
+func Initialize(loadPinNum uint8) error {
+	if err := rpio.Open(); err != nil {
 		return err
 	}
+
+	err := rpio.SpiBegin(rpio.Spi0)
+	if err != nil {
+		return err
+	}
+	rpio.SpiSpeed(10000000)
+	rpio.SpiMode(0, 0)
+
+	loadPin = rpio.Pin(loadPinNum)
+	loadPin.Output()
+	loadPin.Low()
+
+	sendCommand(Max7219RegScanLimit, 0x07)
+	sendCommand(Max7219RegDecodeMode, 0x00)
+	sendCommand(Max7219RegShutdown, 0x01)
+	sendCommand(Max7219RegDisplayTest, 0x00)
+	Clear()
+	sendCommand(Max7219RegIntensity, 0x0f)
+
 	return nil
 }
 
-// Init initializes the MAX7219 LED matrix.
-func (m *MaxMatrix) Init() {
-	m.sendCommand(Max7219RegScanLimit, 0x07)
-	m.sendCommand(Max7219RegDecodeMode, 0x00)
-	m.sendCommand(Max7219RegShutdown, 0x01)
-	m.sendCommand(Max7219RegDisplayTest, 0x00)
-	m.Clear()
-	m.sendCommand(Max7219RegIntensity, 0x0f)
-}
-
 // Clear clears the LED matrix.
-func (m *MaxMatrix) Clear() {
+func Clear() {
 	for i := 0; i < 8; i++ {
-		m.buffer[i] = 0
-		m.sendCommand(byte(Max7219RegDigit0+i), 0)
+		buffer[i] = 0
+		sendCommand(byte(Max7219RegDigit0+i), 0)
 	}
 }
 
 // SetIntensity sets the intensity of the LED matrix.
-func (m *MaxMatrix) SetIntensity(intensity byte) {
-	m.sendCommand(Max7219RegIntensity, intensity)
+func SetIntensity(intensity byte) {
+	sendCommand(Max7219RegIntensity, intensity)
 }
 
 // SetPixel sets the state of a single pixel.
-func (m *MaxMatrix) SetPixel(x, y int, value bool) {
+func SetPixel(x, y int, value bool) {
 	if x < 0 || x >= 8 || y < 0 || y >= 8 {
 		return
 	}
 
 	if value {
-		m.buffer[y] |= 1 << uint(x)
+		buffer[y] |= 1 << uint(x)
 	} else {
-		m.buffer[y] &^= 1 << uint(x)
+		buffer[y] &^= 1 << uint(x)
 	}
-	m.sendCommand(byte(Max7219RegDigit0+y), m.buffer[y])
+	sendCommand(byte(Max7219RegDigit0+y), buffer[y])
 }
 
-// sendCommand sends a command to the MAX7219.
-func (m *MaxMatrix) sendCommand(register, data byte) {
-	m.loadPin.Out(gpio.Low)
-	m.conn.Tx([]byte{register, data}, nil)
-	m.loadPin.Out(gpio.High)
+// sendCommand sends a command to the LED matrix
+func sendCommand(register, data byte) {
+	loadPin.Low()
+	rpio.SpiTransmit(register, data)
+	loadPin.High()
 }
 
-func main() {
-	matrix, err := NewMaxMatrix("SPI0.0", "GPIO10")
+// Cleanup releases the resources used
+func Cleanup() {
+	rpio.SpiEnd(rpio.Spi0)
+	err := rpio.Close()
 	if err != nil {
-		log.Fatalf("Failed to create MaxMatrix: %v", err)
+		return
 	}
-	defer matrix.Close()
-
-	matrix.Init()
-	matrix.SetIntensity(0x08)
-
-	for y := 0; y < 8; y++ {
-		for x := 0; x < 8; x++ {
-			matrix.SetPixel(x, y, true)
-			time.Sleep(100 * time.Millisecond)
-			matrix.SetPixel(x, y, false)
-		}
-	}
-
-	// Display a pattern
-	pattern := []byte{
-		0b00111100,
-		0b01000010,
-		0b10011001,
-		0b10100101,
-		0b10000001,
-		0b10000001,
-		0b01000010,
-		0b00111100,
-	}
-	for i, row := range pattern {
-		matrix.sendCommand(byte(Max7219RegDigit0+i), row)
-	}
-	time.Sleep(5 * time.Second)
-
-	matrix.Clear()
 }

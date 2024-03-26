@@ -14,6 +14,9 @@ require (
 	go.mongodb.org/mongo-driver v1.14.0
 	gobot.io/x/gobot v1.16.0
 	golang.org/x/crypto v0.21.0
+	periph.io/x/conn/v3 v3.7.0
+	periph.io/x/host/v3 v3.8.2
+	periph.io/x/periph v3.6.2+incompatible
 )
 
 require (
@@ -60,5 +63,4 @@ require (
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	periph.io/x/periph v3.6.2+incompatible // indirect
 )

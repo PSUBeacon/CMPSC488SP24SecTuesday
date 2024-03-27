@@ -21,14 +21,21 @@ func Switchable(pinNum uint8, status bool) {
 	fmt.Printf("on pin %s", pinNum)
 	if status == true {
 		pin := rpio.Pin(pinNum)
-		pin.Output()
-		pin.High()
+		pin.Mode(rpio.Output) // Alternative syntax
+		pin.Write(rpio.High)
 		fmt.Printf("on pin %d is switched on.\n", pinNum)
+		rpio.Close()
 	}
 	if status == false {
 		pin := rpio.Pin(pinNum)
 		pin.Output()
 		pin.Low()
 		fmt.Printf("Buzzer on pin %d is switched off.\n", pinNum)
+		rpio.Close()
 	}
+	pin := rpio.Pin(17)
+	pin.Mode(rpio.Output) // Alternative syntax
+	pin.Write(rpio.High)
+	fmt.Printf("on pin %d is switched on.\n", pinNum)
+	rpio.Close()
 }

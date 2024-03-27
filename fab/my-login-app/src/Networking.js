@@ -82,7 +82,7 @@ const networkLogs = [
 
 const networkLogsTable = (
   <div>
-    <h2 style={{ color: '#173350' }}>Network Logs</h2>
+    <h2 style={{ color: '#13350' }}>Network Logs</h2>
     <Table striped bordered hover variant="dark" style={{ marginTop: '20px', backgroundColor: "#173350" }}>
       <thead>
         <tr>

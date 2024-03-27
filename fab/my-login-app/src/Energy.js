@@ -160,37 +160,37 @@ const Energy = () => {
             <ul style={{ listStyle: 'none', padding: 0 }}>
               {/* Apply active style to 'Overview' since it's the current page */}
               <li className="nav-item"style={{margin: '0.5rem 0', padding: '0.5rem'}}>
-                <Link to="/dashboard" style={{ color: 'white', textDecoration: 'none' }}>
+                <Link to="/dashboard" style={{ color: '#95A4B6', textDecoration: 'none' }}>
                   <i className="fas fa-home" style={{ marginRight: '10px' }}></i>
                   Overview
                 </Link>
               </li>
               <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
-                <Link to="/security" style={{ color: 'white', textDecoration: 'none' }}>
+                <Link to="/security" style={{ color: '#95A4B6', textDecoration: 'none' }}>
                   <i className="fas fa-lock" style={{ marginRight: '10px' }}></i>
                   Security
                 </Link>
               </li>
               <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
-                <Link to="/lighting" style={{ color: 'white', textDecoration: 'none' }}>
+                <Link to="/lighting" style={{ color: '#95A4B6', textDecoration: 'none' }}>
                   <i className="fas fa-lightbulb" style={{ marginRight: '10px' }}></i>
                   Lighting
                 </Link>
               </li>
               <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
-                <Link to="/networking" style={{ color: 'white', textDecoration: 'none' }}>
+                <Link to="/networking" style={{ color: '#95A4B6', textDecoration: 'none' }}>
                   <i className="fas fa-sliders-h" style={{ marginRight: '10px' }}></i>
                   Networking
                 </Link>
               </li>
               <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
-                <Link to="/hvac" style={{ color: 'white', textDecoration: 'none' }}>
+                <Link to="/hvac" style={{ color: '#95A4B6', textDecoration: 'none' }}>
                   <i className="fas fa-thermometer-half" style={{ marginRight: '10px' }}></i>
                   HVAC
                 </Link>
               </li>
               <li className="nav-item"style={{margin: '0.5rem 0', padding: '0.5rem'}}>
-                <Link to="/appliances" style={{  color: 'white', textDecoration: 'none' }}>
+                <Link to="/appliances" style={{  color: '#95A4B6', textDecoration: 'none' }}>
                   <i className="fas fa-blender" style={{ marginRight: '10px' }}></i>
                   Appliances
                 </Link>

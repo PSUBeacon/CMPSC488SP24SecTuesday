@@ -11,12 +11,7 @@ func Switchable(pinNum uint8, status bool) {
 		fmt.Println("Unable to open GPIO:", err)
 		return
 	}
-	defer func() {
-		err := rpio.Close()
-		if err != nil {
-
-		}
-	}()
+	defer rpio.Close()
 	fmt.Printf("%s status.\n", status)
 	fmt.Printf("on pin %s", pinNum)
 	if status == true {

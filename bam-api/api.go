@@ -3,16 +3,21 @@ package main
 import (
 	"CMPSC488SP24SecTuesday/dal"
 	"bytes"
+
 	"context"
 	"fmt"
-	"github.com/gin-contrib/cors"
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
+
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
+
+	//"github.com/joho/godotenv"
+
+	"github.com/gin-contrib/cors"
+
+	//"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
 	"os"
@@ -22,11 +27,8 @@ import (
 
 var client *mongo.Client
 
-const userkey = "user"
-
-var secret = []byte("secret")
-
 func main() {
+	//connect to mongo server
 	var er error
 	client, er = dal.ConnectToMongoDB()
 	if er != nil {
@@ -42,7 +44,7 @@ func main() {
 
 	// Configure CORS
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
+		AllowOrigins:     []string{"*"}, //for open access
 		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
@@ -53,44 +55,16 @@ func main() {
 		MaxAge: 12 * time.Hour,
 	}))
 
-	r.Use(sessions.Sessions("mysession", cookie.NewStore(secret)))
-
-	/*
-		// unprotected endpoints no auth needed
-		r.GET("/status", statusResp)
-		r.POST("/login", loginHandler)
-		r.GET("/logout", logout)
-
-		// Apply JWT middleware to protected routes
-		protectedRoutes := r.Group("/")
-		protectedRoutes.Use(authMiddleware())
-
-		// This ones should be protected
-		protectedRoutes.POST("/lighting", updateIoT)
-		protectedRoutes.POST("/hvac", updateIoT)
-		protectedRoutes.POST("/security", updateIoT)
-		//protectedRoutes.POST("/appliances", updateAppliances)
-		protectedRoutes.POST("/energy", updateIoT)
-
-		// use JWT middleware for all protected routes
-		//r.Use(authMiddleware())
-
-		//ADJUSTMENT:
-
-		// Combined route group for both admin and user dashboards
-		dashboardGroup := r.Group("/dashboard", dashboardHandler)
-		dashboardGroup.Use(authMiddleware()) // Apply authMiddleware to protect the route
-		{
-			// Combined dashboard route for admin and user
-			dashboardGroup.POST("/", me)
-			dashboardGroup.GET("/me", me) // Use an empty string for the base path of the group
-			dashboardGroup.GET("/status", statusResp)
-		}
-	*/
-
 	// unprotected endpoints no auth needed
 	r.GET("/status", statusResp)
 	r.POST("/login", loginHandler)
+
+	// these ones should be protected
+	r.POST("/lighting", updateLighting)
+	r.POST("/hvac", updateHVAC)
+	r.POST("/security", updateSecurity)
+	r.POST("/appliances", updateAppliances)
+	r.POST("/energy", updateEnergy)
 
 	// use JWT middleware for all protected routes
 	r.Use(authMiddleware())
@@ -111,11 +85,11 @@ func main() {
 
 }
 
-func updateIoT(c *gin.Context) {
+func updateLighting(c *gin.Context) {
 	//var req dal.UpdateLightingRequest
-	var req dal.MessagingStruct
+	var req dal.UpdateLightingRequest
 	requestBody, _ := ioutil.ReadAll(c.Request.Body)
-	//fmt.Printf("Received request body: %s\n", string(requestBody))
+	fmt.Printf("Received request body: %s\n", string(requestBody))
 	// Reset the request body to be able to parse it again
 	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
 
@@ -125,10 +99,91 @@ func updateIoT(c *gin.Context) {
 		return
 	}
 
-	dal.UpdateMessaging(client, []byte(req.UUID), req.Name, req.AppType, req.Function, req.Change)
+	// Call the Iotlighting function
+	dal.IotLighting([]byte(req.UUID), req.Status, req.Brightness)
 	// Respond to the request indicating success.
 	c.JSON(http.StatusOK, gin.H{"message": "Lighting updated successfully"})
 
+}
+
+func updateHVAC(c *gin.Context) {
+	var req dal.UpdateHVACRequest
+	requestBody, _ := ioutil.ReadAll(c.Request.Body)
+	fmt.Printf("Received request body: %s\n", string(requestBody))
+	// Reset the request body to be able to parse it again
+	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		fmt.Printf("Error binding JSON: %v\n", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Call the IotHVAC function
+	dal.IotHVAC([]byte(req.UUID), req.Status, req.Temperature, req.FanSpeed, req.Mode)
+
+	// Respond to the request indicating success.
+	c.JSON(http.StatusOK, gin.H{"message": "HVAC settings updated successfully"})
+}
+
+func updateSecurity(c *gin.Context) {
+	var req dal.UpdateSecurityRequest
+	requestBody, _ := ioutil.ReadAll(c.Request.Body)
+	fmt.Printf("Received request body: %s\n", string(requestBody))
+	// Reset the request body to be able to parse it again
+	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		fmt.Printf("Error binding JSON: %v\n", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Call the security update function from the DAL package
+	dal.IotSecurity([]byte(req.UUID), req.Status)
+
+	// Respond to the request indicating success.
+	c.JSON(http.StatusOK, gin.H{"message": "Security settings updated successfully"})
+}
+
+func updateAppliances(c *gin.Context) {
+	var req dal.UpdateAppliancesRequest
+	requestBody, _ := ioutil.ReadAll(c.Request.Body)
+	fmt.Printf("Received request body: %s\n", string(requestBody))
+	// Reset the request body to be able to parse it again
+	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		fmt.Printf("Error binding JSON: %v\n", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Call the appliance update function from the DAL package
+	dal.IotAppliance([]byte(req.UUID), req.Status, req.Temperature, req.TimerStopTime, req.Power, req.EnergySaveMode, req.WashTime)
+
+	// Respond to the request indicating success.
+	c.JSON(http.StatusOK, gin.H{"message": "Appliance settings updated successfully"})
+}
+
+func updateEnergy(c *gin.Context) {
+	var req dal.UpdateEnergyRequest
+	requestBody, _ := ioutil.ReadAll(c.Request.Body)
+	fmt.Printf("Received request body: %s\n", string(requestBody))
+	// Reset the request body to be able to parse it again
+	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		fmt.Printf("Error binding JSON: %v\n", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Call the energy update function from the DAL package
+	dal.IotEnergy([]byte(req.UUID), req.Status, req.PanelID, req.PowerOutput)
+
+	// Respond to the request indicating success.
+	c.JSON(http.StatusOK, gin.H{"message": "Energy settings updated successfully"})
 }
 
 func statusResp(c *gin.Context) {
@@ -148,7 +203,6 @@ func getJwtKey() string {
 var jwtKey = []byte(getJwtKey())
 
 func loginHandler(c *gin.Context) {
-	session := sessions.Default(c)
 	var loginData struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
@@ -159,16 +213,16 @@ func loginHandler(c *gin.Context) {
 		return
 	}
 
-	fmt.Printf("user: %s", loginData.Username)
-	fmt.Printf("pass: %s", loginData.Password)
 	// Fetch user by username from MongoDB
 	fetchedUser, err := dal.FetchUser(client, loginData.Username)
+	fmt.Printf("Username:", fetchedUser.Username)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"}) // Use generic error message
 		return
 	}
 
 	passwordFromDB := fetchedUser.Password
+	fmt.Printf("Password: %s\n", passwordFromDB)
 
 	// Compare the password hash using bcrypt.CompareHashAndPassword
 	err = bcrypt.CompareHashAndPassword([]byte(passwordFromDB), []byte(loginData.Password))
@@ -197,47 +251,10 @@ func loginHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create the token"})
 		return
 	}
-	session.Set(userkey, loginData.Username)
-	if err := session.Save(); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save session"})
-		return
-	}
+
 	// Return the JWT token in the response
 	c.JSON(http.StatusOK, gin.H{"token": tokenString})
 
-}
-
-func logout(c *gin.Context) {
-	session := sessions.Default(c)
-	user := session.Get(userkey)
-	if user == nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid session token"})
-		return
-	}
-	session.Delete(userkey)
-	if err := session.Save(); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save session"})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"message": "Successfully logged out"})
-}
-
-func AuthRequired(c *gin.Context) {
-	session := sessions.Default(c)
-	user := session.Get(userkey)
-	if user == nil {
-		// Abort the request with the appropriate error code
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
-		return
-	}
-	// Continue down the chain to handler etc
-	c.Next()
-}
-
-func me(c *gin.Context) {
-	session := sessions.Default(c)
-	user := session.Get(userkey)
-	c.JSON(http.StatusOK, gin.H{"user": user})
 }
 
 // check jwt auth and set user role
@@ -317,6 +334,7 @@ func dashboardHandler(c *gin.Context) {
 
 	// Determine the response based on the user's role
 	switch role {
+
 	case "admin": //owner role
 		if smartHomeDB == nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch smart home data"})
@@ -341,4 +359,5 @@ func dashboardHandler(c *gin.Context) {
 	default:
 		c.JSON(http.StatusForbidden, gin.H{"error": "Invalid role or insufficient privileges"})
 	}
+
 }

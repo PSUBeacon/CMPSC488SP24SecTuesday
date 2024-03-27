@@ -1,11 +1,12 @@
-import React, {useEffect, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
-import {Link} from 'react-router-dom'; // Import Link from react-router-dom for navigation
+
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom'; // Import Link from react-router-dom for navigation
 import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure Bootstrap CSS is imported to use its grid system and components
 import logoImage from './logo.webp';
 import houseImage from './houseImage.jpg';
-import {Table} from 'react-bootstrap';
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import { Table } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import settingsIcon from './settings.png'
 import accountIcon from './account.png'
 import menuIcon from './menu.png'
@@ -22,51 +23,37 @@ import {
 import 'bootstrap/dist/css/bootstrap.min.css';
 // Define the Dashboard component using a functional component pattern
 const Energy = () => {
-    const [user, setUser] = useState(null);
-    const [error, setError] = useState('');
-    const [accountType, setAccountType] = useState('')
-    const navigate = useNavigate(); // Instantiate useNavigate hook
-    const [isNavVisible, setIsNavVisible] = useState(false);
+    const [deviceData, setDeviceData] = useState({});
+    useEffect(() => {
+        const storedData = localStorage.getItem('devices');
+        if (storedData) {
+            setDeviceData(JSON.parse(storedData));
+        }
+    }, []);
+
+
+    //If IoT team is going with format in table on this page, Netgain, netloss, battery must be added as fields in db, then it will display
     const energy = [
-        {Device: 'Microwave', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF'},
-        {Device: 'Oven', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF'},
-        {Device: 'Fridge', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF'},
-        {Device: 'Freezer', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF'},
-        {Device: 'Toaster', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF'},
-        {Device: 'Dishwasher', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF'},
+        { Device: 'Microwave', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF' },
+        { Device: 'Oven', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF' },
+        { Device: 'Fridge', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF' },
+        { Device: 'Freezer', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF' },
+        { Device: 'Toaster', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF' },
+        { Device: 'Dishwasher', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF' },
 
     ];
 
-    useEffect(() => {
-        const token = sessionStorage.getItem('token');
-        const url = 'http://localhost:8081/energy';
+    //Added appliance type struct to pass dyamic IoT data
+    const applianceTypes = [
+        'Microwave', 'Oven', 'Fridge', 'Freezer', 'Toaster', 'Dishwasher'
+    ];
 
-        if (!token) {
-            navigate('/'); // Redirect to login page if token is not present
-            return;
-        }
 
-        fetch(url, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            },
-        })
-            .then(response => response.json())
-            .then(response => {
-                if (response && response.data) {
-                    setUser(response.data.user);
-                    setAccountType(response.data.accountType);
-                    sessionStorage.setItem('accountType', response.data.accountType);
-                } else {
-                    setError('Unexpected response from server');
-                }
-            })
-            .catch(error => {
-                console.log('Fetch operation error:', error)
-            });
-    }, [navigate]);
+    const navigate = useNavigate(); // Instantiate useNavigate hook
+    const [isNavVisible, setIsNavVisible] = useState(false);
+
+
+
     const toggleNav = () => {
         setIsNavVisible(!isNavVisible);
     };
@@ -96,11 +83,11 @@ const Energy = () => {
         setIsAccountPopupVisible(!isAccountPopupVisible);
     };
 
-    const AccountPopup = ({isVisible, onClose}) => {
+    const AccountPopup = ({ isVisible, onClose }) => {
         if (!isVisible) return null;
 
         return (
-            <div class="accountPop" style={{
+            <div class = "accountPop"style={{
                 position: 'absolute',
                 top: '100%', // Position it right below the button
                 right: '0', // Align it with the right edge of the container
@@ -128,29 +115,14 @@ const Energy = () => {
         };
 
         return (
-            <div className="camera-widget" style={{
-                position: 'relative',
-                maxWidth: '100%',
-                backgroundColor: '#12232E',
-                borderRadius: '10px',
-                overflow: 'hidden'
-            }}>
+            <div className="camera-widget" style={{ position: 'relative', maxWidth: '100%', backgroundColor: '#12232E', borderRadius: '10px', overflow: 'hidden' }}>
                 {/* Live Feed */}
-                <img src={cameraFeeds[cameraView]} alt="Live feed"
-                     style={{width: '100%', height: 'auto', display: 'block'}}/>
+                <img src={cameraFeeds[cameraView]} alt="Live feed" style={{ width: '100%', height: 'auto', display: 'block' }} />
 
                 {/* Camera View Buttons */}
-                <div style={{position: 'absolute', top: '10px', left: '10px', display: 'flex', gap: '5px'}}>
-                    <button onClick={() => setCameraView('livingroom')} style={{
-                        padding: '5px',
-                        backgroundColor: cameraView === 'livingroom' ? '#4CAF50' : 'transparent'
-                    }}>R1
-                    </button>
-                    <button onClick={() => setCameraView('kitchen')} style={{
-                        padding: '5px',
-                        backgroundColor: cameraView === 'kitchen' ? '#4CAF50' : 'transparent'
-                    }}>R2
-                    </button>
+                <div style={{ position: 'absolute', top: '10px', left: '10px', display: 'flex', gap: '5px' }}>
+                    <button onClick={() => setCameraView('livingroom')} style={{ padding: '5px', backgroundColor: cameraView === 'livingroom' ? '#4CAF50' : 'transparent' }}>R1</button>
+                    <button onClick={() => setCameraView('kitchen')} style={{ padding: '5px', backgroundColor: cameraView === 'kitchen' ? '#4CAF50' : 'transparent' }}>R2</button>
                     {/* Add more buttons for additional camera views as needed */}
                 </div>
             </div>
@@ -159,15 +131,14 @@ const Energy = () => {
 
     // This is the JSX return statement where we layout our component's HTML structure
     return (
-        <div style={{display: 'flex', minHeight: '100vh', flexDirection: 'column', backgroundColor: '#081624'}}>
+        <div style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column', backgroundColor: '#081624' }}>
             {/* Top Navbar */}
-            <nav class="topNav" style={{backgroundColor: '#081624', color: 'white', padding: '0.5rem 1rem'}}>
-                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                    <div style={{display: 'flex', alignItems: 'center'}}>
+            <nav class="topNav" style={{ backgroundColor: '#081624', color: 'white', padding: '0.5rem 1rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
                         <img src={menuIcon} alt="Menu" onClick={toggleNav} className="hamburger-menu"/>
-                        <img src={logoImage} alt="Logo" style={{marginRight: '10px'}}
-                             id='circle'/> {/* Adjust the height as needed */}
-                        <span id='menuText2'>Beacon</span>
+                        <img src={logoImage} alt="Logo" style={{ marginRight: '10px'}} id='circle'/> {/* Adjust the height as needed */}
+                        <span id = 'menuText2'>Beacon</span>
                     </div>
                     <div>
                         <span id='menuText'>March 05, 2024</span>
@@ -176,77 +147,67 @@ const Energy = () => {
                         <span id='menuText'>11:48 AM</span>
                     </div>
                     <div>
-                        <div style={{position: 'relative'}}>
-                            <img src={settingsIcon} alt="Settings" style={{marginRight: '10px'}} id="menuIcon"
-                                 onClick={goToSettings}/>
-                            <button onClick={toggleAccountPopup}
-                                    style={{background: 'none', border: 'none', padding: 0, cursor: 'pointer'}}>
-                                <img src={accountIcon} alt="account" style={{marginRight: '10px'}} id="menuIcon2"/>
+                        <div style={{ position: 'relative' }}>
+                            <img src={settingsIcon} alt="Settings" style={{ marginRight: '10px' }} id="menuIcon" onClick={goToSettings} />
+                            <button onClick={toggleAccountPopup} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>
+                                <img src={accountIcon} alt="account" style={{ marginRight: '10px' }} id = "menuIcon2"/>
                             </button>
-                            <AccountPopup isVisible={isAccountPopupVisible}
-                                          onClose={() => setIsAccountPopupVisible(false)}/>
+                            <AccountPopup isVisible={isAccountPopupVisible} onClose={() => setIsAccountPopupVisible(false)} />
                         </div>
                     </div>
                 </div>
             </nav>
 
             {/* Side Navbar and Dashboard Content */}
-            <div style={{display: 'flex', flex: '1'}}>
+            <div style={{ display: 'flex', flex: '1' }}>
                 {/* Side Navbar */}
-                <aside className={`side-nav ${isNavVisible ? '' : 'hidden'}`}
-                       style={{backgroundColor: '#0E2237', color: 'white', width: '250px', padding: '1rem'}}>
-                    <div class="houseInfo">
-                        <div><img src={houseImage} alt="Logo" style={{marginRight: '10px'}} id='circle2'/></div>
-                        <div>My House</div>
-                        <div>State College, PA 16801</div>
-                    </div>
+                <aside className={`side-nav ${isNavVisible ? '' : 'hidden'}`} style={{ backgroundColor: '#0E2237', color: 'white', width: '250px', padding: '1rem' }}>          <div class="houseInfo">
+                    <div><img src={houseImage} alt="Logo" style={{ marginRight: '10px'}} id='circle2'/></div>
+                    <div>My House</div>
+                    <div>State College, PA 16801</div>
+                </div>
                     <nav>
-                        <ul style={{listStyle: 'none', padding: 0}}>
+                        <ul style={{ listStyle: 'none', padding: 0 }}>
                             {/* Apply active style to 'Overview' since it's the current page */}
-                            <li className="nav-item" style={{margin: '0.5rem 0', padding: '0.5rem'}}>
-                                <Link to="/dashboard" style={{color: 'white', textDecoration: 'none'}}>
-                                    <i className="fas fa-home" style={{marginRight: '10px'}}></i>
+                            <li className="nav-item"style={{margin: '0.5rem 0', padding: '0.5rem'}}>
+                                <Link to="/dashboard" style={{ color: 'white', textDecoration: 'none' }}>
+                                    <i className="fas fa-home" style={{ marginRight: '10px' }}></i>
                                     Overview
                                 </Link>
                             </li>
-                            <li className="nav-item" style={{margin: '0.5rem 0', padding: '0.5rem'}}>
-                                <Link to="/security" style={{color: 'white', textDecoration: 'none'}}>
-                                    <i className="fas fa-lock" style={{marginRight: '10px'}}></i>
+                            <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
+                                <Link to="/security" style={{ color: 'white', textDecoration: 'none' }}>
+                                    <i className="fas fa-lock" style={{ marginRight: '10px' }}></i>
                                     Security
                                 </Link>
                             </li>
-                            <li className="nav-item" style={{margin: '0.5rem 0', padding: '0.5rem'}}>
-                                <Link to="/lighting" style={{color: 'white', textDecoration: 'none'}}>
-                                    <i className="fas fa-lightbulb" style={{marginRight: '10px'}}></i>
+                            <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
+                                <Link to="/lighting" style={{ color: 'white', textDecoration: 'none' }}>
+                                    <i className="fas fa-lightbulb" style={{ marginRight: '10px' }}></i>
                                     Lighting
                                 </Link>
                             </li>
-                            <li className="nav-item" style={{margin: '0.5rem 0', padding: '0.5rem'}}>
-                                <Link to="/preferences" style={{color: 'white', textDecoration: 'none'}}>
-                                    <i className="fas fa-sliders-h" style={{marginRight: '10px'}}></i>
+                            <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
+                                <Link to="/preferences" style={{ color: 'white', textDecoration: 'none' }}>
+                                    <i className="fas fa-sliders-h" style={{ marginRight: '10px' }}></i>
                                     Preferences
                                 </Link>
                             </li>
-                            <li className="nav-item" style={{margin: '0.5rem 0', padding: '0.5rem'}}>
-                                <Link to="/hvac" style={{color: 'white', textDecoration: 'none'}}>
-                                    <i className="fas fa-thermometer-half" style={{marginRight: '10px'}}></i>
+                            <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
+                                <Link to="/hvac" style={{ color: 'white', textDecoration: 'none' }}>
+                                    <i className="fas fa-thermometer-half" style={{ marginRight: '10px' }}></i>
                                     HVAC
                                 </Link>
                             </li>
-                            <li className="nav-item" style={{margin: '0.5rem 0', padding: '0.5rem'}}>
-                                <Link to="/appliances" style={{color: 'white', textDecoration: 'none'}}>
-                                    <i className="fas fa-blender" style={{marginRight: '10px'}}></i>
+                            <li className="nav-item"style={{margin: '0.5rem 0', padding: '0.5rem'}}>
+                                <Link to="/appliances" style={{  color: 'white', textDecoration: 'none' }}>
+                                    <i className="fas fa-blender" style={{ marginRight: '10px' }}></i>
                                     Appliances
                                 </Link>
                             </li>
-                            <li className="nav-item" style={{
-                                backgroundColor: '#08192B',
-                                margin: '0.5rem 0',
-                                padding: '0.5rem',
-                                borderLeft: '3px solid #0294A5'
-                            }}>
-                                <Link to="/energy" style={{color: '#50BCC0', textDecoration: 'none'}}>
-                                    <i className="fas fa-bolt" style={{marginRight: '10px'}}></i>
+                            <li className="nav-item"style={{ backgroundColor: '#08192B', margin: '0.5rem 0', padding: '0.5rem', borderLeft: '3px solid #0294A5' }}>
+                                <Link to="/energy" style={{ color: '#50BCC0', textDecoration: 'none' }}>
+                                    <i className="fas fa-bolt" style={{ marginRight: '10px' }}></i>
                                     Energy
                                 </Link>
                             </li>
@@ -255,17 +216,9 @@ const Energy = () => {
                 </aside>
 
 
-                <main style={{
-                    flex: '1',
-                    padding: '1rem',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    backgroundColor: '#0E2237'
-                }}>
-                    <h2 style={{color: 'white'}}>Devices Using Energy</h2>
-                    <Table striped bordered hover variant="dark"
-                           style={{marginTop: '20px', backgroundColor: "#173350"}}>
+                <main style={{ flex: '1', padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: '#0E2237'}}>
+                    <h2 style={{ color: 'white' }}>Devices Using Energy</h2>
+                    <Table striped bordered hover variant="dark" style={{ marginTop: '20px', backgroundColor: "#173350" }}>
                         <thead>
                         <tr>
                             <th>Device</th>
@@ -276,14 +229,14 @@ const Energy = () => {
                         </tr>
                         </thead>
                         <tbody>
-                        {energy.map((energy, index) => (
+                        {/*Maps appliance type from IoT data if it does not exist then N/A */}
+                        {applianceTypes.map((type, index) => (
                             <tr key={index}>
-
-                                <td>{energy.Device}</td>
-                                <td>{energy.NetlossEnergy}</td>
-                                <td>{energy.NetgainEnergy}</td>
-                                <td>{energy.Battery}</td>
-                                <td>{energy.Status}</td>
+                                <td>{type}</td>
+                                <td>{deviceData[type]?.[0]?.NetLoss ?? 'N/A'}</td>
+                                <td>{deviceData[type]?.[0]?.NetGain ?? 'N/A'}</td>
+                                <td>{deviceData[type]?.[0]?.Battery ?? 'N/A'}</td>
+                                <td>{deviceData[type]?.[0]?.Status ? 'On' : 'Off'}</td>
                             </tr>
                         ))}
                         </tbody>

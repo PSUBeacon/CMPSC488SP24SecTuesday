@@ -12,7 +12,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
-	"strconv"
 	"time"
 )
 
@@ -142,27 +141,40 @@ type SmartHomeDB struct {
 	Users          []User
 }
 
-type UUIDsConfig struct {
-	LightingUUIDs   []string
-	HvacUUIDs       []string
-	SecurityUUIDs   []string
-	AppliancesUUIDs []string
-	EnergyUUIDs     []string
+type UpdateLightingRequest struct {
+	UUID       string `json:"UUID"`
+	Status     bool   `json:"Status"`
+	Brightness int    `json:"Brightness"`
 }
 
-type MessagingStruct struct {
-	UUID     string `json:"UUID"`
-	Name     string `json:"Name"`     //type item being changes ex(Lighting) or (HVAC)
-	AppType  string `json:"AppType"`  //Which Type of appliance it is
-	Function string `json:"Function"` //function being changed ex(brightness)
-	Change   string `json:"Change"`   //actual change being made ex(100) for brightness
+type UpdateHVACRequest struct {
+	UUID        string `json:"UUID"`
+	Temperature int    `json:"Temperature"`
+	FanSpeed    int    `json:"FanSpeed"`
+	Status      bool   `json:"Status"`
+	Mode        string `json:"Mode"`
 }
 
-type LoggingStruct struct {
-	DeviceID string    `json:"DeviceID"`
-	Function string    `json:"Function"`
-	Change   string    `json:"Change"`
-	Time     time.Time `json:"Time"`
+type UpdateSecurityRequest struct {
+	UUID   string `json:"UUID"`
+	Status bool   `json:"Status"`
+}
+
+type UpdateAppliancesRequest struct {
+	UUID           string    `json:"UUID"`
+	Status         bool      `json:"Status"`
+	Temperature    int       `json:"Temperature"`
+	TimerStopTime  time.Time `json:"TimerStopTime"`
+	Power          int       `json:"Power"`
+	EnergySaveMode bool      `json:"EnergySaveMode"`
+	WashTime       int       `json:"WashTime"`
+}
+
+type UpdateEnergyRequest struct {
+	UUID        string `json:"UUID"`
+	Status      bool   `json:"Status"`
+	PanelID     string `json:"PanelID"`
+	PowerOutput int    `json:"PowerOutput"`
 }
 
 func FetchCollections(client *mongo.Client, dbName string) (*SmartHomeDB, error) {
@@ -238,64 +250,82 @@ func FetchUser(client *mongo.Client, userName string) (User, error) {
 	return user, nil
 }
 
-func UpdateMessaging(client *mongo.Client, UUID []byte, name string, apptype string, function string, change string) {
-	var messageRequest MessagingStruct
-	messageRequest.UUID = string(UUID)
-	messageRequest.Name = name
-	messageRequest.AppType = apptype
-	messageRequest.Function = function
-	messageRequest.Change = change
-	message, err := json.Marshal(messageRequest)
+func IotLighting(UUID []byte, status bool, brightness int) {
+
+	var lightingChange UpdateLightingRequest
+	lightingChange.UUID = string(UUID)
+	lightingChange.Status = status
+	lightingChange.Brightness = brightness
+
+	message, _ := json.Marshal(lightingChange)
+	messaging.BroadCastMessage(message)
+	return
+}
+
+func IotHVAC(UUID []byte, status bool, temperature int, fanSpeed int, mode string) {
+
+	var HVACChange UpdateHVACRequest
+	HVACChange.UUID = string(UUID)
+	HVACChange.Status = status
+	HVACChange.Temperature = temperature
+	HVACChange.FanSpeed = fanSpeed
+	HVACChange.Mode = mode
+	message, err := json.Marshal(HVACChange)
 	if err != nil {
-		fmt.Printf("Error marshaling JSON message: %v", err)
+		log.Printf("Error marshaling JSON message: %v", err)
 		return
 	}
 	messaging.BroadCastMessage(message)
+	return
+}
 
-	var logg LoggingStruct
-	// Update the MongoDB collection using JSON
-	collection := client.Database("smartHomeDB").Collection(apptype)
-	Logging := client.Database("smartHomeDB").Collection("Logging")
-	filter := bson.M{"UUID": messageRequest.UUID}
+func IotSecurity(UUID []byte, status bool) {
 
-	var updatedValue interface{}
-	switch function {
-	case "WashTime", "TemperatureSettings", "EnergyConsumption", "Brightness", "Power":
-		updatedValue, _ = strconv.Atoi(change)
-	default:
-		updatedValue = change
-	}
+	var securityChange UpdateSecurityRequest
+	securityChange.UUID = string(UUID)
+	securityChange.Status = status
 
-	update := map[string]interface{}{
-		"$set": map[string]interface{}{
-			function: updatedValue,
-		},
-	}
-
-	updateJSON, err := json.Marshal(update)
+	message, err := json.Marshal(securityChange)
 	if err != nil {
-		fmt.Printf("Error marshaling update JSON: %v", err)
+		log.Printf("Error marshaling JSON message: %v", err)
 		return
 	}
+	messaging.BroadCastMessage(message)
+	return
+}
 
-	var updateDoc bson.M
-	if err := bson.UnmarshalExtJSON(updateJSON, true, &updateDoc); err != nil {
-		fmt.Printf("Error unmarshaling update JSON: %v", err)
-		return
-	}
+func IotAppliance(UUID []byte, status bool, temperature int, timerStopTime time.Time, power int, energySaveMode bool, washTime int) {
+	var applianceChange UpdateAppliancesRequest
+	applianceChange.UUID = string(UUID)
+	applianceChange.Status = status
+	applianceChange.Temperature = temperature
+	applianceChange.TimerStopTime = timerStopTime
+	applianceChange.Power = power
+	applianceChange.EnergySaveMode = energySaveMode
+	applianceChange.WashTime = washTime
 
-	_, err = collection.UpdateOne(context.Background(), filter, updateDoc)
+	message, err := json.Marshal(applianceChange)
 	if err != nil {
-		fmt.Printf("Error updating document: %v", err)
+		log.Printf("Error marshaling JSON message: %v", err)
 		return
 	}
+	messaging.BroadCastMessage(message)
+	return
+}
 
-	logg.DeviceID = name
-	logg.Function = function
-	logg.Change = change
-	logg.Time = time.Now()
-	_, err = Logging.InsertOne(context.Background(), logg)
+func IotEnergy(UUID []byte, status bool, panelID string, powerOutput int) {
+	var energyChange UpdateEnergyRequest
+	energyChange.UUID = string(UUID)
+	energyChange.Status = status
+	energyChange.PanelID = panelID
+	energyChange.PowerOutput = powerOutput
 
+	message, err := json.Marshal(energyChange)
+	if err != nil {
+		log.Printf("Error marshaling JSON message: %v", err)
+		return
+	}
+	messaging.BroadCastMessage(message)
 	return
 }
 

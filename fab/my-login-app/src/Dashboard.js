@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom for navigation
@@ -17,11 +16,28 @@ const Dashboard = () => {
 
 
 
+    /////////////////////////////////////////////////////////////////////////////////////
+    // States for date and time
+    const [currentDate, setCurrentDate] = useState(new Date().toLocaleDateString());
+    const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentDate(new Date().toLocaleDateString());
+            setCurrentTime(new Date().toLocaleTimeString());
+        }, 1000);
+
+        // Cleanup on component unmount
+        return () => clearInterval(timer);
+    }, []);
+
+
+
     const navigate = useNavigate(); // Instantiate useNavigate hook
     const [isNavVisible, setIsNavVisible] = useState(false);
     const [dashboardMessage, setDashboardMessage] = useState('');
     const [accountType, setAccountType] = useState('');
-// Simplify the initial state to hold the structured device data directly
+    //cleaned up iot handling
     const [deviceData, setDeviceData] = useState({});
 
     useEffect(() => {
@@ -39,13 +55,13 @@ const Dashboard = () => {
             .then(data => {
                 console.log(data);
                 if (data.devices) { // Check if the devices data is present in the response
-                    // Update the entire device data state with the received structured data
+                    // Update the entire device data state
                     setDeviceData(data.devices);
 
-                    // Optionally, store the structured device data in localStorage as needed
+
                     localStorage.setItem('devices', JSON.stringify(data.devices));
                 }
-                setDashboardMessage(data.message); // Update the dashboard message
+                setDashboardMessage(data.message);
 
                 // Update and store the account type
                 setAccountType(data.accountType);
@@ -53,8 +69,6 @@ const Dashboard = () => {
             })
             .catch(error => console.error('Fetch operation error:', error));
     }, []); // Ensure the useEffect hook runs only once after the component mounts
-
-
 
     const toggleNav = () => {
         setIsNavVisible(!isNavVisible);
@@ -150,13 +164,13 @@ const Dashboard = () => {
                         <span id = 'menuText2'>Beacon</span>
                     </div>
                     <div>
-                        <span id='menuText'>March 05, 2024</span>
+                        <span id='menuText'>{currentDate}</span>
                     </div>
                     <div>
-                        <span id='menuText'>11:48 AM</span>
+                        <span id='menuText'>{currentTime}</span>
                     </div>
                     <div>
-                        <div style={{ position: 'relative' }}>
+                        <div style={{position: 'relative' }}>
                             <img src={settingsIcon} alt="Settings" style={{ marginRight: '10px' }} id="menuIcon" onClick={goToSettings} />
                             <button onClick={toggleAccountPopup} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>
                                 <img src={accountIcon} alt="account" style={{ marginRight: '10px' }} id = "menuIcon2"/>
@@ -254,18 +268,11 @@ const Dashboard = () => {
                         {/* Another Row for More Widgets */}
                         <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: '20px' }}>
                             {/* Status by Units Widget */}
-                            <div className="widget" style={{
-                                flex: '1',
-                                minWidth: '250px',
-                                backgroundColor: '#173350',
-                                padding: '20px',
-                                borderRadius: '1px',
-                                margin: '10px',
-                                boxSizing: 'border-box'
-                            }}>
+                            <div className="widget" style={{ flex: '1', minWidth: '250px', backgroundColor: '#173350', padding: '20px', borderRadius: '1px', margin: '10px', boxSizing: 'border-box' }}>
                                 <h3>Status by Units</h3>
                                 {/* Content of the status by units widget */}
-                                <p>{deviceData.HVAC?.[0]?.Temperature ?? ''}</p>
+                                {/* Content of the status by units widget */}
+                                <p>{deviceData.HVAC?.[0]?.Temperature ? `${deviceData.HVAC[0].Temperature}°F` : ''}</p>
 
 
                             </div>

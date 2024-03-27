@@ -1,6 +1,6 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
-import {useNavigate, Link} from 'react-router-dom'; // Import Link
+import { useNavigate, Link } from 'react-router-dom'; // Import Link
 import 'bootstrap/dist/css/bootstrap.min.css';
 import loginImage from './loginImage.png';
 import logoImage from './logo.webp';
@@ -23,11 +23,10 @@ const LoginForm = () => {
             const jwtToken = response.data.token; // Assuming the token is returned in a field named 'token'
             console.log('JWT Token:', jwtToken);
 
-            sessionStorage.setItem('token', jwtToken);
+            localStorage.setItem('token', jwtToken);
 
             // Redirect user to the dashboard page
-            // Use navigate to redirect
-            navigate('/dashboard');
+            navigate('/dashboard'); // Use navigate to redirect
 
         } catch (error) {
             setError('Failed to login. Please check your network connection and credentials.');
@@ -46,7 +45,7 @@ const LoginForm = () => {
     };
 
     return (
-        <div className="container-fluid h-100" style={{minHeight: '100vh'}}>
+        <div className="container-fluid h-100" style={{ minHeight: '100vh' }}>
             <div className="row no-gutter">
                 {/* The image column that takes 70% of the page */}
                 <div
@@ -61,16 +60,11 @@ const LoginForm = () => {
                 </div>
 
                 {/* The login form column that takes 30% of the page */}
-                <div className="col-md-4 d-flex align-items-center" style={{backgroundColor: '#0E2237', padding: 0}}>
+                <div className="col-md-4 d-flex align-items-center" style={{ backgroundColor: '#0E2237', padding: 0 }}>
                     {/* Actual login form centered within the form column */}
                     <div className="w-100">
-                        <div className="mx-auto" style={{maxWidth: '320px'}}>
-                            <img src={logoImage} alt="Logo" className="mb-4" id="circle" style={{
-                                maxWidth: '150px',
-                                display: 'block',
-                                marginLeft: 'auto',
-                                marginRight: 'auto'
-                            }}/>
+                        <div className="mx-auto" style={{ maxWidth: '320px' }}>
+                            <img src={logoImage} alt="Logo" className="mb-4" id = "circle" style={{ maxWidth: '150px', display: 'block', marginLeft: 'auto', marginRight: 'auto' }} />
                             <h3 className="display-4 mb-5 text-center text-white">Sign in</h3>
                             {error && <div className="alert alert-danger" role="alert">{error}</div>}
                             <form onSubmit={handleSubmit}>
@@ -99,25 +93,15 @@ const LoginForm = () => {
                                     </div>
                                 </div>
                                 <div className="form-group mb-5">
-                                    <button type="submit" className="btn btn-primary btn-block text-uppercase shadow-sm"
-                                            style={{
-                                                width: '100%',
-                                                backgroundColor: '#50BCC0',
-                                                borderColor: '#50BCC0'
-                                            }}>Sign in
-                                    </button>
+                                    <button type="submit" className="btn btn-primary btn-block text-uppercase shadow-sm" style={{ width: '100%', backgroundColor: '#50BCC0', borderColor: '#50BCC0' }}>Sign in</button>
                                 </div>
                                 <div className="text-center mt-5">
-                                    <div style={{marginBottom: '50px'}}>
-                                        <a href="#" className="text-white mr-3" style={{textDecoration: 'none'}}>Forgot
-                                            your password?</a>
+                                    <div style={{ marginBottom: '50px' }}>
+                                        <a href="#" className="text-white mr-3" style={{ textDecoration: 'none' }}>Forgot your password?</a>
                                     </div>
-                                    <div style={{marginBottom: '50px'}}>
+                                    <div style={{ marginBottom: '50px' }}>
                                         <span className="text-white mr-3">Don't Have An Account?</span>
-                                        <Link to="/signup"
-                                              className="btn btn-link text-uppercase font-weight-bold shadow-none"
-                                              style={{color: '#50BCC0', textDecoration: 'none', fontWeight: 'bold'}}>Sign
-                                            up</Link> {/* Link to the sign-up page */}
+                                        <Link to="/signup" className="btn btn-link text-uppercase font-weight-bold shadow-none" style={{ color: '#50BCC0', textDecoration: 'none', fontWeight: 'bold' }}>Sign up</Link> {/* Link to the sign-up page */}
                                     </div>
                                 </div>
                             </form>
@@ -130,3 +114,4 @@ const LoginForm = () => {
 };
 
 export default LoginForm;
+

@@ -1,4 +1,4 @@
-package main
+package networking
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"github.com/google/gopacket/pcap"
 )
 
-func networkAdapters() {
+func NetworkAdapters() {
 	// Get a list of available network interfaces
 	interfaces, err := pcap.FindAllDevs()
 	if err != nil {

@@ -1,0 +1,333 @@
+{
+  "chain": [
+    {
+      "index": 0,
+      "timestamp": "2024-03-26 22:06:33.6179849 -0400 EDT m=+681.178951901",
+      "data": "Genesis Block",
+      "prevhash": "",
+      "hash": "6340fa2b7d95c1c5b324222c18ea5fa00bff7ef644a656f846446dede2d1f8c4"
+    },
+    {
+      "index": 1,
+      "timestamp": "2024-03-26 22:06:33.6179849 -0400 EDT m=+681.178951901",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"true\"}",
+      "prevhash": "6340fa2b7d95c1c5b324222c18ea5fa00bff7ef644a656f846446dede2d1f8c4",
+      "hash": "20c78528e38b77b3b7ca3be199c69744095967d2c466b751e4333367fa65e523"
+    },
+    {
+      "index": 2,
+      "timestamp": "2024-03-26 22:06:35.4169561 -0400 EDT m=+682.977923101",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"false\"}",
+      "prevhash": "20c78528e38b77b3b7ca3be199c69744095967d2c466b751e4333367fa65e523",
+      "hash": "ce13755262094b2d37ec2dc0fd2f54d4706adaa280cf77e84f1842f3d7708f6f"
+    },
+    {
+      "index": 3,
+      "timestamp": "2024-03-26 22:06:38.9769468 -0400 EDT m=+686.537913801",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"true\"}",
+      "prevhash": "ce13755262094b2d37ec2dc0fd2f54d4706adaa280cf77e84f1842f3d7708f6f",
+      "hash": "901fe10e40e15cd5d7d081cd68ca9922a544efff96f524fef9b099fd8631a3c0"
+    },
+    {
+      "index": 4,
+      "timestamp": "2024-03-26 22:06:40.6069528 -0400 EDT m=+688.167919801",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"false\"}",
+      "prevhash": "901fe10e40e15cd5d7d081cd68ca9922a544efff96f524fef9b099fd8631a3c0",
+      "hash": "65d2dc1f96cad05b5292daa7b7853e1cebd697e4b3c15036072ccf61b3fe3aea"
+    },
+    {
+      "index": 5,
+      "timestamp": "2024-03-26 22:06:41.8316216 -0400 EDT m=+689.392588601",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"true\"}",
+      "prevhash": "65d2dc1f96cad05b5292daa7b7853e1cebd697e4b3c15036072ccf61b3fe3aea",
+      "hash": "d4f540b1cbfbdeeab918046095ee57c4faaf873e3f39a656f2914bffa9cd095e"
+    },
+    {
+      "index": 6,
+      "timestamp": "2024-03-26 22:06:42.9840601 -0400 EDT m=+690.545027101",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"false\"}",
+      "prevhash": "d4f540b1cbfbdeeab918046095ee57c4faaf873e3f39a656f2914bffa9cd095e",
+      "hash": "afea1219b27af8492c7a4a895cbe4807db7d41634094975804b13dd793276ab6"
+    },
+    {
+      "index": 7,
+      "timestamp": "2024-03-26 22:06:44.125115 -0400 EDT m=+691.686082001",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"true\"}",
+      "prevhash": "afea1219b27af8492c7a4a895cbe4807db7d41634094975804b13dd793276ab6",
+      "hash": "ab49b3a6547bd67638fb9b23fb8a6e12d3655aeb2c545416b1f7b044c448fc3c"
+    },
+    {
+      "index": 8,
+      "timestamp": "2024-03-26 22:06:45.132469 -0400 EDT m=+692.693436001",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"false\"}",
+      "prevhash": "ab49b3a6547bd67638fb9b23fb8a6e12d3655aeb2c545416b1f7b044c448fc3c",
+      "hash": "9e9f01af8be3640b87681a9c962c553b2dd781416323cb73803bde401801b4af"
+    },
+    {
+      "index": 9,
+      "timestamp": "2024-03-26 22:06:46.1073814 -0400 EDT m=+693.668348401",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"true\"}",
+      "prevhash": "9e9f01af8be3640b87681a9c962c553b2dd781416323cb73803bde401801b4af",
+      "hash": "7501ac6d1adbd58876ddf451ce5d7ab0e5c2fcda959e93d78e9fea2081c90900"
+    },
+    {
+      "index": 10,
+      "timestamp": "2024-03-26 22:06:53.9528352 -0400 EDT m=+701.513802201",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"false\"}",
+      "prevhash": "7501ac6d1adbd58876ddf451ce5d7ab0e5c2fcda959e93d78e9fea2081c90900",
+      "hash": "3397bb7936dcc5d988853d3eff1571fd9c0ed280f433980c07970b75f265484e"
+    },
+    {
+      "index": 11,
+      "timestamp": "2024-03-26 22:06:55.5081033 -0400 EDT m=+703.069070301",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"true\"}",
+      "prevhash": "3397bb7936dcc5d988853d3eff1571fd9c0ed280f433980c07970b75f265484e",
+      "hash": "cdfd50dddcb5459cc9d1e570b99e6c2e0f7992d0ddb12a6908cd70d8fd894420"
+    },
+    {
+      "index": 12,
+      "timestamp": "2024-03-26 22:06:57.4406738 -0400 EDT m=+705.001640801",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"false\"}",
+      "prevhash": "cdfd50dddcb5459cc9d1e570b99e6c2e0f7992d0ddb12a6908cd70d8fd894420",
+      "hash": "c7aa5c695ce960b1bdf21f388826b4bfc99c3cf20bf9c9a56dde9031cd7c2a8a"
+    },
+    {
+      "index": 13,
+      "timestamp": "2024-03-26 22:06:59.2805805 -0400 EDT m=+706.841547501",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"true\"}",
+      "prevhash": "c7aa5c695ce960b1bdf21f388826b4bfc99c3cf20bf9c9a56dde9031cd7c2a8a",
+      "hash": "9ac764a831fbc8cac6f6c2f4ade54cb9d938c53a8803601ab0db65eb3dbd9b2c"
+    },
+    {
+      "index": 14,
+      "timestamp": "2024-03-26 22:07:00.6869285 -0400 EDT m=+708.247895501",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"false\"}",
+      "prevhash": "9ac764a831fbc8cac6f6c2f4ade54cb9d938c53a8803601ab0db65eb3dbd9b2c",
+      "hash": "9471d29c80e4b054498a9ba80b47d3cc4d627cc0b6f7fe89c276ab239b87a681"
+    },
+    {
+      "index": 15,
+      "timestamp": "2024-03-26 22:07:02.6999361 -0400 EDT m=+710.260903101",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"true\"}",
+      "prevhash": "9471d29c80e4b054498a9ba80b47d3cc4d627cc0b6f7fe89c276ab239b87a681",
+      "hash": "718f71d53d60f83c654a8f075c0c25a218c320900d85600a50d801c0587a442d"
+    },
+    {
+      "index": 16,
+      "timestamp": "2024-03-26 22:07:36.0657705 -0400 EDT m=+743.626737501",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"false\"}",
+      "prevhash": "718f71d53d60f83c654a8f075c0c25a218c320900d85600a50d801c0587a442d",
+      "hash": "4a8882e0bcd09ec826637611c7f4ad016a3f929a0af91341bf7193f3ee06dc44"
+    },
+    {
+      "index": 17,
+      "timestamp": "2024-03-26 22:07:37.6069803 -0400 EDT m=+745.167947301",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"true\"}",
+      "prevhash": "4a8882e0bcd09ec826637611c7f4ad016a3f929a0af91341bf7193f3ee06dc44",
+      "hash": "457e38d46ed8801a4bd33d17f53f3268cc485a43b453257fdcfd693f574259cf"
+    },
+    {
+      "index": 18,
+      "timestamp": "2024-03-26 22:07:39.1243502 -0400 EDT m=+746.685317201",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"false\"}",
+      "prevhash": "457e38d46ed8801a4bd33d17f53f3268cc485a43b453257fdcfd693f574259cf",
+      "hash": "549cf7b654626d3203e0d0bacfcd99c864df44a1b1e6e80c7ba7211daf52de98"
+    },
+    {
+      "index": 19,
+      "timestamp": "2024-03-26 22:07:40.707013 -0400 EDT m=+748.267980001",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"true\"}",
+      "prevhash": "549cf7b654626d3203e0d0bacfcd99c864df44a1b1e6e80c7ba7211daf52de98",
+      "hash": "056e50911e55cbf85125366da68e9fa679b18187db51ed7149d1175cd689c047"
+    },
+    {
+      "index": 20,
+      "timestamp": "2024-03-26 22:09:16.5198726 -0400 EDT m=+844.080839601",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"false\"}",
+      "prevhash": "056e50911e55cbf85125366da68e9fa679b18187db51ed7149d1175cd689c047",
+      "hash": "c808a1588ded99312e3a48a5d99d83d1e0c485447fa269a249eaae42d7f33d5b"
+    },
+    {
+      "index": 21,
+      "timestamp": "2024-03-26 22:11:22.6407532 -0400 EDT m=+970.201720201",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"true\"}",
+      "prevhash": "c808a1588ded99312e3a48a5d99d83d1e0c485447fa269a249eaae42d7f33d5b",
+      "hash": "a166f51d9c06fc1e548a636629a22f2c1222c59d78053134db7f7ce196988faf"
+    },
+    {
+      "index": 22,
+      "timestamp": "2024-03-26 22:11:35.9549721 -0400 EDT m=+983.515939101",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"false\"}",
+      "prevhash": "a166f51d9c06fc1e548a636629a22f2c1222c59d78053134db7f7ce196988faf",
+      "hash": "a88b6fc79582ef5ead7e3b102b90bcea229f471b24c7f67daba085acdf84a5c1"
+    },
+    {
+      "index": 23,
+      "timestamp": "2024-03-26 22:12:08.2554804 -0400 EDT m=+1015.816447401",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"true\"}",
+      "prevhash": "a88b6fc79582ef5ead7e3b102b90bcea229f471b24c7f67daba085acdf84a5c1",
+      "hash": "6f154e0cffba171075a92ed8865ccebdb6b01afe81d7ea8d72b2baf0bec4fe93"
+    },
+    {
+      "index": 24,
+      "timestamp": "2024-03-26 22:12:11.4736313 -0400 EDT m=+1019.034598301",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"false\"}",
+      "prevhash": "6f154e0cffba171075a92ed8865ccebdb6b01afe81d7ea8d72b2baf0bec4fe93",
+      "hash": "0b17dcfa69daeaa86bab66b6fa434c1c1aa0fa1fa7b593e4176515fee88ebe11"
+    },
+    {
+      "index": 25,
+      "timestamp": "2024-03-26 22:13:46.6259822 -0400 EDT m=+1114.186949201",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"true\"}",
+      "prevhash": "0b17dcfa69daeaa86bab66b6fa434c1c1aa0fa1fa7b593e4176515fee88ebe11",
+      "hash": "35eec4fff7a5675e18dc826ae5809b749036cb9158b331eb06a5f767324d866f"
+    },
+    {
+      "index": 26,
+      "timestamp": "2024-03-26 22:15:04.2023468 -0400 EDT m=+1191.763313801",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"false\"}",
+      "prevhash": "35eec4fff7a5675e18dc826ae5809b749036cb9158b331eb06a5f767324d866f",
+      "hash": "1e748792ea17f22c8b6aac2afb3652012bbcd3948f051f40c2126fe1cb95b755"
+    },
+    {
+      "index": 27,
+      "timestamp": "2024-03-26 22:15:05.8012094 -0400 EDT m=+1193.362176401",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"true\"}",
+      "prevhash": "1e748792ea17f22c8b6aac2afb3652012bbcd3948f051f40c2126fe1cb95b755",
+      "hash": "56f545879b8ce97083d36d6c7c20b814b053e7397fb52182d5f448db7cc744eb"
+    },
+    {
+      "index": 28,
+      "timestamp": "2024-03-26 22:15:12.9816949 -0400 EDT m=+1200.542661901",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"false\"}",
+      "prevhash": "56f545879b8ce97083d36d6c7c20b814b053e7397fb52182d5f448db7cc744eb",
+      "hash": "0f169ba29321d74d9a9971bc166592a73613f3d1f999629d8afdd599d9a91fdd"
+    },
+    {
+      "index": 29,
+      "timestamp": "2024-03-26 22:15:16.1795122 -0400 EDT m=+1203.740479201",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"true\"}",
+      "prevhash": "0f169ba29321d74d9a9971bc166592a73613f3d1f999629d8afdd599d9a91fdd",
+      "hash": "ad1fb079f487dd4266a569c3795871c55386810112e78dbe532a3526773fbccd"
+    },
+    {
+      "index": 30,
+      "timestamp": "2024-03-26 22:15:20.3877888 -0400 EDT m=+1207.948755801",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"false\"}",
+      "prevhash": "ad1fb079f487dd4266a569c3795871c55386810112e78dbe532a3526773fbccd",
+      "hash": "6438070bff996e3f2b8e0a209f336aa9aacd5adaf5e4e2cb3288f13b0ab1f017"
+    },
+    {
+      "index": 31,
+      "timestamp": "2024-03-26 22:15:36.9095419 -0400 EDT m=+1224.470508901",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"true\"}",
+      "prevhash": "6438070bff996e3f2b8e0a209f336aa9aacd5adaf5e4e2cb3288f13b0ab1f017",
+      "hash": "4f944d5c0b30cc0817bd89d42e9fc66685d22b58131704b2edca7633641eb952"
+    },
+    {
+      "index": 32,
+      "timestamp": "2024-03-26 22:15:48.146121 -0400 EDT m=+1235.707088001",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"false\"}",
+      "prevhash": "4f944d5c0b30cc0817bd89d42e9fc66685d22b58131704b2edca7633641eb952",
+      "hash": "fe5537063a3b6c4a671452c1cf3c56428be728df6e0e791238118b3cac627b2a"
+    },
+    {
+      "index": 33,
+      "timestamp": "2024-03-26 22:15:50.0684151 -0400 EDT m=+1237.629382101",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"true\"}",
+      "prevhash": "fe5537063a3b6c4a671452c1cf3c56428be728df6e0e791238118b3cac627b2a",
+      "hash": "ac1d13897b496bd3fa98d2d491e96b8c021370e6789fc597c1a730d02ce239e9"
+    },
+    {
+      "index": 34,
+      "timestamp": "2024-03-26 22:17:47.2287429 -0400 EDT m=+1354.789709901",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"false\"}",
+      "prevhash": "ac1d13897b496bd3fa98d2d491e96b8c021370e6789fc597c1a730d02ce239e9",
+      "hash": "309653277304258648ed010ff25f2c870ba13e71d742593ad5215f5c7c7902f5"
+    },
+    {
+      "index": 35,
+      "timestamp": "2024-03-26 22:17:51.241425 -0400 EDT m=+1358.802392001",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"true\"}",
+      "prevhash": "309653277304258648ed010ff25f2c870ba13e71d742593ad5215f5c7c7902f5",
+      "hash": "64adc9f49ad5fdc0c1f5684ba85cb840e8a5fc6388fed9236be2adde40dda22a"
+    },
+    {
+      "index": 36,
+      "timestamp": "2024-03-26 22:19:06.4191258 -0400 EDT m=+1433.980092801",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"false\"}",
+      "prevhash": "64adc9f49ad5fdc0c1f5684ba85cb840e8a5fc6388fed9236be2adde40dda22a",
+      "hash": "8d13a99a6179eb34ad399cfc154d6ee0558ed0024206e1e454fb7d91703494e3"
+    },
+    {
+      "index": 37,
+      "timestamp": "2024-03-26 22:19:08.91 -0400 EDT m=+1436.470967001",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"true\"}",
+      "prevhash": "8d13a99a6179eb34ad399cfc154d6ee0558ed0024206e1e454fb7d91703494e3",
+      "hash": "6c9f9e41092add7583c190e481aa13581d4f7c957724a93c5ea38d19fb49a412"
+    },
+    {
+      "index": 38,
+      "timestamp": "2024-03-26 22:19:16.9302595 -0400 EDT m=+1444.491226501",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"false\"}",
+      "prevhash": "6c9f9e41092add7583c190e481aa13581d4f7c957724a93c5ea38d19fb49a412",
+      "hash": "d0fea1f91548e876110ec9806468a654e275ae17b3b5a4597def6292fb0f3d3e"
+    },
+    {
+      "index": 39,
+      "timestamp": "2024-03-26 22:19:18.6991974 -0400 EDT m=+1446.260164401",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"true\"}",
+      "prevhash": "d0fea1f91548e876110ec9806468a654e275ae17b3b5a4597def6292fb0f3d3e",
+      "hash": "d9a4428d0b3f22b0f4e7fd515226e246973853844135d9c6664e8b9d60ef6fce"
+    },
+    {
+      "index": 40,
+      "timestamp": "2024-03-26 22:19:33.2615795 -0400 EDT m=+1460.822546501",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"false\"}",
+      "prevhash": "d9a4428d0b3f22b0f4e7fd515226e246973853844135d9c6664e8b9d60ef6fce",
+      "hash": "93684bfe4a17f04090a43426dc34e633cf672296ab6393e502b02bf2242bb79e"
+    },
+    {
+      "index": 41,
+      "timestamp": "2024-03-26 22:20:40.5878251 -0400 EDT m=+1528.148792101",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"true\"}",
+      "prevhash": "93684bfe4a17f04090a43426dc34e633cf672296ab6393e502b02bf2242bb79e",
+      "hash": "33be100ba7772212e5b1b1aea044a8f06de0b1048f21eeb3ce86ec5c6beb1c69"
+    },
+    {
+      "index": 42,
+      "timestamp": "2024-03-26 22:20:42.4000161 -0400 EDT m=+1529.960983101",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"false\"}",
+      "prevhash": "33be100ba7772212e5b1b1aea044a8f06de0b1048f21eeb3ce86ec5c6beb1c69",
+      "hash": "a27027774996efab149176e4b33c69558b768c527c8d6fe2c0335f63cd13ed95"
+    },
+    {
+      "index": 43,
+      "timestamp": "2024-03-26 22:20:46.0828421 -0400 EDT m=+1533.643809101",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"true\"}",
+      "prevhash": "a27027774996efab149176e4b33c69558b768c527c8d6fe2c0335f63cd13ed95",
+      "hash": "b205a2cb9869eab5cfbc4c9d9ce1302ef5c86356dc4a7733970eaa4cb8a7dac2"
+    },
+    {
+      "index": 44,
+      "timestamp": "2024-03-26 22:20:51.3264998 -0400 EDT m=+1538.887466801",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"false\"}",
+      "prevhash": "b205a2cb9869eab5cfbc4c9d9ce1302ef5c86356dc4a7733970eaa4cb8a7dac2",
+      "hash": "eacdf12e73cc5e74ac20f9c3d457f85e787bb94bc255b6f01c3e7447ac44d57c"
+    },
+    {
+      "index": 45,
+      "timestamp": "2024-03-26 22:20:52.7898837 -0400 EDT m=+1540.350850701",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"true\"}",
+      "prevhash": "eacdf12e73cc5e74ac20f9c3d457f85e787bb94bc255b6f01c3e7447ac44d57c",
+      "hash": "233c24e34f71b2bd824304a47c388e4c002c34077f2bf4eb89194d72a4b5f6d8"
+    },
+    {
+      "index": 46,
+      "timestamp": "2024-03-26 22:20:54.8331565 -0400 EDT m=+1542.394123501",
+      "data": "{\"UUID\":\"417293\",\"Name\":\"Lighting\",\"AppType\":\"Lighting\",\"Function\":\"Status\",\"Change\":\"false\"}",
+      "prevhash": "233c24e34f71b2bd824304a47c388e4c002c34077f2bf4eb89194d72a4b5f6d8",
+      "hash": "93e2083c07376745828f8814007fa5c21c8c78c5e9560af0af4067df43917faf"
+    }
+  ]
+}

@@ -151,7 +151,7 @@ const Lighting= () => {
   <button onClick={toggleAccountPopup} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>
     <img src={accountIcon} alt="account" style={{ marginRight: '10px' }} id = "menuIcon2"/>
   </button>
-  <AccountPopup isVisible={isAccountPopupVisible} onClose={() => setIsAccountPopupVisible(false)} />
+            {/* <AccountPopup isVisible={isAccountPopupVisible} onClose={() => setIsAccountPopupVisible(false)} /> */}
 </div>
 </div>
         </div>

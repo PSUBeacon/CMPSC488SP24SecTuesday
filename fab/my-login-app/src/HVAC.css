@@ -9,4 +9,35 @@
     margin: 0; /* Removes default margin */
     padding: 0; /* Removes default padding */
   }
+  .hvac-data-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .data-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background-color: #1A3851;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+  }
+  
+  .data-icon {
+    margin-right: 1rem;
+    font-size: 24px;
+    color: #50BCC0;
+  }
+  
+  .data-info {
+    color: #FFFFFF;
+  }
+  
+  .data-info p:first-child {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
   

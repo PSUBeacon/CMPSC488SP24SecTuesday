@@ -1,15 +1,13 @@
-package messaging
+package main
 
 import (
 	"CMPSC488SP24SecTuesday/blockchain"
 	"CMPSC488SP24SecTuesday/crypto"
-	"bufio"
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/json"
 	"fmt"
 	"github.com/joho/godotenv"
-	"go.bug.st/serial"
 	"log"
 	"os"
 )
@@ -55,45 +53,12 @@ func BlockReceiver() {
 	// Open the XBee module for communication
 	var chain blockchain.Blockchain
 	var block blockchain.Block
-	mode := &serial.Mode{
-		BaudRate: 9600,
-	}
-	port, err := serial.Open("/dev/ttyUSB0", mode)
-	if err != nil {
-		log.Fatal("Error opening XBee module:", err)
-	}
-	defer func(port serial.Port) {
-		err := port.Close()
-		if err != nil {
-
-		}
-	}(port) // Ensure the port is closed when the function returns
-
-	// Wrap the port in a bufio.Reader
-	const bufferSize = 4096 // Adjust this value as needed
-	reader := bufio.NewReaderSize(port, bufferSize)
 
 	fmt.Println("Waiting for incoming messages...")
 	// Use ReadBytes or ReadString to dynamically handle incoming data
-	for {
-		// Read and parse the data manually
-		var message []byte
-		for {
-			b, err := reader.ReadByte()
-			if err != nil {
-				log.Fatal("Error reading byte:", err)
-			}
-			// Check for the UTF-8 encoding of '♄' the hex value is (E2 99 B4)
-			if len(message) >= 2 && message[len(message)-2] == 0xE2 && message[len(message)-1] == 0x99 && b == 0xB4 {
-				//fmt.Println(message)
-				message = message[:len(message)-2] // Remove the delimiter from the message
-				break
-			}
-			message = append(message, b)
-		}
 
 		//loads file and pulls the key from there
-		err = godotenv.Load()
+		err := godotenv.Load()
 		AesKey := os.Getenv("AES_KEY")
 
 		//Decrypt the message.
@@ -191,18 +156,17 @@ func verifyBlockchain(currentblock blockchain.Block) bool {
 
 	if readBlockchain.Chain[len(readBlockchain.Chain)-1].Hash == currentblock.PrevHash {
 		// Verify the rest of the hashes
-		//for i := 1; i < len(readBlockchain.Chain); i++ {
-		//currBlock := readBlockchain.Chain[i]
-		//prevBlock := readBlockchain.Chain[i-1]
+		for i := 1; i < len(readBlockchain.Chain); i++ {
+			currBlock := readBlockchain.Chain[i]
+			prevBlock := readBlockchain.Chain[i-1]
 
-		//if currBlock.PrevHash != prevBlock.Hash { //invalid hash
-
-		//checks just the previous block
-		fmt.Println("block and chain is valid")
-		return true
+			if currBlock.PrevHash != prevBlock.Hash { //invalid hash
+				return false
+			}
+		}
 	}
-	//}
-	return false
+	fmt.Println("block and chain is valid")
+	return true
 }
 
 //

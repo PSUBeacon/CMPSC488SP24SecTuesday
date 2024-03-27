@@ -200,7 +200,7 @@ const Appliances = () => {
     
 <main style={{ flex: '1', padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: '#0E2237'}}>
 <h2 style={{ color: 'white' }}>Appliances</h2>
-      <Table striped bordered hover variant="dark" style={{ marginTop: '20px', backgroundColor: "#173350" }}>
+<Table striped bordered hover variant="dark" style={{ marginTop: '20px', backgroundColor: "#173350" }}>
         <thead>
           <tr>
             <th>Device</th>

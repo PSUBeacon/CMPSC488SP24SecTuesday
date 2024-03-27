@@ -17,6 +17,20 @@ import './Security.css'; // Import your CSS file here
 
 const Security = () => {
 
+   // States for date and time
+   const [currentDate, setCurrentDate] = useState(new Date().toLocaleDateString());
+   const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
+ 
+   useEffect(() => {
+       const timer = setInterval(() => {
+           setCurrentDate(new Date().toLocaleDateString());
+           setCurrentTime(new Date().toLocaleTimeString());
+       }, 1000);
+ 
+       // Cleanup on component unmount
+       return () => clearInterval(timer);
+   }, []);
+
   const navigate = useNavigate(); // Instantiate useNavigate hook
   const [isNavVisible, setIsNavVisible] = useState(false);
     const [dashboardMessage, setDashboardMessage] = useState('');
@@ -134,10 +148,10 @@ const Security = () => {
             <span id = 'menuText2'>Beacon</span>
           </div>
           <div>
-            <span id='menuText'>March 05, 2024</span>
+          <span id='menuText'>{currentDate}</span>
           </div>
           <div>
-            <span id='menuText'>11:48 AM</span>
+            <span id='menuText'>{currentTime}</span>
           </div>
           <div>
           <div style={{ position: 'relative' }}>

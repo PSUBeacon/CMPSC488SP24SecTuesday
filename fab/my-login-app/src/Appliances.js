@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom for navigation
 import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure Bootstrap CSS is imported to use its grid system and components
@@ -23,6 +23,20 @@ import {
 import 'bootstrap/dist/css/bootstrap.min.css';
 // Define the Dashboard component using a functional component pattern
 const Appliances = () => {
+
+   // States for date and time
+   const [currentDate, setCurrentDate] = useState(new Date().toLocaleDateString());
+   const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
+ 
+   useEffect(() => {
+       const timer = setInterval(() => {
+           setCurrentDate(new Date().toLocaleDateString());
+           setCurrentTime(new Date().toLocaleTimeString());
+       }, 1000);
+ 
+       // Cleanup on component unmount
+       return () => clearInterval(timer);
+   }, []);
 
   const appliances = [
     { icon: faMicrophone, name: 'Microwave', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00' },
@@ -123,10 +137,10 @@ const Appliances = () => {
             <span id = 'menuText2'>Beacon</span>
           </div>
           <div>
-            <span id='menuText'>March 05, 2024</span>
+          <span id='menuText'>{currentDate}</span>
           </div>
           <div>
-            <span id='menuText'>11:48 AM</span>
+            <span id='menuText'>{currentTime}</span>
           </div>
           <div>
           <div style={{ position: 'relative' }}>

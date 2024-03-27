@@ -9,6 +9,8 @@ import { Table } from 'react-bootstrap';
 
 const SettingsPage = () => {
 
+  
+
   const [selectedNav, setSelectedNav] = useState(); // State variable for selected navigation item
 
 

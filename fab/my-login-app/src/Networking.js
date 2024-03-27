@@ -16,7 +16,19 @@ import { Table } from 'react-bootstrap';
 // Define the Dashboard component using a functional component pattern
 const Networking = () => {
 
+ // States for date and time
+ const [currentDate, setCurrentDate] = useState(new Date().toLocaleDateString());
+ const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
 
+ useEffect(() => {
+     const timer = setInterval(() => {
+         setCurrentDate(new Date().toLocaleDateString());
+         setCurrentTime(new Date().toLocaleTimeString());
+     }, 1000);
+
+     // Cleanup on component unmount
+     return () => clearInterval(timer);
+ }, []);
 
   const navigate = useNavigate(); // Instantiate useNavigate hook
   const [isNavVisible, setIsNavVisible] = useState(false);
@@ -206,10 +218,10 @@ const networkLogsTable = (
           <div style={{ display: 'flex', alignItems: 'center' }}>
           <img src={menuIcon} alt="Menu" onClick={toggleNav} className="hamburger-menu"/>
             <img src={logoImage} alt="Logo" style={{ marginRight: '10px'}} id='circle'/> {/* Adjust the height as needed */}
-            <span id = 'menuText2'>Beacon</span>
+            <span id='menuText'>{currentDate}</span>
           </div>
           <div>
-            <span id='menuText'>March 05, 2024</span>
+            <span id='menuText'>{currentTime}</span>
           </div>
           <div>
             <span id='menuText'>11:48 AM</span>

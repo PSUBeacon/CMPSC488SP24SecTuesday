@@ -9,6 +9,7 @@ import HVAC from './HVAC'; // Import HVAC component
 import Appliances from './Appliances'; // Import Appliances component
 import Energy from './Energy'; // Import Energy component
 import Settings from './Settings'; // Import your settings page component
+import Networking from './Networking'; //Import your networking page component
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './login.css';
 
@@ -23,7 +24,7 @@ function App() {
         <Route path="/settings" element={<Settings />} />
         <Route path="/security" element={<Security />} />
         <Route path="/lighting" element={<Lighting />} />
-        <Route path="/preferences" element={<Preferences />} />
+        <Route path="/networking" element={<Networking />} />
         <Route path="/hvac" element={<HVAC />} />
         <Route path="/appliances" element={<Appliances />} />
         <Route path="/energy" element={<Energy />} />

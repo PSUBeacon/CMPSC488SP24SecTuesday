@@ -33,6 +33,13 @@ const Energy = () => {
     { Device: 'Dishwasher', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF' },
     
   ];
+
+  {/*solar panel statistics table*/}
+  const solarPanel = [
+    { TotalEnergy: 'KW', EnergyUsedToday: 'KW' },
+    { TotalEnergy: 'KW', EnergyUsedToday: 'KW'},
+    
+  ];
   
   const navigate = useNavigate(); // Instantiate useNavigate hook
   const [isNavVisible, setIsNavVisible] = useState(false);
@@ -171,9 +178,9 @@ const Energy = () => {
                 </Link>
               </li>
               <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
-                <Link to="/preferences" style={{ color: 'white', textDecoration: 'none' }}>
+                <Link to="/networking" style={{ color: 'white', textDecoration: 'none' }}>
                   <i className="fas fa-sliders-h" style={{ marginRight: '10px' }}></i>
-                  Preferences
+                  Networking
                 </Link>
               </li>
               <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
@@ -198,7 +205,7 @@ const Energy = () => {
           </nav>
         </aside>
 
-    
+
 <main style={{ flex: '1', padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: '#0E2237'}}>
 <h2 style={{ color: 'white' }}>Devices Using Energy</h2>
       <Table striped bordered hover variant="dark" style={{ marginTop: '20px', backgroundColor: "#173350" }}>
@@ -220,6 +227,26 @@ const Energy = () => {
               <td>{energy.NetgainEnergy}</td>
               <td>{energy.Battery}</td>
               <td>{energy.Status}</td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+
+      {/*this is the table for the solar panel content*/}
+      <h2 style={{ color: 'white' }}>Solar Panel Statistics</h2>
+      <Table striped bordered hover variant="dark" style={{ marginTop: '20px', backgroundColor: "#173350" }}>
+        <thead>
+          <tr>
+            <th>Total Energy</th>
+            <th>Energy Used Today</th>
+          </tr>
+        </thead>
+        <tbody>
+          {solarPanel.map((solarPanel, index) => (
+            <tr key={index}>
+              
+              <td>{solarPanel.TotalEnergy}</td>
+              <td>{solarPanel.EnergyUsedToday}</td>
             </tr>
           ))}
         </tbody>

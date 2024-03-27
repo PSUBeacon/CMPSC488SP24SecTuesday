@@ -205,22 +205,108 @@ border-left: 3px solid #0294A5; /* Visible border on hover */
 .centered-title {
   text-align: center;
 }
+.roomSelection {
+  /* ... existing styles */
+  float: left; /* Float left to align it to the left side */
+}
+
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* This ensures the form stays at the top */
+  padding-left: '1rem';
+}
+main {
+  flex-wrap: nowrap; /* This prevents wrapping of flex items*/
+}
+/* Style your form elements here */
+form label {
+  display: block; /* Make labels block-level for better structure */
+  margin-bottom: 0.5rem;
+}
+
+form input[type='text'] {
+  margin-bottom: 1rem; /* Space out the inputs */
+  width: 100%; /* Full width inputs */
+}
+
+/* Style for list of lights */
+ul {
+  list-style: none; /* Remove bullet points */
+  padding: 0; /* Remove padding */
+}
+
+ul li {
+  margin-bottom: 0.5rem; /* Space out list items */
+}
 
 
 
-@media (max-width: 600px) {
-  .card {
+@media (max-width: 720px) {
+  .roomSelection,
+  .formContainer {
+    float: none;
+    width: 100%;
     flex-basis: 70%; /* Forces stacking */
   }
   html {
     max-width: 100%;
   }
 }
+@media (min-width: 721px) and (max-width: 901px) {
+  .roomSelection, .dimmerControl {
+    width: 100%; /* Full width for both elements to prevent overlapping */
+    box-sizing: border-box; /* Make sure padding is included in the width */
+    padding: 0 15px; /* Add some padding on the sides */
+    margin-bottom: 20px; /* Add space between the elements */
+  }
+
+  .lightsControl {
+    display: block; /* Stack the children vertically */
+  }
+
+  .RoomCards {
+    justify-content: center; /* Center room cards for this viewport */
+    margin-bottom: 20px; /* Space between room cards and dimmer control */
+  }
+
+  .RoomCards .card {
+    width: calc(33.333% - 10px); /* Adjust room cards width to fit 3 in a row */
+    margin: 5px; /* Add a small margin around the cards */
+  }
+
+  .formContainer {
+    clear: both; /* Clear floated elements */
+    width: auto; /* Allow the container to grow with the content */
+  }
+
+  .formContainer input[type='text'], .formContainer button, .toggleButton {
+    width: 100%; /* Full width for inputs and buttons to avoid overflow */
+  }
+
+  /* Adjust the position of the dimmer and toggle button for better alignment */
+  .dimmerControl {
+    float: none; /* Don't float, stack instead */
+    margin-right: 0; /* Reset right margin */
+  }
+
+  .toggleButton {
+    display: inline-block; /* Keep the button inline */
+    width: auto; /* Allow button to shrink */
+    margin-top: 10px; /* Space above the button */
+  }
+}
 
 
 /* Style for dimmer control, adding more space at the top */
 .dimmerControl {
-  margin-top: 20px; /* Add more margin at the top to move the dimmer down */
+  margin-top: 20px; /* Add more margin at the top */
+  margin-left: 20px;
+  /* Add the following to position the dimmer to the right */
+  position: absolute; /* Position it absolutely relative to its parent */
+  right: 0; /* Align to the right */
+  top: 50%; /* Adjust the top to center it vertically */
+  transform: translateY(-50%); /* Center it vertically */
 }
 
 /* Styles for the slider track. there are so many different styles because it appears differently on different web browser */
@@ -278,4 +364,18 @@ input[type='range']::-ms-track {
   color: transparent; /* Transparent slider thumb */
 }
 
-
+/* Styles for the on/off toggle button */
+.toggleButton {
+  padding: 10px 20px; /* Add some padding */
+  margin-top: 10px; /* Space from the dimmer switch */
+  color: white; /* Text color */
+  background-color: #0294A5; /* Green background for 'on' state */
+  border: none; /* Remove border */
+  border-radius: 5px; /* Slight rounding of corners */
+  cursor: pointer; /* Change cursor to pointer */
+  display: block; /* Make the button a block to fill container */
+  width: calc(100% - 40px); /* Full container width minus some padding */
+  margin-left: auto; /* Center the button */
+  margin-right: auto; /* Center the button */
+  transition: background-color 0.3s; /* Smooth background transition */
+}

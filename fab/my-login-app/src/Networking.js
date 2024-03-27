@@ -5,17 +5,18 @@ import { Link } from 'react-router-dom'; // Import Link from react-router-dom fo
 import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure Bootstrap CSS is imported to use its grid system and components
 import logoImage from './logo.webp'; 
 import houseImage from './houseImage.jpg';
-import settingsIcon from './settings.png';
-import accountIcon from './account.png';
-import menuIcon from './menu.png';
-import bedroomIcon from './bedroomIcon.jpg';
-import livingroomIcon from './livingroomIcon.jpg';
-import doorLockIcon from './doorLockIcon.png';
-import './Security.css'; // Import your CSS file here
+import notificationIcon from './notification.png'
+import settingsIcon from './settings.png'
+import accountIcon from './account.png'
+import menuIcon from './menu.png'
+import placeholderImage from './placeholderImage.jpg'; // Replace with the path to your placeholder image
+import placeholderImage2 from './placeholderImage2.jpg'; // Replace with the path to your placeholder image
+import { Table } from 'react-bootstrap';
+
+// Define the Dashboard component using a functional component pattern
+const Networking = () => {
 
 
-
-const Security = () => {
 
   const navigate = useNavigate(); // Instantiate useNavigate hook
   const [isNavVisible, setIsNavVisible] = useState(false);
@@ -34,17 +35,77 @@ const Security = () => {
         Toaster: {},
     });
 
-    const [dimmerValue, setDimmerValue] = useState(75); // State to keep track of dimmer value
-    const [isLocked, setIsLocked] = useState(false); //need this for the toggle and also the two lines below
-    const toggleLock = () => {
-      setIsLocked(!isLocked);
-    };
-    const [selectedRoom, setSelectedRoom] = useState(null);
-    // Add a function to handle selecting a room:
-    const selectRoom = (roomName) => {
-      setSelectedRoom(roomName);
-    };
-    
+  const [currentView, setCurrentView] = useState('iotLogs'); // New state to track current view
+  
+  // Define your IoT Logs data similar to how you have solarPanel data
+const iotLogs = [
+  { Device: 'Thermostat', LastActivity: '10:00 AM', Status: 'Active', DataUsage: '500MB' },
+  { Device: 'Smart Lock', LastActivity: '9:45 AM', Status: 'Inactive', DataUsage: '100MB' },
+  // Add more IoT device log entries as needed
+];
+// Function to change view
+const changeView = (view) => {
+  setCurrentView(view);
+};
+const iotLogsTable = (
+  <div>
+    <h2 style={{ color: '#173350' }}>IOT Logs</h2>
+    <Table striped bordered hover variant="dark" style={{ marginTop: '20px', backgroundColor: "#173350" }}>
+      <thead>
+        <tr>
+          <th>Device</th>
+          <th>Last Activity</th>
+          <th>Status</th>
+          <th>Data Usage</th>
+        </tr>
+      </thead>
+      <tbody>
+        {iotLogs.map((log, index) => (
+          <tr key={index}>
+            <td>{log.Device}</td>
+            <td>{log.LastActivity}</td>
+            <td>{log.Status}</td>
+            <td>{log.DataUsage}</td>
+          </tr>
+        ))}
+      </tbody>
+    </Table>
+  </div>
+);
+
+// Define your Network Logs data
+const networkLogs = [
+  { IPAddress: '192.168.1.10', AccessTime: '10:15 AM', DataTransferred: '250MB', Status: 'Success' },
+  { IPAddress: '192.168.1.12', AccessTime: '11:00 AM', DataTransferred: '300MB', Status: 'Failed' },
+  // Add more network log entries as needed
+];
+
+const networkLogsTable = (
+  <div>
+    <h2 style={{ color: '#173350' }}>Network Logs</h2>
+    <Table striped bordered hover variant="dark" style={{ marginTop: '20px', backgroundColor: "#173350" }}>
+      <thead>
+        <tr>
+          <th>IP Address</th>
+          <th>Access Time</th>
+          <th>Data Transferred</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {networkLogs.map((log, index) => (
+          <tr key={index}>
+            <td>{log.IPAddress}</td>
+            <td>{log.AccessTime}</td>
+            <td>{log.DataTransferred}</td>
+            <td>{log.Status}</td>
+          </tr>
+        ))}
+      </tbody>
+    </Table>
+  </div>
+);
+
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -91,6 +152,15 @@ const Security = () => {
     setIsAccountPopupVisible(false); // Close the popup
     navigate('/'); // Use navigate to redirect
   };
+  
+  const [cameraView, setCameraView] = useState('livingroom'); // Default camera view
+  
+  // Object that holds the URLs for your camera feeds
+  const cameraFeeds = {
+    livingroom: placeholderImage, // Replace with the actual camera feed URL or image for the living room
+    kitchen: placeholderImage2, // Replace with the actual camera feed URL or image for the kitchen
+    // Add more camera feeds as needed
+  };
 
   const [isAccountPopupVisible, setIsAccountPopupVisible] = useState(false);
 
@@ -99,6 +169,11 @@ const Security = () => {
   };
 
 
+  
+
+
+
+  
   const AccountPopup = ({ isVisible, onClose }) => {
     if (!isVisible) return null;
   
@@ -120,11 +195,13 @@ const Security = () => {
       </div>
     );
   };
+  
 
 
-   // This is the JSX return statement where we layout our component's HTML structure
-   return (
-    <div style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column', backgroundColor: '#081624', width: '100%' }}>
+
+  // This is the JSX return statement where we layout our component's HTML structure
+  return (
+    <div style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column', backgroundColor: '#081624' }}>
       {/* Top Navbar */}
       <nav className="topNav" style={{ backgroundColor: '#081624', color: 'white', padding: '0.5rem 1rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -162,14 +239,14 @@ const Security = () => {
           <nav>
             <ul style={{ listStyle: 'none', padding: 0 }}>
               {/* Apply active style to 'Overview' since it's the current page */}
-              <li className="nav-item"style={{margin: '0.5rem 0', padding: '0.5rem'}}>
+              <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
                 <Link to="/dashboard" style={{ color: 'white', textDecoration: 'none' }}>
                   <i className="fas fa-home" style={{ marginRight: '10px' }}></i>
                   Overview
                 </Link>
               </li>
-              <li className="nav-item"style={{ backgroundColor: '#08192B', margin: '0.5rem 0', padding: '0.5rem', borderLeft: '3px solid #0294A5' }}>
-                <Link to="/security" style={{ color: '#50BCC0', textDecoration: 'none' }}>
+              <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
+                <Link to="/security" style={{ color: 'white', textDecoration: 'none' }}>
                   <i className="fas fa-lock" style={{ marginRight: '10px' }}></i>
                   Security
                 </Link>
@@ -180,8 +257,8 @@ const Security = () => {
                   Lighting
                 </Link>
               </li>
-              <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
-                <Link to="/networking" style={{ color: 'white', textDecoration: 'none' }}>
+              <li className="nav-item"style={{ backgroundColor: '#08192B', margin: '0.5rem 0', padding: '0.5rem', borderLeft: '3px solid #0294A5' }}>
+                <Link to="/networking" style={{ color: '#50BCC0', textDecoration: 'none'}}>
                   <i className="fas fa-sliders-h" style={{ marginRight: '10px' }}></i>
                   Networking
                 </Link>
@@ -209,57 +286,37 @@ const Security = () => {
         </aside>
 
     
-<main style={{ flex: '1', padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: '#0E2237', width: '100%'}}>
+<main style={{ flex: '1', padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: '#0E2237'}}>
   
-  {/* Content Block */}
-  
-  <div className="contentBlock" style={{ display: 'flex', justifyContent: 'space-around', width: '100%', flexWrap: 'wrap' }}>
-            {/* Lights Control Section */}
-            <div className="lightsControl" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', gap: '20px', width: '100%', flexWrap: 'wrap' }}>
-              {/* Room Selection */}
-              <div className="roomSelection" style={{ flexBasis: '48%' }}>
-                <h3 className="centered-title">Selecting a Door</h3>
-                <div className="roomCards" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', padding: '0px' }}>
-                  {/* Room cards */}
-                  <div className={selectedRoom === "Room 1" ? "card selected" : "card"} onClick={() => selectRoom("Room 1")} style={{ width: '40%', marginBottom: '20px' }}>
-                    <img className="image" src={bedroomIcon} alt="Room 1" />
-                  </div>
-                  <div className={selectedRoom === "Room 2" ? "card selected" : "card"} onClick={() => selectRoom("Room 2")} style={{ width: '40%', marginBottom: '20px' }}>
-                    <img className="image" src={bedroomIcon} alt="Room 2" />
-                  </div>
-                  
-                </div>
-              </div>
-
-
-                {/* Light Selection */}
-                <div className="lightSelection" style={{ flexBasis: '48%'}}>
-                <h3 className="centered-title">Your Lock</h3>
-
-                <div className="lightCards" style={{display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', padding:'0px' }}>
-                  {/* Lock card */}
-                  <div className="card" style={{ width: '100%', maxWidth: '300px', textAlign: 'center', padding: '20px' }}>
-                    <img className="lockImage" src={doorLockIcon} alt="Lock Icon" />
-                    {/*toggle function*/}
-                    <label className="switch"> 
-                      <input type="checkbox" checked={isLocked} onChange={toggleLock} />
-                      <span className="slider round"></span>
-                    </label>
-                  </div>
-                </div>
-      
-
-                
-              </div>
-
+  {/* Widgets Container */}
+  <div style={{ width: '100%', maxWidth: '1700px' }}>
+    {/* Widgets Row */}
+    <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: '20px', marginBottom: '20px' }}>
+        {/* Camera Widget */}
+        <div className="camera-widget" style={{ position: 'relative', maxWidth: '60%', backgroundColor: '#173350', borderRadius: '10px', overflow: 'hidden', flexBasis: '100%', padding: '12px' }}>
+          {/* Conditionally render the table based on the current view */}
+          {currentView === 'iotLogs' && iotLogsTable}
+          {currentView === 'networkLogs' && networkLogsTable}
+          
+          
               
-            </div>
+          {/* Camera View Buttons */}
+          <div style={{ position: 'absolute', top: '10px', left: '10px', display: 'flex', gap: '5px'}}>
+          <button onClick={() => changeView('iotLogs')} style={{ padding: '5px', color:'white',backgroundColor: currentView === 'iotLogs' ? '#0294A5' : '#08192B' }}>IOT Logs</button>
+          <button onClick={() => changeView('networkLogs')} style={{ padding: '5px', color:'white', backgroundColor: currentView === 'networkLogs' ? '#0294A5' : '#08192B' }}>Network Logs</button>
+            {/* Add more buttons for additional camera views */}
           </div>
-        </main>
+      </div>
+      
+      
+      
+      
+    </div>
+  </div>
+</main>
+
       </div>
     </div>
   );
 };
-
-export default Security;
-
+export default Networking;

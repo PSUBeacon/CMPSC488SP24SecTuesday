@@ -14,21 +14,121 @@ import lightbulbIcon from './lightbulbIcon.png'
 import placeholderImage from './placeholderImage.jpg'; // Replace with the path to your placeholder image
 import placeholderImage2 from './placeholderImage2.jpg'; // Replace with the path to your placeholder image
 import './Lighting.css';
-import axios from "axios";
 
-const Lighting = () => {
-  const [isLightOn, setIsLightOn] = useState(false);
+// Define the Dashboard component using a functional component pattern
+const Lighting= () => {
 
-  const handleTurnOn = () => {
-    setIsLightOn(true);
-    // Add logic to turn the light on
+
+
+  const navigate = useNavigate(); // Instantiate useNavigate hook
+  const [selectedLight, setSelectedLight] = useState(null);
+
+  // Function to handle card click
+  const handleSelectLight = (lightId) => {
+    setSelectedLight(lightId); // Update the selected light state
+  };
+  
+  const [isNavVisible, setIsNavVisible] = useState(false);
+    const [dashboardMessage, setDashboardMessage] = useState('');
+    const [accountType ,setAccountType] = useState('')
+    // States for each device
+    const [deviceData, setDeviceData] = useState({
+        HVAC: {},
+        Dishwasher: {},
+        Fridge: {},
+        Lighting: {},
+        Microwave: {},
+        Oven: {},
+        SecuritySystem: {},
+        SolarPanel: {},
+        Toaster: {},
+    });
+    const [dimmerValue, setDimmerValue] = useState(75); // State to keep track of dimmer value    const [roomName, setRoomName] = useState('');
+    const [selectedRoom, setSelectedRoom] = useState(null); 
+    // State for light on/off toggle
+    const [isLightOn, setIsLightOn] = useState(false);
+    // Function to toggle light on/off
+    const toggleLight = () => {
+      setIsLightOn(!isLightOn);
+    };
+
+  const toggleNav = () => {
+    setIsNavVisible(!isNavVisible);
   };
 
-  const handleTurnOff = () => {
-    setIsLightOn(false);
-    // Add logic to turn the light off
+  const goToSettings = () => {
+    navigate('/settings');
   };
 
+  const signOut = () => {
+    // Add your sign-out logic here
+    setIsAccountPopupVisible(false); // Close the popup
+    navigate('/'); // Use navigate to redirect
+  };
+  
+ 
+
+  const [isAccountPopupVisible, setIsAccountPopupVisible] = useState(false);
+
+  const toggleAccountPopup = () => {
+    setIsAccountPopupVisible(!isAccountPopupVisible);
+  };
+  
+  
+
+    
+    
+        
+      
+  
+
+
+
+  
+  const AccountPopup = ({ isVisible, onClose }) => {
+    if (!isVisible) return null;
+  
+    return (
+      <div className = "accountPop"style={{
+        position: 'absolute',
+        top: '100%', // Position it right below the button
+        right: '0', // Align it with the right edge of the container
+        backgroundColor: '#08192B',
+        padding: '20px',
+        zIndex: 100,
+        color: 'white',
+        borderRadius: '2px',
+        // Add box-shadow or borders as needed for better visibility
+      }}>
+        <p>John Doe</p> {/* Replace with actual user name */}
+          {accountType && <p>{accountType}</p>} {/* Dynamically display user role */}
+        <button onClick={signOut} className="signout">Sign Out</button>
+      </div>
+    );
+  };
+  
+  // Add new states for the room and light names
+  const [roomName, setRoomName] = useState('');
+  const [lightName, setLightName] = useState('');
+  const [lights, setLights] = useState([]);
+
+  // Function to handle form submission
+  const handleFormSubmit = (e) => {
+    e.preventDefault(); // Prevent page refresh
+    const newLight = { roomName, lightName };
+    setLights([...lights, newLight]); // Add new light to the list
+  };
+
+  // Function to remove a light
+  const handleRemoveLight = (index) => {
+    const newLights = [...lights];
+    newLights.splice(index, 1);
+    setLights(newLights);
+  };
+
+
+
+  // This is the JSX return statement where we layout our component's HTML structure
   return (
     <div style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column', backgroundColor: '#081624' }}>
       {/* Top Navbar */}
@@ -87,9 +187,9 @@ const Lighting = () => {
                 </Link>
               </li>
               <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
-                <Link to="/preferences" style={{ color: 'white', textDecoration: 'none' }}>
+                <Link to="/networking" style={{ color: 'white', textDecoration: 'none' }}>
                   <i className="fas fa-sliders-h" style={{ marginRight: '10px' }}></i>
-                  Preferences
+                  Networking
                 </Link>
               </li>
               <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
@@ -115,26 +215,47 @@ const Lighting = () => {
         </aside>
 
     
-        <main style={{ flex: '1', padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: '#0E2237', width: '100%'}}>
+        <main style={{ flex: '1', padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', backgroundColor: '#0E2237', width: '100%'}}>
   
   {/* Content Block */}
   
-  <div className="contentBlock" style={{ display: 'flex', justifyContent: 'space-around', width: '100%', flexWrap: 'wrap' }}>
+  <div className="contentBlock" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', paddingBottom: '60px'}}>
             {/* Lights Control Section */}
-            <div className="lightsControl" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', gap: '20px', width: '100%', flexWrap: 'wrap' }}>
+            <div className="lightsControl" style={{ flex: '1', display: 'flex', flexDirection: 'column'}}>
               {/* Room Selection */}
-              <div className="roomSelection" style={{ flexBasis: '48%'}}>
+              <div className="roomSelection" style={{ width: '50%', display: 'flex', flexDirection: 'column' }}>
               <h3 className="centered-title">Selecting a Room</h3>
                 <div className="RoomCards" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around',  padding:'0px' }}>
                   {/* Room cards */}
-                  <div className="card" style={{ width: '40%', marginBottom: '20px' }}><img class="images" src={bedroomIcon} alt="Room 1" /></div>
-                  <div className="card" style={{ width: '40%', marginBottom: '20px' }}><img class="images" src={bedroomIcon} alt="Room 2" /></div>
-                  <div className="card" style={{ width: '40%' }}><img class="images" src={livingroomIcon} alt="Room 3" /></div>
+                  <div className="card" style={{ width: '40%', marginBottom: '20px', border: selectedRoom === "Bedroom 1" ? '2px solid #0294A5' : 'none' }} onClick={() => {setRoomName("Bedroom 1"); setSelectedRoom("Bedroom 1");}}><img class="images" src={bedroomIcon} alt="Room 1" /></div>
+                  <div className="card" style={{ width: '40%', marginBottom: '20px', border: selectedRoom === "Bedroom 2" ? '2px solid #0294A5' : 'none' }} onClick={() => {setRoomName("Bedroom 2"); setSelectedRoom("Bedroom 2");}}><img class="images" src={bedroomIcon} alt="Room 2" /></div>
+                  <div className="card" style={{ width: '40%', border: selectedRoom === "Living Room" ? '2px solid #0294A5' : 'none' }} onClick={() => {setRoomName("Living Room"); setSelectedRoom("Living Room");}}><img class="images" src={livingroomIcon} alt="Room 3" /></div>
                 </div>
-              </div>
-                
+                <div className="formContainer" style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
+                  {/* Form to add lights */}
+                  <form onSubmit={handleFormSubmit}>
+                    <label>
+                      Room Name:
+                      <input type="text" value={roomName} onChange={(e) => setRoomName(e.target.value)} />
+                    </label>
+                    <label>
+                      Light Name:
+                      <input type="text" value={lightName} onChange={(e) => setLightName(e.target.value)} />
+                    </label>
+                    <button type="submit">Add Light</button>
+                  </form>
+                  {/* List of lights with remove option */}
+                  <ul>
+                    {lights.map((light, index) => (
+                      <li key={index}>
+                        {light.roomName} - {light.lightName}
+                        <button onClick={() => handleRemoveLight(index)}>Remove</button>
+                      </li>
+                  ))}
+                </ul>
+                </div>
                 {/* Light Dimmer Control */}
-                <div className="dimmerControl">
+                <div className="dimmerControl" style={{ width: '30%', marginRight: '75px' }}>
                   <input
                     type="range"
                     id="dimmer"
@@ -145,7 +266,14 @@ const Lighting = () => {
                     onChange={(e) => setDimmerValue(e.target.value)}
                   />
                   <label htmlFor="dimmer">{dimmerValue}%</label>
+                  {/* Turn on/off button */}
+                  <button onClick={toggleLight} className="toggleButton">
+                    {isLightOn ? 'Turn Off' : 'Turn On'}
+                  </button>
                 </div>
+              </div>
+                
+                
               
 
               

@@ -170,9 +170,9 @@ const Appliances = () => {
                 </Link>
               </li>
               <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
-                <Link to="/preferences" style={{ color: 'white', textDecoration: 'none' }}>
+                <Link to="/networking" style={{ color: 'white', textDecoration: 'none' }}>
                   <i className="fas fa-sliders-h" style={{ marginRight: '10px' }}></i>
-                  Preferences
+                  Networking
                 </Link>
               </li>
               <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>

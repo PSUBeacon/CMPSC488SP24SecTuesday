@@ -4,30 +4,15 @@ import (
 	"fmt"
 )
 
-// Appliance represents a simple appliance with an on/off state.
-type Appliance struct {
-	Name  string
-	State bool
-	Temp  int
-}
-
-// NewAppliance creates a new Appliance instance with the given name and initial state.
-func NewAppliance(name string, initialState bool, temp int) *Appliance {
-	return &Appliance{
-		Name:  name,
-		State: initialState,
-		Temp:  temp,
-	}
-}
-
 // TurnOn turns the appliance on.
 func UpdateStatus(status bool) {
 	fmt.Printf("%s Status is now set to: \n", status)
 }
 
 func UpdateTemperature(temp int) {
-	//Add microwave
 	fmt.Printf("%s Temperature is now set to %d degrees farenheit\n", temp)
+	// Add function to get the temp
+
 }
 
 func UpdateTimeStopTime(timerstop int) {

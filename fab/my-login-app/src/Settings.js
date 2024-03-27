@@ -8,20 +8,15 @@ import menuIcon from './menu.png'
 
 
 const SettingsPage = () => {
-  // Initialize theme state from local storage if available, otherwise default to 'dark'
-  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
-  const [selectedNav, setSelectedNav] = useState('Theme'); // State variable for selected navigation item
 
-  // Function to set the theme and save it to local storage
-  const changeTheme = (newTheme) => {
-    setTheme(newTheme);
-    localStorage.setItem('theme', newTheme); // Save new theme to local storage
-  };
+  const [selectedNav, setSelectedNav] = useState(); // State variable for selected navigation item
+
+
 
   // Styles that change with the theme
   const topNavStyle = {
-    backgroundColor: theme === 'dark' ? '#081624' : '#F0F1F3',
-    color: theme === 'dark' ? 'white' : 'black',
+    backgroundColor: '#081624',
+    color: 'white',
     padding: '0.5rem 1rem',
     display: 'flex',
     alignItems: 'center',
@@ -29,19 +24,13 @@ const SettingsPage = () => {
   };
 
   const sideNavStyle = {
-    backgroundColor: theme === 'dark' ? '#173350' : '#F0F1F3',
-    color: theme === 'dark' ? 'white' : 'black',
+    backgroundColor: '#173350',
+    color: 'white',
     width: '250px',
     padding: '1rem',
   };
 
-  // useEffect to load theme from local storage on mount
-  useEffect(() => {
-    const storedTheme = localStorage.getItem('theme');
-    if (storedTheme) {
-      setTheme(storedTheme);
-    }
-  }, []);
+ 
 
 
 
@@ -91,91 +80,92 @@ const handleAccountInfoChange = (e) => {
   const renderContent = () => {
     switch (selectedNav) {
       case 'Manage Users':
-    return (
-      <div style={{ width: '100%', textAlign: 'center' }}>
-        <h3>Manage Users</h3>
-        <button onClick={addUserHandler} style={{ margin: '20px', padding: '10px' }}>Add User</button>
-        <div>
-          {users.map(user => (
-            <div key={user.id} style={{ margin: '10px', padding: '10px', backgroundColor: theme === 'dark' ? '#081624' : '#D3D3D3', borderRadius: '5px' }}>
-              <span>{user.name} - {user.role}</span>
-              <select
-                value={user.role}
-                onChange={(e) => changeUserRoleHandler(user.id, e.target.value)}
-                style={{ margin: '0 10px' }}
-              >
-                <option value="Admin">Admin</option>
-                <option value="User">User</option>
-                <option value="Child">Child</option>
-              </select>
-              <button onClick={() => removeUserHandler(user.id)}>Remove</button>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-
-      // ... other cases remain unchanged
-      case 'Theme':
         return (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', width: '100%' }}>
-            <label htmlFor="theme-select" style={{ fontSize: '1.5rem', marginBottom: '10px' }}>Choose a theme:</label>
-            <select
-              id="theme-select"
-              value={theme}
-              onChange={(e) => changeTheme(e.target.value)}
-              style={{ width: '80%', height: '50px', fontSize: '1.2rem', textAlign: 'center', margin: '20px 0' }}
-            >
-              <option value="dark">Dark Mode</option>
-              <option value="light">Light Mode</option>
-            </select>
-          </div>
+            <div style={{ width: '100%', textAlign: 'center', padding: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <h3 style={{ color: '#50BCC0', marginBottom: '20px' }}>Manage Users</h3>
+              <button onClick={addUserHandler} style={{ margin: '20px', padding: '10px', backgroundColor: '#50BCC0', color: 'white', border: 'none', borderRadius: '5px' }}>Add User</button>
+              <div style={{ width: '100%', maxWidth: '400px', overflow: 'auto' }}>
+                {users.map(user => (
+                  <div key={user.id} style={{ margin: '10px', padding: '10px', backgroundColor: '#081624', borderRadius: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <span style={{ fontWeight: 'bold', color: 'white', marginRight: '10px' }}>{user.name}</span>
+                      <span style={{ color: '#95A4B6' }}>({user.role})</span>
+                    </div>
+                    <div>
+                      <select
+                        value={user.role}
+                        onChange={(e) => changeUserRoleHandler(user.id, e.target.value)}
+                        style={{ margin: '0 10px', padding: '5px', borderRadius: '5px', border: '1px solid #50BCC0', backgroundColor: 'transparent', color: 'white' }}
+                      >
+                        <option value="Admin">Admin</option>
+                        <option value="User">User</option>
+                        <option value="Child">Child</option>
+                      </select>
+                      <button onClick={() => removeUserHandler(user.id)} style={{ backgroundColor: '#50BCC0', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '5px' }}>Remove</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+        
         );
-      case 'Notification Settings':
-        return <div>Notification Settings Content Here</div>;
+      
 
-        // Update the 'Account Settings' case in your renderContent function
-  case 'Account Settings':
-    return (
-      <div style={{ width: '100%', textAlign: 'center', padding: '20px' }}>
-        <h3>Account Settings</h3>
-        <div style={{ marginBottom: '20px' }}>
+     
+    case 'Account Settings':
+  return (
+    <div style={{ width: '100%', textAlign: 'center', padding: '20px' }}>
+      <h3 style={{ marginBottom: '40px' }}>Account Settings</h3>
+       {/* Profile Picture */}
+       <div style={{ margin: '10px' }}>
           <img
-            src={accountInfo.profilePicture}
+            src={accountIcon}
             alt="Profile"
-            style={{ width: '100px', height: '100px', borderRadius: '50%' }}
+            style={{ width: '100px', height: '100px', borderRadius: '50%', border: '2px solid #50BCC0' }}
           />
+          <p style={{ margin: '5px', color: '#50BCC0' }}>Change Picture</p>
         </div>
-        <div style={{ marginBottom: '10px' }}>
-          <label>First Name</label>
-          <input
-            type="text"
-            name="firstName"
-            value={accountInfo.firstName}
-            onChange={handleAccountInfoChange}
-          />
-        </div>
-        <div style={{ marginBottom: '10px' }}>
-          <label>Last Name</label>
-          <input
-            type="text"
-            name="lastName"
-            value={accountInfo.lastName}
-            onChange={handleAccountInfoChange}
-          />
-        </div>
-        <div style={{ marginBottom: '10px' }}>
-          <label>Account Type</label>
-          <input
-            type="text"
-            name="accountType"
-            value={accountInfo.accountType}
-            onChange={handleAccountInfoChange}
-            disabled // You might want this to be uneditable, or be a dropdown if editable
-          />
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
+        {/* Account Info */}
+        <div style={{ margin: '10px', borderRadius: '10px', backgroundColor: '#081624', padding: '20px', minWidth: '200px' }}>
+          <div style={{ marginBottom: '10px' }}>
+            <label style={{ color: '#50BCC0' }}>First Name</label>
+            <input
+              type="text"
+              name="firstName"
+              value={accountInfo.firstName}
+              onChange={handleAccountInfoChange}
+              style={{ backgroundColor: 'transparent', color: 'white', border: 'none', borderBottom: '1px solid #50BCC0', width: '100%',  textAlign:'center' }}
+            />
+          </div>
+          <div style={{ marginBottom: '10px' }}>
+            <label style={{ color: '#50BCC0' }}>Last Name</label>
+            <input
+              type="text"
+              name="lastName"
+              value={accountInfo.lastName}
+              onChange={handleAccountInfoChange}
+              style={{ backgroundColor: 'transparent', color: 'white', border: 'none', borderBottom: '1px solid #50BCC0', width: '100%', textAlign:'center' }}
+            />
+          </div>
+          <div style={{ marginBottom: '10px' }}>
+            <label style={{ color: '#50BCC0' }}>Account Type</label>
+            <input
+              type="text"
+              name="accountType"
+              value={accountInfo.accountType}
+              onChange={handleAccountInfoChange}
+              disabled
+              style={{ backgroundColor: 'transparent', color: 'white', border: 'none', borderBottom: '1px solid #50BCC0', width: '100%',  textAlign:'center' }}
+            />
+          </div>
         </div>
       </div>
-    );
+    </div>
+  );
+
+        
+        
       
 
     }
@@ -192,18 +182,41 @@ const handleAccountInfoChange = (e) => {
         <aside style={sideNavStyle}>
           <nav>
             <ul style={{ listStyleType: 'none', padding: 0 }}>
-            <li className="settings-nav-item" onClick={() => setSelectedNav('Dashboard')}>
+            <li className="settings-nav-item" >
 <Link to="/dashboard" style={{ color: 'inherit', textDecoration: 'none' }}>Dashboard</Link> {/* Link to the dashboard */}
 </li>
               <li className="settings-nav-item" onClick={() => setSelectedNav('Manage Users')}>Manage Users</li>
-              <li className="settings-nav-item" onClick={() => setSelectedNav('Theme')}>Theme</li>
               <li className="settings-nav-item" onClick={() => setSelectedNav('Notification Settings')}>Notification Settings</li>
               <li className="settings-nav-item" onClick={() => setSelectedNav('Account Settings')}>Account Settings</li>
             </ul>
           </nav>
         </aside>
 
-        <div style={{ flex: '1', padding: '1rem', backgroundColor: theme === 'dark' ? '#0E2237' : '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {/* Main content area with a gradient background and translucent pattern overlay */}
+        <div
+          style={{
+            flex: '1',
+            padding: '1rem',
+            backgroundImage: 'linear-gradient(to bottom, #0E2237, #081624)',
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          {/* Translucent pattern overlay */}
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              backgroundImage: 'url("https://www.transparenttextures.com/patterns/always-grey.png")',
+              opacity: 0.3,
+            }}
+          ></div>
+          {/* Render content based on selected navigation item */}
           {renderContent()}
         </div>
       </div>

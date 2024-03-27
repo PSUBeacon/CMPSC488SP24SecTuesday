@@ -54,9 +54,8 @@ func main() {
 	}))
 
 	r.Use(sessions.Sessions("mysession", cookie.NewStore(secret)))
-	/*
-		r.Use(sessions.Sessions("mysession", cookie.NewStore(secret)))
 
+	/*
 		// unprotected endpoints no auth needed
 		r.GET("/status", statusResp)
 		r.POST("/login", loginHandler)
@@ -326,79 +325,7 @@ func dashboardHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message":     "Welcome to the Owner dashboard",
 			"accountType": "admin",
-			"Dishwasher": gin.H{
-				"UUID":              smartHomeDB.Dishwasher[0].UUID,
-				"Status":            smartHomeDB.Dishwasher[0].Status,
-				"WashTime":          smartHomeDB.Dishwasher[0].WashTime,
-				"TimerStopTime":     smartHomeDB.Dishwasher[0].TimerStopTime,
-				"EnergyConsumption": smartHomeDB.Dishwasher[0].EnergyConsumption,
-				"LastChanged":       smartHomeDB.Dishwasher[0].LastChanged,
-			},
-			"Fridge": gin.H{
-				"UUID":                smartHomeDB.Fridge[0].UUID,
-				"Status":              smartHomeDB.Fridge[0].Status,
-				"TemperatureSettings": smartHomeDB.Fridge[0].TemperatureSettings,
-				"EnergyConsumption":   smartHomeDB.Fridge[0].EnergyConsumption,
-				"LastChanged":         smartHomeDB.Fridge[0].LastChanged,
-				"EnergySaveMode":      smartHomeDB.Fridge[0].EnergySaveMode,
-			},
-			"HVAC": gin.H{
-				"UUID":              smartHomeDB.HVAC[0].UUID,
-				"Location":          smartHomeDB.HVAC[0].Location,
-				"Temperature":       smartHomeDB.HVAC[0].Temperature,
-				"Humidity":          smartHomeDB.HVAC[0].Humidity,
-				"FanSpeed":          smartHomeDB.HVAC[0].FanSpeed,
-				"Status":            smartHomeDB.HVAC[0].Status,
-				"EnergyConsumption": smartHomeDB.HVAC[0].EnergyConsumption,
-				"LastChanged":       smartHomeDB.HVAC[0].LastChanged,
-			},
-			"Lighting": gin.H{
-				"UUID":              smartHomeDB.Lighting[0].UUID,
-				"Location":          smartHomeDB.Lighting[0].Location,
-				"Brightness":        smartHomeDB.Lighting[0].Brightness,
-				"Status":            smartHomeDB.Lighting[0].Status,
-				"EnergyConsumption": smartHomeDB.Lighting[0].EnergyConsumption,
-				"LastChanged":       smartHomeDB.Lighting[0].LastChanged,
-			},
-			"Microwave": gin.H{
-				"UUID":              smartHomeDB.Microwave[0].UUID,
-				"Status":            smartHomeDB.Microwave[0].Status,
-				"Power":             smartHomeDB.Microwave[0].Power,
-				"TimerStopTime":     smartHomeDB.Microwave[0].TimerStopTime,
-				"EnergyConsumption": smartHomeDB.Microwave[0].EnergyConsumption,
-				"LastChanged":       smartHomeDB.Microwave[0].LastChanged,
-			},
-			"Oven": gin.H{
-				"UUID":                smartHomeDB.Oven[0].UUID,
-				"Status":              smartHomeDB.Oven[0].Status,
-				"TemperatureSettings": smartHomeDB.Oven[0].TemperatureSettings,
-				"TimerStopTime":       smartHomeDB.Oven[0].TimerStopTime,
-				"EnergyConsumption":   smartHomeDB.Oven[0].EnergyConsumption,
-				"LastChanged":         smartHomeDB.Oven[0].LastChanged,
-			},
-			"SecuritySystem": gin.H{
-				"UUID":              smartHomeDB.SecuritySystem[0].UUID,
-				"Location":          smartHomeDB.SecuritySystem[0].Location,
-				"Status":            smartHomeDB.SecuritySystem[0].Status,
-				"EnergyConsumption": smartHomeDB.SecuritySystem[0].EnergyConsumption,
-				"LastTriggered":     smartHomeDB.SecuritySystem[0].LastTriggered,
-			},
-			"SolarPanel": gin.H{
-				"UUID":                 smartHomeDB.SolarPanel[0].UUID,
-				"PanelID":              smartHomeDB.SolarPanel[0].PanelID,
-				"Status":               smartHomeDB.SolarPanel[0].Status,
-				"EnergyGeneratedToday": smartHomeDB.SolarPanel[0].EnergyGeneratedToday,
-				"PowerOutput":          smartHomeDB.SolarPanel[0].PowerOutput,
-				"LastChanged":          smartHomeDB.SolarPanel[0].LastChanged,
-			},
-			"Toaster": gin.H{
-				"UUID":                smartHomeDB.Toaster[0].UUID,
-				"Status":              smartHomeDB.Toaster[0].Status,
-				"TemperatureSettings": smartHomeDB.Toaster[0].TemperatureSettings,
-				"TimerStopTime":       smartHomeDB.Toaster[0].TimerStopTime,
-				"EnergyConsumption":   smartHomeDB.Toaster[0].EnergyConsumption,
-				"LastChanged":         smartHomeDB.Toaster[0].LastChanged,
-			},
+			"devices":     smartHomeDB,
 		})
 
 	case "user": //child role

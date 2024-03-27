@@ -20,20 +20,9 @@ const Dashboard = () => {
     const navigate = useNavigate(); // Instantiate useNavigate hook
     const [isNavVisible, setIsNavVisible] = useState(false);
     const [dashboardMessage, setDashboardMessage] = useState('');
-    const [accountType ,setAccountType] = useState('')
-    // States for each device
-    const [deviceData, setDeviceData] = useState({
-        HVAC: {},
-        Dishwasher: {},
-        Fridge: {},
-        Lighting: {},
-        Microwave: {},
-        Oven: {},
-        SecuritySystem: {},
-        SolarPanel: {},
-        Toaster: {},
-    });
-
+    const [accountType, setAccountType] = useState('');
+// Simplify the initial state to hold the structured device data directly
+    const [deviceData, setDeviceData] = useState({});
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -49,23 +38,23 @@ const Dashboard = () => {
             .then(response => response.json())
             .then(data => {
                 console.log(data);
-                // Update state for each device if present in response
-                const updatedDeviceData = { ...deviceData };
-                Object.keys(updatedDeviceData).forEach(device => {
-                    if (data[device]) {
-                        localStorage.setItem(device, JSON.stringify(data[device]));
-                        updatedDeviceData[device] = data[device];
-                    }
-                });
-                setDeviceData(updatedDeviceData);
-                setDashboardMessage(data.message);
+                if (data.devices) { // Check if the devices data is present in the response
+                    // Update the entire device data state with the received structured data
+                    setDeviceData(data.devices);
 
-                // Store accountType in session storage
+                    // Optionally, store the structured device data in localStorage as needed
+                    localStorage.setItem('devices', JSON.stringify(data.devices));
+                }
+                setDashboardMessage(data.message); // Update the dashboard message
+
+                // Update and store the account type
                 setAccountType(data.accountType);
                 sessionStorage.setItem('accountType', data.accountType);
             })
             .catch(error => console.error('Fetch operation error:', error));
-    }, []);
+    }, []); // Ensure the useEffect hook runs only once after the component mounts
+
+
 
     const toggleNav = () => {
         setIsNavVisible(!isNavVisible);
@@ -265,12 +254,19 @@ const Dashboard = () => {
                         {/* Another Row for More Widgets */}
                         <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: '20px' }}>
                             {/* Status by Units Widget */}
-                            <div className="widget" style={{ flex: '1', minWidth: '250px', backgroundColor: '#173350', padding: '20px', borderRadius: '1px', margin: '10px', boxSizing: 'border-box' }}>
+                            <div className="widget" style={{
+                                flex: '1',
+                                minWidth: '250px',
+                                backgroundColor: '#173350',
+                                padding: '20px',
+                                borderRadius: '1px',
+                                margin: '10px',
+                                boxSizing: 'border-box'
+                            }}>
                                 <h3>Status by Units</h3>
                                 {/* Content of the status by units widget */}
-                                {deviceData.HVAC.Temperature && (
-                                    <p>{deviceData.HVAC.Temperature}</p>
-                                )}
+                                <p>{deviceData.HVAC?.[0]?.Temperature ?? ''}</p>
+
 
                             </div>
 

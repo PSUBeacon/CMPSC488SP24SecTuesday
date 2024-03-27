@@ -44,6 +44,6 @@ func SendMessagesToServer() {
 	}
 }
 
-func main() {
-	SendMessagesToServer()
-}
+//func main() {
+//	SendMessagesToServer()
+//}

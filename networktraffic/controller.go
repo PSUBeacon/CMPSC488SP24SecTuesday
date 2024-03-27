@@ -46,6 +46,6 @@ func ConfigureController() {
 	}
 }
 
-func main() {
-	ConfigureController()
-}
+//func main() {
+//	ConfigureController()
+//}

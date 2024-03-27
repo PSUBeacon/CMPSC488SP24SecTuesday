@@ -121,19 +121,25 @@ const Dashboard = () => {
   };
 
  // Locks Widget JSX
-const LocksWidget = () => {
-  // Assuming you have a state to track the locks' statuses
+ const LocksWidget = () => {
   const [locksStatus, setLocksStatus] = useState({
     frontDoor: 'Locked',
     backDoor: 'Locked',
   });
 
-  // Function to toggle the lock status
   const toggleLockStatus = (door) => {
     setLocksStatus(prevStatus => ({
       ...prevStatus,
       [door]: prevStatus[door] === 'Locked' ? 'Unlocked' : 'Locked',
     }));
+  };
+
+  // Assuming you have a state to track the light status and its setter function
+  const [lightStatus, setLightStatus] = useState('Off');
+
+  const toggleLightStatus = () => {
+    // Toggle the light status
+    setLightStatus(prevStatus => prevStatus === 'Off' ? 'On' : 'Off');
   };
 
   return (
@@ -170,14 +176,30 @@ const LocksWidget = () => {
         </div>
       </div>
       <div>
-        <h3 style={{color:"#95A4B6", marginBottom:'20px'}}>Lights</h3>
-         {/* Bedroom Light Status */}
+        <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#173350', padding: '20px', paddingRight:"0px", borderRadius: '10px', margin: '0px'}}> 
+          <div>
+        <h3 style={{ color: "#95A4B6", marginBottom: '20px' }}>Lights</h3>
+         </div>
+          <div>
+        <button onClick={() => navigate('/lighting')} style={{ backgroundColor: '#0294A5', color: 'white', border: 'none', borderRadius: '5px', padding: '8px 18px', cursor: 'pointer', display: 'block', marginLeft: 'auto', marginRight: 'auto', fontSize:'11px' }}>
+          See More
+        </button>
+        </div>
+        </div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
-          <img src={bulbIcon} alt="Bedroom Light" style={{ width: '80px', height: 'auto', marginRight: '10px', marginBottom:'10px' }} /> {/* Replace with light icon */}
+          <img src={bulbIcon} alt="Bedroom Light" style={{ width: '60px', height: 'auto', marginRight: '30px', marginBottom: '10px' }} />
           <div style={{ textAlign: 'center' }}>
-            <span style={{ color:"#95A4B6", fontSize:'20px' }}>Bedroom light:</span>
-            <p style={{marginTop:'10px'}}>{deviceData.Lighting.Status}</p>
+            <span style={{ color: "#95A4B6", fontSize: '20px' }}>Bedroom light:</span>
+            <p style={{ marginTop: '10px' }}>{lightStatus}</p>
           </div>
+          <label className="toggle" style={{ display: 'block', margin: 'auto' }}>
+            <input
+              type="checkbox"
+              checked={lightStatus === 'Off'}
+              onChange={toggleLightStatus}
+            />
+            <span className="slider"></span>
+          </label>
         </div>
       </div>
     </div>
@@ -216,11 +238,7 @@ const AppliancesWidget = () => {
       </div>
       
     </div>
-    <div> <div>
-      <button onClick={() => navigate('/appliances')} style={{ marginTop: '20px', backgroundColor: '#0294A5', color: 'white', border: 'none', borderRadius: '5px', padding: '10px 20px', cursor: 'pointer', display: 'block', marginLeft: 'auto', marginRight: 'auto' }}>
-        See More
-      </button>
-      </div></div>
+   
     </div>
     
   );
@@ -362,7 +380,16 @@ const AppliancesWidget = () => {
       
       {/* Locks Widget */}
       <div className="widget" style={{ flex: '1', backgroundColor: '#173350', padding: '20px', borderRadius: '1px', margin: '10px', boxSizing: 'border-box' }}>
+        <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#173350', padding: '20px', paddingRight:"0px", borderRadius: '10px', margin: '0px'}}>
+        <div>
         <h3 style={{color:"#95A4B6"}}>Locks</h3>
+        </div>
+        <div>
+      <button onClick={() => navigate('/security')} style={{ backgroundColor: '#0294A5', color: 'white', border: 'none', borderRadius: '5px', padding: '8px 18px', cursor: 'pointer', display: 'block', marginLeft: 'auto', marginRight: 'auto', fontSize:'11px' }}>
+        See More
+      </button>
+      </div>
+      </div>
         <LocksWidget />
       </div>
     </div>
@@ -402,8 +429,16 @@ const AppliancesWidget = () => {
       
       {/* Scheduled Activity Widget */}
       <div className="widget" style={{ flex: '1', minWidth: '250px', backgroundColor: '#173350', padding: '20px', borderRadius: '1px', margin: '10px', boxSizing: 'border-box' }}>
+      <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#173350', padding: '20px', paddingRight:"0px", borderRadius: '10px', margin: '0px'}}>
+        <div>
         <h3 style={{color:"#95A4B6"}}>Active Appliances</h3>
-        {/* Content of the scheduled activity widget */}
+        </div>
+        <div>
+      <button onClick={() => navigate('/appliances')} style={{ backgroundColor: '#0294A5', color: 'white', border: 'none', borderRadius: '5px', padding: '8px 18px', cursor: 'pointer', display: 'block', marginLeft: 'auto', marginRight: 'auto', fontSize:'11px' }}>
+        See More
+      </button>
+      </div>
+      </div>
         <AppliancesWidget />
       </div>
     </div>

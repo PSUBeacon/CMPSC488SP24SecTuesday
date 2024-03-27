@@ -68,8 +68,8 @@ func main() {
 	protectedRoutes.POST("/lighting", updateIoT)
 	protectedRoutes.POST("/hvac", updateIoT)
 	protectedRoutes.POST("/security", updateIoT)
-	//protectedRoutes.POST("/appliances", updateAppliances)
-	protectedRoutes.POST("/energy", updateIoT)
+	protectedRoutes.POST("/appliances", getAppliancesData)
+	protectedRoutes.POST("/energy", getAppliancesData)
 
 	// use JWT middleware for all protected routes
 	//r.Use(authMiddleware())
@@ -110,6 +110,34 @@ func updateIoT(c *gin.Context) {
 	dal.UpdateMessaging(client, []byte(req.UUID), req.Name, req.AppType, req.Function, req.Change)
 	// Respond to the request indicating success.
 	c.JSON(http.StatusOK, gin.H{"message": "Lighting updated successfully"})
+
+}
+
+func getAppliancesData(c *gin.Context) {
+	//var req dal.UpdateLightingRequest
+	var req dal.SmartHomeDB
+	requestBody, _ := ioutil.ReadAll(c.Request.Body)
+	//fmt.Printf("Received request body: %s\n", string(requestBody))
+	// Reset the request body to be able to parse it again
+	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		fmt.Printf("Error binding JSON: %v\n", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Fetch smart home data
+	smartHomeDB, err := dal.FetchCollections(client, "smartHomeDB")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch smart home data"})
+		return
+	}
+
+	//fmt.Printf("%+v\n", smartHomeDB)
+
+	// Respond to the FE request, indicating success.
+	c.JSON(http.StatusOK, smartHomeDB)
 
 }
 

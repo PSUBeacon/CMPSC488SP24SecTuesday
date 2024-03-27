@@ -28,14 +28,20 @@ const Appliances = () => {
     const navigate = useNavigate(); // Instantiate useNavigate hook
     const [isNavVisible, setIsNavVisible] = useState(false);
 
-    const appliances = [
-        {icon: faMicrophone, name: 'Microwave', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
-        {icon: faOtter, name: 'Oven', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
-        {icon: faIceCream, name: 'Fridge', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
-        {icon: faSnowflake, name: 'Freezer', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
-        {icon: faBreadSlice, name: 'Toaster', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
-        {icon: faSoap, name: 'Dishwasher', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
-    ];
+    // const appliances = [
+    //     {icon: faMicrophone, name: 'Microwave', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
+    //     {icon: faOtter, name: 'Oven', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
+    //     {icon: faIceCream, name: 'Fridge', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
+    //     {icon: faSnowflake, name: 'Freezer', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
+    //     {icon: faBreadSlice, name: 'Toaster', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
+    //     {icon: faSoap, name: 'Dishwasher', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
+    // ];
+
+    const [data, setData] = useState({});
+
+    const now = new Date();
+    const dateString = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
 
     useEffect(() => {
         const token = sessionStorage.getItem('token');
@@ -46,27 +52,28 @@ const Appliances = () => {
             return;
         }
 
-        fetch(url, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            },
-        })
-            .then(response => response.json())
-            .then(response => {
-                if (response && response.data) {
-                    setUser(response.data.user);
-                    setAccountType(response.data.accountType);
-                    sessionStorage.setItem('accountType', response.data.accountType);
-                } else {
-                    setError('Unexpected response from server');
-                }
-            })
-            .catch(error => {
-                console.log('Fetch operation error:', error)
-            });
+        const fetchData = async () => {
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({}),
+                });
+                if (!response.ok) throw new Error('Network response was not ok');
+                const jsonData = await response.json();
+                setData(jsonData);
+            } catch (error) {
+                console.error('Failed to fetch data:', error);
+            }
+        };
+
+        fetchData();
     }, [navigate]);
+
+
     const toggleNav = () => {
         setIsNavVisible(!isNavVisible);
     };
@@ -170,10 +177,10 @@ const Appliances = () => {
                         <span id='menuText2'>Beacon</span>
                     </div>
                     <div>
-                        <span id='menuText'>March 05, 2024</span>
+                        <span id='menuText'>{dateString}</span>
                     </div>
                     <div>
-                        <span id='menuText'>11:48 AM</span>
+                        <span id='menuText'>{timeString}</span>
                     </div>
                     <div>
                         <div style={{position: 'relative'}}>
@@ -264,31 +271,64 @@ const Appliances = () => {
                     backgroundColor: '#0E2237'
                 }}>
                     <h2 style={{color: 'white'}}>Appliances</h2>
-                    <Table striped bordered hover variant="dark"
-                           style={{marginTop: '20px', backgroundColor: "#173350"}}>
-                        <thead>
-                        <tr>
-                            <th>Device</th>
-                            <th>Name</th>
-                            <th>Location</th>
-                            <th>Status</th>
-                            <th>Last Used</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {appliances.map((appliance, index) => (
-                            <tr key={index}>
-                                <td>
-                                    <FontAwesomeIcon icon={appliance.icon} style={{color: 'cyan'}}/>
-                                </td>
-                                <td>{appliance.name}</td>
-                                <td>{appliance.location}</td>
-                                <td>{appliance.status}</td>
-                                <td>{appliance.lastUsed}</td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </Table>
+                    {Object.keys(data).length > 0 ? (
+                        Object.entries(data).map(([key, appliances]) => (
+                            <div key={key} style={{alignItems: 'center', width: '70%', marginTop: '20px'}}>
+                                <h3>{key}</h3>
+                                <Table striped bordered hover variant="dark" style={{backgroundColor: "#173350"}}>
+                                    <thead>
+                                    <tr>
+                                        <th>Device</th>
+                                        <th>Name</th>
+                                        <th>Location</th>
+                                        <th>Status</th>
+                                        <th>Last Used</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {appliances.map((appliance, index) => (
+                                        <tr key={index}>
+                                            {/* Assuming the name is stored in a property called 'Name' */}
+                                            <td style={{width: '20%'}}>{key} - {appliance.UUID}</td>
+                                            <td style={{width: '20%'}}>{appliance.Label ? "Label" : ""}</td>
+                                            <td style={{width: '20%'}}>{appliance.Location}</td>
+                                            <td style={{width: '20%'}}>{appliance.Status ? "On" : "Off"}</td>
+                                            <td style={{width: '20%'}}>{appliance.LastChanged}</td>
+                                        </tr>
+                                    ))}
+                                    </tbody>
+                                </Table>
+                            </div>
+                        ))
+                    ) : (
+                        <p>Loading...</p>
+                    )}
+
+                    {/*<Table striped bordered hover variant="dark"*/}
+                    {/*       style={{marginTop: '20px', backgroundColor: "#173350"}}>*/}
+                    {/*    <thead>*/}
+                    {/*    <tr>*/}
+                    {/*        <th>Device</th>*/}
+                    {/*        <th>Name</th>*/}
+                    {/*        <th>Location</th>*/}
+                    {/*        <th>Status</th>*/}
+                    {/*        <th>Last Used</th>*/}
+                    {/*    </tr>*/}
+                    {/*    </thead>*/}
+                    {/*    <tbody>*/}
+                    {/*    {appliances.map((appliance, index) => (*/}
+                    {/*        <tr key={index}>*/}
+                    {/*            <td>*/}
+                    {/*                <FontAwesomeIcon icon={appliance.icon} style={{color: 'cyan'}}/>*/}
+                    {/*            </td>*/}
+                    {/*            <td>{appliance.name}</td>*/}
+                    {/*            <td>{appliance.location}</td>*/}
+                    {/*            <td>{appliance.status}</td>*/}
+                    {/*            <td>{appliance.lastUsed}</td>*/}
+                    {/*        </tr>*/}
+                    {/*    ))}*/}
+                    {/*    </tbody>*/}
+                    {/*</Table>*/}
 
                 </main>
 

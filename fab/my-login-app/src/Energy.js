@@ -25,7 +25,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 const Energy = () => {
 
   const energy = [
-    { Device: 'Microwave', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF' },
+    { Device: 'Microwaves', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF' },
     { Device: 'Oven', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF' },
     { Device: 'Fridge', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF' },
     { Device: 'Freezer', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF' },

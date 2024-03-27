@@ -39,8 +39,11 @@ const Networking = () => {
   
   // Define your IoT Logs data similar to how you have solarPanel data
 const iotLogs = [
-  { Device: 'Thermostat', LastActivity: '10:00 AM', Status: 'Active', DataUsage: '500MB' },
-  { Device: 'Smart Lock', LastActivity: '9:45 AM', Status: 'Inactive', DataUsage: '100MB' },
+  { Time: '00:00', Activity: 'Light Turned On'},
+  { Time: '00:00', Activity: 'Light Turned Off' },
+  { Time: '00:00', Activity: 'Light Turned Off' },
+  { Time: '00:00', Activity: 'Light Turned Off' },
+  { Time: '00:00', Activity: 'Light Turned Off' },
   // Add more IoT device log entries as needed
 ];
 // Function to change view
@@ -53,19 +56,15 @@ const iotLogsTable = (
     <Table striped bordered hover variant="dark" style={{ marginTop: '20px', backgroundColor: "#173350" }}>
       <thead>
         <tr>
-          <th>Devices</th>
-          <th>Last Activity</th>
-          <th>Status</th>
-          <th>Data Usage</th>
+          <th>Time</th>
+          <th>Activity</th>
         </tr>
       </thead>
       <tbody>
         {iotLogs.map((log, index) => (
           <tr key={index}>
-            <td>{log.Device}</td>
-            <td>{log.LastActivity}</td>
-            <td>{log.Status}</td>
-            <td>{log.DataUsage}</td>
+            <td>{log.Time}</td>
+            <td>{log.Activity}</td>
           </tr>
         ))}
       </tbody>
@@ -75,30 +74,29 @@ const iotLogsTable = (
 
 // Define your Network Logs data
 const networkLogs = [
-  { IPAddress: '192.168.1.10', AccessTime: '10:15 AM', DataTransferred: '250MB', Status: 'Success' },
-  { IPAddress: '192.168.1.12', AccessTime: '11:00 AM', DataTransferred: '300MB', Status: 'Failed' },
+  { PortSentFrom: 'Port 80', PortSentTo: 'Port 20' },
+  { PortSentFrom: 'Port 80', PortSentTo: 'Port 20' },
+  { PortSentFrom: 'Port 80', PortSentTo: 'Port 20' },
+  { PortSentFrom: 'Port 80', PortSentTo: 'Port 20' },
+  { PortSentFrom: 'Port 80', PortSentTo: 'Port 20' },
   // Add more network log entries as needed
 ];
 
 const networkLogsTable = (
   <div>
-    <h2 style={{ color: '#13350' }}>Network Logs</h2>
+    <h2 style={{ color: '#173350' }}>Network Logs</h2>
     <Table striped bordered hover variant="dark" style={{ marginTop: '20px', backgroundColor: "#173350" }}>
       <thead>
         <tr>
-          <th>IP Address</th>
-          <th>Access Time</th>
-          <th>Data Transferred</th>
-          <th>Status</th>
+          <th>Port Sent From</th>
+          <th>Port Sent To</th>
         </tr>
       </thead>
       <tbody>
         {networkLogs.map((log, index) => (
           <tr key={index}>
-            <td>{log.IPAddress}</td>
-            <td>{log.AccessTime}</td>
-            <td>{log.DataTransferred}</td>
-            <td>{log.Status}</td>
+            <td>{log.PortSentFrom}</td>
+            <td>{log.PortSentTo}</td>
           </tr>
         ))}
       </tbody>

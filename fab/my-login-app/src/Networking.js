@@ -53,7 +53,7 @@ const iotLogsTable = (
     <Table striped bordered hover variant="dark" style={{ marginTop: '20px', backgroundColor: "#173350" }}>
       <thead>
         <tr>
-          <th>Device</th>
+          <th>Devices</th>
           <th>Last Activity</th>
           <th>Status</th>
           <th>Data Usage</th>

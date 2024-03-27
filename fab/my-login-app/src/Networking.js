@@ -291,7 +291,7 @@ const networkLogsTable = (
     {/* Widgets Row */}
     <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: '20px', marginBottom: '20px' }}>
         {/* Camera Widget */}
-        <div className="camera-widget" style={{ position: 'relative', maxWidth: '60%', backgroundColor: '#173350', borderRadius: '10px', overflow: 'hidden', flexBasis: '100%', padding: '12px' }}>
+        <div className="camera-widget" style={{ position: 'relative', maxWidth: '60%', backgroundColor: '#173350', borderRadius: '10px', overflow: 'hidden', flexBasis: '100%', padding: '12px', marginTop:"70px" }}>
           {/* Conditionally render the table based on the current view */}
           {currentView === 'iotLogs' && iotLogsTable}
           {currentView === 'networkLogs' && networkLogsTable}

@@ -4,7 +4,7 @@ import './Settings.css'; // Adjust the path as necessary based on your file stru
 import { Link } from 'react-router-dom'; // Import Link component
 import accountIcon from './account.png'
 import menuIcon from './menu.png'
-
+import { Table } from 'react-bootstrap';
 
 
 const SettingsPage = () => {
@@ -65,6 +65,16 @@ const SettingsPage = () => {
   accountType: 'Owner',
   profilePicture: '/accountIcon.jpg' // Replace with actual path
 });
+
+// Place this array outside of your component if it doesn't change, or in state if it does
+const notifications = [
+  { Appliance: 'Microwave', DateandTime: '00:00 on mm/dd/yyyy', Status: 'ON/OFF' },
+  { Device: 'Oven', DateandTime: '00:00 on mm/dd/yyyy', Status: 'ON/OFF'},
+  { Device: 'Fridge', DateandTime: '00:00 on mm/dd/yyyy', Status: 'ON/OFF'},
+  { Device: 'Freezer', DateandTime: '00:00 on mm/dd/yyyy', Status: 'ON/OFF' },
+  { Device: 'Toaster', DateandTime: '00:00 on mm/dd/yyyy', Status: 'ON/OFF' },
+  { Device: 'Dishwasher', DateandTime: '00:00 on mm/dd/yyyy', Status: 'ON/OFF'},
+];
 
 // Handler for changing account info (you'll need a more complex handler for a real app)
 const handleAccountInfoChange = (e) => {
@@ -163,7 +173,31 @@ const handleAccountInfoChange = (e) => {
       </div>
     </div>
   );
-
+  case 'Notification Settings':
+    return (
+      <main style={{ flex: '1', padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: '#0E2237'}}>
+        <h2 style={{ color: 'white' }}>Notifications</h2>
+        {/* The UI library's Table component must be imported at the top of your file */}
+        <Table striped bordered hover variant="dark" style={{ marginTop: '20px', backgroundColor: "#173350" }}>
+          <thead>
+            <tr>
+              <th>Appliance</th>
+              <th>Date and Time</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {notifications.map((notification, index) => (
+              <tr key={index}>
+                <td>{notification.Appliance || notification.Device}</td>
+                <td>{notification.DateandTime}</td>
+                <td>{notification.Status}</td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </main>
+    );
         
         
       
@@ -186,7 +220,7 @@ const handleAccountInfoChange = (e) => {
 <Link to="/dashboard" style={{ color: 'inherit', textDecoration: 'none' }}>Dashboard</Link> {/* Link to the dashboard */}
 </li>
               <li className="settings-nav-item" onClick={() => setSelectedNav('Manage Users')}>Manage Users</li>
-              <li className="settings-nav-item" onClick={() => setSelectedNav('Notification Settings')}>Notification Settings</li>
+              <li className="settings-nav-item" onClick={() => setSelectedNav('Notification Settings')}>Notifications</li>
               <li className="settings-nav-item" onClick={() => setSelectedNav('Account Settings')}>Account Settings</li>
             </ul>
           </nav>

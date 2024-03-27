@@ -12,6 +12,20 @@ import menuIcon from './menu.png'
 
 const HVAC = () => {
 
+   // States for date and time
+   const [currentDate, setCurrentDate] = useState(new Date().toLocaleDateString());
+   const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
+ 
+   useEffect(() => {
+       const timer = setInterval(() => {
+           setCurrentDate(new Date().toLocaleDateString());
+           setCurrentTime(new Date().toLocaleTimeString());
+       }, 1000);
+ 
+       // Cleanup on component unmount
+       return () => clearInterval(timer);
+   }, []);
+
   const navigate = useNavigate(); // Instantiate useNavigate hook
   const [isNavVisible, setIsNavVisible] = useState(false);
     const [dashboardMessage, setDashboardMessage] = useState('');
@@ -124,10 +138,10 @@ const HVAC = () => {
             <span id = 'menuText2'>Beacon</span>
           </div>
           <div>
-            <span id='menuText'>March 05, 2024</span>
+          <span id='menuText'>{currentDate}</span>
           </div>
           <div>
-            <span id='menuText'>11:48 AM</span>
+            <span id='menuText'>{currentTime}</span>
           </div>
           <div>
           <div style={{ position: 'relative' }}>
@@ -203,7 +217,7 @@ const HVAC = () => {
   {/* Translucent pattern overlay */}
   <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundImage: 'url("https://www.transparenttextures.com/patterns/always-grey.png")', opacity: 0.3 }}></div>
 
-  <h1 style={{ color: '#50BCC0', marginBottom: '2rem' }}>HVAC</h1>
+  <h1 style={{ color: 'white', marginBottom: '2rem' }}>HVAC</h1>
   {deviceData && (
     <div className="hvac-data-container">
       <div className="data-item">
@@ -211,7 +225,7 @@ const HVAC = () => {
           <i className="fas fa-thermometer-half"></i>
         </div>
         <div className="data-info">
-          <p>Temperature</p>
+          <p style={{ color: '#95A4B6'}}>Temperature</p>
           <p>{deviceData.HVAC.Temperature}°F</p>
         </div>
       </div>
@@ -220,7 +234,7 @@ const HVAC = () => {
           <i className="fas fa-tint"></i>
         </div>
         <div className="data-info">
-          <p>Humidity</p>
+          <p style={{ color: '#95A4B6'}}>Humidity</p>
           <p>{deviceData.HVAC.Humidity}%</p>
         </div>
       </div>
@@ -229,7 +243,7 @@ const HVAC = () => {
           <i className="fas fa-fan"></i>
         </div>
         <div className="data-info">
-          <p>Fan Speed</p>
+          <p style={{ color: '#95A4B6'}}>Fan Speed</p>
           <p>{deviceData.HVAC.FanSpeed}%</p>
         </div>
       </div>
@@ -238,7 +252,7 @@ const HVAC = () => {
           <i className={deviceData.HVAC.Status ? "fas fa-power-on" : "fas fa-power-off"}></i>
         </div>
         <div className="data-info">
-          <p>Status</p>
+          <p style={{ color: '#95A4B6'}}>Status</p>
           <p>{deviceData.HVAC.Status ? "On" : "Off"}</p>
         </div>
       </div>
@@ -247,7 +261,7 @@ const HVAC = () => {
           <i className="fas fa-bolt"></i>
         </div>
         <div className="data-info">
-          <p>Energy Consumption</p>
+          <p style={{ color: '#95A4B6'}}>Energy Consumption</p>
           <p>{deviceData.HVAC.EnergyConsumption}KW</p>
         </div>
       </div>

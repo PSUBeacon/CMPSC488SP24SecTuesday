@@ -331,9 +331,9 @@ const AppliancesWidget = () => {
                 </Link>
               </li>
               <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
-                <Link to="/settings" style={{ color: '#95A4B6', textDecoration: 'none' }}>
+                <Link to="/networking" style={{ color: '#95A4B6', textDecoration: 'none' }}>
                   <i className="fas fa-sliders-h" style={{ marginRight: '10px' }}></i>
-                  Settings
+                  Networking
                 </Link>
               </li>
               <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>

@@ -1,100 +1,82 @@
 package main
 
 import (
-	"log"
-	"periph.io/x/periph/conn/physic"
-	"periph.io/x/periph/conn/spi"
+	"fmt"
+	"os"
 	"time"
 
-	"periph.io/x/periph/conn/spi/spireg"
-	"periph.io/x/periph/host"
+	"github.com/stianeikeland/go-rpio/v4"
 )
 
-// MAX7219 registers
 const (
-	NoOp        byte = 0x00
-	Digit0      byte = 0x01
-	Digit1      byte = 0x02
-	Digit2      byte = 0x03
-	Digit3      byte = 0x04
-	Digit4      byte = 0x05
-	Digit5      byte = 0x06
-	Digit6      byte = 0x07
-	Digit7      byte = 0x08
-	DecodeMode  byte = 0x09
-	Intensity   byte = 0x0A
-	ScanLimit   byte = 0x0B
-	ShutDown    byte = 0x0C
-	DisplayTest byte = 0x0F
+	dinPinNumber = 9  // GPIO pin for DIN (MOSI)
+	csPinNumber  = 4  // GPIO pin for CS
+	clkPinNumber = 10 // GPIO pin for CLK
 )
 
 func main() {
-	// Initialize periph.io library
-	if _, err := host.Init(); err != nil {
-		log.Fatal(err)
+	if err := rpio.Open(); err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
+		os.Exit(1)
 	}
+	defer rpio.Close()
 
-	// Open the first available SPI port
-	port, err := spireg.Open("")
-	if err != nil {
-		log.Fatal(err)
+	// Set up the pins
+	dinPin := rpio.Pin(dinPinNumber)
+	csPin := rpio.Pin(csPinNumber)
+	clkPin := rpio.Pin(clkPinNumber)
+
+	dinPin.Output()
+	csPin.Output()
+	clkPin.Output()
+
+	// Initialize the LED matrix
+	initializeMatrix(dinPin, csPin, clkPin)
+
+	// Turn on all LEDs
+	for row := 0; row < 8; row++ {
+		sendData(csPin, dinPin, clkPin, byte(row+1), 0xFF)
 	}
-	defer port.Close()
-
-	// Create a connection to the MAX7219
-	conn, err := port.Connect(10*physic.MegaHertz, spi.Mode0, 8)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Initialize the MAX7219
-	initMAX7219(conn)
-
-	// Display a pattern on the matrix
-	displayPattern(conn)
-
-	// Keep the pattern displayed for 5 seconds
 	time.Sleep(5 * time.Second)
 
-	// Clear the display
-	clearDisplay(conn)
-}
-
-// initMAX7219 initializes the MAX7219 LED matrix driver.
-func initMAX7219(conn spi.Conn) {
-	sendCommand(conn, ShutDown, 0x01)    // Exit shutdown mode
-	sendCommand(conn, DisplayTest, 0x00) // Disable display test
-	sendCommand(conn, DecodeMode, 0x00)  // No decode for digits
-	sendCommand(conn, ScanLimit, 0x07)   // Display all digits
-	sendCommand(conn, Intensity, 0x08)   // Set moderate intensity
-	sendCommand(conn, ShutDown, 0x01)    // Exit shutdown mode
-	clearDisplay(conn)                   // Clear display register
-}
-
-// sendCommand sends a command to the MAX7219.
-func sendCommand(conn spi.Conn, register, data byte) {
-	if err := conn.Tx([]byte{register, data}, nil); err != nil {
-		log.Fatal(err)
+	// Turn off all LEDs
+	for row := 0; row < 8; row++ {
+		sendData(csPin, dinPin, clkPin, byte(row+1), 0x00)
 	}
 }
 
-// displayPattern displays a pattern on the LED matrix.
-func displayPattern(conn spi.Conn) {
-	//// Example pattern: diagonal line
-	//pattern := []byte{
-	//	0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80,
-	//}
-	//for i, val := range pattern {
-	//	sendCommand(conn, Digit0+byte(i), val)
-	//}
+// Initialize the LED matrix
+func initializeMatrix(dinPin, csPin, clkPin rpio.Pin) {
+	// Set the scan-limit to show all 8 digits
+	sendData(csPin, dinPin, clkPin, 0x0B, 0x07)
 
-	sendCommand(conn, Digit0, 0x01)
+	// Use normal operation mode (not test mode)
+	sendData(csPin, dinPin, clkPin, 0x0F, 0x00)
 
+	// Set the intensity (brightness) of the display
+	sendData(csPin, dinPin, clkPin, 0x0A, 0x0F)
+
+	// Turn on the display
+	sendData(csPin, dinPin, clkPin, 0x0C, 0x01)
 }
 
-// clearDisplay clears the LED matrix display.
-func clearDisplay(conn spi.Conn) {
-	for i := 0; i < 8; i++ {
-		sendCommand(conn, Digit0+byte(i), 0x00)
+// Send data to the LED matrix
+func sendData(csPin, dinPin, clkPin rpio.Pin, address, data byte) {
+	csPin.Low()
+	sendByte(dinPin, clkPin, address)
+	sendByte(dinPin, clkPin, data)
+	csPin.High()
+}
+
+// Send a single byte of data
+func sendByte(dinPin, clkPin rpio.Pin, data byte) {
+	for i := 7; i >= 0; i-- {
+		clkPin.Low()
+		if (data & (1 << i)) != 0 {
+			dinPin.High()
+		} else {
+			dinPin.Low()
+		}
+		clkPin.High()
 	}
 }

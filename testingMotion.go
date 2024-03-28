@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/stianeikeland/go-rpio/v4"
 )
 
@@ -26,8 +28,13 @@ func CheckForMotion(pinNum uint8) (bool, error) {
 }
 
 func main() {
-	for true {
-		motion, _ := CheckForMotion(11)
-		fmt.Println("the motion is ", motion)
+	for {
+		motion, err := CheckForMotion(11)
+		if err != nil {
+			fmt.Printf("Error checking for motion: %v\n", err)
+			return
+		}
+		fmt.Printf("Motion detected: %t\n", motion)
+		time.Sleep(1 * time.Second)
 	}
 }

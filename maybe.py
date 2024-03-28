@@ -85,16 +85,16 @@ def draw_L():
                  0b11111111]  # Bottom
     for row, pattern in enumerate(l_pattern, start=1):
         send_command(row, pattern)
-def draw_O():
+def draw_A():
     clear_matrix()
     # O pattern: Closed loop with no fill
-    o_pattern = [0b11111111,  # Top
-                 0b10000001,  #
-                 0b10000001,  #
-                 0b10000001,  #
-                 0b10000001,  #
-                 0b10000001,  #
-                 0b11111111]  # Bottom
+    o_pattern = [0b00000000,  # Top
+                 0b00111100,  #
+                 0b01100110,  #
+                 0b01100110,  #
+                 0b01100110,  #
+                 0b01100110,  #
+                 0b01100110]  # Bottom
     for row, pattern in enumerate(o_pattern, start=1):
         send_command(row, pattern)
 
@@ -103,14 +103,7 @@ initialize_matrix()
 clear_matrix()
 
 # Fill the matrix
-draw_H()
-sleep(2)
-draw_E()
-sleep(2)
-draw_O()
-sleep(2)
-draw_L()
-sleep(2)
+draw_A()
 
 # Wait for 5 seconds
 sleep(5)

@@ -68,6 +68,24 @@ def draw_lightbulb():
     for row, pattern in enumerate(lightbulb_pattern, start=1):
         send_command(row, pattern)
 
+def draw_lock():
+    # Clear the matrix first to start with a blank slate
+    clear_matrix()
+    # Define the pattern for a lock
+    lock_pattern = [
+        0b00111100,  # Row 1: Top empty space
+        0b00111100,  # Row 2: Top part of the shackle
+        0b01111110,  # Row 3: Bottom part of the shackle
+        0b11111111,  # Row 4: Top of the lock body
+        0b11111111,  # Row 5: Middle of the lock body, widest part
+        0b11000011,  # Row 6: Lower part of the lock body
+        0b11000011,  # Row 7: Bottom of the lock body
+        0b01111110   # Row 8: Base of the lock, gives it a rounded look
+    ]
+
+    # Send each row's pattern to the matrix
+    for row, pattern in enumerate(lock_pattern, start=1):
+        send_command(row, pattern)
 
 def draw_H():
     # Clear the matrix first to start with a blank slate
@@ -91,7 +109,7 @@ clear_matrix()
 
 # Wait for 10 seconds
 #sleep(10)
-draw_lightbulb()
+draw_lock()
 sleep(30)
 # Clear the matrix
 clear_matrix()

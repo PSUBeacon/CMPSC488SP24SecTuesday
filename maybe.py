@@ -49,18 +49,18 @@ def fill_matrix():
     for i in range(1, 9):
         send_command(i, 0xFF)
 def draw_H():
-    # Clear the matrix first to start fresh
+    # Clear the matrix first to start with a blank slate
     clear_matrix()
 
-    # Pattern for an "H"
-    # Rows 1-3 and 5-8: 0b10000001
-    # Row 4 (middle connector): 0b11111111
-    h_pattern = [0b10000001, 0b10000001, 0b10000001, 0b11111111,
-                 0b10000001, 0b10000001, 0b10000001, 0b10000001]
-
-    # Send each row's pattern to the matrix
-    for i, pattern in enumerate(h_pattern, start=1):
-        send_command(i, pattern)
+    # Define the pattern for an "H"
+    # For rows 1-3 and 5-8, turn on columns 1 and 8: 0b10000001
+    # For row 4, turn on all columns to connect the two lines: 0b11111111
+    for row in range(1, 9):
+        if row == 4:  # Middle row, connect the two vertical lines
+            pattern = 0b11111111
+        else:  # Rows for the vertical lines
+            pattern = 0b10000001
+        send_command(row, pattern)
 
 # Initialize and clear the matrix
 initialize_matrix()

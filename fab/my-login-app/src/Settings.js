@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'; // Import Link component
 import accountIcon from './account.png'
 import menuIcon from './menu.png'
 import { Table } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom'; // Import useHistory for navigation
 
 
 const SettingsPage = () => {
@@ -12,8 +13,14 @@ const SettingsPage = () => {
   
 
   const [selectedNav, setSelectedNav] = useState(); // State variable for selected navigation item
-
-
+  const navigate = useNavigate(); // Hook to enable redirection
+  const handleSignOut = () => {
+    // Add your sign-out logic here if necessary, like clearing localStorage or cookies
+    // localStorage.removeItem('userToken');
+  
+    // Redirect to the login page
+    window.location.href = '/'; // Replace '/login' with your actual login route
+  };
 
   // Styles that change with the theme
   const topNavStyle = {
@@ -32,7 +39,11 @@ const SettingsPage = () => {
     padding: '1rem',
   };
 
- 
+  const [showAddUserForm, setShowAddUserForm] = useState(false);
+  const [newUserFirstName, setNewUserFirstName] = useState('');
+  const [newUserLastName, setNewUserLastName] = useState('');
+  const [newUserRole, setNewUserRole] = useState('User');
+
 
 
 
@@ -58,6 +69,17 @@ const SettingsPage = () => {
     // Handler to change a user's role
     const changeUserRoleHandler = (userId, newRole) => {
       setUsers(users.map(user => user.id === userId ? { ...user, role: newRole } : user));
+    };
+
+    const addUserFormHandler = (event) => {
+      event.preventDefault();
+      const newUser = {
+        id: users.length + 1,
+        name: `${newUserFirstName} ${newUserLastName}`,
+        role: newUserRole,
+      };
+      setUsers([...users, newUser]);
+      setShowAddUserForm(false); // Hide the form after adding the user
     };
 
  // Example account data (replace with actual data as necessary)
@@ -92,35 +114,65 @@ const handleAccountInfoChange = (e) => {
   const renderContent = () => {
     switch (selectedNav) {
       case 'Manage Users':
-        return (
-            <div style={{ width: '100%', textAlign: 'center', padding: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <h3 style={{ color: '#50BCC0', marginBottom: '20px' }}>Manage Users</h3>
-              <button onClick={addUserHandler} style={{ margin: '20px', padding: '10px', backgroundColor: '#50BCC0', color: 'white', border: 'none', borderRadius: '5px' }}>Add User</button>
-              <div style={{ width: '100%', maxWidth: '400px', overflow: 'auto' }}>
-                {users.map(user => (
-                  <div key={user.id} style={{ margin: '10px', padding: '10px', backgroundColor: '#081624', borderRadius: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <span style={{ fontWeight: 'bold', color: 'white', marginRight: '10px' }}>{user.name}</span>
-                      <span style={{ color: '#95A4B6' }}>({user.role})</span>
-                    </div>
-                    <div>
-                      <select
-                        value={user.role}
-                        onChange={(e) => changeUserRoleHandler(user.id, e.target.value)}
-                        style={{ margin: '0 10px', padding: '5px', borderRadius: '5px', border: '1px solid #50BCC0', backgroundColor: 'transparent', color: 'white' }}
-                      >
-                        <option value="Admin">Admin</option>
-                        <option value="User">User</option>
-                        <option value="Child">Child</option>
-                      </select>
-                      <button onClick={() => removeUserHandler(user.id)} style={{ backgroundColor: '#50BCC0', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '5px' }}>Remove</button>
-                    </div>
-                  </div>
-                ))}
+      return (
+        <div style={{ width: '100%', textAlign: 'center', padding: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', zIndex: 1 }}>
+          <h3 style={{ color: '#50BCC0', marginBottom: '20px' }}>Manage Users</h3>
+          <button onClick={() => setShowAddUserForm(!showAddUserForm)} style={{ margin: '20px', padding: '10px', backgroundColor: '#50BCC0', color: 'white', border: 'none', borderRadius: '5px', zIndex: 2 }}>Add User</button>
+          {showAddUserForm && (
+            <form onSubmit={addUserFormHandler} style={{ padding: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <input
+                type="text"
+                placeholder="First Name"
+                value={newUserFirstName}
+                onChange={(e) => setNewUserFirstName(e.target.value)}
+                required
+                style={{ margin: '5px' }}
+              />
+              <input
+                type="text"
+                placeholder="Last Name"
+                value={newUserLastName}
+                onChange={(e) => setNewUserLastName(e.target.value)}
+                required
+                style={{ margin: '5px' }}
+              />
+              <select
+                value={newUserRole}
+                onChange={(e) => setNewUserRole(e.target.value)}
+                required
+                style={{ margin: '5px' }}
+              >
+                <option value="Admin">Admin</option>
+                <option value="User">User</option>
+                <option value="Child">Child</option>
+              </select>
+              <button type="submit" style={{ margin: '5px', padding: '10px', backgroundColor: '#50BCC0', color: 'white', border: 'none', borderRadius: '5px' }}>Add</button>
+            </form>
+          )}
+          <div style={{ width: '100%', maxWidth: '400px', overflow: 'auto', zIndex: 2 }}>
+            {users.map(user => (
+              <div key={user.id} style={{ margin: '10px', padding: '10px', backgroundColor: '#081624', borderRadius: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 2 }}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <span style={{ fontWeight: 'bold', color: 'white', marginRight: '10px' }}>{user.name}</span>
+                  <span style={{ color: '#95A4B6' }}>({user.role})</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <select
+                    value={user.role}
+                    onChange={(e) => changeUserRoleHandler(user.id, e.target.value)}
+                    style={{ margin: '0 10px', padding: '5px', borderRadius: '5px', border: '1px solid #50BCC0', backgroundColor: 'transparent', color: 'white', zIndex: 3 }}
+                  >
+                    <option value="Admin">Admin</option>
+                    <option value="User">User</option>
+                    <option value="Child">Child</option>
+                  </select>
+                  <button onClick={() => removeUserHandler(user.id)} style={{ backgroundColor: '#50BCC0', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '5px', zIndex: 3 }}>Remove</button>
+                </div>
               </div>
-            </div>
-        
-        );
+            ))}
+          </div>
+        </div>
+      );
       
 
      
@@ -137,44 +189,59 @@ const handleAccountInfoChange = (e) => {
           />
           <p style={{ margin: '5px', color: '#50BCC0' }}>Change Picture</p>
         </div>
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
-        {/* Account Info */}
-        <div style={{ margin: '10px', borderRadius: '10px', backgroundColor: '#081624', padding: '20px', minWidth: '200px' }}>
-          <div style={{ marginBottom: '10px' }}>
-            <label style={{ color: '#50BCC0' }}>First Name</label>
-            <input
-              type="text"
-              name="firstName"
-              value={accountInfo.firstName}
-              onChange={handleAccountInfoChange}
-              style={{ backgroundColor: 'transparent', color: 'white', border: 'none', borderBottom: '1px solid #50BCC0', width: '100%',  textAlign:'center' }}
-            />
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div style={{ margin: '10px', borderRadius: '10px', backgroundColor: '#081624', padding: '20px', minWidth: '200px' }}>
+              <div style={{ marginBottom: '10px' }}>
+                <label style={{ color: '#50BCC0' }}>First Name</label>
+                <input
+                  type="text"
+                  name="firstName"
+                  value={accountInfo.firstName}
+                  onChange={handleAccountInfoChange}
+                  style={{ backgroundColor: 'transparent', color: 'white', border: 'none', borderBottom: '1px solid #50BCC0', width: '100%', textAlign: 'center' }}
+                />
+              </div>
+              <div style={{ marginBottom: '10px' }}>
+                <label style={{ color: '#50BCC0' }}>Last Name</label>
+                <input
+                  type="text"
+                  name="lastName"
+                  value={accountInfo.lastName}
+                  onChange={handleAccountInfoChange}
+                  style={{ backgroundColor: 'transparent', color: 'white', border: 'none', borderBottom: '1px solid #50BCC0', width: '100%', textAlign: 'center' }}
+                />
+              </div>
+              <div style={{ marginBottom: '10px' }}>
+                <label style={{ color: '#50BCC0' }}>Account Type</label>
+                <input
+                  type="text"
+                  name="accountType"
+                  value={accountInfo.accountType}
+                  onChange={handleAccountInfoChange}
+                  disabled
+                  style={{ backgroundColor: 'transparent', color: 'white', border: 'none', borderBottom: '1px solid #50BCC0', width: '100%', textAlign: 'center' }}
+                />
+              </div>
+            </div>
           </div>
-          <div style={{ marginBottom: '10px' }}>
-            <label style={{ color: '#50BCC0' }}>Last Name</label>
-            <input
-              type="text"
-              name="lastName"
-              value={accountInfo.lastName}
-              onChange={handleAccountInfoChange}
-              style={{ backgroundColor: 'transparent', color: 'white', border: 'none', borderBottom: '1px solid #50BCC0', width: '100%', textAlign:'center' }}
-            />
-          </div>
-          <div style={{ marginBottom: '10px' }}>
-            <label style={{ color: '#50BCC0' }}>Account Type</label>
-            <input
-              type="text"
-              name="accountType"
-              value={accountInfo.accountType}
-              onChange={handleAccountInfoChange}
-              disabled
-              style={{ backgroundColor: 'transparent', color: 'white', border: 'none', borderBottom: '1px solid #50BCC0', width: '100%',  textAlign:'center' }}
-            />
-          </div>
+          {/* Sign-out button */}
+        <button
+          onClick={() => navigate('/login')} // Replace '/login' with your actual login route
+          style={{
+            marginTop: '20px',
+            padding: '10px',
+            backgroundColor: '#50BCC0',
+            color: 'white',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer'
+          }}
+        >
+          Sign Out
+        </button>
         </div>
-      </div>
-    </div>
-  );
+      );
+
   case 'Notification Settings':
     return (
       <main style={{ flex: '1', padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: '#0E2237'}}>

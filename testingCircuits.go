@@ -1,51 +1,19 @@
 package main
 
 import (
-	"log"
+	"CMPSC488SP24SecTuesday/on-metal-c-code"
+	"fmt"
 	"time"
-
-	ws2811 "github.com/rpi-ws281x/rpi-ws281x-go"
-)
-
-const (
-	width  = 8
-	height = 8
-	leds   = width * height
 )
 
 func main() {
-	opt := ws2811.DefaultOptions
-	opt.Channels[0].Brightness = 255
-	opt.Channels[0].LedCount = leds
+	matrix := cCode.NewMaxMatrix(9, 4, 10, 1) // Use the appropriate GPIO pins for data, load, and clock
+	matrix.Init(1)                            // Initialize 1 matrix
+	matrix.SetIntensity(8)                    // Set intensity to a medium level
 
-	dev, err := ws2811.MakeWS2811(&opt)
-	if err != nil {
-		log.Fatal(err)
-	}
+	fmt.Println("Clearing matrix...")
+	matrix.Clear() // Clear the matrix
 
-	if err := dev.Init(); err != nil {
-		log.Fatal(err)
-	}
-	defer dev.Fini()
-
-	// Turn on all LEDs
-	for i := 0; i < leds; i++ {
-		dev.Leds(0)[i] = 0xFFFFFF // White color
-	}
-
-	if err := dev.Render(); err != nil {
-		log.Fatal(err)
-	}
-
-	// Keep the LEDs on for 5 seconds
-	time.Sleep(5 * time.Second)
-
-	// Turn off all LEDs
-	for i := 0; i < leds; i++ {
-		dev.Leds(0)[i] = 0x000000 // Off
-	}
-
-	if err := dev.Render(); err != nil {
-		log.Fatal(err)
-	}
+	// Keep the program running for a while to observe the effects
+	time.Sleep(10 * time.Second)
 }

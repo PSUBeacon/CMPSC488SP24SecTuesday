@@ -44,12 +44,11 @@ func main() {
 	}
 	defer mtx.Close()
 	// Output text message to LED matrix
-	mtx.SlideMessage("H",
-		max7219.FontCP437, true, 50*time.Millisecond)
-	// Wait 1 sec, then continue output new text
-	time.Sleep(1 * time.Second)
-	// Output national text (russian in example) to LED matrix
-	mtx.SlideMessage("П",
-		max7219.FontZXSpectrumRus, true, 50*time.Millisecond)
+	// Output a sequence of ascii codes in a loop
+	font := max7219.FontCP437
+	for i := 0; i <= len(font.GetLetterPatterns()); i++ {
+		mtx.OutputAsciiCode(72, font, i, true)
+		time.Sleep(500 * time.Millisecond)
+	}
 
 }

@@ -80,8 +80,8 @@ def draw_A():
         ]
 
         # Send each row's pattern to the matrix
-        for row, pattern in enumerate(a, start=1):
-            send_command(row, pattern)
+    for row, pattern in enumerate(a, start=1):
+        send_command(row, pattern)
 def draw_lock():
     # Clear the matrix first to start with a blank slate
     clear_matrix()

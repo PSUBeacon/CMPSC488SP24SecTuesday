@@ -92,6 +92,6 @@ clear_matrix()
 # Wait for 10 seconds
 #sleep(10)
 draw_lightbulb()
-sleep(10)
+sleep(30)
 # Clear the matrix
 clear_matrix()

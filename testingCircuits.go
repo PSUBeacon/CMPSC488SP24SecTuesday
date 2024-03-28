@@ -1,39 +1,51 @@
 package main
 
 import (
-	"fmt"
 	"log"
+	"time"
 
-	"periph.io/x/periph/conn/spi"
-	"periph.io/x/periph/conn/spi/spireg"
-	"periph.io/x/periph/host"
+	ws2811 "github.com/rpi-ws281x/rpi-ws281x-go"
+)
+
+const (
+	width  = 8
+	height = 8
+	leds   = width * height
 )
 
 func main() {
-	// Load all the drivers:
-	if _, err := host.Init(); err != nil {
-		log.Fatal(err)
-	}
+	opt := ws2811.DefaultOptions
+	opt.Channels[0].Brightness = 255
+	opt.Channels[0].LedCount = leds
 
-	// Open a handle to the SPI device:
-	port, err := spireg.Open("")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer port.Close()
-
-	// Communicate with the device:
-	s, err := port.Connect(100000000, spi.Mode0, 8)
+	dev, err := ws2811.MakeWS2811(&opt)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Send data to turn on all LEDs:
-	for i := 0; i < 8; i++ {
-		if err := s.Tx([]byte{0x01 << uint(i), 0xFF}, nil); err != nil {
-			log.Fatal(err)
-		}
+	if err := dev.Init(); err != nil {
+		log.Fatal(err)
+	}
+	defer dev.Fini()
+
+	// Turn on all LEDs
+	for i := 0; i < leds; i++ {
+		dev.Leds(0)[i] = 0xFFFFFF // White color
 	}
 
-	fmt.Println("All LEDs turned on.")
+	if err := dev.Render(); err != nil {
+		log.Fatal(err)
+	}
+
+	// Keep the LEDs on for 5 seconds
+	time.Sleep(5 * time.Second)
+
+	// Turn off all LEDs
+	for i := 0; i < leds; i++ {
+		dev.Leds(0)[i] = 0x000000 // Off
+	}
+
+	if err := dev.Render(); err != nil {
+		log.Fatal(err)
+	}
 }

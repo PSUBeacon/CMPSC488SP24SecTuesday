@@ -56,6 +56,9 @@ const Energy = () => {
   ];
   
   const navigate = useNavigate(); // Instantiate useNavigate hook
+  const handleGoToAppliances = () => {
+    navigate('/appliances'); // Adjust the route as necessary
+  };
   const [isNavVisible, setIsNavVisible] = useState(false);
 
   const toggleNav = () => {
@@ -109,29 +112,8 @@ const Energy = () => {
     );
   };
   
-  const CameraWidget = () => {
-    const [cameraView, setCameraView] = useState('livingroom'); // Default view
-    
-    const cameraFeeds = {
-      livingroom: placeholderImage, // Replace with actual video feed or image
-      kitchen: placeholderImage, // Replace with actual video feed or image for kitchen
-      // Add more camera feeds as needed
-    };
-    
-    return (
-      <div className="camera-widget" style={{ position: 'relative', maxWidth: '100%', backgroundColor: '#12232E', borderRadius: '10px', overflow: 'hidden' }}>
-        {/* Live Feed */}
-        <img src={cameraFeeds[cameraView]} alt="Live feed" style={{ width: '100%', height: 'auto', display: 'block' }} />
-        
-        {/* Camera View Buttons */}
-        <div style={{ position: 'absolute', top: '10px', left: '10px', display: 'flex', gap: '5px' }}>
-          <button onClick={() => setCameraView('livingroom')} style={{ padding: '5px', backgroundColor: cameraView === 'livingroom' ? '#4CAF50' : 'transparent' }}>R1</button>
-          <button onClick={() => setCameraView('kitchen')} style={{ padding: '5px', backgroundColor: cameraView === 'kitchen' ? '#4CAF50' : 'transparent' }}>R2</button>
-          {/* Add more buttons for additional camera views as needed */}
-        </div>
-      </div>
-    );
-  };
+  
+
 
   // This is the JSX return statement where we layout our component's HTML structure
   return (
@@ -220,22 +202,26 @@ const Energy = () => {
         </aside>
 
 
-<main style={{ flex: '1', padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: '#0E2237'}}>
-<h2 style={{ color: 'white' }}>Devices Using Energy</h2>
-      <Table striped bordered hover variant="dark" style={{ marginTop: '20px', backgroundColor: "#173350" }}>
-        <thead>
-          <tr>
-            <th>Device</th>
-            <th>Net loss Energy</th>
-            <th>Net Gain Energy</th>
-            <th>Battery %</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
+        <main style={{ flex: '1', padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: '#0E2237'}}>
+  <h2 style={{ color: 'white' }}>Devices Using Energy</h2>
+  <Table striped bordered hover variant="dark" style={{ marginTop: '20px', backgroundColor: "#173350" }}>
+    <thead>
+      <tr>
+        <th>
+          Device
+          <button onClick={handleGoToAppliances} style={{ marginLeft: '10px', padding: '2px 6px', fontSize: '0.8em', background: '#0294A5', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+            See More
+          </button>
+        </th>
+        <th>Net loss Energy</th>
+        <th>Net Gain Energy</th>
+        <th>Battery %</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
           {energy.map((energy, index) => (
             <tr key={index}>
-              
               <td>{energy.Device}</td>
               <td>{energy.NetlossEnergy}</td>
               <td>{energy.NetgainEnergy}</td>

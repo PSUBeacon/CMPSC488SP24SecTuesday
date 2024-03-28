@@ -22,10 +22,10 @@ type PacketDetails struct {
 
 func processZigbeeFrames(data []byte) {
 	// Ensure the minimum length for a Zigbee frame (adjust as needed)
-	if len(data) < 15 {
-		fmt.Println("Invalid Zigbee frame length")
-		return
-	}
+	//if len(data) < 15 {
+	//	fmt.Println("Invalid Zigbee frame length")
+	//	return
+	//}
 
 	// Extract MAC address (64-bit) from the Zigbee frame
 	mac := data[1:9]
@@ -142,7 +142,7 @@ func getNetEvents() {
 	for {
 
 		// Read data from the serial port
-		buf := make([]byte, 128) // Adjust buffer size as needed
+		buf := make([]byte, 4096) // Adjust buffer size as needed
 		n, err := port.Read(buf)
 		if err != nil {
 			log.Println("Error reading from serial port:", err)

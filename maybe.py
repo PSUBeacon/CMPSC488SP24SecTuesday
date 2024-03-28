@@ -67,10 +67,8 @@ def draw_smile():
     ]
 
     # Iterating over each row in the smile_bmp array
-    for i in range(8):
-        # Sending the byte to the corresponding row on the matrix
-        # Assuming row addresses start at 1 and go up to 8
-        send_command(i + 1, smile_bmp[i])
+    for i, row_data in enumerate(smile_bmp, start=1):
+            send_command(i, row_data)
 
     sleep(0.33)  # Display the smiley face for a short period
 def prepare_and_draw(byte_sequence):

@@ -56,7 +56,7 @@ def draw_H():
     # For rows 1-3 and 5-8, turn on columns 1 and 8: 0b10000001
     # For row 4, turn on all columns to connect the two lines: 0b11111111
     for row in range(1, 9):
-        if row%2 = 0:  # Middle row, connect the two vertical lines
+        if row%2 == 0:  # Middle row, connect the two vertical lines
             pattern = 0b11111111
         else:  # Rows for the vertical lines
             pattern = 0b10000001

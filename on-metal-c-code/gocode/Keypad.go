@@ -2,6 +2,8 @@ package gocode
 
 import (
 	"time"
+
+	"github.com/stianeikeland/go-rpio/v4"
 )
 
 // KeyState represents the state of a key.
@@ -25,8 +27,8 @@ type Key struct {
 
 // Keypad represents a keypad.
 type Keypad struct {
-	RowPins      []int
-	ColumnPins   []int
+	RowPins      []rpio.Pin
+	ColumnPins   []rpio.Pin
 	Keys         [][]Key
 	DebounceTime time.Duration
 	HoldTime     time.Duration
@@ -36,14 +38,24 @@ type Keypad struct {
 
 // NewKeypad creates a new Keypad instance.
 func NewKeypad(rowPins, colPins []int, keys [][]Key) *Keypad {
-	return &Keypad{
-		RowPins:      rowPins,
-		ColumnPins:   colPins,
+	kp := &Keypad{
+		RowPins:      make([]rpio.Pin, len(rowPins)),
+		ColumnPins:   make([]rpio.Pin, len(colPins)),
 		Keys:         keys,
 		DebounceTime: 10 * time.Millisecond,
 		HoldTime:     500 * time.Millisecond,
 		LastScanTime: time.Now(),
 	}
+	for i, pin := range rowPins {
+		kp.RowPins[i] = rpio.Pin(pin)
+		kp.RowPins[i].Output()
+	}
+	for i, pin := range colPins {
+		kp.ColumnPins[i] = rpio.Pin(pin)
+		kp.ColumnPins[i].Input()
+		kp.ColumnPins[i].PullDown()
+	}
+	return kp
 }
 
 // SetDebounceTime sets the debounce time for the keypad.
@@ -63,7 +75,7 @@ func (k *Keypad) AddEventListener(listener func(rune)) {
 
 // Begin initializes the keypad.
 func (k *Keypad) Begin() {
-	// Initialize the keypad, set pin modes, etc.
+	// Nothing to do here for now
 }
 
 // GetKey returns a single key press.
@@ -90,24 +102,42 @@ func (k *Keypad) GetKeys() {
 
 // ScanKeys scans the keys and updates their states.
 func (k *Keypad) ScanKeys() {
-	// This is a placeholder for the actual hardware scanning logic.
-	// You'll need to implement this based on your hardware setup.
+	for i, rowPin := range k.RowPins {
+		rowPin.High()
+		for j, colPin := range k.ColumnPins {
+			if colPin.Read() == rpio.High {
+				k.UpdateKeyState(&k.Keys[i][j], PRESSED)
+			} else {
+				k.UpdateKeyState(&k.Keys[i][j], IDLE)
+			}
+		}
+		rowPin.Low()
+	}
 }
 
 // UpdateKeyState updates the state of a given key.
 func (k *Keypad) UpdateKeyState(key *Key, newState KeyState) {
-	key.State = newState
-	key.StateChanged = true
-	if k.Listener != nil {
-		k.Listener(key.Char)
+	if key.State != newState {
+		key.State = newState
+		key.StateChanged = true
+		if newState == PRESSED && k.Listener != nil {
+			k.Listener(key.Char)
+		}
+	} else {
+		key.StateChanged = false
 	}
 }
 
-//
 //func main() {
+//	if err := rpio.Open(); err != nil {
+//		fmt.Printf("Error opening GPIO: %v\n", err)
+//		return
+//	}
+//	defer rpio.Close()
+//
 //	// Example usage
-//	rowPins := []int{1, 2, 3, 4}
-//	columnPins := []int{5, 6, 7}
+//	rowPins := []int{22, 23, 24, 25} // GPIO pin numbers for rows
+//	columnPins := []int{17, 18, 27}  // GPIO pin numbers for columns
 //	keys := [][]Key{
 //		{{'1', 0, IDLE, false}, {'2', 1, IDLE, false}, {'3', 2, IDLE, false}},
 //		{{'4', 3, IDLE, false}, {'5', 4, IDLE, false}, {'6', 5, IDLE, false}},

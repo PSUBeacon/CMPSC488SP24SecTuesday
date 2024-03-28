@@ -91,7 +91,7 @@ def prepare_and_draw(byte_sequence):
 # Example byte sequence for a character (replace with your actual character bytes)
 byte_sequence = b'\x7e\x18\x18\x18\x1c\x18\x18\x00'
 prepare_and_draw(byte_sequence)
-
+sleep(5)
 
 # Initialize and clear the matrix
 initialize_matrix()

@@ -61,6 +61,42 @@ def draw_H():
         else:  # Rows for the vertical lines
             pattern = 0b10000001
         send_command(row, pattern)
+def draw_E():
+    clear_matrix()
+    # E pattern: Vertical line at left, horizontal lines at top, middle, and bottom
+    e_pattern = [0b11111111,  # Top
+                 0b10000001,  #
+                 0b10000001,  #
+                 0b11111111,  # Middle
+                 0b10000001,  #
+                 0b10000001,  #
+                 0b11111111]  # Bottom
+    for row, pattern in enumerate(e_pattern, start=1):
+        send_command(row, pattern)
+def draw_L():
+    clear_matrix()
+    # L pattern: Vertical line at left, horizontal line at bottom
+    l_pattern = [0b10000001,  #
+                 0b10000001,  #
+                 0b10000001,  #
+                 0b10000001,  #
+                 0b10000001,  #
+                 0b10000001,  #
+                 0b11111111]  # Bottom
+    for row, pattern in enumerate(l_pattern, start=1):
+        send_command(row, pattern)
+def draw_O():
+    clear_matrix()
+    # O pattern: Closed loop with no fill
+    o_pattern = [0b11111111,  # Top
+                 0b10000001,  #
+                 0b10000001,  #
+                 0b10000001,  #
+                 0b10000001,  #
+                 0b10000001,  #
+                 0b11111111]  # Bottom
+    for row, pattern in enumerate(o_pattern, start=1):
+        send_command(row, pattern)
 
 # Initialize and clear the matrix
 initialize_matrix()
@@ -68,6 +104,13 @@ clear_matrix()
 
 # Fill the matrix
 draw_H()
+sleep(2)
+draw_E()
+sleep(2)
+draw_O()
+sleep(2)
+draw_L()
+sleep(2)
 
 # Wait for 5 seconds
 sleep(5)

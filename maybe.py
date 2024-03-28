@@ -53,20 +53,17 @@ def set_bit(value, bit):
     """Set the bit at `bit` position to 1 in `value`."""
     return value | (1 << bit)
 
-def draw_H_bit_by_bit():
-    clear_matrix()  # Ensure the matrix starts clear
-    # Iterating through each row and column to set bits for an "H"
-    for row in range(8):  # 0-indexed for iteration, will adjust for 1-indexed commands
-        row_byte = 0b00000000  # Start with an empty row
-        for col in range(8):  # Also 0-indexed
-            # Set bits for the "H" pattern:
-            # For rows 1-3 and 5-8, set the first and last columns
-            # For row 4, set all columns to create the middle horizontal line
-            if col == 0 or col == 7:  # Vertical lines of the "H"
-                row_byte = set_bit(row_byte, 7-col)  # Set appropriate bit
-            if row == 3:  # Middle row, full horizontal line for the "H"
-                row_byte = 0b11111111  # All bits set, completes the row early
-                break  # No need to continue setting bits individually for this row
+def draw_H():
+    clear_matrix()  # Start with a blank matrix
+    for row in range(8):  # For each row
+        row_byte = 0b00000000  # Start with all bits cleared
+        for col in range(8):  # For each column in the row
+            # Adjusting logic for reversed bit ordering
+            if col == 0 or col == 7:  # The vertical lines of the "H"
+                row_byte = set_bit(row_byte, col)  # Reverse the bit-setting logic
+            if row == 3:  # The horizontal line of the "H"
+                row_byte = 0b11111111  # Set all bits for this row, no reversal needed here
+                break  # No need to continue setting bits for this row
         send_command(row + 1, row_byte)  # Send the byte for the current row
 
 
@@ -75,10 +72,10 @@ initialize_matrix()
 clear_matrix()
 
 # Fill the matrix
-draw_H_bit_by_bit()
+draw_H()
 
-# Wait for 5 seconds
-sleep(5)
+# Wait for 10 seconds
+sleep(10)
 
 # Clear the matrix
 clear_matrix()

@@ -49,6 +49,26 @@ def fill_matrix():
     for i in range(1, 9):
         send_command(i, 0xFF)
 
+def draw_lightbulb():
+    # Clear the matrix first to start with a blank slate
+    clear_matrix()
+    # Define the pattern for a lightbulb
+    lightbulb_pattern = [
+        0b00111100,  # Row 1: Top of the bulb
+        0b01111110,  # Row 2
+        0b11111111,  # Row 3
+        0b11111111,  # Row 4: Middle of the bulb (widest)
+        0b01111110,  # Row 5: Start of the base
+        0b00111100,  # Row 6: Narrower part of the base
+        0b00011000,  # Row 7: Bottom of the base
+        0b00011000   # Row 8: Optional, to give the base a more defined look
+    ]
+
+    # Send each row's pattern to the matrix
+    for row, pattern in enumerate(lightbulb_pattern, start=1):
+        send_command(row, pattern)
+
+
 def draw_H():
     # Clear the matrix first to start with a blank slate
     clear_matrix()
@@ -67,10 +87,11 @@ initialize_matrix()
 clear_matrix()
 
 # Fill the matrix
-draw_H()
+#draw_H()
 
 # Wait for 10 seconds
+#sleep(10)
+draw_lightbulb()
 sleep(10)
-
 # Clear the matrix
 clear_matrix()

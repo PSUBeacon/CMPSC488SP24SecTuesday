@@ -48,13 +48,26 @@ def clear_matrix():
 def fill_matrix():
     for i in range(1, 9):
         send_command(i, 0xFF)
+def draw_H():
+    # Clear the matrix first to start fresh
+    clear_matrix()
+
+    # Pattern for an "H"
+    # Rows 1-3 and 5-8: 0b10000001
+    # Row 4 (middle connector): 0b11111111
+    h_pattern = [0b10000001, 0b10000001, 0b10000001, 0b11111111,
+                 0b10000001, 0b10000001, 0b10000001, 0b10000001]
+
+    # Send each row's pattern to the matrix
+    for i, pattern in enumerate(h_pattern, start=1):
+        send_command(i, pattern)
 
 # Initialize and clear the matrix
 initialize_matrix()
 clear_matrix()
 
 # Fill the matrix
-fill_matrix()
+draw_H()
 
 # Wait for 5 seconds
 sleep(5)

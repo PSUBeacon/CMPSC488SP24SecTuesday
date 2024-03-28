@@ -49,22 +49,25 @@ def fill_matrix():
     for i in range(1, 9):
         send_command(i, 0xFF)
 
-def draw_number_1():
-    # Representation of "1" in an 8x8 matrix
-    # This is a simplified version where we light up the second column
-    # to represent the number "1". Each byte represents a column.
-    number_1 = [0x00, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x00]
+def draw_H():
+    # Clear the matrix first to start with a blank slate
+    clear_matrix()
+    # Define the pattern for an "H"
+    # Rows 1-3 and 5-8: 0b10000001 (vertical lines)
+    # Row 4: 0b11111111 (horizontal line connecting the vertical lines)
+    h_pattern = [0b10000001, 0b10000001, 0b10000001, 0b11111111,
+                 0b10000001, 0b10000001, 0b10000001, 0b10000001]
 
-    for i, byte in enumerate(number_1):
-        # The matrix columns are 1-indexed, so we add 1 to the loop index
-        send_command(i + 1, byte)
+    # Send each row's pattern to the matrix
+    for row, pattern in enumerate(h_pattern, start=1):
+        send_command(row, pattern)
 
 # Initialize and clear the matrix
 initialize_matrix()
 clear_matrix()
 
 # Fill the matrix
-draw_number_1()
+draw_H()
 
 # Wait for 10 seconds
 sleep(10)

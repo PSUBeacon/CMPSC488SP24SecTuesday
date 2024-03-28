@@ -70,7 +70,7 @@ initialize_matrix()
 clear_matrix()
 
 # Fill the matrix
-draw_H()
+draw_smile()
 
 # Wait for 5 seconds
 sleep(5)

@@ -1,12 +1,12 @@
-package main
-
-import (
-	"github.com/stianeikeland/go-rpio/v4"
-	"log"
-	"time"
-)
-
+//package main
 //
+//import (
+//	"github.com/stianeikeland/go-rpio/v4"
+//	"log"
+//	"time"
+//)
+//
+////
 //import (
 //	"flag"
 //	"fmt"
@@ -29,47 +29,57 @@ import (
 //
 //}
 
+package main
+
+import (
+	"log"
+	"time"
+
+	"github.com/warthog618/go-gpiocdev"
+)
+
 func main() {
-	// Open/initialize the RPi's GPIO memory range for use
-	err := rpio.Open()
+	chip, err := gpiocdev.NewChip("gpiochip0", gpiocdev.WithConsumer("8x8matrix"))
 	if err != nil {
-		log.Fatalf("Error initializing GPIO: %v", err)
+		log.Fatalf("Failed to open chip: %v", err)
 	}
-	defer rpio.Close()
+	defer chip.Close()
 
-	// Set up pin 4 as output (Chip Select)
-	csPin := rpio.Pin(4)
-	csPin.Output()
-	csPin.High() // Set pin high (inactive) initially
-
-	// Set up SPI communication
-	err = rpio.SpiBegin(rpio.Spi0)
+	din, err := chip.RequestLine(9, gpiocdev.AsOutput(0))
 	if err != nil {
-		log.Fatalf("Error initializing SPI: %v", err)
+		log.Fatalf("Failed to request DIN line: %v", err)
 	}
-	defer rpio.SpiEnd(rpio.Spi0)
+	defer din.Close()
 
-	rpio.SpiSpeed(1000000) // Set SPI speed to 1MHz (adjust as needed)
-	rpio.SpiChipSelect(0)  // Use CS0 (this will be overridden by manual control of the CS pin)
-	rpio.SpiMode(0, 0)     // Set SPI mode (adjust as needed)
-
-	// Map physical pins to SPI function
-	rpio.Pin(9).Mode(rpio.Alt0)  // Set pin 9 as SPI0 MOSI (DIN)
-	rpio.Pin(10).Mode(rpio.Alt0) // Set pin 10 as SPI0 SCLK (CLK)
-
-	// Prepare data to turn on all LEDs in the matrix
-	// This data format will depend on the specific LED matrix you're using
-	// For this example, we're sending 8 bytes, each with all bits set to 1 (0xFF)
-	data := make([]byte, 8)
-	for i := range data {
-		data[i] = 0xFF
+	clk, err := chip.RequestLine(10, gpiocdev.AsOutput(0))
+	if err != nil {
+		log.Fatalf("Failed to request CLK line: %v", err)
 	}
+	defer clk.Close()
 
-	// Send data to turn on all LEDs
-	csPin.Low()               // Activate the CS line
-	rpio.SpiTransmit(data...) // Send the data
-	csPin.High()              // Deactivate the CS line
+	cs, err := chip.RequestLine(4, gpiocdev.AsOutput(1))
+	if err != nil {
+		log.Fatalf("Failed to request CS line: %v", err)
+	}
+	defer cs.Close()
 
-	// Keep the LEDs on for a while to observe
+	// Initialize the matrix
+	cs.SetValue(0)
+	for i := 0; i < 8; i++ {
+		sendByte(din, clk, byte(i+1)) // Address
+		sendByte(din, clk, 0xFF)      // All LEDs on
+	}
+	cs.SetValue(1)
+
+	// Keep the matrix on for a while
 	time.Sleep(5 * time.Second)
+}
+
+func sendByte(din, clk *gpiocdev.Line, b byte) {
+	for i := 0; i < 8; i++ {
+		din.SetValue(int((b >> (7 - i)) & 0x01))
+		clk.SetValue(1)
+		time.Sleep(1 * time.Microsecond) // Small delay
+		clk.SetValue(0)
+	}
 }

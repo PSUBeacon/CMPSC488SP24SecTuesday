@@ -67,7 +67,21 @@ def draw_lightbulb():
     # Send each row's pattern to the matrix
     for row, pattern in enumerate(lightbulb_pattern, start=1):
         send_command(row, pattern)
+def draw_A():
+    a = [
+            0b00011000,  # Row 1: Top of the 'A', forming the peak
+            0b00111100,  # Row 2: Just below the peak, making the upper part wider
+            0b01100110,  # Row 3: Further down, the sides of the 'A'
+            0b01100110,  # Row 4: Sides of the 'A', level with the middle bar
+            0b01111110,  # Row 5: Middle bar of the 'A' and sides
+            0b01100110,  # Row 6: Sides of the 'A' below the middle bar
+            0b01100110,  # Row 7: More sides
+            0b01100110   # Row 8: Bottom of the 'A', completing the sides
+        ]
 
+        # Send each row's pattern to the matrix
+            for row, pattern in enumerate(a, start=1):
+                send_command(row, pattern)
 def draw_lock():
     # Clear the matrix first to start with a blank slate
     clear_matrix()

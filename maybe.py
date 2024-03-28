@@ -48,6 +48,11 @@ def clear_matrix():
 def fill_matrix():
     for i in range(1, 9):
         send_command(i, 0xFF)
+
+def set_bit(value, bit):
+    """Set the bit at `bit` position to 1 in `value`."""
+    return value | (1 << bit)
+
 def draw_H_bit_by_bit():
     clear_matrix()  # Ensure the matrix starts clear
     # Iterating through each row and column to set bits for an "H"

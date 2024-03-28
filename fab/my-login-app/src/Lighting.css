@@ -59,6 +59,75 @@ display: none;
   background-color: #001F3F; /* Your background color */
 }
 
+.lightForm {
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.formGroup {
+  margin-bottom: 15px;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.formGroup input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.submitButton {
+  background-color: #50BCC0;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.roomDropdown {
+  margin-bottom: 20px;
+}
+
+.roomDropdown label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.roomDropdown select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.lightList {
+  list-style: none;
+  padding: 0;
+}
+
+.lightItem {
+  margin-bottom: 10px;
+}
+
+.removeButton {
+  background-color: #FF6347;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+
 
 
 
@@ -298,16 +367,7 @@ ul li {
 }
 
 
-/* Style for dimmer control, adding more space at the top */
-.dimmerControl {
-  margin-top: 20px; /* Add more margin at the top */
-  margin-left: 20px;
-  /* Add the following to position the dimmer to the right */
-  position: absolute; /* Position it absolutely relative to its parent */
-  right: 0; /* Align to the right */
-  top: 50%; /* Adjust the top to center it vertically */
-  transform: translateY(-50%); /* Center it vertically */
-}
+
 
 /* Styles for the slider track. there are so many different styles because it appears differently on different web browser */
 input[type='range'] {

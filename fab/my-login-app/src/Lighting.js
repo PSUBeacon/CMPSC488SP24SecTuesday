@@ -18,19 +18,7 @@ import './Lighting.css';
 // Define the Dashboard component using a functional component pattern
 const Lighting= () => {
 
- // States for date and time
- const [currentDate, setCurrentDate] = useState(new Date().toLocaleDateString());
- const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
 
- useEffect(() => {
-     const timer = setInterval(() => {
-         setCurrentDate(new Date().toLocaleDateString());
-         setCurrentTime(new Date().toLocaleTimeString());
-     }, 1000);
-
-     // Cleanup on component unmount
-     return () => clearInterval(timer);
- }, []);
 
   const navigate = useNavigate(); // Instantiate useNavigate hook
   const [selectedLight, setSelectedLight] = useState(null);
@@ -90,7 +78,14 @@ const Lighting= () => {
 
     
     
-        
+  useEffect(() => {
+    // Retrieve lights from local storage
+    const storedLights = JSON.parse(localStorage.getItem('lights'));
+    if (storedLights) {
+      setLights(storedLights);
+    }
+  }, []);
+     
       
   
 
@@ -124,12 +119,16 @@ const Lighting= () => {
   const [lightName, setLightName] = useState('');
   const [lights, setLights] = useState([]);
 
-  // Function to handle form submission
   const handleFormSubmit = (e) => {
     e.preventDefault(); // Prevent page refresh
     const newLight = { roomName, lightName };
-    setLights([...lights, newLight]); // Add new light to the list
+    const updatedLights = [...lights, newLight];
+    setLights(updatedLights); // Update the state
+  
+    // Store the updated lights in local storage
+    localStorage.setItem('lights', JSON.stringify(updatedLights));
   };
+  
 
   // Function to remove a light
   const handleRemoveLight = (index) => {
@@ -152,10 +151,10 @@ const Lighting= () => {
             <span id = 'menuText2'>Beacon</span>
           </div>
           <div>
-          <span id='menuText'>{currentDate}</span>
+            <span id='menuText'>March 05, 2024</span>
           </div>
           <div>
-            <span id='menuText'>{currentTime}</span>
+            <span id='menuText'>11:48 AM</span>
           </div>
           <div>
           <div style={{ position: 'relative' }}>
@@ -181,13 +180,13 @@ const Lighting= () => {
             <ul style={{ listStyle: 'none', padding: 0 }}>
               {/* Apply active style to 'Overview' since it's the current page */}
               <li className="nav-item"style={{margin: '0.5rem 0', padding: '0.5rem' }}>
-                <Link to="/dashboard" style={{ color: '#95A4B6', textDecoration: 'none' }}>
+                <Link to="/dashboard" style={{ color: 'white', textDecoration: 'none' }}>
                   <i className="fas fa-home" style={{ marginRight: '10px' }}></i>
                   Overview
                 </Link>
               </li>
               <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
-                <Link to="/security" style={{ color: '#95A4B6', textDecoration: 'none' }}>
+                <Link to="/security" style={{ color: 'white', textDecoration: 'none' }}>
                   <i className="fas fa-lock" style={{ marginRight: '10px' }}></i>
                   Security
                 </Link>
@@ -199,25 +198,25 @@ const Lighting= () => {
                 </Link>
               </li>
               <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
-                <Link to="/networking" style={{ color: '#95A4B6', textDecoration: 'none' }}>
+                <Link to="/networking" style={{ color: 'white', textDecoration: 'none' }}>
                   <i className="fas fa-sliders-h" style={{ marginRight: '10px' }}></i>
                   Networking
                 </Link>
               </li>
               <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
-                <Link to="/hvac" style={{ color: '#95A4B6', textDecoration: 'none' }}>
+                <Link to="/hvac" style={{ color: 'white', textDecoration: 'none' }}>
                   <i className="fas fa-thermometer-half" style={{ marginRight: '10px' }}></i>
                   HVAC
                 </Link>
               </li>
               <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
-                <Link to="/appliances" style={{ color: '#95A4B6', textDecoration: 'none' }}>
+                <Link to="/appliances" style={{ color: 'white', textDecoration: 'none' }}>
                   <i className="fas fa-blender" style={{ marginRight: '10px' }}></i>
                   Appliances
                 </Link>
               </li>
               <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
-                <Link to="/energy" style={{ color: '#95A4B6', textDecoration: 'none' }}>
+                <Link to="/energy" style={{ color: 'white', textDecoration: 'none' }}>
                   <i className="fas fa-bolt" style={{ marginRight: '10px' }}></i>
                   Energy
                 </Link>
@@ -227,71 +226,79 @@ const Lighting= () => {
         </aside>
 
     
-        <main style={{ flex: '1', padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', backgroundColor: '#0E2237', width: '100%'}}>
-  
+        <main style={{ flex: '1', padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: '#0E2237', width: '100%'}}>
   {/* Content Block */}
-  
-  <div className="contentBlock" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', paddingBottom: '60px'}}>
-            {/* Lights Control Section */}
-            <div className="lightsControl" style={{ flex: '1', display: 'flex', flexDirection: 'column'}}>
-              {/* Room Selection */}
-              <div className="roomSelection" style={{ width: '50%', display: 'flex', flexDirection: 'column' }}>
-              <h3 className="centered-title">Selecting a Room</h3>
-                <div className="RoomCards" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around',  padding:'0px' }}>
-                  {/* Room cards */}
-                  <div className="card" style={{ width: '40%', marginBottom: '20px', border: selectedRoom === "Bedroom 1" ? '2px solid #0294A5' : 'none' }} onClick={() => {setRoomName("Bedroom 1"); setSelectedRoom("Bedroom 1");}}><img class="images" src={bedroomIcon} alt="Room 1" /></div>
-                  <div className="card" style={{ width: '40%', marginBottom: '20px', border: selectedRoom === "Bedroom 2" ? '2px solid #0294A5' : 'none' }} onClick={() => {setRoomName("Bedroom 2"); setSelectedRoom("Bedroom 2");}}><img class="images" src={bedroomIcon} alt="Room 2" /></div>
-                  <div className="card" style={{ width: '40%', border: selectedRoom === "Living Room" ? '2px solid #0294A5' : 'none' }} onClick={() => {setRoomName("Living Room"); setSelectedRoom("Living Room");}}><img class="images" src={livingroomIcon} alt="Room 3" /></div>
-                </div>
-                <div className="formContainer" style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
-                  {/* Form to add lights */}
-                  <form onSubmit={handleFormSubmit}>
-                    <label>
-                      Room Name:
-                      <input type="text" value={roomName} onChange={(e) => setRoomName(e.target.value)} />
-                    </label>
-                    <label>
-                      Light Name:
-                      <input type="text" value={lightName} onChange={(e) => setLightName(e.target.value)} />
-                    </label>
-                    <button type="submit">Add Light</button>
-                  </form>
-                  {/* List of lights with remove option */}
-                  <ul>
-                    {lights.map((light, index) => (
-                      <li key={index}>
-                        {light.roomName} - {light.lightName}
-                        <button onClick={() => handleRemoveLight(index)}>Remove</button>
-                      </li>
-                  ))}
-                </ul>
-                </div>
-                {/* Light Dimmer Control */}
-                <div className="dimmerControl" style={{ width: '30%', marginRight: '75px' }}>
-                  <input
-                    type="range"
-                    id="dimmer"
-                    name="dimmer"
-                    min="0"
-                    max="100"
-                    value={dimmerValue}
-                    onChange={(e) => setDimmerValue(e.target.value)}
-                  />
-                  <label htmlFor="dimmer">{dimmerValue}%</label>
-                  {/* Turn on/off button */}
-                  <button onClick={toggleLight} className="toggleButton">
-                    {isLightOn ? 'Turn Off' : 'Turn On'}
-                  </button>
-                </div>
-              </div>
-                
-                
-              
-
-              
-            </div>
+  <div className="contentBlock" style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', width: '100%', paddingBottom: '60px'}}>
+    {/* Room Selection */}
+    <div className="roomSelection" style={{ flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center', marginRight: '20px' }}>
+      <h3 className="centered-title">Selecting a Room</h3>
+      <div className="RoomCards" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '40px' }}>
+        {/* Room cards */}
+        <div className="card" style={{ marginBottom: '20px', border: selectedRoom === "Bedroom 1" ? '2px solid #0294A5' : 'none' }} onClick={() => {setRoomName("Bedroom 1"); setSelectedRoom("Bedroom 1");}}><img class="images" src={bedroomIcon} alt="Room 1" /></div>
+        <div className="card" style={{ marginBottom: '20px', border: selectedRoom === "Bedroom 2" ? '2px solid #0294A5' : 'none' }} onClick={() => {setRoomName("Bedroom 2"); setSelectedRoom("Bedroom 2");}}><img class="images" src={bedroomIcon} alt="Room 2" /></div>
+        <div className="card" style={{ border: selectedRoom === "Living Room" ? '2px solid #0294A5' : 'none' }} onClick={() => {setRoomName("Living Room"); setSelectedRoom("Living Room");}}><img class="images" src={livingroomIcon} alt="Room 3" /></div>
+      </div>
+    </div>
+    {/* Light Control */}
+    <div className="lightControl" style={{ flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      {/* Light Form */}
+      <div className="formContainer" style={{ width: '100%', marginBottom: '20px', marginTop: '80px' }}>
+        <form onSubmit={handleFormSubmit} className="lightForm">
+          <div className="formGroup">
+            <label htmlFor="roomName">Room Name:</label>
+            <input type="text" id="roomName" value={roomName} onChange={(e) => setRoomName(e.target.value)} />
           </div>
-        </main>
+          <div className="formGroup">
+            <label htmlFor="lightName">Light Name:</label>
+            <input type="text" id="lightName" value={lightName} onChange={(e) => setLightName(e.target.value)} />
+          </div>
+          <button type="submit" className="submitButton">Add Light</button>
+        </form>
+        {/* Dropdown to select rooms */}
+        <div className="roomDropdown" style={{ marginBottom: '20px' }}>
+          <label htmlFor="selectRoom">Select Room:</label>
+          <select id="selectRoom" onChange={(e) => setSelectedRoom(e.target.value)}>
+            <option value="">Select Room</option>
+            {lights.map((light, index) => (
+              <option key={index} value={light.roomName}>{light.roomName}</option>
+            ))}
+          </select>
+        </div>
+        {/* List of lights for the selected room with remove option */}
+        {selectedRoom && (
+          <ul className="lightList">
+            {lights
+              .filter((light) => light.roomName === selectedRoom)
+              .map((light, index) => (
+                <li key={index} className="lightItem">
+                  {light.lightName}
+                  <button style={{ marginTop: '20px'}}  onClick={() => handleRemoveLight(index)} className="removeButton">Remove</button>
+                </li>
+              ))}
+          </ul>
+        )}
+        {/* Light Dimmer Control */}
+        <div className="dimmerControl" style={{ width: '100%', textAlign: 'center', marginTop: '20px' }}>
+          <input
+            type="range"
+            id="dimmer"
+            name="dimmer"
+            min="0"
+            max="100"
+            value={dimmerValue}
+            onChange={(e) => setDimmerValue(e.target.value)}
+          />
+          <label htmlFor="dimmer">{dimmerValue}%</label>
+          {/* Turn on/off button */}
+          <button onClick={toggleLight} className="toggleButton">
+            {isLightOn ? 'Turn Off' : 'Turn On'}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
       </div>
     </div>
   );

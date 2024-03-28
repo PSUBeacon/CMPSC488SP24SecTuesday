@@ -48,19 +48,22 @@ def clear_matrix():
 def fill_matrix():
     for i in range(1, 9):
         send_command(i, 0xFF)
-def draw_H():
+def draw_smile():
     # Clear the matrix first to start with a blank slate
     clear_matrix()
-
+    o_pattern = [0b00011110,
+    0b00100001,
+    0b11010010,
+    0b11000000,
+    0b11010010,
+    0b11001100,
+    0b00100001,
+    0b00011110]
     # Define the pattern for an "H"
     # For rows 1-3 and 5-8, turn on columns 1 and 8: 0b10000001
     # For row 4, turn on all columns to connect the two lines: 0b11111111
-    for row in range(1, 9):
-        if row%2 == 0:  # Middle row, connect the two vertical lines
-            pattern = 0b11111111
-        else:  # Rows for the vertical lines
-            pattern = 0b10000001
-        send_command(row, pattern)
+    for row, pattern in enumerate(o_pattern, start=1):
+            send_command(row, pattern)
 
 # Initialize and clear the matrix
 initialize_matrix()

@@ -48,29 +48,29 @@ def clear_matrix():
 def fill_matrix():
     for i in range(1, 9):
         send_command(i, 0xFF)
-def draw_smile():
-    # Clear the matrix first to start with a blank slate
-    clear_matrix()
-    o_pattern = [0b00011110,
-    0b00100001,
-    0b11010010,
-    0b11000000,
-    0b11010010,
-    0b11001100,
-    0b00100001,
-    0b00011110]
-    # Define the pattern for an "H"
-    # For rows 1-3 and 5-8, turn on columns 1 and 8: 0b10000001
-    # For row 4, turn on all columns to connect the two lines: 0b11111111
-    for row, pattern in enumerate(o_pattern, start=1):
-            send_command(row, pattern)
+def draw_H_bit_by_bit():
+    clear_matrix()  # Ensure the matrix starts clear
+    # Iterating through each row and column to set bits for an "H"
+    for row in range(8):  # 0-indexed for iteration, will adjust for 1-indexed commands
+        row_byte = 0b00000000  # Start with an empty row
+        for col in range(8):  # Also 0-indexed
+            # Set bits for the "H" pattern:
+            # For rows 1-3 and 5-8, set the first and last columns
+            # For row 4, set all columns to create the middle horizontal line
+            if col == 0 or col == 7:  # Vertical lines of the "H"
+                row_byte = set_bit(row_byte, 7-col)  # Set appropriate bit
+            if row == 3:  # Middle row, full horizontal line for the "H"
+                row_byte = 0b11111111  # All bits set, completes the row early
+                break  # No need to continue setting bits individually for this row
+        send_command(row + 1, row_byte)  # Send the byte for the current row
+
 
 # Initialize and clear the matrix
 initialize_matrix()
 clear_matrix()
 
 # Fill the matrix
-draw_smile()
+draw_H_bit_by_bit()
 
 # Wait for 5 seconds
 sleep(5)

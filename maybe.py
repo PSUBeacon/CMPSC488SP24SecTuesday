@@ -49,28 +49,22 @@ def fill_matrix():
     for i in range(1, 9):
         send_command(i, 0xFF)
 
-def draw_smile():
-    clear_matrix()  # Clear the matrix to start fresh
-    smile_bmp = [
-        0b00011110,
-        0b00100001,
-        0b11010010,
-        0b11000000,
-        0b11010010,
-        0b11001100,
-        0b00100001,
-        0b00011110
-    ]
-    # Loop through each row and send the corresponding byte to the matrix
-    for i, row_data in enumerate(smile_bmp, start=1):
-        send_command(i, row_data)
+def draw_number_1():
+    # Representation of "1" in an 8x8 matrix
+    # This is a simplified version where we light up the second column
+    # to represent the number "1". Each byte represents a column.
+    number_1 = [0x00, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x00]
+
+    for i, byte in enumerate(number_1):
+        # The matrix columns are 1-indexed, so we add 1 to the loop index
+        send_command(i + 1, byte)
 
 # Initialize and clear the matrix
 initialize_matrix()
 clear_matrix()
 
 # Fill the matrix
-draw_smile()
+draw_number_1()
 
 # Wait for 10 seconds
 sleep(10)

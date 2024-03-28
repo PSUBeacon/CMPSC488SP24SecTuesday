@@ -16,19 +16,7 @@ import placeholderImage2 from './placeholderImage2.jpg'; // Replace with the pat
 // Define the Dashboard component using a functional component pattern
 const Dashboard = () => {
 
-  // States for date and time
-  const [currentDate, setCurrentDate] = useState(new Date().toLocaleDateString());
-  const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
-
-  useEffect(() => {
-      const timer = setInterval(() => {
-          setCurrentDate(new Date().toLocaleDateString());
-          setCurrentTime(new Date().toLocaleTimeString());
-      }, 1000);
-
-      // Cleanup on component unmount
-      return () => clearInterval(timer);
-  }, []);
+ 
 
   const navigate = useNavigate(); // Instantiate useNavigate hook
   const [isNavVisible, setIsNavVisible] = useState(false);
@@ -298,10 +286,10 @@ const AppliancesWidget = () => {
             <span id = 'menuText2'>Beacon</span>
           </div>
           <div>
-            <span id='menuText'>{currentDate}</span>
+            <span id='menuText'>{"May 5"}</span>
           </div>
           <div>
-            <span id='menuText'>{currentTime}</span>
+            <span id='menuText'>{"5 PM"}</span>
           </div>
           <div>
           <div style={{ position: 'relative' }}>

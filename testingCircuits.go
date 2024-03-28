@@ -80,13 +80,16 @@ func sendCommand(conn spi.Conn, register, data byte) {
 
 // displayPattern displays a pattern on the LED matrix.
 func displayPattern(conn spi.Conn) {
-	// Example pattern: diagonal line
-	pattern := []byte{
-		0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80,
-	}
-	for i, val := range pattern {
-		sendCommand(conn, Digit0+byte(i), val)
-	}
+	//// Example pattern: diagonal line
+	//pattern := []byte{
+	//	0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80,
+	//}
+	//for i, val := range pattern {
+	//	sendCommand(conn, Digit0+byte(i), val)
+	//}
+
+	sendCommand(conn, Digit0, 0x01)
+
 }
 
 // clearDisplay clears the LED matrix display.

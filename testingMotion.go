@@ -21,9 +21,9 @@ func CheckForMotion(pinNum uint8) (bool, error) {
 
 	pin := rpio.Pin(pinNum)
 	pin.Input()
-	pin.PullDown()
+	pin.PullUp() // Changed to pull-up
 
-	motionDetected := pin.Read() == rpio.High
+	motionDetected := pin.Read() == rpio.Low // Changed to detect low signal
 	return motionDetected, nil
 }
 

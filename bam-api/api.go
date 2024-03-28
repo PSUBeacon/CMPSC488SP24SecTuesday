@@ -1,7 +1,6 @@
 package main
 
 import (
-
 	"CMPSC488SP24SecTuesday/dal"
 	"bytes"
 
@@ -60,6 +59,10 @@ func main() {
 	r.GET("/status", statusResp)
 	r.POST("/login", loginHandler)
 	r.POST("/lighting", updateLighting)
+	r.POST("/hvac", updateHVAC)
+	r.POST("/dishwasher", updateDishwasher)
+	r.POST("/fridge", updateFridge)
+	r.POST("/oven", updateOven)
 
 	// use JWT middleware for all protected routes
 	r.Use(authMiddleware())
@@ -77,7 +80,6 @@ func main() {
 	if err != nil {
 		log.Fatal("Server startup error:", err)
 	}
-
 
 }
 
@@ -108,6 +110,118 @@ func updateLighting(c *gin.Context) {
 
 }
 
+type UpdateHVACRequest struct {
+	UUID        string `json:"UUID"`
+	Status      bool   `json:"Status"`
+	Temperature int    `json:"Temperature"`
+	Mode        string `json:"Modes"`
+	FanSpeed    int    `json:"FanSpeed"`
+}
+
+func updateHVAC(c *gin.Context) {
+	var req UpdateHVACRequest
+	requestBody, _ := ioutil.ReadAll(c.Request.Body)
+	fmt.Printf("Received request body: %s\n", string(requestBody))
+	// Reset the request body to be able to parse it again
+	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		fmt.Printf("Error binding JSON: %v\n", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Call the IotHVAC function
+	dal.IoTHVAC([]byte(req.UUID), req.Temperature, req.FanSpeed, req.Status, req.Mode)
+
+	// Respond to the request indicating success.
+	c.JSON(http.StatusOK, gin.H{"message": "HVAC updated successfully"})
+
+}
+
+type updateDishwasherRequest struct {
+	UUID     string `json:"UUID"`
+	Status   bool   `json:"Status"`
+	WashTime int    `json:"WashTime"`
+}
+
+func updateDishwasher(c *gin.Context) {
+	var req updateDishwasherRequest
+	requestBody, _ := ioutil.ReadAll(c.Request.Body)
+	fmt.Printf("Received request body: %s\n", string(requestBody))
+	// Reset the request body to be able to parse it again
+	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		fmt.Printf("Error binding JSON: %v\n", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Call the IotDishwasher function
+	dal.IoTDishwasher([]byte(req.UUID), req.Status, req.WashTime)
+
+	// Respond to the request indicating success.
+	c.JSON(http.StatusOK, gin.H{"message": "Dishwasher updated successfully"})
+
+}
+
+type updateFridgeRequest struct {
+	UUID                string `json:"UUID"`
+	Status              bool   `json:"Status"`
+	TemperatureSettings int    `json:"TemperatureSettings"`
+	EnergySaverMode     bool   `json:"EnergySaverMode"`
+}
+
+func updateFridge(c *gin.Context) {
+	var req updateFridgeRequest
+	requestBody, _ := ioutil.ReadAll(c.Request.Body)
+	fmt.Printf("Received request body: %s\n", string(requestBody))
+	// Reset the request body to be able to parse it again
+	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		fmt.Printf("Error binding JSON: %v\n", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Call the IotFridge function
+	dal.IoTFridge([]byte(req.UUID), req.Status, req.TemperatureSettings, req.EnergySaverMode)
+
+	// Respond to the request indicating success.
+	c.JSON(http.StatusOK, gin.H{"message": "Fridge updated successfully"})
+
+}
+
+type updateOvenRequest struct {
+	UUID                string    `json:"UUID"`
+	Status              bool      `json:"Status"`
+	TemperatureSettings int       `json:"TemperatureSettings"`
+	TimerStopTime       time.Time `json:"TimerStopTime"`
+}
+
+func updateOven(c *gin.Context) {
+	var req updateOvenRequest
+	requestBody, _ := ioutil.ReadAll(c.Request.Body)
+	fmt.Printf("Received request body: %s\n", string(requestBody))
+	// Reset the request body to be able to parse it again
+	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		fmt.Printf("Error binding JSON: %v\n", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Call the IotOven function
+	dal.IotOven([]byte(req.UUID), req.Status, req.TemperatureSettings, req.TimerStopTime)
+
+	// Respond to the request indicating success.
+	c.JSON(http.StatusOK, gin.H{"message": "Oven updated successfully"})
+
+}
+
 func statusResp(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "OK"})
 }
@@ -135,7 +249,6 @@ func loginHandler(c *gin.Context) {
 		return
 	}
 
-
 	// Fetch user by username from MongoDB
 	fetchedUser, err := dal.FetchUser(client, loginData.Username)
 	fmt.Printf("Username:", fetchedUser.Username)
@@ -158,14 +271,14 @@ func loginHandler(c *gin.Context) {
 	//c.Set("smartHomeDB", smartHomeDB)
 
 	// Print smart home data
-	smartHomeData := dal.PrintSmartHomeDBContents(smartHomeDB)
+	//smartHomeData := dal.PrintSmartHomeDBContents(smartHomeDB)
 
 	// JWT token creation
 	claims := jwt.MapClaims{
 		"username": fetchedUser.Username,
-		"role":     fetchedUser.Role,                      // Use the actual role from the fetched user
+		"role":     fetchedUser.Role, // Use the actual role from the fetched user
 
-		"exp":      time.Now().Add(time.Hour * 24).Unix(), // Token expiration time
+		"exp": time.Now().Add(time.Hour * 24).Unix(), // Token expiration time
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(jwtKey)
@@ -174,7 +287,6 @@ func loginHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create the token"})
 		return
 	}
-
 
 	// Return the JWT token in the response
 	c.JSON(http.StatusOK, gin.H{"token": tokenString})
@@ -266,7 +378,7 @@ func dashboardHandler(c *gin.Context) {
 			return
 		}
 		c.JSON(http.StatusOK, gin.H{
-			"message":     "Welcome to the Owner dashboard",
+			"message": "Welcome to the Owner dashboard",
 
 			"accountType": "Admin",
 		})
@@ -275,11 +387,9 @@ func dashboardHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message":     "Welcome to the Owner dashboard",
 			"accountType": "User",
-
 		})
 	default:
 		c.JSON(http.StatusForbidden, gin.H{"error": "Invalid role or insufficient privileges"})
 	}
 
 }
-

@@ -67,6 +67,7 @@ type HVAC struct {
 	Humidity          int       `json:"Humidity"`
 	FanSpeed          int       `json:"FanSpeed"`
 	Status            bool      `json:"Status"`
+	Mode              string    `json:"Modes"`
 	EnergyConsumption int       `json:"EnergyConsumption"`
 	LastChanged       time.Time `json:"LastChanged"`
 }
@@ -136,7 +137,7 @@ type SmartHomeDB struct {
 	SolarPanel     []SolarPanel
 	Toaster        []Toaster
 	Users          []User
-
+}
 
 // messaging struct to send update requests to IoT devices
 type messagingStruct struct {
@@ -144,6 +145,21 @@ type messagingStruct struct {
 	Function     string `json:"Function"`
 	Change       string `json:"Change"`
 	StatusChange bool   `json:"StatusChange"`
+}
+
+type DbToIotMessageStruct struct {
+	UUID            string    `json:"UUID"`
+	Function        string    `json:"Function"`
+	Change          string    `json:"Change"`
+	StatusChange    bool      `json:"StatusChange"`
+	HVACFanSpeed    int       `json:"FanSpeed"`
+	HVACMode        string    `json:"HVACMode"`
+	HVACTemp        int       `json:"HVACTemp"`
+	DwWashTime      int       `json:"WashTime"`
+	FridgeTemp      int       `json:"FridgeTemp"`
+	FridgeEnergySvr bool      `json:"FridgeEnergy"`
+	OvenTemp        int       `json:"OvenTemp"`
+	TimerStopTime   time.Time `json:"OvenTimerStopTime"`
 }
 
 func FetchCollections(client *mongo.Client, dbName string) (*SmartHomeDB, error) {
@@ -261,6 +277,143 @@ func Iotlighting(UUID []byte, status bool, brightness int) {
 	}
 }
 
+func IoTHVAC(UUID []byte, temperature int, fanSpeed int, status bool, mode string) {
+
+	client, err := ConnectToMongoDB()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer func(client *mongo.Client, ctx context.Context) {
+		err := client.Disconnect(ctx)
+		if err != nil {
+
+		}
+	}(client, context.Background())
+
+	smartHomeDB, err := FetchCollections(client, dbName) // Fetches and populates data
+
+	if err != nil {
+		log.Fatalf("Error fetching IoT data: %v", err)
+	}
+	for _, hvac := range smartHomeDB.HVAC {
+		if bytes.Equal([]byte(hvac.UUID), UUID) {
+			var infoChange DbToIotMessageStruct
+
+			infoChange.UUID = string(UUID)
+			infoChange.Function = "status"
+			infoChange.StatusChange = status
+			infoChange.HVACFanSpeed = fanSpeed
+			infoChange.HVACMode = mode
+			infoChange.HVACTemp = temperature
+
+			message, _ := json.Marshal(infoChange)
+			messaging.BroadCastMessage(message)
+		}
+	}
+}
+
+func IoTDishwasher(UUID []byte, status bool, washTime int) {
+
+	client, err := ConnectToMongoDB()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer func(client *mongo.Client, ctx context.Context) {
+		err := client.Disconnect(ctx)
+		if err != nil {
+
+		}
+	}(client, context.Background())
+
+	smartHomeDB, err := FetchCollections(client, dbName) // Fetches and populates data
+
+	if err != nil {
+		log.Fatalf("Error fetching IoT data: %v", err)
+	}
+	for _, dishwasher := range smartHomeDB.Dishwasher {
+		if bytes.Equal([]byte(dishwasher.UUID), UUID) {
+			var infoChange DbToIotMessageStruct
+
+			infoChange.UUID = string(UUID)
+			infoChange.Function = "status"
+			infoChange.StatusChange = status
+			infoChange.DwWashTime = washTime
+
+			message, _ := json.Marshal(infoChange)
+			messaging.BroadCastMessage(message)
+		}
+	}
+}
+
+func IoTFridge(UUID []byte, status bool, temperature int, energySaveMode bool) {
+
+	client, err := ConnectToMongoDB()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer func(client *mongo.Client, ctx context.Context) {
+		err := client.Disconnect(ctx)
+		if err != nil {
+
+		}
+	}(client, context.Background())
+
+	smartHomeDB, err := FetchCollections(client, dbName) // Fetches and populates data
+
+	if err != nil {
+		log.Fatalf("Error fetching IoT data: %v", err)
+	}
+	for _, fridge := range smartHomeDB.Fridge {
+		if bytes.Equal([]byte(fridge.UUID), UUID) {
+			var infoChange DbToIotMessageStruct
+
+			infoChange.UUID = string(UUID)
+			infoChange.Function = "status"
+			infoChange.StatusChange = status
+			infoChange.FridgeTemp = temperature
+			infoChange.FridgeEnergySvr = energySaveMode
+
+			message, _ := json.Marshal(infoChange)
+			messaging.BroadCastMessage(message)
+		}
+	}
+
+}
+
+func IotOven(UUID []byte, status bool, temperature int, timerStopTime time.Time) {
+
+	client, err := ConnectToMongoDB()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer func(client *mongo.Client, ctx context.Context) {
+		err := client.Disconnect(ctx)
+		if err != nil {
+
+		}
+	}(client, context.Background())
+
+	smartHomeDB, err := FetchCollections(client, dbName) // Fetches and populates data
+
+	if err != nil {
+		log.Fatalf("Error fetching IoT data: %v", err)
+	}
+	for _, oven := range smartHomeDB.Oven {
+		if bytes.Equal([]byte(oven.UUID), UUID) {
+			var infoChange DbToIotMessageStruct
+
+			infoChange.UUID = string(UUID)
+			infoChange.Function = "status"
+			infoChange.StatusChange = status
+			infoChange.OvenTemp = temperature
+			infoChange.TimerStopTime = timerStopTime
+
+			message, _ := json.Marshal(infoChange)
+			messaging.BroadCastMessage(message)
+		}
+	}
+}
+
 //func PrintSmartHomeDBContents(smartHomeDB *SmartHomeDB) string {
 //	return fmt.Sprintf(
 //		"Dishwasher: %+v\nFridge: %+v\nHVAC: %+v\nLighting: %+v\nMicrowave: %+v\nOven: %+v\nSecuritySystem: %+v\nSolarPanel: %+v\nToaster: %+v\n",
@@ -283,7 +436,7 @@ func main() {
 		log.Fatal(err)
 	}
 	defer client.Disconnect(context.Background())
-  
+
 	////Testing fetchedUser function
 	//fetchedUser, err := FetchUser(client, "Owner")
 	if err != nil {

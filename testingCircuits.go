@@ -23,7 +23,7 @@ func main() {
 	defer port.Close()
 
 	// Communicate with the device:
-	s, err := port.Connect(100, spi.Mode0, 8)
+	s, err := port.Connect(100000, spi.Mode0, 8)
 	if err != nil {
 		log.Fatal(err)
 	}

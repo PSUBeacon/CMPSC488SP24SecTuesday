@@ -31,6 +31,15 @@ const HVAC = () => {
     const [dashboardMessage, setDashboardMessage] = useState('');
     const [accountType ,setAccountType] = useState('')
     
+    const toggleHVACStatus = () => {
+      setDeviceData(prevDeviceData => ({
+        ...prevDeviceData,
+        HVAC: {
+          ...prevDeviceData.HVAC,
+          Status: !prevDeviceData.HVAC.Status,
+        },
+      }));
+    };
 
  // States for each device
  const [deviceData, setDeviceData] = useState({
@@ -254,6 +263,15 @@ const HVAC = () => {
         <div className="data-info">
           <p style={{ color: '#95A4B6'}}>Status</p>
           <p>{deviceData.HVAC.Status ? "On" : "Off"}</p>
+          {/* Toggle */}
+          <label className="toggle" style={{ display: 'block', margin: 'auto' }}>
+            <input
+              type="checkbox"
+              checked={deviceData.HVAC.Status}
+              onChange={toggleHVACStatus}
+            />
+            <span className="slider" style={{ background: deviceData.HVAC.Status ? '#50BCC0' : 'grey' }}></span>
+          </label>
         </div>
       </div>
       <div className="data-item">
@@ -268,6 +286,8 @@ const HVAC = () => {
     </div>
   )}
 </main>
+
+
 
 
 

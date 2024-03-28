@@ -56,7 +56,7 @@ def draw_lightbulb():
     lightbulb_pattern = [
         0b00111100,  # Row 1: Top of the bulb
         0b01111110,  # Row 2
-        0b11111111,  # Row 3
+        0b01111110,  # Row 3
         0b11111111,  # Row 4: Middle of the bulb (widest)
         0b01111110,  # Row 5: Start of the base
         0b00111100,  # Row 6: Narrower part of the base

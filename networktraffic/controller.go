@@ -1,4 +1,4 @@
-package main
+package networking
 
 import (
 	"bufio"
@@ -46,6 +46,6 @@ func ConfigureController() {
 	}
 }
 
-func main() {
-	ConfigureController()
-}
+//func main() {
+//	ConfigureController()
+//}

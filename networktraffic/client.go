@@ -1,4 +1,4 @@
-package main
+package networking
 
 import (
 	"bufio"
@@ -44,6 +44,6 @@ func SendMessagesToServer() {
 	}
 }
 
-func main() {
-	SendMessagesToServer()
-}
+//func main() {
+//	SendMessagesToServer()
+//}

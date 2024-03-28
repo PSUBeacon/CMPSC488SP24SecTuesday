@@ -1,4 +1,4 @@
-package main
+package networking
 
 import (
 	"encoding/json"
@@ -20,7 +20,7 @@ type PacketDetails struct {
 	DestinationPort string `json:"destination_port"`
 }
 
-func processZigbeeFrames(data []byte) {
+func ProcessZigbeeFrames(data []byte) {
 	// Ensure the minimum length for a Zigbee frame (adjust as needed)
 	//if len(data) < 15 {
 	//	fmt.Println("Invalid Zigbee frame length")
@@ -38,12 +38,12 @@ func processZigbeeFrames(data []byte) {
 	fmt.Printf("PAN ID: %X\n", panID)
 }
 
-func getNetEvents() {
+func GetNetEvents() {
 	// list all adapters
-	networkAdapters()
+	NetworkAdapters()
 
 	// Define the network interface you want to capture packets from
-	device := "any"
+	device := "/dev/ttyUSB0"
 
 	// Open the network device for packet capture
 	handle, err := pcap.OpenLive(device, 1600, true, pcap.BlockForever)
@@ -151,7 +151,7 @@ func getNetEvents() {
 
 		// Process the received data (Zigbee frames)
 		fmt.Println("\nZigbee PAN and MAC on the network:")
-		processZigbeeFrames(buf[:n])
+		ProcessZigbeeFrames(buf[:n])
 
 		// Check if 30 seconds have passed
 		if time.Since(startTime) >= 30*time.Second {

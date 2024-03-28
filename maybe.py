@@ -49,54 +49,22 @@ def fill_matrix():
     for i in range(1, 9):
         send_command(i, 0xFF)
 
-def set_bit(value, bit):
-    """Set the bit at `bit` position to 1 in `value`."""
-    return value | (1 << bit)
+def draw_number_1():
+    # Representation of "1" in an 8x8 matrix
+    # This is a simplified version where we light up the second column
+    # to represent the number "1". Each byte represents a column.
+    number_1 = [0x00, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x00]
 
-def draw_smile():
-    clear_matrix()  # Clear the matrix to start fresh
-    smile_bmp = [
-        0b00011110,
-        0b00100001,
-        0b11010010,
-        0b11000000,
-        0b11010010,
-        0b11001100,
-        0b00100001,
-        0b00011110
-    ]
-
-    # Iterating over each row in the smile_bmp array
-    for i, row_data in enumerate(smile_bmp, start=1):
-            send_command(i, row_data)
-
-    sleep(0.33)  # Display the smiley face for a short period
-def prepare_and_draw(byte_sequence):
-    # Step 1: Reverse the byte order
-    reversed_bytes = byte_sequence[::-1]
-
-    # Step 2: Convert from LSB to MSB for each byte
-    def reverse_bits(byte):
-        return int('{:08b}'.format(byte)[::-1], 2)
-    converted_bytes = bytes(reverse_bits(b) for b in reversed_bytes)
-
-    # Step 3: Draw the prepared bytes on the matrix
-    clear_matrix()  # Ensure a clean slate
-    for i, byte in enumerate(converted_bytes):
+    for i, byte in enumerate(number_1):
+        # The matrix columns are 1-indexed, so we add 1 to the loop index
         send_command(i + 1, byte)
-    sleep(0.33)  # Display for a short duration
-
-# Example byte sequence for a character (replace with your actual character bytes)
-byte_sequence = b'\x7e\x18\x18\x18\x1c\x18\x18\x00'
-prepare_and_draw(byte_sequence)
-sleep(5)
 
 # Initialize and clear the matrix
 initialize_matrix()
 clear_matrix()
 
 # Fill the matrix
-draw_smile()
+draw_number_1()
 
 # Wait for 10 seconds
 sleep(10)

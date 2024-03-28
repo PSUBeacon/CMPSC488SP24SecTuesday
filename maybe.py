@@ -67,7 +67,7 @@ initialize_matrix()
 clear_matrix()
 
 # Fill the matrix
-draw_A()
+draw_H()
 
 # Wait for 5 seconds
 sleep(5)

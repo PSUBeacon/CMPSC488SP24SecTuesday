@@ -88,7 +88,7 @@ const Dashboard = () => {
   const cameraFeeds = {
     livingroom: placeholderImage, // Replace with the actual camera feed URL or image for the living room
     kitchen: placeholderImage2, // Replace with the actual camera feed URL or image for the kitchen
-    // Add more camera feeds as needed
+    r3: placeholderImage, //adding another tab to the camera views
   };
 
   const [isAccountPopupVisible, setIsAccountPopupVisible] = useState(false);
@@ -99,11 +99,11 @@ const Dashboard = () => {
 
 
   const CameraWidget = () => {
-    const [cameraView, setCameraView] = useState('livingroom'); // Default view
     
     const cameraFeeds = {
       livingroom: placeholderImage, // Replace with actual video feed or image
       kitchen: placeholderImage, // Replace with actual video feed or image for kitchen
+      r3: placeholderImage,
       // Add more camera feeds as needed
     };
     
@@ -116,6 +116,7 @@ const Dashboard = () => {
         <div style={{ position: 'absolute', top: '10px', left: '10px', display: 'flex', gap: '5px' }}>
           <button onClick={() => setCameraView('livingroom')} style={{ padding: '5px', backgroundColor: cameraView === 'livingroom' ? '#4CAF50' : 'transparent' }}>R1</button>
           <button onClick={() => setCameraView('kitchen')} style={{ padding: '5px', backgroundColor: cameraView === 'kitchen' ? '#4CAF50' : 'transparent' }}>R2</button>
+          <button onClick={() => setCameraView('r3')} style={{ padding: '5px', backgroundColor: cameraView === 'r3' ? '#4CAF50' : 'transparent' }}>R3</button>
           {/* Add more buttons for additional camera views as needed */}
         </div>
       </div>
@@ -376,7 +377,7 @@ const AppliancesWidget = () => {
               <div style={{ position: 'absolute', top: '10px', left: '10px', display: 'flex', gap: '5px' }}>
                 <button onClick={() => setCameraView('livingroom')} style={{ padding: '5px', color:'white',backgroundColor: cameraView === 'livingroom' ? '#0294A5' : '#08192B' }}>R1</button>
                 <button onClick={() => setCameraView('kitchen')} style={{ padding: '5px', color:'white', backgroundColor: cameraView === 'kitchen' ? '#0294A5' : '#08192B' }}>R2</button>
-                {/* Add more buttons for additional camera views */}
+                <button onClick={() => setCameraView('r3')} style={{ padding: '5px', color: 'white', backgroundColor: cameraView === 'r3' ? '#0294A5' : '#08192B' }}>R3</button>
               </div>
       </div>
       

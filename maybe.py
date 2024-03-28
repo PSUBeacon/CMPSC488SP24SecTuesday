@@ -77,7 +77,7 @@ def draw_lock():
         0b00111100,  # Row 2: Top part of the shackle
         0b01111110,  # Row 3: Bottom part of the shackle
         0b11111111,  # Row 4: Top of the lock body
-        0b11111111,  # Row 5: Middle of the lock body, widest part
+        0b11000011,  # Row 5: Middle of the lock body, widest part
         0b11000011,  # Row 6: Lower part of the lock body
         0b11000011,  # Row 7: Bottom of the lock body
         0b01111110   # Row 8: Base of the lock, gives it a rounded look

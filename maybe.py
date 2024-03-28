@@ -73,6 +73,24 @@ def draw_smile():
         send_command(i + 1, smile_bmp[i])
 
     sleep(0.33)  # Display the smiley face for a short period
+def prepare_and_draw(byte_sequence):
+    # Step 1: Reverse the byte order
+    reversed_bytes = byte_sequence[::-1]
+
+    # Step 2: Convert from LSB to MSB for each byte
+    def reverse_bits(byte):
+        return int('{:08b}'.format(byte)[::-1], 2)
+    converted_bytes = bytes(reverse_bits(b) for b in reversed_bytes)
+
+    # Step 3: Draw the prepared bytes on the matrix
+    clear_matrix()  # Ensure a clean slate
+    for i, byte in enumerate(converted_bytes):
+        send_command(i + 1, byte)
+    sleep(0.33)  # Display for a short duration
+
+# Example byte sequence for a character (replace with your actual character bytes)
+byte_sequence = b'\x7e\x18\x18\x18\x1c\x18\x18\x00'
+prepare_and_draw(byte_sequence)
 
 
 # Initialize and clear the matrix

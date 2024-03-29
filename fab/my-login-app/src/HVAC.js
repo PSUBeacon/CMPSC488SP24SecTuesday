@@ -12,6 +12,19 @@ import menuIcon from './menu.png'
 
 const HVAC = () => {
 
+ // States for each device
+ const [deviceData, setDeviceData] = useState({
+  HVAC: {},
+  Dishwasher: {},
+  Fridge: {},
+  Lighting: {},
+  Microwave: {},
+  Oven: {},
+  SecuritySystem: {},
+  SolarPanel: {},
+  Toaster: {},
+});
+
    // States for date and time
    const [currentDate, setCurrentDate] = useState(new Date().toLocaleDateString());
    const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
@@ -31,28 +44,22 @@ const HVAC = () => {
     const [dashboardMessage, setDashboardMessage] = useState('');
     const [accountType ,setAccountType] = useState('')
     
-    const toggleHVACStatus = () => {
-      setDeviceData(prevDeviceData => ({
-        ...prevDeviceData,
-        HVAC: {
-          ...prevDeviceData.HVAC,
-          Status: !prevDeviceData.HVAC.Status,
-        },
-      }));
-    };
+    const [secondFloorHVACStatus, setSecondFloorHVACStatus] = useState(deviceData.HVAC.Status);
+    const [basementHVACStatus, setBasementHVACStatus] = useState(deviceData.HVAC.Status);
 
- // States for each device
- const [deviceData, setDeviceData] = useState({
-  HVAC: {},
-  Dishwasher: {},
-  Fridge: {},
-  Lighting: {},
-  Microwave: {},
-  Oven: {},
-  SecuritySystem: {},
-  SolarPanel: {},
-  Toaster: {},
-});
+   // Toggle function for 2nd floor HVAC status
+  const toggleSecondFloorHVACStatus = () => {
+    setSecondFloorHVACStatus(prevStatus => !prevStatus);
+    // Update the actual device data
+    updateHVACStatus(!secondFloorHVACStatus);
+  };
+
+  // Toggle function for basement HVAC status
+  const toggleBasementHVACStatus = () => {
+    setBasementHVACStatus(prevStatus => !prevStatus);
+    // Update the actual device data
+    updateHVACStatus(!basementHVACStatus);
+  };
 
 
     useEffect(() => {
@@ -86,6 +93,17 @@ const HVAC = () => {
             })
             .catch(error => console.error('Fetch operation error:', error));
     }, []);
+
+      // Function to update HVAC status in device data
+  const updateHVACStatus = (status) => {
+    setDeviceData(prevDeviceData => ({
+      ...prevDeviceData,
+      HVAC: {
+        ...prevDeviceData.HVAC,
+        Status: status,
+      },
+    }));
+  };
 
   const toggleNav = () => {
     setIsNavVisible(!isNavVisible);
@@ -222,73 +240,157 @@ const HVAC = () => {
         </aside>
 
     
-        <main style={{ flex: '1', padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundImage: 'linear-gradient(to bottom, #0E2237, #081624)', position: 'relative' }}>
+<main style={{ flex: '1', padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundImage: 'linear-gradient(to bottom, #0E2237, #081624)', position: 'relative' }}>
   {/* Translucent pattern overlay */}
   <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundImage: 'url("https://www.transparenttextures.com/patterns/always-grey.png")', opacity: 0.3 }}></div>
 
   <h1 style={{ color: 'white', marginBottom: '2rem' }}>HVAC</h1>
   {deviceData && (
-    <div className="hvac-data-container">
-      <div className="data-item">
-        <div className="data-icon">
-          <i className="fas fa-thermometer-half"></i>
+    <div className="hvac-data-container" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around', width: '100%' }}>
+      {/* First Column */}
+      <div style={{ marginRight: '2rem' }}>
+        <h4 style={{textAlign:"center", marginBottom:'20px', color: '#95A4B6'}}>2nd Floor</h4>
+
+        <div className="data-item">
+          <div className="data-icon">
+            <i className="fas fa-thermometer-half"></i>
+          </div>
+          <div className="data-info">
+            <p style={{ color: '#95A4B6'}}>Mode</p>
+            <p>{deviceData.HVAC.Mode}</p>
+          </div>
         </div>
-        <div className="data-info">
-          <p style={{ color: '#95A4B6'}}>Temperature</p>
-          <p>{deviceData.HVAC.Temperature}°F</p>
+
+        <div className="data-item">
+          <div className="data-icon">
+            <i className="fas fa-thermometer-half"></i>
+          </div>
+          <div className="data-info">
+            <p style={{ color: '#95A4B6'}}>Temperature</p>
+            <p>{deviceData.HVAC.Temperature}°F</p>
+          </div>
+        </div>
+        
+        <div className="data-item">
+          <div className="data-icon">
+            <i className="fas fa-tint"></i>
+          </div>
+          <div className="data-info">
+            <p style={{ color: '#95A4B6'}}>Humidity</p>
+            <p>{deviceData.HVAC.Humidity}%</p>
+          </div>
+        </div>
+        <div className="data-item">
+          <div className="data-icon">
+            <i className="fas fa-fan"></i>
+          </div>
+          <div className="data-info">
+            <p style={{ color: '#95A4B6'}}>Fan Speed</p>
+            <p>{deviceData.HVAC.FanSpeed}%</p>
+          </div>
+        </div>
+        <div className="data-item">
+          <div className="data-icon">
+            <i className={deviceData.HVAC.Status ? "fas fa-power-on" : "fas fa-power-off"}></i>
+          </div>
+          <div className="data-info">
+            <p style={{ color: '#95A4B6'}}>Status</p>
+            <p>{deviceData.HVAC.Status ? "On" : "Off"}</p>
+            {/* Toggle */}
+            <label className="toggle" style={{ display: 'block', margin: 'auto' }}>
+              <input
+                type="checkbox"
+                checked={deviceData.HVAC.Status}
+                onChange={toggleSecondFloorHVACStatus}
+              />
+              <span className="slider" style={{ background: deviceData.HVAC.Status ? '#50BCC0' : 'grey' }}></span>
+            </label>
+          </div>
+        </div>
+        <div className="data-item">
+          <div className="data-icon">
+            <i className="fas fa-bolt"></i>
+          </div>
+          <div className="data-info">
+            <p style={{ color: '#95A4B6'}}>Energy Consumption</p>
+            <p>{deviceData.HVAC.EnergyConsumption}KW</p>
+          </div>
         </div>
       </div>
+
+      {/* Second Column (Duplicated) */}
+      <div>
+      <h4 style={{textAlign:"center", marginBottom:'20px', color: '#95A4B6'}}>Basement</h4>
+
       <div className="data-item">
-        <div className="data-icon">
-          <i className="fas fa-tint"></i>
+          <div className="data-icon">
+            <i className="fas fa-thermometer-half"></i>
+          </div>
+          <div className="data-info">
+            <p style={{ color: '#95A4B6'}}>Mode</p>
+            <p>{deviceData.HVAC.Mode}</p>
+          </div>
         </div>
-        <div className="data-info">
-          <p style={{ color: '#95A4B6'}}>Humidity</p>
-          <p>{deviceData.HVAC.Humidity}%</p>
+
+        <div className="data-item">
+          <div className="data-icon">
+            <i className="fas fa-thermometer-half"></i>
+          </div>
+          <div className="data-info">
+            <p style={{ color: '#95A4B6'}}>Temperature</p>
+            <p>{deviceData.HVAC.Temperature}°F</p>
+          </div>
         </div>
-      </div>
-      <div className="data-item">
-        <div className="data-icon">
-          <i className="fas fa-fan"></i>
+        
+        <div className="data-item">
+          <div className="data-icon">
+            <i className="fas fa-tint"></i>
+          </div>
+          <div className="data-info">
+            <p style={{ color: '#95A4B6'}}>Humidity</p>
+            <p>{deviceData.HVAC.Humidity}%</p>
+          </div>
         </div>
-        <div className="data-info">
-          <p style={{ color: '#95A4B6'}}>Fan Speed</p>
-          <p>{deviceData.HVAC.FanSpeed}%</p>
+        <div className="data-item">
+          <div className="data-icon">
+            <i className="fas fa-fan"></i>
+          </div>
+          <div className="data-info">
+            <p style={{ color: '#95A4B6'}}>Fan Speed</p>
+            <p>{deviceData.HVAC.FanSpeed}%</p>
+          </div>
         </div>
-      </div>
-      <div className="data-item">
-        <div className="data-icon">
-          <i className={deviceData.HVAC.Status ? "fas fa-power-on" : "fas fa-power-off"}></i>
+        <div className="data-item">
+          <div className="data-icon">
+            <i className={deviceData.HVAC.Status ? "fas fa-power-on" : "fas fa-power-off"}></i>
+          </div>
+          <div className="data-info">
+            <p style={{ color: '#95A4B6'}}>Status</p>
+            <p>{deviceData.HVAC.Status ? "On" : "Off"}</p>
+            {/* Toggle */}
+            <label className="toggle" style={{ display: 'block', margin: 'auto' }}>
+              <input
+                type="checkbox"
+                checked={deviceData.HVAC.Status}
+                onChange={toggleBasementHVACStatus}
+              />
+              <span className="slider" style={{ background: deviceData.HVAC.Status ? '#50BCC0' : 'grey' }}></span>
+            </label>
+          </div>
         </div>
-        <div className="data-info">
-          <p style={{ color: '#95A4B6'}}>Status</p>
-          <p>{deviceData.HVAC.Status ? "On" : "Off"}</p>
-          {/* Toggle */}
-          <label className="toggle" style={{ display: 'block', margin: 'auto' }}>
-            <input
-              type="checkbox"
-              checked={deviceData.HVAC.Status}
-              onChange={toggleHVACStatus}
-            />
-            <span className="slider" style={{ background: deviceData.HVAC.Status ? '#50BCC0' : 'grey' }}></span>
-          </label>
-        </div>
-      </div>
-      <div className="data-item">
-        <div className="data-icon">
-          <i className="fas fa-bolt"></i>
-        </div>
-        <div className="data-info">
-          <p style={{ color: '#95A4B6'}}>Energy Consumption</p>
-          <p>{deviceData.HVAC.EnergyConsumption}KW</p>
+        <div className="data-item">
+          <div className="data-icon">
+            <i className="fas fa-bolt"></i>
+          </div>
+          <div className="data-info">
+            <p style={{ color: '#95A4B6'}}>Energy Consumption</p>
+            <p>{deviceData.HVAC.EnergyConsumption}KW</p>
+          </div>
         </div>
       </div>
     </div>
   )}
 </main>
-
-
-
 
 
       </div>

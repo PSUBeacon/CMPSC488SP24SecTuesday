@@ -223,27 +223,26 @@ const Security = () => {
         </aside>
 
     
-<main style={{ flex: '1', padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: '#0E2237', width: '100%'}}>
+        <main style={{ flex: '1', padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: '#0E2237', width: '100%'}}>
   
   {/* Content Block */}
   
-  <div className="contentBlock" style={{ display: 'flex', justifyContent: 'space-around', width: '100%', flexWrap: 'wrap' }}>
+  <div className="contentBlock" style={{ display: 'flex', width: '100%', flexWrap: 'wrap' }}>
             {/* Lights Control Section */}
             <div className="lightsControl" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', gap: '20px', width: '100%', flexWrap: 'wrap' }}>
               {/* Room Selection */}
-              <div className="roomSelection" style={{ flexBasis: '48%' }}>
-                <h3 className="centered-title">Selecting a Door</h3>
-                <div className="roomCards" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', padding: '0px' }}>
-                  {/* Room cards */}
-                  <div className={selectedRoom === "Room 1" ? "card selected" : "card"} onClick={() => selectRoom("Room 1")} style={{ width: '40%', marginBottom: '20px' }}>
-                    <img className="image" src={bedroomIcon} alt="Room 1" />
-                  </div>
-                  <div className={selectedRoom === "Room 2" ? "card selected" : "card"} onClick={() => selectRoom("Room 2")} style={{ width: '40%', marginBottom: '20px' }}>
-                    <img className="image" src={bedroomIcon} alt="Room 2" />
-                  </div>
-                  
-                </div>
-              </div>
+              <div className="roomSelection" style={{ flexBasis: '100%', maxWidth: '300px', margin: '0 auto' }}>
+  <h3 className="centered-title">Selecting a Door</h3>
+  <div className="roomCards" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0px' }}>
+    {/* Room cards */}
+    <div className={selectedRoom === "Room 1" ? "card selected" : "card"} onClick={() => selectRoom("Room 1")} style={{ marginBottom: '20px', width: '100%' }}>
+      <img className="image" src={bedroomIcon} alt="Room 1" />
+    </div>
+    <div className={selectedRoom === "Room 2" ? "card selected" : "card"} onClick={() => selectRoom("Room 2")} style={{ marginBottom: '20px', width: '100%' }}>
+      <img className="image" src={bedroomIcon} alt="Room 2" />
+    </div>
+  </div>
+</div>
 
 
                 {/* Light Selection */}

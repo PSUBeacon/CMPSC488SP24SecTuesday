@@ -38,43 +38,50 @@ const Appliances = () => {
        return () => clearInterval(timer);
    }, []);
 
-  const dishwasher = [
-    { Device: "Dishwasher", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00', WashTime: "00:00" },
-    { Device: "Dishwasher", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00', WashTime: "00:00" },
-  ];
+   const [dishwasher, setDishwasher] = useState([
+    { Device: "Dishwasher", Name: "N/A", Location: 'N/A', Status: 'ON', LastUsed: 'MM/DD/YY 00:00', WashTime: "00:00" },
+    { Device: "Dishwasher", Name: "N/A", Location: 'N/A', Status: 'ON', LastUsed: 'MM/DD/YY 00:00', WashTime: "00:00" },
+  ]);
+  
 
   //this const is also for the freezer
-  const fridge = [
-    { Device: "Fridge", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00', Temp: "Degrees", EnergySavingMode: "KW"},
-    { Device: "Fridge", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00', Temp: "Degrees", EnergySavingMode: "KW" },
-    { Device: "Freezer", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00', Temp: "Degrees", EnergySavingMode: "KW" },
-    { Device: "Freezer", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00', Temp: "Degrees", EnergySavingMode: "KW" },
-  ];
+  const [fridge, setFridge] = useState([ // <-- Initialize fridge state and setter
+    { Device: "Fridge", Name: "N/A", Location: 'N/A', Status: 'ON', LastUsed: 'MM/DD/YY 00:00', Temp: "°F", EnergySavingMode: "KW"},
+    { Device: "Fridge", Name: "N/A", Location: 'N/A', Status: 'ON', LastUsed: 'MM/DD/YY 00:00', Temp: "°F", EnergySavingMode: "KW" },
+    { Device: "Freezer", Name: "N/A", Location: 'N/A', Status: 'ON', LastUsed: 'MM/DD/YY 00:00', Temp: "°F", EnergySavingMode: "KW" },
+    { Device: "Freezer", Name: "N/A", Location: 'N/A', Status: 'ON', LastUsed: 'MM/DD/YY 00:00', Temp: "°F", EnergySavingMode: "KW" },
+  ]);
 
-  const hvac = [
-    { Device: "HVAC", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00' },
-    { Device: "HVAC", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00' },
-  ];
+  const [hvac, setHvac] = useState([
+    { Device: "HVAC", Name: "N/A", Location: 'N/A', Status: 'ON', LastUsed: 'MM/DD/YY 00:00' },
+    { Device: "HVAC", Name: "N/A", Location: 'N/A', Status: 'ON', LastUsed: 'MM/DD/YY 00:00' },
+  ]);
+  
 
-  const lighting = [
-    { Device: "Lighting", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00' },
-    { Device: "Lighting", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00' },
-  ];
+  const [lighting, setLighting] = useState([
+    { Device: "Lighting", Name: "N/A", Location: 'N/A', Status: 'ON', LastUsed: 'MM/DD/YY 00:00' },
+    { Device: "Lighting", Name: "N/A", Location: 'N/A', Status: 'ON', LastUsed: 'MM/DD/YY 00:00' },
+  ]);
+  
 
-  const microwave = [
-    { Device: "Microwave", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00', Power: "KW", StopTime: "00:00" },
-    { Device: "Microwave", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00', Power: "KW", StopTime: "00:00" },
-  ];
+  const [microwave, setMicrowave] = useState([
+    { Device: "Microwave", Name: "N/A", Location: 'N/A', Status: 'ON', LastUsed: 'MM/DD/YY 00:00', Power: "KW", StopTime: "00:00" },
+    { Device: "Microwave", Name: "N/A", Location: 'N/A', Status: 'ON', LastUsed: 'MM/DD/YY 00:00', Power: "KW", StopTime: "00:00" },
+  ]);  
+  
 
-  const toaster = [
-    { Device: "Toaster", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00', Temp: "Degrees", StopTime: "00:00" },
-    { Device: "Toaster", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00', Temp: "Degrees", StopTime: "00:00" },
-  ];
+  const [toaster, setToaster] = useState([
+    { Device: "Toaster", Name: "N/A", Location: 'N/A', Status: 'ON', LastUsed: 'MM/DD/YY 00:00', Temp: "°F", StopTime: "00:00" },
+    { Device: "Toaster", Name: "N/A", Location: 'N/A', Status: 'ON', LastUsed: 'MM/DD/YY 00:00', Temp: "°F", StopTime: "00:00" },
+  ]);
+  
+  
 
-  const oven = [
-    { Device: "Oven", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00', Temp: "Degrees", StopTime: "00:00"  },
-    { Device: "Oven", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00', Temp: "Degrees", StopTime: "00:00"  },
-  ];
+  const [oven, setOven] = useState([
+    { Device: "Oven", Name: "N/A", Location: 'N/A', Status: 'ON', LastUsed: 'MM/DD/YY 00:00', Temp: "°F", StopTime: "00:00"  },
+    { Device: "Oven", Name: "N/A", Location: 'N/A', Status: 'ON', LastUsed: 'MM/DD/YY 00:00', Temp: "°F", StopTime: "00:00"  },
+  ]);  
+  
   
   const navigate = useNavigate(); // Instantiate useNavigate hook
   const [isNavVisible, setIsNavVisible] = useState(false);
@@ -129,30 +136,7 @@ const Appliances = () => {
       </div>
     );
   };
-  
-  const CameraWidget = () => {
-    const [cameraView, setCameraView] = useState('livingroom'); // Default view
-    
-    const cameraFeeds = {
-      livingroom: placeholderImage, // Replace with actual video feed or image
-      kitchen: placeholderImage, // Replace with actual video feed or image for kitchen
-      // Add more camera feeds as needed
-    };
-    
-    return (
-      <div className="camera-widget" style={{ position: 'relative', maxWidth: '100%', backgroundColor: '#12232E', borderRadius: '10px', overflow: 'hidden' }}>
-        {/* Live Feed */}
-        <img src={cameraFeeds[cameraView]} alt="Live feed" style={{ width: '100%', height: 'auto', display: 'block' }} />
-        
-        {/* Camera View Buttons */}
-        <div style={{ position: 'absolute', top: '10px', left: '10px', display: 'flex', gap: '5px' }}>
-          <button onClick={() => setCameraView('livingroom')} style={{ padding: '5px', backgroundColor: cameraView === 'livingroom' ? '#4CAF50' : 'transparent' }}>R1</button>
-          <button onClick={() => setCameraView('kitchen')} style={{ padding: '5px', backgroundColor: cameraView === 'kitchen' ? '#4CAF50' : 'transparent' }}>R2</button>
-          {/* Add more buttons for additional camera views as needed */}
-        </div>
-      </div>
-    );
-  };
+
 
   // This is the JSX return statement where we layout our component's HTML structure
   return (
@@ -258,17 +242,46 @@ const Appliances = () => {
           </tr>
         </thead>
         <tbody>
-          {dishwasher.map((dishwasher, index) => (
-            <tr key={index}>
-              <td>{dishwasher.Device}</td>
-              <td>{dishwasher.Name}</td>
-              <td>{dishwasher.Location}</td>
-              <td>{dishwasher.Status}</td>
-              <td>{dishwasher.LastUsed}</td>
-              <td>{dishwasher.WashTimer}</td>
-            </tr>
-          ))}
-        </tbody>
+        {dishwasher.map((dishwasherItem, index) => (
+  <tr key={index}>
+    <td>{dishwasherItem.Device}</td>
+    <td>{dishwasherItem.Name}</td>
+    <td>{dishwasherItem.Location}</td>
+    <td>
+      <button
+        onClick={() => {
+          const updatedDishwasher = [...dishwasher];
+          updatedDishwasher[index] = {
+            ...dishwasherItem,
+            Status: dishwasherItem.Status === 'ON' ? 'OFF' : 'ON'
+          };
+          setDishwasher(updatedDishwasher);
+        }}
+      >
+        {dishwasherItem.Status}
+      </button>
+    </td>
+    <td>{dishwasherItem.LastUsed}</td>
+    <td>
+      <input
+        type="text"
+        value={dishwasherItem.WashTime}
+        onChange={(e) => {
+          const newWashTime = e.target.value;
+          const updatedDishwasher = [...dishwasher];
+          updatedDishwasher[index] = {
+            ...updatedDishwasher[index],
+            WashTime: newWashTime
+          };
+          setDishwasher(updatedDishwasher);
+        }}
+      />
+    </td>
+  </tr>
+))}
+</tbody>
+
+
       </Table>
 
 {/*fridge table*/}
@@ -288,17 +301,54 @@ const Appliances = () => {
           </tr>
         </thead>
         <tbody>
-          {fridge.map((fridge, index) => (
-            <tr key={index}>
-              <td>{fridge.Device}</td>
-              <td>{fridge.Name}</td>
-              <td>{fridge.Location}</td>
-              <td>{fridge.Status}</td>
-              <td>{fridge.LastUsed}</td>
-              <td>{fridge.Temp}</td>
-              <td>{fridge.EnergySavingMode}</td>
-            </tr>
-          ))}
+        {fridge.map((fridgeItem, index) => (
+  <tr key={index}>
+    <td>{fridgeItem.Device}</td>
+    <td>{fridgeItem.Name}</td>
+    <td>{fridgeItem.Location}</td>
+    {/* Replace the current display of "Status" with a button */}
+    <td>
+      <button
+        onClick={() => {
+          const updatedFridge = [...fridge];
+          updatedFridge[index] = {
+            ...fridgeItem,
+            Status: fridgeItem.Status === 'ON' ? 'OFF' : 'ON'
+          };
+          setFridge(updatedFridge);
+        }}
+      >
+        {fridgeItem.Status}
+      </button>
+    </td>
+    <td>{fridgeItem.LastUsed}</td>
+    <td>
+      <input
+        type="text"
+        value={fridgeItem.Temp} // Bind the value of the input field to the state
+        onChange={(e) => {
+          const newTemp = e.target.value;
+          const updatedFridge = [...fridge]; // Create a copy of the array
+          updatedFridge[index] = { ...fridgeItem, Temp: newTemp }; // Update the specific item in the copied array
+          setFridge(updatedFridge); // Update the state with the new array
+        }}
+      />
+    </td>
+    <td>
+      <input
+        type="text"
+        value={fridgeItem.EnergySavingMode} // Bind the value of the input field to the state
+        onChange={(e) => {
+          const newEnergySavingMode = e.target.value;
+          const updatedFridge = [...fridge]; // Create a copy of the array
+          updatedFridge[index] = { ...fridgeItem, EnergySavingMode: newEnergySavingMode }; // Update the specific item in the copied array
+          setFridge(updatedFridge); // Update the state with the new array
+        }}
+      />
+    </td>
+  </tr>
+))}
+
         </tbody>
       </Table>
 
@@ -317,15 +367,30 @@ const Appliances = () => {
           </tr>
         </thead>
         <tbody>
-          {hvac.map((hvac, index) => (
-            <tr key={index}>
-              <td>{hvac.Device}</td>
-              <td>{hvac.Name}</td>
-              <td>{hvac.Location}</td>
-              <td>{hvac.Status}</td>
-              <td>{hvac.LastUsed}</td>
-            </tr>
-          ))}
+        {hvac.map((hvacItem, index) => (
+  <tr key={index}>
+    <td>{hvacItem.Device}</td>
+    <td>{hvacItem.Name}</td>
+    <td>{hvacItem.Location}</td>
+    {/* Replace the current display of "Status" with a button */}
+    <td>
+      <button
+        onClick={() => {
+          const updatedHvac = [...hvac];
+          updatedHvac[index] = {
+            ...hvacItem,
+            Status: hvacItem.Status === 'ON' ? 'OFF' : 'ON'
+          };
+          setHvac(updatedHvac);
+        }}
+      >
+        {hvacItem.Status}
+      </button>
+    </td>
+    <td>{hvacItem.LastUsed}</td>
+  </tr>
+))}
+
         </tbody>
       </Table>
 
@@ -344,15 +409,30 @@ const Appliances = () => {
           </tr>
         </thead>
         <tbody>
-          {lighting.map((lighting, index) => (
-            <tr key={index}>
-              <td>{lighting.Device}</td>
-              <td>{lighting.Name}</td>
-              <td>{lighting.Location}</td>
-              <td>{lighting.Status}</td>
-              <td>{lighting.LastUsed}</td>
-            </tr>
-          ))}
+        {lighting.map((lightingItem, index) => (
+  <tr key={index}>
+    <td>{lightingItem.Device}</td>
+    <td>{lightingItem.Name}</td>
+    <td>{lightingItem.Location}</td>
+    {/* Replace the current display of "Status" with a button */}
+    <td>
+      <button
+        onClick={() => {
+          const updatedLighting = [...lighting];
+          updatedLighting[index] = {
+            ...lightingItem,
+            Status: lightingItem.Status === 'ON' ? 'OFF' : 'ON'
+          };
+          setLighting(updatedLighting);
+        }}
+      >
+        {lightingItem.Status}
+      </button>
+    </td>
+    <td>{lightingItem.LastUsed}</td>
+  </tr>
+))}
+
         </tbody>
       </Table>
 
@@ -373,18 +453,56 @@ const Appliances = () => {
           </tr>
         </thead>
         <tbody>
-          {microwave.map((microwave, index) => (
-            <tr key={index}>
-              <td>{microwave.Device}</td>
-              <td>{microwave.Name}</td>
-              <td>{microwave.Location}</td>
-              <td>{microwave.Status}</td>
-              <td>{microwave.LastUsed}</td>
-              <td>{microwave.Power}</td>
-              <td>{microwave.StopTime}</td>
-            </tr>
-          ))}
-        </tbody>
+        {microwave.map((microwaveItem, index) => (
+  <tr key={index}>
+    <td>{microwaveItem.Device}</td>
+    <td>{microwaveItem.Name}</td>
+    <td>{microwaveItem.Location}</td>
+    {/* Replace the current display of "Status" with a button */}
+    <td>
+      <button
+        onClick={() => {
+          const updatedMicrowave = [...microwave];
+          updatedMicrowave[index] = {
+            ...microwaveItem,
+            Status: microwaveItem.Status === 'ON' ? 'OFF' : 'ON'
+          };
+          setMicrowave(updatedMicrowave);
+        }}
+      >
+        {microwaveItem.Status}
+      </button>
+    </td>
+    <td>{microwaveItem.LastUsed}</td>
+    <td>
+      <input
+        type="text"
+        value={microwaveItem.Power} // Bind the value of the input field to the state
+        onChange={(e) => {
+          const newPower = e.target.value;
+          const updatedMicrowave = [...microwave]; // Create a copy of the array
+          updatedMicrowave[index] = { ...microwaveItem, Power: newPower }; // Update the specific item in the copied array
+          setMicrowave(updatedMicrowave); // Update the state with the new array
+        }}
+      />
+    </td>
+    <td>
+      <input
+        type="text"
+        value={microwaveItem.StopTime} // Bind the value of the input field to the state
+        onChange={(e) => {
+          const newStopTime = e.target.value;
+          const updatedMicrowave = [...microwave]; // Create a copy of the array
+          updatedMicrowave[index] = { ...microwaveItem, StopTime: newStopTime }; // Update the specific item in the copied array
+          setMicrowave(updatedMicrowave); // Update the state with the new array
+        }}
+      />
+    </td>
+  </tr>
+))}
+
+</tbody>
+
       </Table>
 
 {/*Toaster table*/}
@@ -404,18 +522,56 @@ const Appliances = () => {
           </tr>
         </thead>
         <tbody>
-          {toaster.map((toaster, index) => (
-            <tr key={index}>
-              <td>{toaster.Device}</td>
-              <td>{toaster.Name}</td>
-              <td>{toaster.Location}</td>
-              <td>{toaster.Status}</td>
-              <td>{toaster.LastUsed}</td>
-              <td>{toaster.Temp}</td>
-              <td>{toaster.StopTime}</td>
-            </tr>
-          ))}
-        </tbody>
+        {toaster.map((toasterItem, index) => (
+  <tr key={index}>
+    <td>{toasterItem.Device}</td>
+    <td>{toasterItem.Name}</td>
+    <td>{toasterItem.Location}</td>
+    {/* Replace the current display of "Status" with a button */}
+    <td>
+      <button
+        onClick={() => {
+          const updatedToaster = [...toaster];
+          updatedToaster[index] = {
+            ...toasterItem,
+            Status: toasterItem.Status === 'ON' ? 'OFF' : 'ON'
+          };
+          setToaster(updatedToaster);
+        }}
+      >
+        {toasterItem.Status}
+      </button>
+    </td>
+    <td>{toasterItem.LastUsed}</td>
+    <td>
+      <input
+        type="text"
+        value={toasterItem.Temperature} // Bind the value of the input field to the state
+        onChange={(e) => {
+          const newTemperature = e.target.value;
+          const updatedToaster = [...toaster]; // Create a copy of the array
+          updatedToaster[index] = { ...toasterItem, Temperature: newTemperature }; // Update the specific item in the copied array
+          setToaster(updatedToaster); // Update the state with the new array
+        }}
+      />
+    </td>
+    <td>
+      <input
+        type="text"
+        value={toasterItem.StopTime} // Bind the value of the input field to the state
+        onChange={(e) => {
+          const newStopTime = e.target.value;
+          const updatedToaster = [...toaster]; // Create a copy of the array
+          updatedToaster[index] = { ...toasterItem, StopTime: newStopTime }; // Update the specific item in the copied array
+          setToaster(updatedToaster); // Update the state with the new array
+        }}
+      />
+    </td>
+  </tr>
+))}
+
+</tbody>
+
       </Table>
 
 {/*Oven table*/}
@@ -435,18 +591,56 @@ const Appliances = () => {
           </tr>
         </thead>
         <tbody>
-          {oven.map((oven, index) => (
-            <tr key={index}>
-              <td>{oven.Device}</td>
-              <td>{oven.Name}</td>
-              <td>{oven.Location}</td>
-              <td>{oven.Status}</td>
-              <td>{oven.LastUsed}</td>
-              <td>{oven.Temp}</td>
-              <td>{oven.StopTime}</td>
-            </tr>
-          ))}
-        </tbody>
+        {oven.map((ovenItem, index) => (
+  <tr key={index}>
+    <td>{ovenItem.Device}</td>
+    <td>{ovenItem.Name}</td>
+    <td>{ovenItem.Location}</td>
+    {/* Replace the current display of "Status" with a button */}
+    <td>
+      <button
+        onClick={() => {
+          const updatedOven = [...oven];
+          updatedOven[index] = {
+            ...ovenItem,
+            Status: ovenItem.Status === 'ON' ? 'OFF' : 'ON'
+          };
+          setOven(updatedOven);
+        }}
+      >
+        {ovenItem.Status}
+      </button>
+    </td>
+    <td>{ovenItem.LastUsed}</td>
+    <td>
+      <input
+        type="text"
+        value={ovenItem.Temperature} // Bind the value of the input field to the state
+        onChange={(e) => {
+          const newTemperature = e.target.value;
+          const updatedOven = [...oven]; // Create a copy of the array
+          updatedOven[index] = { ...ovenItem, Temperature: newTemperature }; // Update the specific item in the copied array
+          setOven(updatedOven); // Update the state with the new array
+        }}
+      />
+    </td>
+    <td>
+      <input
+        type="text"
+        value={ovenItem.StopTime} // Bind the value of the input field to the state
+        onChange={(e) => {
+          const newStopTime = e.target.value;
+          const updatedOven = [...oven]; // Create a copy of the array
+          updatedOven[index] = { ...ovenItem, StopTime: newStopTime }; // Update the specific item in the copied array
+          setOven(updatedOven); // Update the state with the new array
+        }}
+      />
+    </td>
+  </tr>
+))}
+
+</tbody>
+
       </Table>
 
 

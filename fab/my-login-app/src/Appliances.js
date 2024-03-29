@@ -262,21 +262,7 @@ const Appliances = () => {
       </button>
     </td>
     <td>{dishwasherItem.LastUsed}</td>
-    <td>
-      <input
-        type="text"
-        value={dishwasherItem.WashTime}
-        onChange={(e) => {
-          const newWashTime = e.target.value;
-          const updatedDishwasher = [...dishwasher];
-          updatedDishwasher[index] = {
-            ...updatedDishwasher[index],
-            WashTime: newWashTime
-          };
-          setDishwasher(updatedDishwasher);
-        }}
-      />
-    </td>
+    <td>{dishwasherItem.WashTime}</td>
   </tr>
 ))}
 </tbody>
@@ -322,30 +308,8 @@ const Appliances = () => {
       </button>
     </td>
     <td>{fridgeItem.LastUsed}</td>
-    <td>
-      <input
-        type="text"
-        value={fridgeItem.Temp} // Bind the value of the input field to the state
-        onChange={(e) => {
-          const newTemp = e.target.value;
-          const updatedFridge = [...fridge]; // Create a copy of the array
-          updatedFridge[index] = { ...fridgeItem, Temp: newTemp }; // Update the specific item in the copied array
-          setFridge(updatedFridge); // Update the state with the new array
-        }}
-      />
-    </td>
-    <td>
-      <input
-        type="text"
-        value={fridgeItem.EnergySavingMode} // Bind the value of the input field to the state
-        onChange={(e) => {
-          const newEnergySavingMode = e.target.value;
-          const updatedFridge = [...fridge]; // Create a copy of the array
-          updatedFridge[index] = { ...fridgeItem, EnergySavingMode: newEnergySavingMode }; // Update the specific item in the copied array
-          setFridge(updatedFridge); // Update the state with the new array
-        }}
-      />
-    </td>
+    <td>{fridgeItem.Temp}</td>
+    <td>{fridgeItem.EnergySavingMode}</td>
   </tr>
 ))}
 
@@ -474,30 +438,8 @@ const Appliances = () => {
       </button>
     </td>
     <td>{microwaveItem.LastUsed}</td>
-    <td>
-      <input
-        type="text"
-        value={microwaveItem.Power} // Bind the value of the input field to the state
-        onChange={(e) => {
-          const newPower = e.target.value;
-          const updatedMicrowave = [...microwave]; // Create a copy of the array
-          updatedMicrowave[index] = { ...microwaveItem, Power: newPower }; // Update the specific item in the copied array
-          setMicrowave(updatedMicrowave); // Update the state with the new array
-        }}
-      />
-    </td>
-    <td>
-      <input
-        type="text"
-        value={microwaveItem.StopTime} // Bind the value of the input field to the state
-        onChange={(e) => {
-          const newStopTime = e.target.value;
-          const updatedMicrowave = [...microwave]; // Create a copy of the array
-          updatedMicrowave[index] = { ...microwaveItem, StopTime: newStopTime }; // Update the specific item in the copied array
-          setMicrowave(updatedMicrowave); // Update the state with the new array
-        }}
-      />
-    </td>
+    <td>{microwaveItem.Power}</td>
+    <td>{microwaveItem.StopTime}</td>
   </tr>
 ))}
 
@@ -543,30 +485,8 @@ const Appliances = () => {
       </button>
     </td>
     <td>{toasterItem.LastUsed}</td>
-    <td>
-      <input
-        type="text"
-        value={toasterItem.Temperature} // Bind the value of the input field to the state
-        onChange={(e) => {
-          const newTemperature = e.target.value;
-          const updatedToaster = [...toaster]; // Create a copy of the array
-          updatedToaster[index] = { ...toasterItem, Temperature: newTemperature }; // Update the specific item in the copied array
-          setToaster(updatedToaster); // Update the state with the new array
-        }}
-      />
-    </td>
-    <td>
-      <input
-        type="text"
-        value={toasterItem.StopTime} // Bind the value of the input field to the state
-        onChange={(e) => {
-          const newStopTime = e.target.value;
-          const updatedToaster = [...toaster]; // Create a copy of the array
-          updatedToaster[index] = { ...toasterItem, StopTime: newStopTime }; // Update the specific item in the copied array
-          setToaster(updatedToaster); // Update the state with the new array
-        }}
-      />
-    </td>
+    <td>{toasterItem.Temp}</td>
+    <td>{toasterItem.StopTime}</td>
   </tr>
 ))}
 
@@ -612,30 +532,8 @@ const Appliances = () => {
       </button>
     </td>
     <td>{ovenItem.LastUsed}</td>
-    <td>
-      <input
-        type="text"
-        value={ovenItem.Temperature} // Bind the value of the input field to the state
-        onChange={(e) => {
-          const newTemperature = e.target.value;
-          const updatedOven = [...oven]; // Create a copy of the array
-          updatedOven[index] = { ...ovenItem, Temperature: newTemperature }; // Update the specific item in the copied array
-          setOven(updatedOven); // Update the state with the new array
-        }}
-      />
-    </td>
-    <td>
-      <input
-        type="text"
-        value={ovenItem.StopTime} // Bind the value of the input field to the state
-        onChange={(e) => {
-          const newStopTime = e.target.value;
-          const updatedOven = [...oven]; // Create a copy of the array
-          updatedOven[index] = { ...ovenItem, StopTime: newStopTime }; // Update the specific item in the copied array
-          setOven(updatedOven); // Update the state with the new array
-        }}
-      />
-    </td>
+    <td>{ovenItem.Temp}</td>
+    <td>{ovenItem.StopTime}</td>
   </tr>
 ))}
 

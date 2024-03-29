@@ -3,9 +3,7 @@ package dal
 //go get go.mongodb.org/mongo-driver/mongo
 
 import (
-	messaging "CMPSC488SP24SecTuesday/AES-BlockChain-Communication"
 	"context"
-	"encoding/json"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"log"
@@ -133,6 +131,12 @@ type Toaster struct {
 	LastChanged         time.Time `json:"LastChanged"`
 }
 
+type User struct {
+	Username string `json:"Username"`
+	Password string `json:"Password"`
+	Role     string `json:"Role"`
+}
+
 type SmartHomeDB struct {
 	Dishwasher     []Dishwasher
 	Fridge         []Fridge
@@ -217,6 +221,17 @@ func FetchCollections(client *mongo.Client, dbName string) (*SmartHomeDB, error)
 	return smartHomeDB, nil
 }
 
+///////////////////////////////////////////////////////////
+
+func FetchUser(client *mongo.Client, userName string) (User, error) {
+
+	collection := client.Database(dbName).Collection("Users")
+
+	// Create a filter to specify the criteria of the query
+	filter := bson.M{"username": userName}
+
+	// Finding multiple documents returns a cursor
+
 // Create a new user in the MongoDB database
 func CreateUser(client *mongo.Client, user User) error {
 	collection := client.Database(dbName).Collection("users")
@@ -229,19 +244,19 @@ func FetchUser(client *mongo.Client, key, value string) (*User, error) {
 	filter := bson.M{key: value}
 	var user User
 	err := collection.FindOne(context.Background(), filter).Decode(&user)
-	if err != nil {
-		return nil, err // Return nil user and error if user not found or error occurs
-	}
+    if err != nil {
+      return nil, err // Return nil user and error if user not found or error occurs
+    }
+  	
+    return &user, nil // Return pointer to user and nil error if user found
+  }
+  
+ func deleteUser(client *mongo.Client, key, value string) error {
+  collection := client.Database(dbName).Collection("users")
+  filter := bson.M{key: value}
 
-	return &user, nil // Return pointer to user and nil error if user found
-}
-
-func deleteUser(client *mongo.Client, key, value string) error {
-	collection := client.Database(dbName).Collection("users")
-	filter := bson.M{key: value}
-
-	_, err := collection.DeleteOne(context.Background(), filter)
-	return err
+  _, err := collection.DeleteOne(context.Background(), filter)
+  return err
 }
 
 func UpdateMessaging(client *mongo.Client, UUID []byte, name string, apptype string, function string, change string) {
@@ -328,26 +343,26 @@ func main() {
 	}
 	defer client.Disconnect(context.Background())
 
-	// 	// Example: Creating a new user
-	// 	newUser := User{
-	// 		Name:     "john_doess",
-	// 		Password: "passlel",
-	// 		Email:    "john@example.com",
-	// 	}
+// 	// Example: Creating a new user
+// 	newUser := User{
+// 		Name:     "john_doess",
+// 		Password: "passlel",
+// 		Email:    "john@example.com",
+// 	}
 
-	// 	err = CreateUser(client, newUser)
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
+// 	err = CreateUser(client, newUser)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	// 	fmt.Println("User created successfully!")
+// 	fmt.Println("User created successfully!")
 
 	// Example: Fetching a user by username
-	// 	fetchedUser, err := FetchUser(client, "name", "john_doess")
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// 	fmt.Println(fetchedUser)
-	// 	fmt.Println(fetchedUser.Name)
-
+// 	fetchedUser, err := FetchUser(client, "name", "john_doess")
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	fmt.Println(fetchedUser)
+// 	fmt.Println(fetchedUser.Name)
+  
 }

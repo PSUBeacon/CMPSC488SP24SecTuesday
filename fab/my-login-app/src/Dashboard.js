@@ -1,8 +1,9 @@
-import React, {useState, useEffect} from 'react';
-import {useNavigate} from 'react-router-dom';
-import {Link} from 'react-router-dom'; // Import Link from react-router-dom for navigation
+
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom'; // Import Link from react-router-dom for navigation
 import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure Bootstrap CSS is imported to use its grid system and components
-import logoImage from './logo.webp';
+import logoImage from './logo.webp'; 
 import houseImage from './houseImage.jpg';
 import doorLockIcon from './doorLockIcon.png'
 import settingsIcon from './settings.png'
@@ -10,19 +11,17 @@ import accountIcon from './account.png'
 import menuIcon from './menu.png'
 import bulbIcon from './bulb-icon.png'
 import placeholderImage from './placeholderImage.jpg'; // Replace with the path to your placeholder image
-import placeholderImage2 from './placeholderImage2.jpg';
-import axios from "axios"; // Replace with the path to your placeholder image
+import placeholderImage2 from './placeholderImage2.jpg'; // Replace with the path to your placeholder image
 
 // Define the Dashboard component using a functional component pattern
 const Dashboard = () => {
 
-    const [user, setUser] = useState(null);
-    const [error, setError] = useState('');
-    const navigate = useNavigate(); // Instantiate useNavigate hook
-    const [isNavVisible, setIsNavVisible] = useState(false);
+ 
 
+  const navigate = useNavigate(); // Instantiate useNavigate hook
+  const [isNavVisible, setIsNavVisible] = useState(false);
     const [dashboardMessage, setDashboardMessage] = useState('');
-    const [accountType, setAccountType] = useState('')
+    const [accountType ,setAccountType] = useState('')
     // States for each device
     const [deviceData, setDeviceData] = useState({
         HVAC: {},
@@ -38,13 +37,8 @@ const Dashboard = () => {
 
 
     useEffect(() => {
-        const token = sessionStorage.getItem('token');
+        const token = localStorage.getItem('token');
         const url = 'http://localhost:8081/dashboard';
-
-        if (!token) {
-            navigate('/'); // Redirect to login page if token is not present
-            return;
-        }
 
         fetch(url, {
             method: 'GET',
@@ -54,24 +48,22 @@ const Dashboard = () => {
             },
         })
             .then(response => response.json())
-            .then(response => {
-                if (response && response.data) {
-                    setUser(response.data.user);
-                    setDashboardMessage(response.data.message);
-                    setAccountType(response.data.accountType);
-                    sessionStorage.setItem('accountType', response.data.accountType);
+            .then(data => {
+                console.log(data);
+                // Update state for each device if present in response
+                const updatedDeviceData = { ...deviceData };
+                Object.keys(updatedDeviceData).forEach(device => {
+                    if (data[device]) {
+                        localStorage.setItem(device, JSON.stringify(data[device]));
+                        updatedDeviceData[device] = data[device];
+                    }
+                });
+                setDeviceData(updatedDeviceData);
+                setDashboardMessage(data.message);
 
-                    const updatedDeviceData = {...deviceData};
-                    Object.keys(updatedDeviceData).forEach(device => {
-                        if (response.data[device]) {
-                            sessionStorage.setItem(device, JSON.stringify(response.data[device]));
-                            updatedDeviceData[device] = response.data[device];
-                        }
-                    });
-                    setDeviceData(updatedDeviceData);
-                } else {
-                    setError('Unexpected response from server');
-                }
+                // Store accountType in session storage
+                setAccountType(data.accountType);
+                sessionStorage.setItem('accountType', data.accountType);
             })
             .catch(error => console.error('Fetch operation error:', error));
     }, []);
@@ -255,67 +247,12 @@ const AppliancesWidget = () => {
   );
 };
 
-        const cameraFeeds = {
-            livingroom: placeholderImage, // Replace with actual video feed or image
-            kitchen: placeholderImage, // Replace with actual video feed or image for kitchen
-            // Add more camera feeds as needed
-        };
-
-        return (
-            <div className="camera-widget" style={{
-                position: 'relative',
-                maxWidth: '100%',
-                backgroundColor: '#12232E',
-                borderRadius: '10px',
-                overflow: 'hidden'
-            }}>
-                {/* Live Feed */}
-                <img src={cameraFeeds[cameraView]} alt="Live feed"
-                     style={{width: '100%', height: 'auto', display: 'block'}}/>
-
-                {/* Camera View Buttons */}
-                <div style={{position: 'absolute', top: '10px', left: '10px', display: 'flex', gap: '5px'}}>
-                    <button onClick={() => setCameraView('livingroom')} style={{
-                        padding: '5px',
-                        backgroundColor: cameraView === 'livingroom' ? '#4CAF50' : 'transparent'
-                    }}>R1
-                    </button>
-                    <button onClick={() => setCameraView('kitchen')} style={{
-                        padding: '5px',
-                        backgroundColor: cameraView === 'kitchen' ? '#4CAF50' : 'transparent'
-                    }}>R2
-                    </button>
-                    {/* Add more buttons for additional camera views as needed */}
-                </div>
-            </div>
-        );
-    };
 
 
-    const AccountPopup = ({isVisible, onClose}) => {
-        if (!isVisible) return null;
-
-        return (
-            <div className="accountPop" style={{
-                position: 'absolute',
-                top: '100%', // Position it right below the button
-                right: '0', // Align it with the right edge of the container
-                backgroundColor: '#08192B',
-                padding: '20px',
-                zIndex: 100,
-                color: 'white',
-                borderRadius: '2px',
-                // Add box-shadow or borders as needed for better visibility
-            }}>
-                <p>John Doe</p> {/* Replace with actual user name */}
-                {accountType && <p>{accountType}</p>} {/* Dynamically display user role */}
-                <button onClick={signOut} className="signout">Sign Out</button>
-            </div>
-        );
-    };
-
-
-    // This is the JSX return statement where we layout our component's HTML structure
+  
+  const AccountPopup = ({ isVisible, onClose }) => {
+    if (!isVisible) return null;
+  
     return (
       <div className = "accountPop"style={{
         position: 'absolute',

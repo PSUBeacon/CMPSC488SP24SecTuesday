@@ -1,8 +1,9 @@
-import React, {useState, useEffect} from 'react';
-import {useNavigate} from 'react-router-dom';
-import {Link} from 'react-router-dom'; // Import Link from react-router-dom for navigation
+
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom'; // Import Link from react-router-dom for navigation
 import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure Bootstrap CSS is imported to use its grid system and components
-import logoImage from './logo.webp';
+import logoImage from './logo.webp'; 
 import houseImage from './houseImage.jpg';
 import settingsIcon from './settings.png';
 import accountIcon from './account.png';
@@ -13,8 +14,8 @@ import doorLockIcon from './doorLockIcon.png';
 import './Security.css'; // Import your CSS file here
 
 
-const Security = () => {
 
+const Security = () => {
 
    // States for date and time
    const [currentDate, setCurrentDate] = useState(new Date().toLocaleDateString());
@@ -33,7 +34,7 @@ const Security = () => {
   const navigate = useNavigate(); // Instantiate useNavigate hook
   const [isNavVisible, setIsNavVisible] = useState(false);
     const [dashboardMessage, setDashboardMessage] = useState('');
-    const [accountType, setAccountType] = useState('')
+    const [accountType ,setAccountType] = useState('')
     // States for each device
     const [deviceData, setDeviceData] = useState({
         HVAC: {},
@@ -50,23 +51,18 @@ const Security = () => {
     const [dimmerValue, setDimmerValue] = useState(75); // State to keep track of dimmer value
     const [isLocked, setIsLocked] = useState(false); //need this for the toggle and also the two lines below
     const toggleLock = () => {
-        setIsLocked(!isLocked);
+      setIsLocked(!isLocked);
     };
     const [selectedRoom, setSelectedRoom] = useState(null);
     // Add a function to handle selecting a room:
     const selectRoom = (roomName) => {
-        setSelectedRoom(roomName);
+      setSelectedRoom(roomName);
     };
-
+    
 
     useEffect(() => {
-        const token = sessionStorage.getItem('token');
-        const url = 'http://localhost:8081/security';
-
-        if (!token) {
-            navigate('/'); // Redirect to login page if token is not present
-            return;
-        }
+        const token = localStorage.getItem('token');
+        const url = 'http://localhost:8081/dashboard';
 
         fetch(url, {
             method: 'GET',
@@ -76,65 +72,50 @@ const Security = () => {
             },
         })
             .then(response => response.json())
-            .then(response => {
-                if (response && response.data) {
-                    setUser(response.data.user);
-                    setAccountType(response.data.accountType);
-                    sessionStorage.setItem('accountType', response.data.accountType);
-                } else {
-                    setError('Unexpected response from server');
-                }
+            .then(data => {
+                console.log(data);
+                // Update state for each device if present in response
+                const updatedDeviceData = { ...deviceData };
+                Object.keys(updatedDeviceData).forEach(device => {
+                    if (data[device]) {
+                        localStorage.setItem(device, JSON.stringify(data[device]));
+                        updatedDeviceData[device] = data[device];
+                    }
+                });
+                setDeviceData(updatedDeviceData);
+                setDashboardMessage(data.message);
+
+                // Store accountType in session storage
+                setAccountType(data.accountType);
+                sessionStorage.setItem('accountType', data.accountType);
             })
-            .catch(error => {
-                console.log('Fetch operation error:', error)
-            });
-    }, [navigate]);
+            .catch(error => console.error('Fetch operation error:', error));
+    }, []);
 
-    const toggleNav = () => {
-        setIsNavVisible(!isNavVisible);
-    };
+  const toggleNav = () => {
+    setIsNavVisible(!isNavVisible);
+  };
 
-    const goToSettings = () => {
-        navigate('/settings');
-    };
+  const goToSettings = () => {
+    navigate('/settings');
+  };
 
-    const signOut = () => {
-        // Add your sign-out logic here
-        setIsAccountPopupVisible(false); // Close the popup
-        navigate('/'); // Use navigate to redirect
-    };
+  const signOut = () => {
+    // Add your sign-out logic here
+    setIsAccountPopupVisible(false); // Close the popup
+    navigate('/'); // Use navigate to redirect
+  };
 
-    const [isAccountPopupVisible, setIsAccountPopupVisible] = useState(false);
+  const [isAccountPopupVisible, setIsAccountPopupVisible] = useState(false);
 
-    const toggleAccountPopup = () => {
-        setIsAccountPopupVisible(!isAccountPopupVisible);
-    };
+  const toggleAccountPopup = () => {
+    setIsAccountPopupVisible(!isAccountPopupVisible);
+  };
 
 
-    const AccountPopup = ({isVisible, onClose}) => {
-        if (!isVisible) return null;
-
-        return (
-            <div className="accountPop" style={{
-                position: 'absolute',
-                top: '100%', // Position it right below the button
-                right: '0', // Align it with the right edge of the container
-                backgroundColor: '#08192B',
-                padding: '20px',
-                zIndex: 100,
-                color: 'white',
-                borderRadius: '2px',
-                // Add box-shadow or borders as needed for better visibility
-            }}>
-                <p>John Doe</p> {/* Replace with actual user name */}
-                {accountType && <p>{accountType}</p>} {/* Dynamically display user role */}
-                <button onClick={signOut} className="signout">Sign Out</button>
-            </div>
-        );
-    };
-
-
-    // This is the JSX return statement where we layout our component's HTML structure
+  const AccountPopup = ({ isVisible, onClose }) => {
+    if (!isVisible) return null;
+  
     return (
       <div className = "accountPop"style={{
         position: 'absolute',
@@ -279,43 +260,18 @@ const Security = () => {
                     </label>
                   </div>
                 </div>
-     
-                            {/* Light Selection */}
-                            <div className="lightSelection" style={{flexBasis: '48%'}}>
-                                <h3 className="centered-title">Your Lock</h3>
+      
 
-                                <div className="lightCards" style={{
-                                    display: 'flex',
-                                    flexWrap: 'wrap',
-                                    justifyContent: 'space-around',
-                                    padding: '0px'
-                                }}>
-                                    {/* Lock card */}
-                                    <div className="card" style={{
-                                        width: '100%',
-                                        maxWidth: '300px',
-                                        textAlign: 'center',
-                                        padding: '20px'
-                                    }}>
-                                        <img className="lockImage" src={doorLockIcon} alt="Lock Icon"/>
-                                        {/*toggle function*/}
-                                        <label className="switch">
-                                            <input type="checkbox" checked={isLocked} onChange={toggleLock}/>
-                                            <span className="slider round"></span>
-                                        </label>
-                                    </div>
-                                </div>
+                
+              </div>
 
-
-                            </div>
-
-
-                        </div>
-                    </div>
-                </main>
+              
             </div>
-        </div>
-    );
+          </div>
+        </main>
+      </div>
+    </div>
+  );
 };
 
 export default Security;

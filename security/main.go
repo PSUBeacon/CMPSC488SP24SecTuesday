@@ -1,6 +1,7 @@
-package security
+package main
 
 import (
+	"encoding/json"
 	"fmt"
 )
 
@@ -61,8 +62,15 @@ func NewAlarm(name string) *Alarm {
 }
 
 // Arm sets the alarm to the armed state.
-func UpdateAlarmStatus(status bool) {
-	fmt.Printf("%s Alarm status is set to: \n", status)
+func (a *Alarm) Arm() {
+	a.Armed = true
+	fmt.Printf("%s is armed and ready.\n", a.Name)
+}
+
+// Disarm disarms the alarm.
+func (a *Alarm) Disarm() {
+	a.Armed = false
+	fmt.Printf("%s is disarmed.\n", a.Name)
 }
 
 // Trigger activates the alarm if it's armed.
@@ -142,218 +150,218 @@ func (a *PadLock) Verify(pin string) {
 	}
 }
 
-//func main() {
-//	// Create a security system, motion sensor, alarm, padlock, frontdoor, backdoor
-//	securitySystem := NewSecuirtySystem("House1", "imaginary sensor", true, 3, "02/21 10:32:05PM '24 -0700")
-//	motionSensor := NewMotionSensor("Motion Sensor")
-//	securityAlarm := NewAlarm("Security Alarm")
-//	padLock1 := NewPadlock("PadLock1", "1234")
-//	frontdoor := NewDoorLock("FrontDoor", true)
-//	backdoor := NewDoorLock("BackDoor", true)
-//
-//	//Serializations---------------------------------
-//
-//	//security
-//	securityJSON, err := json.Marshal(securitySystem)
-//	if err != nil {
-//		fmt.Println("Error:", err)
-//	}
-//
-//	//motionSensor
-//	motionSensorJSON, err := json.Marshal(motionSensor)
-//	if err != nil {
-//		fmt.Println("Error:", err)
-//	}
-//
-//	//security alarm
-//	securityAlarmJSON, err := json.Marshal(securityAlarm)
-//	if err != nil {
-//		fmt.Println("Error:", err)
-//	}
-//
-//	//padlock
-//	padLockJSON, err := json.Marshal(padLock1)
-//	if err != nil {
-//		fmt.Println("Error:", err)
-//	}
-//
-//	frontDoorJSON, err := json.Marshal(frontdoor)
-//	if err != nil {
-//		fmt.Println("Error:", err)
-//	}
-//
-//	backDoorJSON, err := json.Marshal(backdoor)
-//	if err != nil {
-//		fmt.Println("Error:", err)
-//	}
-//
-//	//end of Serializations------------------------------
-//	// Arm the security system
-//	securityAlarm.Arm()
-//
-//	// Simulate motion detection
-//	motionSensor.DetectMotion()
-//
-//	// Check if the alarm is triggered
-//	securityAlarm.Trigger()
-//
-//	// Disarm the security system
-//	securityAlarm.Disarm()
-//
-//	// Simulate motion detection again
-//	motionSensor.DetectMotion()
-//
-//	// Check if the alarm is triggered (it should not be triggered this time)
-//	securityAlarm.Trigger()
-//
-//	// checks if the pin worked in this case it doesn't because we set pin to 1234
-//	padLock1.Verify("4321")
-//
-//	// pin works and should unlock
-//	padLock1.Verify("1234")
-//
-//	// should return already locked
-//	frontdoor.LockOrUnlock(true)
-//
-//	// should unlock it
-//	frontdoor.LockOrUnlock(false)
-//
-//	// should return already unlocked
-//	frontdoor.LockOrUnlock(false)
-//
-//	// should lock it
-//	frontdoor.LockOrUnlock(true)
-//
-//	// should return already locked
-//	backdoor.LockOrUnlock(true)
-//
-//	// should unlock it
-//	backdoor.LockOrUnlock(false)
-//
-//	// should return already unlocked
-//	backdoor.LockOrUnlock(false)
-//
-//	// should lock it
-//	frontdoor.LockOrUnlock(true)
-//
-//	// Deserializations -----------------------------
-//
-//	// security
-//	var loadedSecurity SecuritySystem
-//	err = json.Unmarshal(securityJSON, &loadedSecurity)
-//	if err != nil {
-//		fmt.Println("Error", err)
-//		return
-//	}
-//
-//	// Motion Sensor
-//	var loadedMotionSensor MotionSensor
-//	err = json.Unmarshal(motionSensorJSON, &loadedMotionSensor)
-//	if err != nil {
-//		fmt.Println("Error", err)
-//		return
-//	}
-//
-//	// Security Alarm
-//	var loadedSecurityAlarm Alarm
-//	err = json.Unmarshal(securityAlarmJSON, &loadedSecurityAlarm)
-//	if err != nil {
-//		fmt.Println("Error", err)
-//		return
-//	}
-//
-//	// PadLock
-//	var loadedPadLock PadLock
-//	err = json.Unmarshal(padLockJSON, &loadedPadLock)
-//	if err != nil {
-//		fmt.Println("Error", err)
-//		return
-//	}
-//
-//	// Front Door
-//	var loadedFrontDoor DoorLock
-//	err = json.Unmarshal(frontDoorJSON, &loadedFrontDoor)
-//	if err != nil {
-//		fmt.Println("Error", err)
-//		return
-//	}
-//
-//	// Front Door
-//	var loadedBackDoor DoorLock
-//	err = json.Unmarshal(backDoorJSON, &loadedFrontDoor)
-//	if err != nil {
-//		fmt.Println("Error", err)
-//		return
-//	}
-//
-//	//end -------------------------------------------
-//
-//	// serialization prints-------------------------------
-//
-//	fmt.Println("\n\nHere are the Serializations:\n\nSecurity Object Serialization")
-//	fmt.Println(string(securityJSON))
-//	fmt.Println()
-//
-//	fmt.Println("Motion Sensor Object Serialization")
-//	fmt.Println(string(motionSensorJSON))
-//	fmt.Println()
-//
-//	fmt.Println("Security Alarm Object Serialization")
-//	fmt.Println(string(securityAlarmJSON))
-//	fmt.Println()
-//
-//	fmt.Println("PadLock Object Serialization")
-//	fmt.Println(string(padLockJSON))
-//	fmt.Println()
-//
-//	fmt.Println("FrontDoor Object Serialization")
-//	fmt.Println(string(frontDoorJSON))
-//	fmt.Println()
-//
-//	fmt.Println("BackDoor Object Serialization")
-//	fmt.Println(string(backDoorJSON))
-//	fmt.Println()
-//	fmt.Println()
-//	// ends------------------------------------------
-//
-//	//Deserialization prints---------------------------
-//	fmt.Println("Deserialization Prints:\n\n")
-//
-//	//Security
-//	fmt.Println("Deserialization Security System")
-//	fmt.Println("Location: ", loadedSecurity.Location)
-//	fmt.Println("SensorType: ", loadedSecurity.SensorType)
-//	fmt.Println("Status: ", loadedSecurity.Status)
-//	fmt.Println("EnergyConsumption: ", loadedSecurity.EnergyConsumption)
-//	fmt.Println("LastTriggred: ", loadedSecurity.LastTriggered)
-//	fmt.Println()
-//
-//	//Motion Sensor
-//	fmt.Println("Deserialization Motion Sensor")
-//	fmt.Println("Name: ", loadedMotionSensor.Name)
-//	fmt.Println("MotionDetected: ", loadedMotionSensor.MotionDetected)
-//	fmt.Println()
-//
-//	//Alarm
-//	fmt.Println("Deserialization Alarm")
-//	fmt.Println("Name: ", loadedSecurityAlarm.Name)
-//	fmt.Println("Armed: ", loadedSecurityAlarm.Armed)
-//	fmt.Println("Sounded: ", loadedSecurityAlarm.Sounded)
-//	fmt.Println("Energy: ", loadedSecurityAlarm.Energy)
-//	fmt.Println()
-//
-//	//FrontDoor
-//	fmt.Println("Deserialization Front Door")
-//	fmt.Println("Location: ", loadedFrontDoor.Location)
-//	fmt.Println("Lock: ", loadedFrontDoor.Lock)
-//	fmt.Println()
-//
-//	//BackDoor
-//	fmt.Println("Deserialization Back Door")
-//	fmt.Println("Location: ", loadedBackDoor.Location)
-//	fmt.Println("Lock: ", loadedBackDoor.Lock)
-//	fmt.Println()
-//
-//	// ends------------------------------------------------
-//
-//}
+func main() {
+	// Create a security system, motion sensor, alarm, padlock, frontdoor, backdoor
+	securitySystem := NewSecuirtySystem("House1", "imaginary sensor", true, 3, "02/21 10:32:05PM '24 -0700")
+	motionSensor := NewMotionSensor("Motion Sensor")
+	securityAlarm := NewAlarm("Security Alarm")
+	padLock1 := NewPadlock("PadLock1", "1234")
+	frontdoor := NewDoorLock("FrontDoor", true)
+	backdoor := NewDoorLock("BackDoor", true)
+
+	//Serializations---------------------------------
+
+	//security
+	securityJSON, err := json.Marshal(securitySystem)
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+
+	//motionSensor
+	motionSensorJSON, err := json.Marshal(motionSensor)
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+
+	//security alarm
+	securityAlarmJSON, err := json.Marshal(securityAlarm)
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+
+	//padlock
+	padLockJSON, err := json.Marshal(padLock1)
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+
+	frontDoorJSON, err := json.Marshal(frontdoor)
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+
+	backDoorJSON, err := json.Marshal(backdoor)
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+
+	//end of Serializations------------------------------
+	// Arm the security system
+	securityAlarm.Arm()
+
+	// Simulate motion detection
+	motionSensor.DetectMotion()
+
+	// Check if the alarm is triggered
+	securityAlarm.Trigger()
+
+	// Disarm the security system
+	securityAlarm.Disarm()
+
+	// Simulate motion detection again
+	motionSensor.DetectMotion()
+
+	// Check if the alarm is triggered (it should not be triggered this time)
+	securityAlarm.Trigger()
+
+	// checks if the pin worked in this case it doesn't because we set pin to 1234
+	padLock1.Verify("4321")
+
+	// pin works and should unlock
+	padLock1.Verify("1234")
+
+	// should return already locked
+	frontdoor.LockOrUnlock(true)
+
+	// should unlock it
+	frontdoor.LockOrUnlock(false)
+
+	// should return already unlocked
+	frontdoor.LockOrUnlock(false)
+
+	// should lock it
+	frontdoor.LockOrUnlock(true)
+
+	// should return already locked
+	backdoor.LockOrUnlock(true)
+
+	// should unlock it
+	backdoor.LockOrUnlock(false)
+
+	// should return already unlocked
+	backdoor.LockOrUnlock(false)
+
+	// should lock it
+	frontdoor.LockOrUnlock(true)
+
+	// Deserializations -----------------------------
+
+	// security
+	var loadedSecurity SecuritySystem
+	err = json.Unmarshal(securityJSON, &loadedSecurity)
+	if err != nil {
+		fmt.Println("Error", err)
+		return
+	}
+
+	// Motion Sensor
+	var loadedMotionSensor MotionSensor
+	err = json.Unmarshal(motionSensorJSON, &loadedMotionSensor)
+	if err != nil {
+		fmt.Println("Error", err)
+		return
+	}
+
+	// Security Alarm
+	var loadedSecurityAlarm Alarm
+	err = json.Unmarshal(securityAlarmJSON, &loadedSecurityAlarm)
+	if err != nil {
+		fmt.Println("Error", err)
+		return
+	}
+
+	// PadLock
+	var loadedPadLock PadLock
+	err = json.Unmarshal(padLockJSON, &loadedPadLock)
+	if err != nil {
+		fmt.Println("Error", err)
+		return
+	}
+
+	// Front Door
+	var loadedFrontDoor DoorLock
+	err = json.Unmarshal(frontDoorJSON, &loadedFrontDoor)
+	if err != nil {
+		fmt.Println("Error", err)
+		return
+	}
+
+	// Front Door
+	var loadedBackDoor DoorLock
+	err = json.Unmarshal(backDoorJSON, &loadedFrontDoor)
+	if err != nil {
+		fmt.Println("Error", err)
+		return
+	}
+
+	//end -------------------------------------------
+
+	// serialization prints-------------------------------
+
+	fmt.Println("\n\nHere are the Serializations:\n\nSecurity Object Serialization")
+	fmt.Println(string(securityJSON))
+	fmt.Println()
+
+	fmt.Println("Motion Sensor Object Serialization")
+	fmt.Println(string(motionSensorJSON))
+	fmt.Println()
+
+	fmt.Println("Security Alarm Object Serialization")
+	fmt.Println(string(securityAlarmJSON))
+	fmt.Println()
+
+	fmt.Println("PadLock Object Serialization")
+	fmt.Println(string(padLockJSON))
+	fmt.Println()
+
+	fmt.Println("FrontDoor Object Serialization")
+	fmt.Println(string(frontDoorJSON))
+	fmt.Println()
+
+	fmt.Println("BackDoor Object Serialization")
+	fmt.Println(string(backDoorJSON))
+	fmt.Println()
+	fmt.Println()
+	// ends------------------------------------------
+
+	//Deserialization prints---------------------------
+	fmt.Println("Deserialization Prints:\n\n")
+
+	//Security
+	fmt.Println("Deserialization Security System")
+	fmt.Println("Location: ", loadedSecurity.Location)
+	fmt.Println("SensorType: ", loadedSecurity.SensorType)
+	fmt.Println("Status: ", loadedSecurity.Status)
+	fmt.Println("EnergyConsumption: ", loadedSecurity.EnergyConsumption)
+	fmt.Println("LastTriggred: ", loadedSecurity.LastTriggered)
+	fmt.Println()
+
+	//Motion Sensor
+	fmt.Println("Deserialization Motion Sensor")
+	fmt.Println("Name: ", loadedMotionSensor.Name)
+	fmt.Println("MotionDetected: ", loadedMotionSensor.MotionDetected)
+	fmt.Println()
+
+	//Alarm
+	fmt.Println("Deserialization Alarm")
+	fmt.Println("Name: ", loadedSecurityAlarm.Name)
+	fmt.Println("Armed: ", loadedSecurityAlarm.Armed)
+	fmt.Println("Sounded: ", loadedSecurityAlarm.Sounded)
+	fmt.Println("Energy: ", loadedSecurityAlarm.Energy)
+	fmt.Println()
+
+	//FrontDoor
+	fmt.Println("Deserialization Front Door")
+	fmt.Println("Location: ", loadedFrontDoor.Location)
+	fmt.Println("Lock: ", loadedFrontDoor.Lock)
+	fmt.Println()
+
+	//BackDoor
+	fmt.Println("Deserialization Back Door")
+	fmt.Println("Location: ", loadedBackDoor.Location)
+	fmt.Println("Lock: ", loadedBackDoor.Lock)
+	fmt.Println()
+
+	// ends------------------------------------------------
+
+}

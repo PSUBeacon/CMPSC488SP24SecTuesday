@@ -7,9 +7,9 @@ import (
 	"crypto/cipher"
 	"encoding/json"
 	"fmt"
-	"github.com/joho/godotenv"
-	"log"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 func decryptAES(key, ciphertext []byte) ([]byte, error) {
@@ -57,38 +57,68 @@ func BlockReceiver() {
 	fmt.Println("Waiting for incoming messages...")
 	// Use ReadBytes or ReadString to dynamically handle incoming data
 
-		//loads file and pulls the key from there
-		err := godotenv.Load()
-		AesKey := os.Getenv("AES_KEY")
+	//loads file and pulls the key from there
+	err := godotenv.Load()
+	AesKey := os.Getenv("AES_KEY")
 
-		//Decrypt the message.
-		decryptedText, err := decryptAES([]byte(AesKey), message)
+	//Decrypt the message.
+	decryptedText, err := decryptAES([]byte(AesKey), message)
+	if err != nil {
+		fmt.Println("Error decrypting:", err)
+		return
+	}
+	//fmt.Printf("Decrypted text: %s\n", decryptedText)
+
+	//Verify the HMAC
+	isValid, receivedMessage := crypto.VerifyHMAC(decryptedText)
+	//if valid will check the blockchain
+	if isValid {
+		fmt.Println("Message integrity verified successfully.")
+		jsonChainData, err := os.ReadFile("chain.json")
+		chainlen := len(jsonChainData)
 		if err != nil {
-			fmt.Println("Error decrypting:", err)
-			return
+			panic(err)
 		}
-		//fmt.Printf("Decrypted text: %s\n", decryptedText)
 
-		//Verify the HMAC
-		isValid, receivedMessage := crypto.VerifyHMAC(decryptedText)
-		//if valid will check the blockchain
-		if isValid {
-			fmt.Println("Message integrity verified successfully.")
-			jsonChainData, err := os.ReadFile("chain.json")
-			chainlen := len(jsonChainData)
+		//Checks if there is an existing chain or if this is the start of the chain
+		if chainlen == 0 {
+			chainTojson := json.Unmarshal(receivedMessage, &chain)
+			if chainTojson != nil {
+				// if error is not nil
+				fmt.Println(chainTojson)
+			}
+			// Marshal the chain struct to JSON
+			jsonChainData, err = json.MarshalIndent(chain, "", "    ")
 			if err != nil {
 				panic(err)
 			}
+			// Write the JSON data to a file
+			err = os.WriteFile("chain.json", jsonChainData, 0644)
+			if err != nil {
+				panic(err)
+			}
+			continue
 
-			//Checks if there is an existing chain or if this is the start of the chain
-			if chainlen == 0 {
-				chainTojson := json.Unmarshal(receivedMessage, &chain)
-				if chainTojson != nil {
-					// if error is not nil
-					fmt.Println(chainTojson)
+		}
+
+		//Checks if the incoming block is not the first block in a chain
+		if chainlen > 0 {
+			blockTojson := json.Unmarshal(receivedMessage, &block)
+			if blockTojson != nil {
+				fmt.Println(blockTojson)
+			}
+			verify := verifyBlockchain(block)
+			if verify == true {
+
+				err := json.Unmarshal(jsonChainData, &chain)
+				if err != nil {
+					return
 				}
+
+				chain.Chain = append(chain.Chain, block)
 				// Marshal the chain struct to JSON
 				jsonChainData, err = json.MarshalIndent(chain, "", "    ")
+				//fmt.Println("This is the chain after its been appended: ", string(jsonChainData))
 				if err != nil {
 					panic(err)
 				}
@@ -97,46 +127,15 @@ func BlockReceiver() {
 				if err != nil {
 					panic(err)
 				}
-				continue
-
 			}
-
-			//Checks if the incoming block is not the first block in a chain
-			if chainlen > 0 {
-				blockTojson := json.Unmarshal(receivedMessage, &block)
-				if blockTojson != nil {
-					fmt.Println(blockTojson)
-				}
-				verify := verifyBlockchain(block)
-				if verify == true {
-
-					err := json.Unmarshal(jsonChainData, &chain)
-					if err != nil {
-						return
-					}
-
-					chain.Chain = append(chain.Chain, block)
-					// Marshal the chain struct to JSON
-					jsonChainData, err = json.MarshalIndent(chain, "", "    ")
-					//fmt.Println("This is the chain after its been appended: ", string(jsonChainData))
-					if err != nil {
-						panic(err)
-					}
-					// Write the JSON data to a file
-					err = os.WriteFile("chain.json", jsonChainData, 0644)
-					if err != nil {
-						panic(err)
-					}
-				}
-				if verify == false {
-					fmt.Println("Invalid Block")
-				}
+			if verify == false {
+				fmt.Println("Invalid Block")
 			}
-		} else {
-			fmt.Println("Message integrity verification failed.")
-			continue
-
 		}
+	} else {
+		fmt.Println("Message integrity verification failed.")
+		continue
+
 	}
 }
 

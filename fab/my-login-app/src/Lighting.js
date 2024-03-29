@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom for navigation
 import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure Bootstrap CSS is imported to use its grid system and components
-import logoImage from './logo.webp'; 
+import logoImage from './logo.webp';
+import removeIcon from './recycle-bin-icon.png';  
 import houseImage from './houseImage.jpg';
 import notificationIcon from './notification.png'
 import accountIcon from './account.png'
@@ -115,28 +116,41 @@ const Lighting= () => {
   };
   
   // Add new states for the room and light names
+  const [lights, setLights] = useState([]);
   const [roomName, setRoomName] = useState('');
   const [lightName, setLightName] = useState('');
-  const [lights, setLights] = useState([]);
 
-  const handleFormSubmit = (e) => {
-    e.preventDefault(); // Prevent page refresh
-    const newLight = { roomName, lightName };
-    const updatedLights = [...lights, newLight];
-    setLights(updatedLights); // Update the state
-  
-    // Store the updated lights in local storage
-    localStorage.setItem('lights', JSON.stringify(updatedLights));
-  };
-  
 
-  // Function to remove a light
+  // Function to handle light removal
   const handleRemoveLight = (index) => {
-    const newLights = [...lights];
-    newLights.splice(index, 1);
-    setLights(newLights);
+    const updatedLights = [...lights];
+    updatedLights.splice(index, 1);
+    setLights(updatedLights);
   };
 
+  // Function to handle turning a light on
+  const handleLightOn = (index) => {
+    const updatedLights = [...lights];
+    updatedLights[index].isOn = true;
+    setLights(updatedLights);
+  };
+
+  // Function to handle turning a light off
+  const handleLightOff = (index) => {
+    const updatedLights = [...lights];
+    updatedLights[index].isOn = false;
+    setLights(updatedLights);
+  };
+
+  // Function to handle form submission when adding a light
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    if (roomName && lightName) {
+      setLights([...lights, { roomName, lightName, isOn: false }]);
+      setRoomName('');
+      setLightName('');
+    }
+  };
 
 
   // This is the JSX return statement where we layout our component's HTML structure
@@ -162,7 +176,7 @@ const Lighting= () => {
   <button onClick={toggleAccountPopup} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>
     <img src={accountIcon} alt="account" style={{ marginRight: '10px' }} id = "menuIcon2"/>
   </button>
-            {/* <AccountPopup isVisible={isAccountPopupVisible} onClose={() => setIsAccountPopupVisible(false)} /> */}
+        <AccountPopup isVisible={isAccountPopupVisible} onClose={() => setIsAccountPopupVisible(false)} />
 </div>
 </div>
         </div>
@@ -227,77 +241,80 @@ const Lighting= () => {
 
     
         <main style={{ flex: '1', padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: '#0E2237', width: '100%'}}>
-  {/* Content Block */}
-  <div className="contentBlock" style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', width: '100%', paddingBottom: '60px'}}>
-    {/* Room Selection */}
-    <div className="roomSelection" style={{ flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center', marginRight: '20px' }}>
-      <h3 className="centered-title">Selecting a Room</h3>
-      <div className="RoomCards" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '40px' }}>
-        {/* Room cards */}
-        <div className="card" style={{ marginBottom: '20px', border: selectedRoom === "Bedroom 1" ? '2px solid #0294A5' : 'none' }} onClick={() => {setRoomName("Bedroom 1"); setSelectedRoom("Bedroom 1");}}><img class="images" src={bedroomIcon} alt="Room 1" /></div>
-        <div className="card" style={{ marginBottom: '20px', border: selectedRoom === "Bedroom 2" ? '2px solid #0294A5' : 'none' }} onClick={() => {setRoomName("Bedroom 2"); setSelectedRoom("Bedroom 2");}}><img class="images" src={bedroomIcon} alt="Room 2" /></div>
-        <div className="card" style={{ border: selectedRoom === "Living Room" ? '2px solid #0294A5' : 'none' }} onClick={() => {setRoomName("Living Room"); setSelectedRoom("Living Room");}}><img class="images" src={livingroomIcon} alt="Room 3" /></div>
-      </div>
-    </div>
-    {/* Light Control */}
-    <div className="lightControl" style={{ flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      {/* Light Form */}
-      <div className="formContainer" style={{ width: '100%', marginBottom: '20px', marginTop: '80px' }}>
-        <form onSubmit={handleFormSubmit} className="lightForm">
-          <div className="formGroup">
-            <label htmlFor="roomName">Room Name:</label>
-            <input type="text" id="roomName" value={roomName} onChange={(e) => setRoomName(e.target.value)} />
+      <div className="contentBlock" style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', width: '100%', paddingBottom: '60px'}}>
+        <div className="roomSelection" style={{ flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center', marginRight: '20px' }}>
+          <h3 className="centered-title">Selecting a Room</h3>
+          <div className="RoomCards" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '40px' }}>
+            <div className="card" style={{ marginBottom: '20px', border: selectedRoom === "Bedroom 1" ? '2px solid #0294A5' : 'none' }} onClick={() => {setRoomName("Bedroom 1"); setSelectedRoom("Bedroom 1");}}><img class="images" src={bedroomIcon} alt="Room 1" /></div>
+            <div className="card" style={{ marginBottom: '20px', border: selectedRoom === "Bedroom 2" ? '2px solid #0294A5' : 'none' }} onClick={() => {setRoomName("Bedroom 2"); setSelectedRoom("Bedroom 2");}}><img class="images" src={bedroomIcon} alt="Room 2" /></div>
+            <div className="card" style={{ border: selectedRoom === "Living Room" ? '2px solid #0294A5' : 'none' }} onClick={() => {setRoomName("Living Room"); setSelectedRoom("Living Room");}}><img class="images" src={livingroomIcon} alt="Room 3" /></div>
           </div>
-          <div className="formGroup">
-            <label htmlFor="lightName">Light Name:</label>
-            <input type="text" id="lightName" value={lightName} onChange={(e) => setLightName(e.target.value)} />
-          </div>
-          <button type="submit" className="submitButton">Add Light</button>
-        </form>
-        {/* Dropdown to select rooms */}
-        <div className="roomDropdown" style={{ marginBottom: '20px' }}>
-          <label htmlFor="selectRoom">Select Room:</label>
-          <select id="selectRoom" onChange={(e) => setSelectedRoom(e.target.value)}>
-            <option value="">Select Room</option>
-            {lights.map((light, index) => (
-              <option key={index} value={light.roomName}>{light.roomName}</option>
-            ))}
-          </select>
         </div>
-        {/* List of lights for the selected room with remove option */}
-        {selectedRoom && (
-          <ul className="lightList">
-            {lights
-              .filter((light) => light.roomName === selectedRoom)
-              .map((light, index) => (
-                <li key={index} className="lightItem">
-                  {light.lightName}
-                  <button style={{ marginTop: '20px'}}  onClick={() => handleRemoveLight(index)} className="removeButton">Remove</button>
-                </li>
-              ))}
-          </ul>
-        )}
-        {/* Light Dimmer Control */}
-        <div className="dimmerControl" style={{ width: '100%', textAlign: 'center', marginTop: '20px' }}>
-          <input
-            type="range"
-            id="dimmer"
-            name="dimmer"
-            min="0"
-            max="100"
-            value={dimmerValue}
-            onChange={(e) => setDimmerValue(e.target.value)}
-          />
-          <label htmlFor="dimmer">{dimmerValue}%</label>
-          {/* Turn on/off button */}
-          <button onClick={toggleLight} className="toggleButton">
-            {isLightOn ? 'Turn Off' : 'Turn On'}
-          </button>
+        <div className="lightControl" style={{ flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div className="formContainer" style={{ width: '100%', marginBottom: '20px', marginTop: '80px' }}>
+            <form onSubmit={handleFormSubmit} className="lightForm">
+              <div className="formGroup">
+                <label htmlFor="roomName">Room Name:</label>
+                <input type="text" id="roomName" value={roomName} onChange={(e) => setRoomName(e.target.value)} />
+              </div>
+              <div className="formGroup">
+                <label htmlFor="lightName">Light Name:</label>
+                <input type="text" id="lightName" value={lightName} onChange={(e) => setLightName(e.target.value)} />
+              </div>
+              <button type="submit" className="submitButton">Add Light</button>
+            </form>
+            <div className="roomDropdown" style={{ marginBottom: '20px', width:'72%' }}>
+              <label htmlFor="selectRoom">Select Room:</label>
+              <select id="selectRoom" onChange={(e) => setSelectedRoom(e.target.value)}>
+                <option value="">Select Room</option>
+                {lights.map((light, index) => (
+                  <option key={index} value={light.roomName}>{light.roomName}</option>
+                ))}
+              </select>
+            </div>
+            {selectedRoom && (
+              <ul className="lightList">
+                {lights
+                  .filter((light) => light.roomName === selectedRoom)
+                  .map((light, index) => (
+                    <li key={index} className="lightItem">
+                      {light.lightName}
+                      <div>
+                        <button style={{ marginRight: '10px' }} onClick={() => handleLightOn(index)}>Turn On</button>
+                        <button onClick={() => handleLightOff(index)}>Turn Off</button>
+                        <img src={removeIcon} alt="Remove" style={{ width: '20px', marginLeft: '10px', cursor: 'pointer' }} onClick={() => handleRemoveLight(index)} />
+                      </div>
+                    </li>
+                  ))}
+              </ul>
+            )}
+            <div className="dimmerControl" style={{ width: '72%', textAlign: 'center', marginTop: '20px' }}>
+              <input
+                type="range"
+                id="dimmer"
+                name="dimmer"
+                min="0"
+                max="100"
+                value={dimmerValue}
+                onChange={(e) => setDimmerValue(e.target.value)}
+                style={{
+                  WebkitAppearance: 'none',
+                  width: '100%',
+                  height: '15px',
+                  background: '#d3d3d3',
+                  outline: 'none',
+                  opacity: '0.7',
+                  transition: 'opacity .2s',
+                  borderRadius: '5px',
+                }}
+              />
+              <label htmlFor="dimmer" style={{ color: '#fff', marginTop: '5px' }}>{dimmerValue}%</label>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-</main>
+    </main>
+
 
       </div>
     </div>

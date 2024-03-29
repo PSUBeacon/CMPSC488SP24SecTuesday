@@ -316,6 +316,9 @@ const handleAccountInfoChange = (e) => {
               <li className="settings-nav-item" onClick={() => setSelectedNav('Manage Users')}>Manage Users</li>
               <li className="settings-nav-item" onClick={() => setSelectedNav('Notification Settings')}>Notifications</li>
               <li className="settings-nav-item" onClick={() => setSelectedNav('Account Settings')}>Account Settings</li>
+              <li className="settings-nav-item" >
+<Link to="/" style={{ color: 'inherit', textDecoration: 'none' }}>Logout</Link> {/* Link to the dashboard */}
+</li>
             </ul>
           </nav>
         </aside>

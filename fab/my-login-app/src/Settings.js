@@ -249,21 +249,7 @@ const handleAccountInfoChange = (e) => {
               </div>
             </div>
           </div>
-          {/* Sign-out button */}
-        <button
-          onClick={() => navigate('/login')} // Replace '/login' with your actual login route
-          style={{
-            marginTop: '20px',
-            padding: '10px',
-            backgroundColor: '#50BCC0',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer'
-          }}
-        >
-          Sign Out
-        </button>
+        
         </div>
       );
 
@@ -317,7 +303,7 @@ const handleAccountInfoChange = (e) => {
               <li className="settings-nav-item" onClick={() => setSelectedNav('Notification Settings')}>Notifications</li>
               <li className="settings-nav-item" onClick={() => setSelectedNav('Account Settings')}>Account Settings</li>
               <li className="settings-nav-item" >
-<Link to="/" style={{ color: 'inherit', textDecoration: 'none' }}>Logout</Link> {/* Link to the dashboard */}
+<Link to="/" style={{ color: 'inherit', textDecoration: 'none' }}>Sign Out</Link> {/* Link to the dashboard */}
 </li>
             </ul>
           </nav>

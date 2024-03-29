@@ -11,8 +11,8 @@ import accountIcon from './account.png'
 import menuIcon from './menu.png'
 import bulbIcon from './bulb-icon.png'
 import placeholderImage from './placeholderImage.jpg'; // Replace with the path to your placeholder image
-import placeholderImage2 from './placeholderImage2.jpg'; // Replace with the path to your placeholder image
-
+import livingRoomFootage from './livingRoomFootage1.gif'; 
+import kitchenFootage from './kitchenFootage.gif'; 
 // Define the Dashboard component using a functional component pattern
 const Dashboard = () => {
 
@@ -86,8 +86,8 @@ const Dashboard = () => {
   
   // Object that holds the URLs for your camera feeds
   const cameraFeeds = {
-    livingroom: placeholderImage, // Replace with the actual camera feed URL or image for the living room
-    kitchen: placeholderImage2, // Replace with the actual camera feed URL or image for the kitchen
+    livingroom: livingRoomFootage, // Replace with actual video feed or image
+    kitchen: kitchenFootage, // Replace with the actual camera feed URL or image for the kitchen
     r3: placeholderImage, //adding another tab to the camera views
   };
 
@@ -101,8 +101,8 @@ const Dashboard = () => {
   const CameraWidget = () => {
     
     const cameraFeeds = {
-      livingroom: placeholderImage, // Replace with actual video feed or image
-      kitchen: placeholderImage, // Replace with actual video feed or image for kitchen
+      livingroom: 'livingRoomFootage.mp4', // Replace with actual video feed or image
+      kitchen: 'kitchenFootage.mp4', // Replace with actual video feed or image for kitchen
       r3: placeholderImage,
       // Add more camera feeds as needed
     };

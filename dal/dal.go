@@ -143,11 +143,16 @@ type SmartHomeDB struct {
 }
 
 type UUIDsConfig struct {
-	LightingUUIDs   []string
-	HvacUUIDs       []string
-	SecurityUUIDs   []string
-	AppliancesUUIDs []string
-	EnergyUUIDs     []string
+	LightingUUIDs   []Pi
+	HvacUUIDs       []Pi
+	SecurityUUIDs   []Pi
+	AppliancesUUIDs []Pi
+	EnergyUUIDs     []Pi
+}
+
+type Pi struct {
+	Pinum int    `json:"Pinum"`
+	UUID  string `json:"UUID"`
 }
 
 type MessagingStruct struct {

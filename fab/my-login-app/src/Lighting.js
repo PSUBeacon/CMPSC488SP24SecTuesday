@@ -63,6 +63,7 @@ const Lighting = () => {
 
         // Define the body of the request based on your Go server's expected input.
         const requestBody = {
+
             uuid: '417293',
             name: "Lighting",
             apptype: "Lighting",
@@ -70,6 +71,7 @@ const Lighting = () => {
             change: "true"
 
         };
+
         const token = sessionStorage.getItem('token')
         // Send a POST request to turn the light on.
         axios.post(serverUrl, requestBody, {headers: {'Authorization': `Bearer ${token}`}})

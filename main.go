@@ -1,6 +1,7 @@
 package main
 
 import (
+	messaging "CMPSC488SP24SecTuesday/AES-BlockChain-Communication"
 	"CMPSC488SP24SecTuesday/appliances"
 	"CMPSC488SP24SecTuesday/blockchain"
 	"CMPSC488SP24SecTuesday/crypto"
@@ -18,6 +19,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"time"
 )
 
 func decryptAES(key, ciphertext []byte) ([]byte, error) {
@@ -80,6 +82,9 @@ func BlockReceiver() {
 	reader := bufio.NewReaderSize(port, bufferSize)
 
 	fmt.Println("Waiting for incoming messages...")
+
+	ticker := time.NewTicker(60 * time.Second)
+
 	// Use ReadBytes or ReadString to dynamically handle incoming data
 	for {
 		// Read and parse the data manually
@@ -89,6 +94,12 @@ func BlockReceiver() {
 			if err != nil {
 				log.Fatal("Error reading byte:", err)
 			}
+			if ticker == nil {
+				go messaging.BroadCastMessage([]byte("pi # connected"))
+				ticker.Reset(60 * time.Second)
+
+			}
+
 			// Check for the UTF-8 encoding of '♄' the hex value is (E2 99 B4)
 			if len(message) >= 2 && message[len(message)-2] == 0xE2 && message[len(message)-1] == 0x99 && b == 0xB4 {
 				//fmt.Println(message)
@@ -138,6 +149,7 @@ func BlockReceiver() {
 				if err != nil {
 					panic(err)
 				}
+				go handleFunctionality()
 				continue
 
 			}
@@ -168,7 +180,7 @@ func BlockReceiver() {
 					if err != nil {
 						panic(err)
 					}
-					handleFunctionality()
+					go handleFunctionality()
 				}
 				if verify == false {
 					fmt.Println("Invalid Block")

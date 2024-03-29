@@ -1,25 +1,48 @@
 {
-  "lightingUUIDs": [
-    "417293",
-    "417294"
+  "lighting": [
+    {
+      "PiNumber": 22,
+      "uuid": "417293"
+    },
+    {
+      "PiNumber": 13,
+      "uuid": "417294"
+    }
   ],
-  "hvacUUIDs": [
-    "mnop3456",
-    "qrst7890"
+  "hvac": [
+    {
+      "PiNumber": 25,
+      "uuid": "mnop3456"
+    },
+    {
+      "PiNumber": 25,
+      "uuid": "qrst7890"
+    }
   ],
-  "securityUUIDs": [
-    "uvwx1234",
-    "yzab5678"
+  "security": [
+    {
+      "PiNumber": 13,
+      "uuid": "uvwx1234"
+    },
+    {
+      "PiNumber": 13,
+      "uuid": "yzab5678"
+    }
   ],
-  "appliancesUUIDs": [
-    "cdef9012"
+  "appliances": [
+    {
+      "PiNumber": 55,
+      "uuid": "cdef9012"
+    }
   ],
-  "energyUUIDs": [
-    "ghij3456",
-    "klmn7890"
+  "energy": [
+    {
+      "PiNumber": 16,
+      "uuid": "ghij3456"
+    },
+    {
+      "PiNumber": 16,
+      "uuid": "klmn7890"
+    }
   ]
 }
-
-
-
-

@@ -1,9 +1,11 @@
 package main
 
 import (
+	messaging "CMPSC488SP24SecTuesday/AES-BlockChain-Communication"
 	"CMPSC488SP24SecTuesday/dal"
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
@@ -16,6 +18,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -25,6 +28,13 @@ var client *mongo.Client
 const userkey = "user"
 
 var secret = []byte("secret")
+
+var disconnectedPiNums []int
+
+func UpdateMissingPi(PiNum string) {
+	NumPi, _ := strconv.Atoi(PiNum)
+	disconnectedPiNums = append(disconnectedPiNums, NumPi)
+}
 
 func main() {
 	var er error
@@ -37,7 +47,7 @@ func main() {
 			log.Fatalf("Failed to disconnect from MongoDB: %v", er)
 		}
 	}()
-
+	go messaging.BlockReceiver()
 	r := gin.Default()
 
 	// Configure CORS
@@ -68,8 +78,9 @@ func main() {
 	protectedRoutes.POST("/lighting", updateIoT)
 	protectedRoutes.POST("/hvac", updateIoT)
 	protectedRoutes.POST("/security", updateIoT)
-	//protectedRoutes.POST("/appliances", updateAppliances)
+	protectedRoutes.POST("/appliances", updateIoT)
 	protectedRoutes.POST("/energy", updateIoT)
+	protectedRoutes.POST("/net-events", updateIoT)
 
 	// use JWT middleware for all protected routes
 	//r.Use(authMiddleware())
@@ -107,10 +118,42 @@ func updateIoT(c *gin.Context) {
 		return
 	}
 
-	dal.UpdateMessaging(client, []byte(req.UUID), req.Name, req.AppType, req.Function, req.Change)
-	// Respond to the request indicating success.
-	c.JSON(http.StatusOK, gin.H{"message": "Lighting updated successfully"})
+	var UUIDsData dal.UUIDsConfig
+	jsonconfigData, _ := os.ReadFile("config.json")
+	_ = json.Unmarshal(jsonconfigData, &UUIDsData)
 
+	allPis := [][]dal.Pi{
+		UUIDsData.LightingUUIDs,
+		UUIDsData.HvacUUIDs,
+		UUIDsData.SecurityUUIDs,
+		UUIDsData.AppliancesUUIDs,
+		UUIDsData.EnergyUUIDs,
+	}
+	//UpdateMissingPi(messaging.)
+	foundPi, found := findPiByUUID(allPis, req.UUID)
+	if found {
+		for i := 0; i < len(disconnectedPiNums); i++ {
+			if foundPi.Pinum == disconnectedPiNums[i] {
+				fmt.Println("Pi is disconnected")
+			}
+		}
+	}
+	if !found {
+		dal.UpdateMessaging(client, []byte(req.UUID), req.Name, req.AppType, req.Function, req.Change)
+		c.JSON(http.StatusOK, gin.H{"message": "IOT updated successfully"})
+	}
+
+}
+
+func findPiByUUID(allPis [][]dal.Pi, uuidToFind string) (dal.Pi, bool) {
+	for _, category := range allPis {
+		for _, pi := range category {
+			if pi.UUID == uuidToFind {
+				return pi, true
+			}
+		}
+	}
+	return dal.Pi{}, false
 }
 
 func statusResp(c *gin.Context) {
@@ -328,162 +371,6 @@ func dashboardHandler(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch smart home data"})
 			return
 		}
-		c.JSON(http.StatusOK, gin.H{
-			"message":     "Welcome to the Owner dashboard",
-			"accountType": "Owner",
-			"Dishwasher": gin.H{
-				"UUID":              smartHomeDB.Dishwasher[0].UUID,
-				"Status":            smartHomeDB.Dishwasher[0].Status,
-				"WashTime":          smartHomeDB.Dishwasher[0].WashTime,
-				"TimerStopTime":     smartHomeDB.Dishwasher[0].TimerStopTime,
-				"EnergyConsumption": smartHomeDB.Dishwasher[0].EnergyConsumption,
-				"LastChanged":       smartHomeDB.Dishwasher[0].LastChanged,
-			},
-			"Fridge": gin.H{
-				"UUID":                smartHomeDB.Fridge[0].UUID,
-				"Status":              smartHomeDB.Fridge[0].Status,
-				"TemperatureSettings": smartHomeDB.Fridge[0].TemperatureSettings,
-				"EnergyConsumption":   smartHomeDB.Fridge[0].EnergyConsumption,
-				"LastChanged":         smartHomeDB.Fridge[0].LastChanged,
-				"EnergySaveMode":      smartHomeDB.Fridge[0].EnergySaveMode,
-			},
-			"HVAC": gin.H{
-				"UUID":              smartHomeDB.HVAC[0].UUID,
-				"Location":          smartHomeDB.HVAC[0].Location,
-				"Temperature":       smartHomeDB.HVAC[0].Temperature,
-				"Humidity":          smartHomeDB.HVAC[0].Humidity,
-				"FanSpeed":          smartHomeDB.HVAC[0].FanSpeed,
-				"Status":            smartHomeDB.HVAC[0].Status,
-				"EnergyConsumption": smartHomeDB.HVAC[0].EnergyConsumption,
-				"LastChanged":       smartHomeDB.HVAC[0].LastChanged,
-			},
-			"Lighting": gin.H{
-				"UUID":              smartHomeDB.Lighting[0].UUID,
-				"Location":          smartHomeDB.Lighting[0].Location,
-				"Brightness":        smartHomeDB.Lighting[0].Brightness,
-				"Status":            smartHomeDB.Lighting[0].Status,
-				"EnergyConsumption": smartHomeDB.Lighting[0].EnergyConsumption,
-				"LastChanged":       smartHomeDB.Lighting[0].LastChanged,
-			},
-			"Microwave": gin.H{
-				"UUID":              smartHomeDB.Microwave[0].UUID,
-				"Status":            smartHomeDB.Microwave[0].Status,
-				"Power":             smartHomeDB.Microwave[0].Power,
-				"TimerStopTime":     smartHomeDB.Microwave[0].TimerStopTime,
-				"EnergyConsumption": smartHomeDB.Microwave[0].EnergyConsumption,
-				"LastChanged":       smartHomeDB.Microwave[0].LastChanged,
-			},
-			"Oven": gin.H{
-				"UUID":                smartHomeDB.Oven[0].UUID,
-				"Status":              smartHomeDB.Oven[0].Status,
-				"TemperatureSettings": smartHomeDB.Oven[0].TemperatureSettings,
-				"TimerStopTime":       smartHomeDB.Oven[0].TimerStopTime,
-				"EnergyConsumption":   smartHomeDB.Oven[0].EnergyConsumption,
-				"LastChanged":         smartHomeDB.Oven[0].LastChanged,
-			},
-			"SecuritySystem": gin.H{
-				"UUID":              smartHomeDB.SecuritySystem[0].UUID,
-				"Location":          smartHomeDB.SecuritySystem[0].Location,
-				"Status":            smartHomeDB.SecuritySystem[0].Status,
-				"EnergyConsumption": smartHomeDB.SecuritySystem[0].EnergyConsumption,
-				"LastTriggered":     smartHomeDB.SecuritySystem[0].LastTriggered,
-			},
-			"SolarPanel": gin.H{
-				"UUID":                 smartHomeDB.SolarPanel[0].UUID,
-				"PanelID":              smartHomeDB.SolarPanel[0].PanelID,
-				"Status":               smartHomeDB.SolarPanel[0].Status,
-				"EnergyGeneratedToday": smartHomeDB.SolarPanel[0].EnergyGeneratedToday,
-				"PowerOutput":          smartHomeDB.SolarPanel[0].PowerOutput,
-				"LastChanged":          smartHomeDB.SolarPanel[0].LastChanged,
-			},
-			"Toaster": gin.H{
-				"UUID":                smartHomeDB.Toaster[0].UUID,
-				"Status":              smartHomeDB.Toaster[0].Status,
-				"TemperatureSettings": smartHomeDB.Toaster[0].TemperatureSettings,
-				"TimerStopTime":       smartHomeDB.Toaster[0].TimerStopTime,
-				"EnergyConsumption":   smartHomeDB.Toaster[0].EnergyConsumption,
-				"LastChanged":         smartHomeDB.Toaster[0].LastChanged,
-			},
-		})
-
-	case "read": //child role
-		c.JSON(http.StatusOK, gin.H{
-			"message":     "Welcome to the Owner dashboard",
-			"accountType": "Child",
-			"Dishwasher": gin.H{
-				"UUID":              smartHomeDB.Dishwasher[0].UUID,
-				"Status":            smartHomeDB.Dishwasher[0].Status,
-				"WashTime":          smartHomeDB.Dishwasher[0].WashTime,
-				"TimerStopTime":     smartHomeDB.Dishwasher[0].TimerStopTime,
-				"EnergyConsumption": smartHomeDB.Dishwasher[0].EnergyConsumption,
-				"LastChanged":       smartHomeDB.Dishwasher[0].LastChanged,
-			},
-			"Fridge": gin.H{
-				"UUID":                smartHomeDB.Fridge[0].UUID,
-				"Status":              smartHomeDB.Fridge[0].Status,
-				"TemperatureSettings": smartHomeDB.Fridge[0].TemperatureSettings,
-				"EnergyConsumption":   smartHomeDB.Fridge[0].EnergyConsumption,
-				"LastChanged":         smartHomeDB.Fridge[0].LastChanged,
-				"EnergySaveMode":      smartHomeDB.Fridge[0].EnergySaveMode,
-			},
-			"HVAC": gin.H{
-				"UUID":              smartHomeDB.HVAC[0].UUID,
-				"Location":          smartHomeDB.HVAC[0].Location,
-				"Temperature":       smartHomeDB.HVAC[0].Temperature,
-				"Humidity":          smartHomeDB.HVAC[0].Humidity,
-				"FanSpeed":          smartHomeDB.HVAC[0].FanSpeed,
-				"Status":            smartHomeDB.HVAC[0].Status,
-				"EnergyConsumption": smartHomeDB.HVAC[0].EnergyConsumption,
-				"LastChanged":       smartHomeDB.HVAC[0].LastChanged,
-			},
-			"Lighting": gin.H{
-				"UUID":              smartHomeDB.Lighting[0].UUID,
-				"Location":          smartHomeDB.Lighting[0].Location,
-				"Brightness":        smartHomeDB.Lighting[0].Brightness,
-				"Status":            smartHomeDB.Lighting[0].Status,
-				"EnergyConsumption": smartHomeDB.Lighting[0].EnergyConsumption,
-				"LastChanged":       smartHomeDB.Lighting[0].LastChanged,
-			},
-			"Microwave": gin.H{
-				"UUID":              smartHomeDB.Microwave[0].UUID,
-				"Status":            smartHomeDB.Microwave[0].Status,
-				"Power":             smartHomeDB.Microwave[0].Power,
-				"TimerStopTime":     smartHomeDB.Microwave[0].TimerStopTime,
-				"EnergyConsumption": smartHomeDB.Microwave[0].EnergyConsumption,
-				"LastChanged":       smartHomeDB.Microwave[0].LastChanged,
-			},
-			"Oven": gin.H{
-				"UUID":                smartHomeDB.Oven[0].UUID,
-				"Status":              smartHomeDB.Oven[0].Status,
-				"TemperatureSettings": smartHomeDB.Oven[0].TemperatureSettings,
-				"TimerStopTime":       smartHomeDB.Oven[0].TimerStopTime,
-				"EnergyConsumption":   smartHomeDB.Oven[0].EnergyConsumption,
-				"LastChanged":         smartHomeDB.Oven[0].LastChanged,
-			},
-			"SecuritySystem": gin.H{
-				"UUID":              smartHomeDB.SecuritySystem[0].UUID,
-				"Location":          smartHomeDB.SecuritySystem[0].Location,
-				"Status":            smartHomeDB.SecuritySystem[0].Status,
-				"EnergyConsumption": smartHomeDB.SecuritySystem[0].EnergyConsumption,
-				"LastTriggered":     smartHomeDB.SecuritySystem[0].LastTriggered,
-			},
-			"SolarPanel": gin.H{
-				"UUID":                 smartHomeDB.SolarPanel[0].UUID,
-				"PanelID":              smartHomeDB.SolarPanel[0].PanelID,
-				"Status":               smartHomeDB.SolarPanel[0].Status,
-				"EnergyGeneratedToday": smartHomeDB.SolarPanel[0].EnergyGeneratedToday,
-				"PowerOutput":          smartHomeDB.SolarPanel[0].PowerOutput,
-				"LastChanged":          smartHomeDB.SolarPanel[0].LastChanged,
-			},
-			"Toaster": gin.H{
-				"UUID":                smartHomeDB.Toaster[0].UUID,
-				"Status":              smartHomeDB.Toaster[0].Status,
-				"TemperatureSettings": smartHomeDB.Toaster[0].TemperatureSettings,
-				"TimerStopTime":       smartHomeDB.Toaster[0].TimerStopTime,
-				"EnergyConsumption":   smartHomeDB.Toaster[0].EnergyConsumption,
-				"LastChanged":         smartHomeDB.Toaster[0].LastChanged,
-			},
-		})
 	default:
 		c.JSON(http.StatusForbidden, gin.H{"error": "Invalid role or insufficient privileges"})
 	}

@@ -38,13 +38,42 @@ const Appliances = () => {
        return () => clearInterval(timer);
    }, []);
 
-  const appliances = [
-    { icon: faMicrophone, name: 'Microwave', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00' },
-    { icon: faOtter, name: 'Oven', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00' },
-    { icon: faIceCream, name: 'Fridge', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00' },
-    { icon: faSnowflake, name: 'Freezer', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00' },
-    { icon: faBreadSlice, name: 'Toaster', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00' },
-    { icon: faSoap, name: 'Dishwasher', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00' },
+  const dishwasher = [
+    { Device: "Dishwasher", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00', WashTime: "00:00" },
+    { Device: "Dishwasher", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00', WashTime: "00:00" },
+  ];
+
+  //this const is also for the freezer
+  const fridge = [
+    { Device: "Fridge", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00', Temp: "Degrees", EnergySavingMode: "KW"},
+    { Device: "Fridge", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00', Temp: "Degrees", EnergySavingMode: "KW" },
+    { Device: "Freezer", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00', Temp: "Degrees", EnergySavingMode: "KW" },
+    { Device: "Freezer", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00', Temp: "Degrees", EnergySavingMode: "KW" },
+  ];
+
+  const hvac = [
+    { Device: "HVAC", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00' },
+    { Device: "HVAC", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00' },
+  ];
+
+  const lighting = [
+    { Device: "Lighting", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00' },
+    { Device: "Lighting", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00' },
+  ];
+
+  const microwave = [
+    { Device: "Microwave", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00', Power: "KW", StopTime: "00:00" },
+    { Device: "Microwave", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00', Power: "KW", StopTime: "00:00" },
+  ];
+
+  const toaster = [
+    { Device: "Toaster", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00', Temp: "Degrees", StopTime: "00:00" },
+    { Device: "Toaster", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00', Temp: "Degrees", StopTime: "00:00" },
+  ];
+
+  const oven = [
+    { Device: "Oven", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00', Temp: "Degrees", StopTime: "00:00"  },
+    { Device: "Oven", Name: "N/A", Location: 'N/A', Status: 'ON/OFF', LastUsed: 'MM/DD/YY 00:00', Temp: "Degrees", StopTime: "00:00"  },
   ];
   
   const navigate = useNavigate(); // Instantiate useNavigate hook
@@ -211,9 +240,72 @@ const Appliances = () => {
           </nav>
         </aside>
 
-    
+{/*dishwasher table*/}    
 <main style={{ flex: '1', padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: '#0E2237'}}>
 <h2 style={{ color: 'white' }}>Appliances</h2>
+<div style={{ alignSelf: 'flex-start', width: '100%' }}>
+    <h3 style={{ color: 'white', marginLeft: '1rem' }}>Dishwasher</h3>
+  </div>
+<Table striped bordered hover variant="dark" style={{ marginTop: '20px', backgroundColor: "#173350" }}>
+        <thead>
+          <tr>
+            <th>Device</th>
+            <th>Name</th>
+            <th>Location</th>
+            <th>Status</th>
+            <th>Last Used</th>
+            <th>Wash Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          {dishwasher.map((dishwasher, index) => (
+            <tr key={index}>
+              <td>{dishwasher.Device}</td>
+              <td>{dishwasher.Name}</td>
+              <td>{dishwasher.Location}</td>
+              <td>{dishwasher.Status}</td>
+              <td>{dishwasher.LastUsed}</td>
+              <td>{dishwasher.WashTimer}</td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+
+{/*fridge table*/}
+      <div style={{ alignSelf: 'flex-start', width: '100%' }}>
+    <h3 style={{ color: 'white', marginLeft: '1rem', marginTop: '10px' }}>Fridge</h3>
+  </div>
+<Table striped bordered hover variant="dark" style={{ marginTop: '20px', backgroundColor: "#173350" }}>
+        <thead>
+          <tr>
+            <th>Device</th>
+            <th>Name</th>
+            <th>Location</th>
+            <th>Status</th>
+            <th>Last Used</th>
+            <th>Temperature</th>
+            <th>Energy Saving Mode</th>
+          </tr>
+        </thead>
+        <tbody>
+          {fridge.map((fridge, index) => (
+            <tr key={index}>
+              <td>{fridge.Device}</td>
+              <td>{fridge.Name}</td>
+              <td>{fridge.Location}</td>
+              <td>{fridge.Status}</td>
+              <td>{fridge.LastUsed}</td>
+              <td>{fridge.Temp}</td>
+              <td>{fridge.EnergySavingMode}</td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+
+{/*hvac table*/}
+<div style={{ alignSelf: 'flex-start', width: '100%' }}>
+    <h3 style={{ color: 'white', marginLeft: '1rem', marginTop: '10px' }}>HVAC</h3>
+  </div>
 <Table striped bordered hover variant="dark" style={{ marginTop: '20px', backgroundColor: "#173350" }}>
         <thead>
           <tr>
@@ -225,19 +317,139 @@ const Appliances = () => {
           </tr>
         </thead>
         <tbody>
-          {appliances.map((appliance, index) => (
+          {hvac.map((hvac, index) => (
             <tr key={index}>
-              <td>
-                <FontAwesomeIcon icon={appliance.icon} style={{ color: 'cyan' }} />
-              </td>
-              <td>{appliance.name}</td>
-              <td>{appliance.location}</td>
-              <td>{appliance.status}</td>
-              <td>{appliance.lastUsed}</td>
+              <td>{hvac.Device}</td>
+              <td>{hvac.Name}</td>
+              <td>{hvac.Location}</td>
+              <td>{hvac.Status}</td>
+              <td>{hvac.LastUsed}</td>
             </tr>
           ))}
         </tbody>
       </Table>
+
+{/*Lighting table*/}
+<div style={{ alignSelf: 'flex-start', width: '100%' }}>
+    <h3 style={{ color: 'white', marginLeft: '1rem', marginTop: '10px' }}>Lighting</h3>
+  </div>
+<Table striped bordered hover variant="dark" style={{ marginTop: '20px', backgroundColor: "#173350" }}>
+        <thead>
+          <tr>
+            <th>Device</th>
+            <th>Name</th>
+            <th>Location</th>
+            <th>Status</th>
+            <th>Last Used</th>
+          </tr>
+        </thead>
+        <tbody>
+          {lighting.map((lighting, index) => (
+            <tr key={index}>
+              <td>{lighting.Device}</td>
+              <td>{lighting.Name}</td>
+              <td>{lighting.Location}</td>
+              <td>{lighting.Status}</td>
+              <td>{lighting.LastUsed}</td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+
+{/*Microwave table*/}
+<div style={{ alignSelf: 'flex-start', width: '100%' }}>
+    <h3 style={{ color: 'white', marginLeft: '1rem', marginTop: '10px' }}>Microwave</h3>
+  </div>
+<Table striped bordered hover variant="dark" style={{ marginTop: '20px', backgroundColor: "#173350" }}>
+        <thead>
+          <tr>
+            <th>Device</th>
+            <th>Name</th>
+            <th>Location</th>
+            <th>Status</th>
+            <th>Last Used</th>
+            <th>Power</th>
+            <th>Stop Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          {microwave.map((microwave, index) => (
+            <tr key={index}>
+              <td>{microwave.Device}</td>
+              <td>{microwave.Name}</td>
+              <td>{microwave.Location}</td>
+              <td>{microwave.Status}</td>
+              <td>{microwave.LastUsed}</td>
+              <td>{microwave.Power}</td>
+              <td>{microwave.StopTime}</td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+
+{/*Toaster table*/}
+<div style={{ alignSelf: 'flex-start', width: '100%' }}>
+    <h3 style={{ color: 'white', marginLeft: '1rem', marginTop: '10px' }}>Toaster</h3>
+  </div>
+<Table striped bordered hover variant="dark" style={{ marginTop: '20px', backgroundColor: "#173350" }}>
+        <thead>
+          <tr>
+            <th>Device</th>
+            <th>Name</th>
+            <th>Location</th>
+            <th>Status</th>
+            <th>Last Used</th>
+            <th>Temperature</th>
+            <th>Stop Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          {toaster.map((toaster, index) => (
+            <tr key={index}>
+              <td>{toaster.Device}</td>
+              <td>{toaster.Name}</td>
+              <td>{toaster.Location}</td>
+              <td>{toaster.Status}</td>
+              <td>{toaster.LastUsed}</td>
+              <td>{toaster.Temp}</td>
+              <td>{toaster.StopTime}</td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+
+{/*Oven table*/}
+<div style={{ alignSelf: 'flex-start', width: '100%' }}>
+    <h3 style={{ color: 'white', marginLeft: '1rem', marginTop: '10px' }}>Oven</h3>
+  </div>
+<Table striped bordered hover variant="dark" style={{ marginTop: '20px', backgroundColor: "#173350" }}>
+        <thead>
+          <tr>
+            <th>Device</th>
+            <th>Name</th>
+            <th>Location</th>
+            <th>Status</th>
+            <th>Last Used</th>
+            <th>Temperature</th>
+            <th>Stop Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          {oven.map((oven, index) => (
+            <tr key={index}>
+              <td>{oven.Device}</td>
+              <td>{oven.Name}</td>
+              <td>{oven.Location}</td>
+              <td>{oven.Status}</td>
+              <td>{oven.LastUsed}</td>
+              <td>{oven.Temp}</td>
+              <td>{oven.StopTime}</td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+
+
   
 </main>
 

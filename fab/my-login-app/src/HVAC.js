@@ -404,24 +404,24 @@ const toggleBasementHVACStatus = () => {
 
         {/* First Column - status */}
         <div className="data-item">
-          <div className="data-icon">
-            <i className={deviceData.HVAC.Status ? "fas fa-power-on" : "fas fa-power-off"}></i>
-          </div>
-          <div className="data-info">
-            <p style={{ color: '#95A4B6'}}>Status</p>
-            <p>{deviceData.HVAC.Status ? "On" : "Off"}</p>
-            {/* Toggle */}
-            <label className="toggle" style={{ display: 'block', margin: 'auto' }}>
-              <input
+    <div className="data-icon">
+        <i className={secondFloorHVACStatus ? "fas fa-power-on" : "fas fa-power-off"}></i>
+    </div>
+    <div className="data-info">
+        <p style={{ color: '#95A4B6' }}>Status</p>
+        <p>{secondFloorHVACStatus ? "On" : "Off"}</p>
+        {/* Toggle */}
+        <label className="toggle" style={{ display: 'block', margin: 'auto' }}>
+            <input
                 type="checkbox"
                 checked={secondFloorHVACStatus}
                 onChange={toggleSecondFloorHVACStatus}
-              />
-              <span className="slider" style={{ background: secondFloorHVACStatus ? '#50BCC0' : 'grey' }}></span>
-            </label>
+            />
+            <span className="slider" style={{ background: secondFloorHVACStatus ? '#50BCC0' : 'grey' }}></span>
+        </label>
+    </div>
+</div>
 
-          </div>
-        </div>
 {/* ========================================================================= */}
 
         {/* First Column - energy consumption */}
@@ -562,25 +562,25 @@ const toggleBasementHVACStatus = () => {
 {/* ============================================================== */}
 
 {/* Second Column - Status */}
-        <div className="data-item">
-          <div className="data-icon">
-            <i className={deviceData.HVAC.Status ? "fas fa-power-on" : "fas fa-power-off"}></i>
-          </div>
-          <div className="data-info">
-            <p style={{ color: '#95A4B6'}}>Status</p>
-            <p>{deviceData.HVAC.Status ? "On" : "Off"}</p>
-            {/* Toggle */}
-            <label className="toggle" style={{ display: 'block', margin: 'auto' }}>
-              <input
+<div className="data-item">
+    <div className="data-icon">
+        <i className={basementHVACStatus ? "fas fa-power-on" : "fas fa-power-off"}></i>
+    </div>
+    <div className="data-info">
+        <p style={{ color: '#95A4B6' }}>Status</p>
+        <p>{basementHVACStatus ? "On" : "Off"}</p>
+        {/* Toggle */}
+        <label className="toggle" style={{ display: 'block', margin: 'auto' }}>
+            <input
                 type="checkbox"
                 checked={basementHVACStatus}
                 onChange={toggleBasementHVACStatus}
-              />
-              <span className="slider" style={{ background: basementHVACStatus ? '#50BCC0' : 'grey' }}></span>
-            </label>
+            />
+            <span className="slider" style={{ background: basementHVACStatus ? '#50BCC0' : 'grey' }}></span>
+        </label>
+    </div>
+</div>
 
-          </div>
-        </div>
 {/* ============================================================== */}
 
         {/* Second Column - Energy Consumption */}

@@ -23,7 +23,7 @@ const Lighting= () => {
 
   const navigate = useNavigate(); // Instantiate useNavigate hook
   const [selectedLight, setSelectedLight] = useState(null);
-
+    
   // Function to handle card click
   const handleSelectLight = (lightId) => {
     setSelectedLight(lightId); // Update the selected light state
@@ -75,7 +75,7 @@ const Lighting= () => {
     setIsAccountPopupVisible(!isAccountPopupVisible);
   };
   
-  
+
 
     
     
@@ -117,16 +117,18 @@ const Lighting= () => {
   
   // Add new states for the room and light names
   const [lights, setLights] = useState([]);
+  const uniqueRoomNames = [...new Set(lights.map(light => light.roomName))];
   const [roomName, setRoomName] = useState('');
   const [lightName, setLightName] = useState('');
 
 
   // Function to handle light removal
-  const handleRemoveLight = (index) => {
-    const updatedLights = [...lights];
-    updatedLights.splice(index, 1);
-    setLights(updatedLights);
-  };
+const handleRemoveLight = (index, roomName) => {
+  const updatedLights = lights.filter((light, lightIndex) => {
+    return !(lightIndex === index && light.roomName === roomName);
+  });
+  setLights(updatedLights);
+};
 
   // Function to handle turning a light on
   const handleLightOn = (index) => {
@@ -264,14 +266,14 @@ const Lighting= () => {
               <button type="submit" className="submitButton">Add Light</button>
             </form>
             <div className="roomDropdown" style={{ marginBottom: '20px', width:'72%' }}>
-              <label htmlFor="selectRoom">Select Room:</label>
-              <select id="selectRoom" onChange={(e) => setSelectedRoom(e.target.value)}>
-                <option value="">Select Room</option>
-                {lights.map((light, index) => (
-                  <option key={index} value={light.roomName}>{light.roomName}</option>
-                ))}
-              </select>
-            </div>
+  <label htmlFor="selectRoom">Select Room:</label>
+  <select id="selectRoom" onChange={(e) => setSelectedRoom(e.target.value)}>
+    <option value="">Select Room</option>
+    {uniqueRoomNames.map((room, index) => (
+      <option key={index} value={room}>{room}</option>
+    ))}
+  </select>
+</div>
             {selectedRoom && (
               <ul className="lightList">
                 {lights
@@ -282,7 +284,7 @@ const Lighting= () => {
                       <div>
                         <button style={{ marginRight: '10px' }} onClick={() => handleLightOn(index)}>Turn On</button>
                         <button onClick={() => handleLightOff(index)}>Turn Off</button>
-                        <img src={removeIcon} alt="Remove" style={{ width: '20px', marginLeft: '10px', cursor: 'pointer' }} onClick={() => handleRemoveLight(index)} />
+                        <img src={removeIcon} alt="Remove" style={{ width: '20px', marginLeft: '10px', cursor: 'pointer' }} onClick={() => handleRemoveLight(index, selectedRoom)} />
                       </div>
                     </li>
                   ))}

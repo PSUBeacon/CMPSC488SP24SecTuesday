@@ -335,22 +335,26 @@ func dashboardHandler(c *gin.Context) {
 	// Determine the response based on the user's role
 	switch role {
 
-	case "admin": //admin
-
+	case "admin": //owner role
 		if smartHomeDB == nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch smart home data"})
 			return
 		}
 		c.JSON(http.StatusOK, gin.H{
-			"message": "Welcome to the Owner dashboard",
-
+			"message":     "Welcome to the Admin dashboard",
 			"accountType": "Admin",
+			"devices":     smartHomeDB,
 		})
 
-	case "user": //user
+	case "user": //owner role
+		if smartHomeDB == nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch smart home data"})
+			return
+		}
 		c.JSON(http.StatusOK, gin.H{
-			"message":     "Welcome to the Owner dashboard",
+			"message":     "Welcome to the User dashboard",
 			"accountType": "User",
+			"devices":     smartHomeDB,
 		})
 	default:
 		c.JSON(http.StatusForbidden, gin.H{"error": "Invalid role or insufficient privileges"})

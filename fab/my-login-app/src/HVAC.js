@@ -13,33 +13,32 @@ import menuIcon from './menu.png'
 const HVAC = () => {
 
  // States for each device
- const [deviceData, setDeviceData] = useState({
-  HVAC: {},
-  Dishwasher: {},
-  Fridge: {},
-  Lighting: {},
-  Microwave: {},
-  Oven: {},
-  SecuritySystem: {},
-  SolarPanel: {},
-  Toaster: {},
-});
+ const [deviceData, setDeviceData] = useState({});
 
-   // States for date and time
+    useEffect(() => {
+        // This useEffect is for loading stored data from localStorage
+        const storedData = localStorage.getItem('devices');
+        if (storedData) {
+            setDeviceData(JSON.parse(storedData));
+        }
+    }, []); // The dependency array is empty, meaning this effect runs once on component mount
+
+
+    // States for date and time
    const [currentDate, setCurrentDate] = useState(new Date().toLocaleDateString());
    const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
-   const [secondFloorMode, setSecondFloorMode] = useState(deviceData.HVAC.secondFloorMode || 'Heat');
-   const [basementMode, setBasementMode] = useState(deviceData.HVAC.basementMode || 'Heat');
-   const [secondFloorTemp, setSecondFloorTemp] = useState(deviceData.HVAC.secondFloorTemp || '');
-   const [basementTemp, setBasementTemp] = useState(deviceData.HVAC.basementTemp || '');
-   const [secondFloorHumidity, setSecondFloorHumidity] = useState(deviceData.HVAC.secondFloorHumidity || '');
-   const [basementHumidity, setBasementHumidity] = useState(deviceData.HVAC.basementHumidity || '');
-   const [secondFloorFanSpeed, setSecondFloorFanSpeed] = useState(deviceData.HVAC.secondFloorFanSpeed || '');
-   const [basementFanSpeed, setBasementFanSpeed] = useState(deviceData.HVAC.basementFanSpeed || '');
-   const [secondFloorEnergyConsumption, setSecondFloorEnergyConsumption] = useState(deviceData.HVAC.secondFloorEnergyConsumption || '');
-   const [basementEnergyConsumption, setBasementEnergyConsumption] = useState(deviceData.HVAC.basementEnergyConsumption || '');
-   const [secondFloorHVACStatus, setSecondFloorHVACStatus] = useState(deviceData.HVAC.Status);
-  const [basementHVACStatus, setBasementHVACStatus] = useState(deviceData.HVAC.Status);
+   const [secondFloorMode, setSecondFloorMode] = useState(deviceData.HVAC?.[0]?.Mode || 'Heat');
+    const [basementMode, setBasementMode] = useState(deviceData.HVAC?.[1]?.Mode || 'Heat');
+    const [secondFloorTemp, setSecondFloorTemp] = useState(deviceData.HVAC?.[0]?.Temperature ? `${deviceData.HVAC[0].Temperature}°F` : '');
+    const [basementTemp, setBasementTemp] = useState(deviceData.HVAC?.[1]?.Temperature ? `${deviceData.HVAC[1].Temperature}°F` : '');
+    const [secondFloorHumidity, setSecondFloorHumidity] = useState(deviceData.HVAC?.[0]?.Humidity ? `${deviceData.HVAC[0].Humidity}%` : '');
+   const [basementHumidity, setBasementHumidity] = useState(deviceData.HVAC?.[1]?.Humidity ? `${deviceData.HVAC[1].Humidity}%` : '');
+   const [secondFloorFanSpeed, setSecondFloorFanSpeed] = useState(deviceData.HVAC?.[0]?.FanSpeed || '')
+   const [basementFanSpeed, setBasementFanSpeed] =  useState(deviceData.HVAC?.[1]?.FanSpeed || '')
+   const [secondFloorEnergyConsumption, setSecondFloorEnergyConsumption] = useState(deviceData.HVAC?.[0]?.EnergyConsumption ? `${deviceData.HVAC[0].EnergyConsumption}kWh` : '');
+   const [basementEnergyConsumption, setBasementEnergyConsumption] =useState(deviceData.HVAC?.[1]?.EnergyConsumption ? `${deviceData.HVAC[1].EnergyConsumption}kWh` : '');
+   const [secondFloorHVACStatus, setSecondFloorHVACStatus] = useState(deviceData?.HVAC?.[1]?.Status ? "On" : "Off");
+  const [basementHVACStatus, setBasementHVACStatus] = useState(deviceData?.HVAC?.[0]?.Status ? "On" : "Off");
 
 
    const updateSecondFloorHVACMode = (newMode) => {
@@ -106,7 +105,6 @@ const toggleBasementHVACStatus = () => {
 };
 
 
-
     useEffect(() => {
         const token = localStorage.getItem('token');
         const url = 'http://localhost:8081/dashboard';
@@ -121,23 +119,21 @@ const toggleBasementHVACStatus = () => {
             .then(response => response.json())
             .then(data => {
                 console.log(data);
-                // Update state for each device if present in response
-                const updatedDeviceData = { ...deviceData };
-                Object.keys(updatedDeviceData).forEach(device => {
-                    if (data[device]) {
-                        localStorage.setItem(device, JSON.stringify(data[device]));
-                        updatedDeviceData[device] = data[device];
-                    }
-                });
-                setDeviceData(updatedDeviceData);
+                if (data.devices) { // Check if the devices data is present in the response
+                    // Update the entire device data state
+                    setDeviceData(data.devices);
+
+
+                    localStorage.setItem('devices', JSON.stringify(data.devices));
+                }
                 setDashboardMessage(data.message);
 
-                // Store accountType in session storage
+                // Update and store the account type
                 setAccountType(data.accountType);
                 sessionStorage.setItem('accountType', data.accountType);
             })
             .catch(error => console.error('Fetch operation error:', error));
-    }, []);
+    }, []); // Ensure the useEffect hook runs only once after the component mounts
 
       // Function to update HVAC status in device data
   const updateHVACStatus = (status) => {

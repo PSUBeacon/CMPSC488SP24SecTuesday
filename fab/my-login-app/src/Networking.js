@@ -51,11 +51,11 @@ const Networking = () => {
   
   // Define your IoT Logs data similar to how you have solarPanel data
 const iotLogs = [
-  { Time: '00:00', Activity: 'Light Turned On'},
-  { Time: '00:00', Activity: 'Light Turned Off' },
-  { Time: '00:00', Activity: 'Light Turned Off' },
-  { Time: '00:00', Activity: 'Light Turned Off' },
-  { Time: '00:00', Activity: 'Light Turned Off' },
+  { Time: '00:00', Activity: 'Light Turned On', User: 'x'},
+  { Time: '00:00', Activity: 'Light Turned Off', User: 'x' },
+  { Time: '00:00', Activity: 'Light Turned Off', User: 'x' },
+  { Time: '00:00', Activity: 'Light Turned Off', User: 'x' },
+  { Time: '00:00', Activity: 'Light Turned Off', User: 'x' },
   // Add more IoT device log entries as needed
 ];
 // Function to change view
@@ -70,6 +70,7 @@ const iotLogsTable = (
         <tr>
           <th>Time</th>
           <th>Activity</th>
+          <th>User</th>
         </tr>
       </thead>
       <tbody>
@@ -77,6 +78,7 @@ const iotLogsTable = (
           <tr key={index}>
             <td>{log.Time}</td>
             <td>{log.Activity}</td>
+            <td>{log.User}</td>
           </tr>
         ))}
       </tbody>

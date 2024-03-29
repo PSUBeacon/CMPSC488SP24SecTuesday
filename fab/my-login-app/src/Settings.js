@@ -43,7 +43,8 @@ const SettingsPage = () => {
   const [newUserFirstName, setNewUserFirstName] = useState('');
   const [newUserLastName, setNewUserLastName] = useState('');
   const [newUserRole, setNewUserRole] = useState('User');
-
+  const [newUserEmail, setNewUserEmail] = useState('');
+  const [newUserPassword, setNewUserPassword] = useState('');
 
 
 
@@ -77,9 +78,17 @@ const SettingsPage = () => {
         id: users.length + 1,
         name: `${newUserFirstName} ${newUserLastName}`,
         role: newUserRole,
+        email: newUserEmail,
+        password: newUserPassword, // Ensure you hash the password in a real app!
       };
       setUsers([...users, newUser]);
       setShowAddUserForm(false); // Hide the form after adding the user
+    
+      // Reset form fields
+      setNewUserFirstName('');
+      setNewUserLastName('');
+      setNewUserEmail('');
+      setNewUserPassword('');
     };
 
  // Example account data (replace with actual data as necessary)
@@ -133,6 +142,22 @@ const handleAccountInfoChange = (e) => {
                 placeholder="Last Name"
                 value={newUserLastName}
                 onChange={(e) => setNewUserLastName(e.target.value)}
+                required
+                style={{ margin: '5px' }}
+              />
+              <input
+                type="email"
+                placeholder="Email"
+                value={newUserEmail}
+                onChange={(e) => setNewUserEmail(e.target.value)}
+                required
+                style={{ margin: '5px' }}
+              />
+              <input
+                type="password"
+                placeholder="Password"
+                value={newUserPassword}
+                onChange={(e) => setNewUserPassword(e.target.value)}
                 required
                 style={{ margin: '5px' }}
               />

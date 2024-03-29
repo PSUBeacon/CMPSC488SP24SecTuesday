@@ -89,9 +89,9 @@ const Dashboard = () => {
     setIsAccountPopupVisible(false); // Close the popup
     navigate('/'); // Use navigate to redirect
   };
-
+  
   const [cameraView, setCameraView] = useState('livingroom'); // Default camera view
-
+  
   // Object that holds the URLs for your camera feeds
   const cameraFeeds = {
     livingroom: placeholderImage, // Replace with the actual camera feed URL or image for the living room
@@ -107,19 +107,19 @@ const Dashboard = () => {
 
 
   const CameraWidget = () => {
-
+    
     const cameraFeeds = {
       livingroom: placeholderImage, // Replace with actual video feed or image
       kitchen: placeholderImage, // Replace with actual video feed or image for kitchen
       r3: placeholderImage,
       // Add more camera feeds as needed
     };
-
+    
     return (
       <div className="camera-widget" style={{ position: 'relative', maxWidth: '100%', backgroundColor: '#12232E', borderRadius: '10px', overflow: 'hidden' }}>
         {/* Live Feed */}
         <img src={cameraFeeds[cameraView]} alt="Live feed" style={{ width: '100%', height: 'auto', display: 'block' }} />
-
+        
         {/* Camera View Buttons */}
         <div style={{ position: 'absolute', top: '10px', left: '10px', display: 'flex', gap: '5px' }}>
           <button onClick={() => setCameraView('livingroom')} style={{ padding: '5px', backgroundColor: cameraView === 'livingroom' ? '#4CAF50' : 'transparent' }}>R1</button>
@@ -170,7 +170,7 @@ const Dashboard = () => {
             <span className="slider"></span>
           </label>
         </div>
-
+        
         {/* Back Door Lock */}
         <div style={{ flex: '1', maxWidth:'250px', textAlign: 'center' }}>
           <p style={{color:"#95A4B6", marginRight:'20px'}}>Back Door</p>
@@ -187,7 +187,7 @@ const Dashboard = () => {
         </div>
       </div>
       <div>
-        <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#173350', padding: '20px', paddingRight:"0px", borderRadius: '10px', margin: '0px'}}>
+        <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#173350', padding: '20px', paddingRight:"0px", borderRadius: '10px', margin: '0px'}}> 
           <div>
         <h3 style={{ color: "#95A4B6", marginBottom: '20px' }}>Lights</h3>
          </div>
@@ -247,13 +247,49 @@ const AppliancesWidget = () => {
         <span style={{ color:"#95A4B6", margin:'6px' }}>Toaster</span>
         <p>{deviceData.Toaster.Status}</p>
       </div>
-
+      
     </div>
-
+   
     </div>
-
+    
   );
 };
+
+        const cameraFeeds = {
+            livingroom: placeholderImage, // Replace with actual video feed or image
+            kitchen: placeholderImage, // Replace with actual video feed or image for kitchen
+            // Add more camera feeds as needed
+        };
+
+        return (
+            <div className="camera-widget" style={{
+                position: 'relative',
+                maxWidth: '100%',
+                backgroundColor: '#12232E',
+                borderRadius: '10px',
+                overflow: 'hidden'
+            }}>
+                {/* Live Feed */}
+                <img src={cameraFeeds[cameraView]} alt="Live feed"
+                     style={{width: '100%', height: 'auto', display: 'block'}}/>
+
+                {/* Camera View Buttons */}
+                <div style={{position: 'absolute', top: '10px', left: '10px', display: 'flex', gap: '5px'}}>
+                    <button onClick={() => setCameraView('livingroom')} style={{
+                        padding: '5px',
+                        backgroundColor: cameraView === 'livingroom' ? '#4CAF50' : 'transparent'
+                    }}>R1
+                    </button>
+                    <button onClick={() => setCameraView('kitchen')} style={{
+                        padding: '5px',
+                        backgroundColor: cameraView === 'kitchen' ? '#4CAF50' : 'transparent'
+                    }}>R2
+                    </button>
+                    {/* Add more buttons for additional camera views as needed */}
+                </div>
+            </div>
+        );
+    };
 
 
     const AccountPopup = ({isVisible, onClose}) => {
@@ -277,6 +313,30 @@ const AppliancesWidget = () => {
             </div>
         );
     };
+
+
+    // This is the JSX return statement where we layout our component's HTML structure
+    return (
+      <div className = "accountPop"style={{
+        position: 'absolute',
+        top: '100%', // Position it right below the button
+        right: '0', // Align it with the right edge of the container
+        backgroundColor: '#08192B',
+        padding: '20px',
+        zIndex: 100,
+        color: 'white',
+        borderRadius: '2px',
+        // Add box-shadow or borders as needed for better visibility
+      }}>
+        <p>John Doe</p> {/* Replace with actual user name */}
+          {accountType && <p>{accountType}</p>} {/* Dynamically display user role */}
+        <button onClick={signOut} className="signout">Sign Out</button>
+      </div>
+    );
+  };
+  
+
+
 
   // This is the JSX return statement where we layout our component's HTML structure
   return (
@@ -364,9 +424,9 @@ const AppliancesWidget = () => {
           </nav>
         </aside>
 
-
+    
 <main style={{ flex: '1', padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: '#0E2237'}}>
-
+  
   {/* Widgets Container */}
   <div style={{ width: '100%', maxWidth: '1200px' }}>
     {/* Widgets Row */}
@@ -375,7 +435,7 @@ const AppliancesWidget = () => {
       <div className="camera-widget" style={{ position: 'relative', maxWidth: '60%', backgroundColor: '#173350', borderRadius: '1px', overflow: 'hidden', flexBasis: '100%', padding:'12px' }}>
               {/* Camera Feed */}
               <img src={cameraFeeds[cameraView]} alt="Camera feed" style={{ width: '100%', height: '100%' }} />
-
+              
               {/* Camera View Buttons */}
               <div style={{ position: 'absolute', top: '10px', left: '10px', display: 'flex', gap: '5px' }}>
                 <button onClick={() => setCameraView('livingroom')} style={{ padding: '5px', color:'white',backgroundColor: cameraView === 'livingroom' ? '#0294A5' : '#08192B' }}>R1</button>
@@ -383,7 +443,7 @@ const AppliancesWidget = () => {
                 <button onClick={() => setCameraView('r3')} style={{ padding: '5px', color: 'white', backgroundColor: cameraView === 'r3' ? '#0294A5' : '#08192B' }}>R3</button>
               </div>
       </div>
-
+      
       {/* Locks Widget */}
       <div className="widget" style={{ flex: '1', backgroundColor: '#173350', padding: '20px', borderRadius: '1px', margin: '10px', boxSizing: 'border-box' }}>
         <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#173350', padding: '20px', paddingRight:"0px", borderRadius: '10px', margin: '0px'}}>
@@ -432,7 +492,7 @@ const AppliancesWidget = () => {
           </div>
 
       </div>
-
+      
       {/* Scheduled Activity Widget */}
       <div className="widget" style={{ flex: '1', minWidth: '250px', backgroundColor: '#173350', padding: '20px', borderRadius: '1px', margin: '10px', boxSizing: 'border-box' }}>
       <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#173350', padding: '20px', paddingRight:"0px", borderRadius: '10px', margin: '0px'}}>

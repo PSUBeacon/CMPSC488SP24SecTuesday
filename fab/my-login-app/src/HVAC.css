@@ -41,6 +41,11 @@
     margin-bottom: 0.5rem;
   }
 
+  .data-info select {
+    z-index: 10; /* Adjust as necessary */
+}
+
+
   .slider {
     position: absolute;
     cursor: pointer;

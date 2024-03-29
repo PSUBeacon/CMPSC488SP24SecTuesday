@@ -192,7 +192,7 @@ const Dashboard = () => {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
           <img src={bulbIcon} alt="Bedroom Light" style={{ width: '60px', height: 'auto', marginRight: '30px', marginBottom: '10px' }} />
           <div style={{ textAlign: 'center' }}>
-            <span style={{ color: "#95A4B6", fontSize: '20px' }}>Bedroom light:</span>
+            <span style={{ color: "#95A4B6", fontSize: '20px' }}>Livingroom light:</span>
             <p style={{ marginTop: '10px' }}>{lightStatus}</p>
           </div>
           <label className="toggle" style={{ display: 'block', margin: 'auto' }}>

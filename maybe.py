@@ -77,9 +77,9 @@ def draw_A():
         0b01100110,  # Row 6: Sides of the 'A' below the middle bar
         0b01100110,  # Row 7: More sides
         0b01100110   # Row 8: Bottom of the 'A', completing the sides
-    ]
+        ]
 
-    # Send each row's pattern to the matrix
+        # Send each row's pattern to the matrix
     for row, pattern in enumerate(a, start=1):
         send_command(row, pattern)
 def draw_lock():
@@ -127,6 +127,3 @@ draw_A()
 sleep(30)
 # Clear the matrix
 clear_matrix()
-
-
-

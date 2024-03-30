@@ -129,6 +129,7 @@ func updateIoT(c *gin.Context) {
 		UUIDsData.AppliancesUUIDs,
 		UUIDsData.EnergyUUIDs,
 	}
+
 	//UpdateMissingPi(messaging.)
 	foundPi, found := findPiByUUID(allPis, req.UUID)
 	if found {

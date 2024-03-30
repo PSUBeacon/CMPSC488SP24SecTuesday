@@ -1,96 +1,174 @@
 package gocode
 
 import (
+	"fmt"
+	"os"
+	"time"
+
 	"github.com/stianeikeland/go-rpio/v4"
 )
 
-// registers
 const (
-	Max7219RegNoop        = 0x00
-	Max7219RegDigit0      = 0x01
-	Max7219RegDigit1      = 0x02
-	Max7219RegDigit2      = 0x03
-	Max7219RegDigit3      = 0x04
-	Max7219RegDigit4      = 0x05
-	Max7219RegDigit5      = 0x06
-	Max7219RegDigit6      = 0x07
-	Max7219RegDigit7      = 0x08
-	Max7219RegDecodeMode  = 0x09
-	Max7219RegIntensity   = 0x0a
-	Max7219RegScanLimit   = 0x0b
-	Max7219RegShutdown    = 0x0c
-	Max7219RegDisplayTest = 0x0f
+	dinPinNumber = 9  // GPIO pin for DIN (MOSI)
+	csPinNumber  = 4  // GPIO pin for CS
+	clkPinNumber = 10 // GPIO pin for CLK
 )
 
-var loadPin rpio.Pin
-var buffer [8]byte
-
-// Initialize initializes the LED matrix.
-func Initialize(loadPinNum rpio.Pin) error {
+func main() {
 	if err := rpio.Open(); err != nil {
-		return err
+		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
+		os.Exit(1)
 	}
+	defer rpio.Close()
 
-	err := rpio.SpiBegin(rpio.Spi0)
-	if err != nil {
-		return err
+	// Set up the pins
+	dinPin := rpio.Pin(dinPinNumber)
+	csPin := rpio.Pin(csPinNumber)
+	clkPin := rpio.Pin(clkPinNumber)
+
+	dinPin.Output()
+	csPin.Output()
+	clkPin.Output()
+
+	// Initialize the LED matrix
+	initializeMatrix(dinPin, csPin, clkPin)
+
+	setIntensity(dinPin, csPin, clkPin, 0x04)
+	// Draw patterns
+	drawLightbulb(dinPin, csPin, clkPin)
+	time.Sleep(5 * time.Second)
+
+	drawLock(dinPin, csPin, clkPin)
+	time.Sleep(5 * time.Second)
+
+	drawH(dinPin, csPin, clkPin)
+	time.Sleep(5 * time.Second)
+
+	drawA(dinPin, csPin, clkPin)
+	time.Sleep(5 * time.Second)
+
+	// Turn off all LEDs
+	for row := 0; row < 8; row++ {
+		sendData(csPin, dinPin, clkPin, byte(row+1), 0x00)
 	}
-	rpio.SpiSpeed(10000000)
-	rpio.SpiMode(0, 0)
-
-	loadPin = loadPinNum
-	loadPin.Output()
-	loadPin.Low()
-
-	sendCommand(Max7219RegScanLimit, 0x07)
-	sendCommand(Max7219RegDecodeMode, 0x00)
-	sendCommand(Max7219RegShutdown, 0x01)
-	sendCommand(Max7219RegDisplayTest, 0x00)
-	Clear()
-	sendCommand(Max7219RegIntensity, 0x0f)
-
-	return nil
 }
 
-// Clear clears the LED matrix.
-func Clear() {
-	for i := 0; i < 8; i++ {
-		buffer[i] = 0
-		sendCommand(byte(Max7219RegDigit0+i), 0)
+// Initialize the LED matrix
+func initializeMatrix(dinPin, csPin, clkPin rpio.Pin) {
+	// Set the scan-limit to show all 8 digits
+	sendData(csPin, dinPin, clkPin, 0x0B, 0x07)
+
+	// Use normal operation mode (not test mode)
+	sendData(csPin, dinPin, clkPin, 0x0F, 0x00)
+
+	// Set the intensity (brightness) of the display
+	sendData(csPin, dinPin, clkPin, 0x0A, 0x0F)
+
+	// Turn on the display
+	sendData(csPin, dinPin, clkPin, 0x0C, 0x01)
+}
+
+// Set the intensity (brightness) of the LED matrix
+func setIntensity(dinPin, csPin, clkPin rpio.Pin, intensity byte) {
+	if intensity > 0x0F {
+		intensity = 0x0F // Maximum intensity value is 0x0F
+	}
+	sendData(csPin, dinPin, clkPin, 0x0A, intensity)
+}
+
+// Send data to the LED matrix
+func sendData(csPin, dinPin, clkPin rpio.Pin, address, data byte) {
+	csPin.Low()
+	sendByte(dinPin, clkPin, address)
+	sendByte(dinPin, clkPin, data)
+	csPin.High()
+}
+
+// Send a single byte of data
+func sendByte(dinPin, clkPin rpio.Pin, data byte) {
+	for i := 7; i >= 0; i-- {
+		clkPin.Low()
+		if (data & (1 << i)) != 0 {
+			dinPin.High()
+		} else {
+			dinPin.Low()
+		}
+		clkPin.High()
 	}
 }
 
-// SetIntensity sets the intensity of the LED matrix.
-func SetIntensity(intensity byte) {
-	sendCommand(Max7219RegIntensity, intensity)
-}
-
-// SetPixel sets the state of a single pixel.
-func SetPixel(x, y int, value bool) {
-	if x < 0 || x >= 8 || y < 0 || y >= 8 {
-		return
+// Drawing functions
+func drawLightbulb(dinPin, csPin, clkPin rpio.Pin) {
+	clearMatrix(csPin, dinPin, clkPin)
+	lightbulbPattern := []byte{
+		0b00111100,
+		0b01111110,
+		0b01111110,
+		0b01111110,
+		0b01111110,
+		0b00111100,
+		0b00011000,
+		0b00011000,
 	}
-
-	if value {
-		buffer[y] |= 1 << uint(x)
-	} else {
-		buffer[y] &^= 1 << uint(x)
+	for row, pattern := range lightbulbPattern {
+		sendData(csPin, dinPin, clkPin, byte(row+1), pattern)
 	}
-	sendCommand(byte(Max7219RegDigit0+y), buffer[y])
 }
 
-// sendCommand sends a command to the LED matrix
-func sendCommand(register, data byte) {
-	loadPin.Low()
-	rpio.SpiTransmit(register, data)
-	loadPin.High()
+func drawLock(dinPin, csPin, clkPin rpio.Pin) {
+	clearMatrix(csPin, dinPin, clkPin)
+	lockPattern := []byte{
+		0b00111100,
+		0b00100100,
+		0b01100110,
+		0b01111110,
+		0b01111110,
+		0b01111110,
+		0b01111110,
+		0b01111110,
+	}
+	for row, pattern := range lockPattern {
+		sendData(csPin, dinPin, clkPin, byte(row+1), pattern)
+	}
 }
 
-// Cleanup releases the resources used
-func Cleanup() {
-	rpio.SpiEnd(rpio.Spi0)
-	err := rpio.Close()
-	if err != nil {
-		return
+func drawH(dinPin, csPin, clkPin rpio.Pin) {
+	clearMatrix(csPin, dinPin, clkPin)
+	hPattern := []byte{
+		0b10000001,
+		0b10000001,
+		0b10000001,
+		0b11111111,
+		0b10000001,
+		0b10000001,
+		0b10000001,
+		0b10000001,
+	}
+	for row, pattern := range hPattern {
+		sendData(csPin, dinPin, clkPin, byte(row+1), pattern)
+	}
+}
+
+func drawA(dinPin, csPin, clkPin rpio.Pin) {
+	clearMatrix(csPin, dinPin, clkPin)
+	hPattern := []byte{
+		0b00011000,
+		0b00111100,
+		0b01100110,
+		0b01100110,
+		0b01111110,
+		0b01100110,
+		0b01100110,
+		0b01100110,
+	}
+	for row, pattern := range hPattern {
+		sendData(csPin, dinPin, clkPin, byte(row+1), pattern)
+	}
+}
+
+// Clear the LED matrix
+func clearMatrix(csPin, dinPin, clkPin rpio.Pin) {
+	for row := 0; row < 8; row++ {
+		sendData(csPin, dinPin, clkPin, byte(row+1), 0x00)
 	}
 }

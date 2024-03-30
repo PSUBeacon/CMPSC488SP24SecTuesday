@@ -23,6 +23,10 @@ require (
 	github.com/chenzhuoyu/base64x v0.0.0-20230717121745-296ad89f973d // indirect
 	github.com/chenzhuoyu/iasm v0.9.1 // indirect
 	github.com/creack/goselect v0.1.2 // indirect
+	github.com/d2r2/go-dht v0.0.0-20200119175940-4ba96621a218 // indirect
+	github.com/d2r2/go-logger v0.0.0-20210606094344-60e9d1233e22 // indirect
+	github.com/d2r2/go-shell v0.0.0-20211022052110-f591c27e3e2e // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect

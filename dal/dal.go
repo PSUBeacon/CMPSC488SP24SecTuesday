@@ -1,36 +1,27 @@
 package dal
 
-//go get go.mongodb.org/mongo-driver/mongo
+//package main
 
 import (
 	messaging "CMPSC488SP24SecTuesday/AES-BlockChain-Communication"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options" 
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"strconv"
 	"time"
 )
 
-// Define a struct to represent your data model
-type User struct {
-	ID       string `bson:"_id,omitempty"`
-	Name     string `bson:"name"`
-	Password string `bson:"password"`
-	Email    string `bson:"email"`
-	Role     string `bson:"role"`
-}
-
-// MongoDB configuration
+// Secure connection to DB through admin user
 var (
-	mongoURI = "mongodb://localhost:27017" // MongoDB server URI
-	dbName   = "smartHomeDB"               // Collection name
+	mongoURI = "mongodb://localhost:27017"
+	dbName   = "smartHomeDB"
 )
 
-// Connect to MongoDB and return a MongoDB client
 func ConnectToMongoDB() (*mongo.Client, error) {
 	clientOptions := options.Client().ApplyURI(mongoURI)
 	client, err := mongo.Connect(context.Background(), clientOptions)
@@ -38,7 +29,7 @@ func ConnectToMongoDB() (*mongo.Client, error) {
 		return nil, err
 	}
 
-	// Ping the MongoDB server to verify the connection
+	// Ping MongoDB server for connection verification
 	err = client.Ping(context.Background(), nil)
 	if err != nil {
 		return nil, err
@@ -132,6 +123,12 @@ type Toaster struct {
 	LastChanged         time.Time `json:"LastChanged"`
 }
 
+type User struct {
+	Username string `json:"Username"`
+	Password string `json:"Password"`
+	Role     string `json:"Role"`
+}
+
 type SmartHomeDB struct {
 	Dishwasher     []Dishwasher
 	Fridge         []Fridge
@@ -141,8 +138,7 @@ type SmartHomeDB struct {
 	Oven           []Oven
 	SecuritySystem []SecuritySystem
 	SolarPanel     []SolarPanel
-	Toaster        []Toaster 
-	Users          []User
+	Toaster        []Toaster
 }
 
 type UUIDsConfig struct {
@@ -165,7 +161,7 @@ type MessagingStruct struct {
 	Function string `json:"Function"` //function being changed ex(brightness)
 	Change   string `json:"Change"`   //actual change being made ex(100) for brightness
 }
- 
+
 type LoggingStruct struct {
 	DeviceID string    `json:"DeviceID"`
 	Function string    `json:"Function"`
@@ -221,33 +217,31 @@ func FetchCollections(client *mongo.Client, dbName string) (*SmartHomeDB, error)
 	return smartHomeDB, nil
 }
 
-// Create a new user in the MongoDB database
-func CreateUser(client *mongo.Client, user User) error {
-	collection := client.Database(dbName).Collection("users")
-	_, err := collection.InsertOne(context.Background(), user)
-	return err
-}
+///////////////////////////////////////////////////////////
 
-func FetchUser(client *mongo.Client, key, value string) (*User, error) {
-	collection := client.Database(dbName).Collection("users")
-	filter := bson.M{key: value}
+func FetchUser(client *mongo.Client, userName string) (User, error) {
+
+	collection := client.Database(dbName).Collection("Users")
+
+	// Create a filter to specify the criteria of the query
+	filter := bson.M{"username": userName}
+
+	// Finding multiple documents returns a cursor
 	var user User
-	err := collection.FindOne(context.Background(), filter).Decode(&user)
+	err := collection.FindOne(context.TODO(), filter).Decode(&user)
 	if err != nil {
-		return nil, err // Return nil user and error if user not found or error occurs
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			// User was not found
+			return User{}, fmt.Errorf("no user found with username: %s", userName)
+		}
+		// Some other error occurred
+		return User{}, err
 	}
 
-	return &user, nil // Return pointer to user and nil error if user found
+	fmt.Printf("Username: %s, Role: %s\n", user.Username, user.Role)
+	return user, nil
 }
- 
-func deleteUser(client *mongo.Client, key, value string) error {
-	collection := client.Database(dbName).Collection("users")
-	filter := bson.M{key: value}
 
-	_, err := collection.DeleteOne(context.Background(), filter)
-	return err
-}
- 
 func UpdateMessaging(client *mongo.Client, UUID []byte, name string, apptype string, function string, change string) {
 	var messageRequest MessagingStruct
 	messageRequest.UUID = string(UUID)
@@ -324,34 +318,42 @@ func UpdateMessaging(client *mongo.Client, UUID []byte, name string, apptype str
 //	)
 //}
 
+// connect to db if exists, else return error log
 func main() {
-	// Connect to MongoDB
 	client, err := ConnectToMongoDB()
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer client.Disconnect(context.Background())
 
-	// 	// Example: Creating a new user
-	// 	newUser := User{
-	// 		Name:     "john_doess",
-	// 		Password: "passlel",
-	// 		Email:    "john@example.com",
-	// 	}
+	////Testing fetchedUser function
+	//fetchedUser, err := FetchUser(client, "Owner")
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	// 	err = CreateUser(client, newUser)
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
+	//fmt.Printf("User name: %s\n", fetchedUser.User)
+	//fmt.Printf("Password: %v\n", fetchedUser.CustomData["password"])
+	//fmt.Printf("UserID: %x\n", fetchedUser.UserID.Data)
+	//fmt.Printf("Role: %s\n", fetchedUser.Role.Role)
+	//fmt.Printf("Role DB: %s\n", fetchedUser.Role.DB)
 
-	// 	fmt.Println("User created successfully!")
+	//Testing IoT functions
+	// Fetch the IoT system data
+	//smartHomeDB, err := FetchCollections(client, dbName) // Fetches and populates data
+	//if err != nil {
+	//	log.Fatalf("Error fetching IoT data: %v", err)
+	//}
 
-	// Example: Fetching a user by username
-	// 	fetchedUser, err := FetchUser(client, "name", "john_doess")
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// 	fmt.Println(fetchedUser)
-	// 	fmt.Println(fetchedUser.Name)
+	//fmt.Printf("HVAC Temperature: %s\n", smartHomeDB.HVAC.Temperature)
+
+	//fmt.Printf("Dishwasher Status: %s\n", smartHomeDB.Dishwasher.Status)
+
+	//fmt.Printf("Oven UUID: %s\n", smartHomeDB.Oven.UUID)
+
+	// Print the contents of smartHomeDB
+	//fmt.Printf(PrintSmartHomeDBContents(smartHomeDB))
+
+	fmt.Println(FetchUser(client, "beaconuser"))
 
 }

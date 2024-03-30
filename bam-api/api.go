@@ -1,42 +1,34 @@
 package main
 
 import (
-	messaging "CMPSC488SP24SecTuesday/AES-BlockChain-Communication"
 	"CMPSC488SP24SecTuesday/dal"
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
+	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
-
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 )
+
+var client *mongo.Client
 
 const userkey = "user"
 
 var secret = []byte("secret")
 
-var disconnectedPiNums []int
-
-func UpdateMissingPi(PiNum string) {
-	NumPi, _ := strconv.Atoi(PiNum)
-	disconnectedPiNums = append(disconnectedPiNums, NumPi)
-}
-
 func main() {
 	var er error
-	client, er := dal.ConnectToMongoDB()
+	client, er = dal.ConnectToMongoDB()
 	if er != nil {
 		log.Fatalf("Failed to connect to MongoDB: %v", er)
 	}
@@ -45,7 +37,6 @@ func main() {
 			log.Fatalf("Failed to disconnect from MongoDB: %v", er)
 		}
 	}()
-	go messaging.BlockReceiver()
 
 	r := gin.Default()
 
@@ -77,10 +68,8 @@ func main() {
 	protectedRoutes.POST("/lighting", updateIoT)
 	protectedRoutes.POST("/hvac", updateIoT)
 	protectedRoutes.POST("/security", updateIoT)
-
-	protectedRoutes.POST("/appliances", updateIoT)
-	protectedRoutes.POST("/energy", updateIoT)
-	protectedRoutes.POST("/net-events", updateIoT)
+	protectedRoutes.POST("/appliances", getAppliancesData)
+	protectedRoutes.POST("/energy", getAppliancesData)
 
 	// use JWT middleware for all protected routes
 	//r.Use(authMiddleware())
@@ -88,7 +77,7 @@ func main() {
 	//ADJUSTMENT:
 
 	// Combined route group for both admin and user dashboards
-	dashboardGroup := r.Group("/dashboard", adminDashboardHandler)
+	dashboardGroup := r.Group("/dashboard", dashboardHandler)
 	dashboardGroup.Use(authMiddleware()) // Apply authMiddleware to protect the route
 	{
 		// Combined dashboard route for admin and user
@@ -102,11 +91,10 @@ func main() {
 		log.Fatal("Server startup error:", err)
 	}
 
-} // closes main
+}
 
 func updateIoT(c *gin.Context) {
 	//var req dal.UpdateLightingRequest
-	client, _ := dal.ConnectToMongoDB()
 	var req dal.MessagingStruct
 	requestBody, _ := ioutil.ReadAll(c.Request.Body)
 	//fmt.Printf("Received request body: %s\n", string(requestBody))
@@ -119,43 +107,38 @@ func updateIoT(c *gin.Context) {
 		return
 	}
 
-	var UUIDsData dal.UUIDsConfig
-	jsonconfigData, _ := os.ReadFile("config.json")
-	_ = json.Unmarshal(jsonconfigData, &UUIDsData)
-
-	allPis := [][]dal.Pi{
-		UUIDsData.LightingUUIDs,
-		UUIDsData.HvacUUIDs,
-		UUIDsData.SecurityUUIDs,
-		UUIDsData.AppliancesUUIDs,
-		UUIDsData.EnergyUUIDs,
-	}
-
-	//UpdateMissingPi(messaging.)
-	foundPi, found := findPiByUUID(allPis, req.UUID)
-	if found {
-		for i := 0; i < len(disconnectedPiNums); i++ {
-			if foundPi.Pinum == disconnectedPiNums[i] {
-				fmt.Println("Pi is disconnected")
-			}
-		}
-	}
-	if !found {
-		dal.UpdateMessaging(client, []byte(req.UUID), req.Name, req.AppType, req.Function, req.Change)
-		c.JSON(http.StatusOK, gin.H{"message": "IOT updated successfully"})
-	}
+	dal.UpdateMessaging(client, []byte(req.UUID), req.Name, req.AppType, req.Function, req.Change)
+	// Respond to the request indicating success.
+	c.JSON(http.StatusOK, gin.H{"message": "Lighting updated successfully"})
 
 }
 
-func findPiByUUID(allPis [][]dal.Pi, uuidToFind string) (dal.Pi, bool) {
-	for _, category := range allPis {
-		for _, pi := range category {
-			if pi.UUID == uuidToFind {
-				return pi, true
-			}
-		}
+func getAppliancesData(c *gin.Context) {
+	//var req dal.UpdateLightingRequest
+	var req dal.SmartHomeDB
+	requestBody, _ := ioutil.ReadAll(c.Request.Body)
+	//fmt.Printf("Received request body: %s\n", string(requestBody))
+	// Reset the request body to be able to parse it again
+	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		fmt.Printf("Error binding JSON: %v\n", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
-	return dal.Pi{}, false
+
+	// Fetch smart home data
+	smartHomeDB, err := dal.FetchCollections(client, "smartHomeDB")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch smart home data"})
+		return
+	}
+
+	//fmt.Printf("%+v\n", smartHomeDB)
+
+	// Respond to the FE request, indicating success.
+	c.JSON(http.StatusOK, smartHomeDB)
+
 }
 
 func statusResp(c *gin.Context) {
@@ -186,38 +169,42 @@ func loginHandler(c *gin.Context) {
 		return
 	}
 
-	client, err := dal.ConnectToMongoDB()
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to MongoDB"})
-		return
-	}
-	defer client.Disconnect(context.Background())
-
+	fmt.Printf("user: %s", loginData.Username)
+	fmt.Printf("\npass: %s", loginData.Password)
 	// Fetch user by username from MongoDB
-	fetchedUser, err := dal.FetchUser(client, "name", loginData.Username)
+	fetchedUser, err := dal.FetchUser(client, loginData.Username)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username (not found in DB"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"}) // Use generic error message
 		return
 	}
+
+	passwordFromDB := fetchedUser.Password
+
 	// Compare the password hash using bcrypt.CompareHashAndPassword
-	err = bcrypt.CompareHashAndPassword([]byte(fetchedUser.Password), []byte(loginData.Password))
+	err = bcrypt.CompareHashAndPassword([]byte(passwordFromDB), []byte(loginData.Password))
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid  password"})
+		fmt.Printf("Error: password")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"}) // Use generic error message
+
 		return
 	}
+	//c.Set("smartHomeDB", smartHomeDB)
+
+	// Print smart home data
+	//smartHomeData := dal.PrintSmartHomeDBContents(smartHomeDB)
 
 	// JWT token creation
 	claims := jwt.MapClaims{
-		"username": fetchedUser.Name,
-		"role":     "admin",                               // Replace with the actual role from MongoDB
-		"exp":      time.Now().Add(time.Hour * 24).Unix(), // Token expiration time
+		"username": fetchedUser.Username,
+		"role":     fetchedUser.Role, // Use the actual role from the fetched user
+
+		"exp": time.Now().Add(time.Hour * 24).Unix(), // Token expiration time
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(jwtKey)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create the token"})
 		return
 	}
 	session.Set(userkey, loginData.Username)
@@ -225,10 +212,9 @@ func loginHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save session"})
 		return
 	}
-
 	// Return the JWT token in the response
-
 	c.JSON(http.StatusOK, gin.H{"token": tokenString})
+
 }
 
 func logout(c *gin.Context) {
@@ -311,199 +297,56 @@ func authMiddleware() gin.HandlerFunc {
 	}
 }
 
-// handle admin
-func adminMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		// Retrieve user claims from the request context
-		userClaims, exists := c.Get("user")
-		if !exists {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "User claims not found"})
-			c.Abort()
-			return
-		}
-
-		// Extract role from user claims
-		role, ok := userClaims.(jwt.MapClaims)["role"].(string)
-		if !ok {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Role not found in user claims"})
-			c.Abort()
-			return
-		}
-
-		// Perform role-based authorization check
-		if role != "admin" {
-			c.JSON(http.StatusForbidden, gin.H{"error": "Insufficient privileges"})
-			c.Abort()
-			return
-		}
-
-		// Proceed to the next middleware or route handler
-		c.Next()
-	}
-}
-
-// handle user
-func userMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		// Retrieve user claims from the request context
-		userClaims, exists := c.Get("user")
-		if !exists {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "User claims not found"})
-			c.Abort()
-			return
-		}
-
-		// Extract role from user claims
-		role, ok := userClaims.(jwt.MapClaims)["role"].(string)
-		if !ok {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Role not found in user claims"})
-			c.Abort()
-			return
-		}
-
-		// Perform role-based authorization check
-		if role != "user" {
-			c.JSON(http.StatusForbidden, gin.H{"error": "Insufficient privileges"})
-			c.Abort()
-			return
-		}
-
-		// Proceed to the next middleware or route handler
-		c.Next()
-	}
-}
-
-// handle admin dashboard
-func adminDashboardHandler(c *gin.Context) {
+func dashboardHandler(c *gin.Context) {
 	// Retrieve user claims from the request context
 	userClaims, exists := c.Get("user")
 	if !exists {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "User claims not found"})
+		return
+	}
+
+	claims, ok := userClaims.(jwt.MapClaims)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error processing user claims"})
 		return
 	}
 
 	// Extract role from user claims
-	role, ok := userClaims.(jwt.MapClaims)["role"].(string)
-	if !ok {
+	role, roleExists := claims["role"].(string)
+	if !roleExists {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Role not found in user claims"})
 		return
 	}
 
-	// Perform role-based authorization check
-	if role != "admin" {
-		c.JSON(http.StatusForbidden, gin.H{"error": "Insufficient privileges"})
-		return
-	}
-
-	// Proceed with the handler logic for admin dashboard
-	// For example, return information specific to the admin dashboard
-	c.JSON(http.StatusOK, gin.H{"message": "Welcome to the admin dashboard!"})
-}
-
-// handle user dashboard
-func userProfileHandler(c *gin.Context) {
-	// Retrieve user claims from the request context
-	userClaims, exists := c.Get("user")
-	if !exists {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "User claims not found"})
-		return
-	}
-
-	// Extract username from user claims
-	username, ok := userClaims.(jwt.MapClaims)["username"].(string)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Username not found in user claims"})
-		return
-	}
-
-	// Proceed with the handler logic for user profile
-	// For example, return user-specific data or render a page
-	userProfile := getUserProfile(username)
-	if userProfile == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "User profile not found"})
-		return
-	}
-
-	// Return user profile data
-	c.JSON(http.StatusOK, gin.H{"username": userProfile.FirstName, "email": userProfile.Email})
-}
-
-func getUserProfile(username string) *UserProfile {
-	// Example implementation to fetch user profile from the database
-	// You should replace this with your actual implementation
-	// This function should query the database to retrieve the user profile based on the provided username
-	// Return nil if user profile not found or an error occurs
-
-	// Example:
-	// userProfile, err := db.GetUserProfileByUsername(username)
-	// if err != nil {
-	//     return nil
-	// }
-	// return userProfile
-
-	// For demonstration purposes, return a hardcoded user profile
-	return &UserProfile{
-		//Username: username,
-		Email: "user@example.com",
-	}
-}
-
-// Determine the response based on the user's role
-func signupHandler(c *gin.Context) {
-	var userData UserProfile
-
-	if err := c.BindJSON(&userData); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON"})
-		return
-	}
-
-	// Validate user data (e.g., check for required fields, validate email format, etc.)
-
-	// Connect to MongoDB
-	client, err := dal.ConnectToMongoDB()
+	// Fetch smart home data
+	smartHomeDB, err := dal.FetchCollections(client, "smartHomeDB")
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to MongoDB"})
-		return
-	}
-	defer client.Disconnect(context.Background())
-
-	// Check if the username already exists in the database
-	existingUser, err := dal.FetchUser(client, "username", userData.Email)
-	if existingUser != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Username already exists"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch smart home data"})
 		return
 	}
 
-	// Hash the password before storing it in the database
-	//hashedPassword, err := bcrypt.GenerateFromPassword([]byte(userData.Password), bcrypt.DefaultCost)
-	//if err != nil {
-	//    c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
-	//    return
-	//}
+	// Determine the response based on the user's role
+	switch role {
 
-	// Create a new user object with hashed password
-	newUser := dal.User{
-		Email:    userData.Email,
-		Name:     userData.FirstName + " " + userData.LastName,
-		Password: userData.Password, // Replace with hashedPassword
-		Role:     "None",            // Set user role
+	case "admin": //admin
+
+		if smartHomeDB == nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch smart home data"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Welcome to the Owner dashboard",
+
+			"accountType": "Admin",
+		})
+
+	case "user": //user
+		c.JSON(http.StatusOK, gin.H{
+			"message":     "Welcome to the Owner dashboard",
+			"accountType": "User",
+		})
+	default:
+		c.JSON(http.StatusForbidden, gin.H{"error": "Invalid role or insufficient privileges"})
 	}
 
-	// Insert the new user into the database
-	err = dal.CreateUser(client, newUser)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert user"})
-		return
-	}
-
-	c.JSON(http.StatusCreated, gin.H{"message": "User created successfully"})
-}
-
-// struct to represent user profile data
-type UserProfile struct {
-	Email     string `json:"email"` // this is the email and also the username
-	FirstName string `json:"firstName"`
-	LastName  string `json:"lastName"`
-	Password  string `json:"password"`
-	Role      string `json:"role"`
 }

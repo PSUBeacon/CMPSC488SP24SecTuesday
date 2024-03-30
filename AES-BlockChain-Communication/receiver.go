@@ -1,5 +1,5 @@
 package messaging
- 
+
 import (
 	"CMPSC488SP24SecTuesday/blockchain"
 	"CMPSC488SP24SecTuesday/crypto"
@@ -62,7 +62,7 @@ func BlockReceiver() {
 	mode := &serial.Mode{
 		BaudRate: 9600,
 	}
-	port, err := serial.Open("/dev/ttyUSB0", mode)
+	port, err := serial.Open("COM4", mode)
 	if err != nil {
 		log.Fatal("Error opening XBee module:", err)
 	}
@@ -238,4 +238,3 @@ func verifyBlockchain(currentblock blockchain.Block) bool {
 	//}
 	return false
 }
- 

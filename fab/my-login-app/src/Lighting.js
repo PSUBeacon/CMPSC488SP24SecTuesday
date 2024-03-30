@@ -16,10 +16,15 @@ import lightbulbIcon from './lightbulbIcon.png'
 import placeholderImage from './placeholderImage.jpg'; // Replace with the path to your placeholder image
 import placeholderImage2 from './placeholderImage2.jpg'; // Replace with the path to your placeholder image
 import './Lighting.css';
+import axios from "axios";
 
  
 // Define the Dashboard component using a functional component pattern
 const Lighting= () => {
+    const navigate = useNavigate(); // Instantiate useNavigate hook
+    const [selectedLight, setSelectedLight] = useState(null);
+    const [user, setUser] = useState(null);
+    const [error, setError] = useState('');
 
 
     useEffect(() => {
@@ -53,8 +58,6 @@ const Lighting= () => {
             });
     }, [navigate]);
 
-  const navigate = useNavigate(); // Instantiate useNavigate hook
-  const [selectedLight, setSelectedLight] = useState(null);
     const handleTurnOn = () => {
         setIsLightOn(true);
         const serverUrl = 'http://localhost:8081/lighting';

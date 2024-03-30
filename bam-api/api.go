@@ -92,6 +92,7 @@ func main() {
 
 	// This ones should be protected
 	protectedRoutes.POST("/lighting", updateIoT)
+	protectedRoutes.GET("/lighting", getLights)
 	protectedRoutes.POST("/hvac", updateIoT)
 	protectedRoutes.POST("/security", updateIoT)
 	protectedRoutes.POST("/appliances", updateIoT)
@@ -159,6 +160,22 @@ func updateIoT(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "IOT updated successfully"})
 	}
 
+}
+
+func getLights(c *gin.Context) {
+	room := c.Query("roomName")
+	if room == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Room name is required"})
+		return
+	}
+	fmt.Printf("Room name: ", room)
+	lights, err := dal.FetchLights(client, "smartHomeDB", room)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	fmt.Printf("Light: ", lights)
+	c.JSON(http.StatusOK, lights)
 }
 
 func findPiByUUID(allPis [][]dal.Pi, uuidToFind string) (dal.Pi, bool) {

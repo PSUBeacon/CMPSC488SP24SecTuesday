@@ -42,7 +42,7 @@ func ConnectToMongoDB() (*mongo.Client, error) {
 // IOT Structure to fit system info
 type Dishwasher struct {
 	UUID              string    `json:"UUID"`
-	Status            bool      `json:"Status"`
+	Status            string    `json:"Status"`
 	WashTime          int       `json:"WashTime"`
 	TimerStopTime     time.Time `json:"TimerStopTime"`
 	EnergyConsumption int       `json:"EnergyConsumption"`
@@ -51,7 +51,7 @@ type Dishwasher struct {
 
 type Fridge struct {
 	UUID                string    `json:"UUID"`
-	Status              bool      `json:"Status"`
+	Status              string    `json:"Status"`
 	TemperatureSettings int       `json:"TemperatureSettings"`
 	EnergyConsumption   int       `json:"EnergyConsumption"`
 	LastChanged         time.Time `json:"LastChanged"`
@@ -64,7 +64,7 @@ type HVAC struct {
 	Temperature       int       `json:"Temperature"`
 	Humidity          int       `json:"Humidity"`
 	FanSpeed          int       `json:"FanSpeed"`
-	Status            bool      `json:"Status"`
+	Status            string    `json:"Status"`
 	Mode              string    `json:"Mode"`
 	EnergyConsumption int       `json:"EnergyConsumption"`
 	LastChanged       time.Time `json:"LastChanged"`
@@ -74,14 +74,14 @@ type Lighting struct {
 	UUID              string    `json:"UUID"`
 	Location          string    `json:"Location"`
 	Brightness        int       `json:"Brightness"`
-	Status            bool      `json:"Status"`
+	Status            string    `json:"Status"`
 	EnergyConsumption int       `json:"EnergyConsumption"`
 	LastChanged       time.Time `json:"LastChanged"`
 }
 
 type Microwave struct {
 	UUID              string    `json:"UUID"`
-	Status            bool      `json:"Status"`
+	Status            string    `json:"Status"`
 	Power             int       `json:"Power"`
 	TimerStopTime     time.Time `json:"TimerStopTime"`
 	EnergyConsumption int       `json:"EnergyConsumption"`
@@ -90,7 +90,7 @@ type Microwave struct {
 
 type Oven struct {
 	UUID                string    `json:"UUID"`
-	Status              bool      `json:"Status"`
+	Status              string    `json:"Status"`
 	TemperatureSettings int       `json:"TemperatureSettings"`
 	TimerStopTime       time.Time `json:"TimerStopTime"`
 	EnergyConsumption   int       `json:"EnergyConsumption"`
@@ -100,7 +100,7 @@ type Oven struct {
 type SecuritySystem struct {
 	UUID              string    `json:"UUID"`
 	Location          string    `json:"Location"`
-	Status            bool      `json:"Status"`
+	Status            string    `json:"Status"`
 	EnergyConsumption int       `json:"EnergyConsumption"`
 	LastTriggered     time.Time `json:"LastTriggered"`
 }
@@ -108,7 +108,7 @@ type SecuritySystem struct {
 type SolarPanel struct {
 	UUID                 string    `json:"UUID"`
 	PanelID              string    `json:"PanelID"`
-	Status               bool      `json:"Status"`
+	Status               string    `json:"Status"`
 	EnergyGeneratedToday int       `json:"EnergyGeneratedToday"`
 	PowerOutput          int       `json:"PowerOutput"`
 	LastChanged          time.Time `json:"LastChanged"`
@@ -116,7 +116,7 @@ type SolarPanel struct {
 
 type Toaster struct {
 	UUID                string    `json:"UUID"`
-	Status              bool      `json:"Status"`
+	Status              string    `json:"Status"`
 	TemperatureSettings int       `json:"TemperatureSettings"`
 	TimerStopTime       time.Time `json:"TimerStopTime"`
 	EnergyConsumption   int       `json:"EnergyConsumption"`
@@ -241,6 +241,39 @@ func FetchUser(client *mongo.Client, userName string) (User, error) {
 
 	fmt.Printf("Username: %s, Role: %s\n", user.Username, user.Role)
 	return user, nil
+}
+
+func FetchLights(client *mongo.Client, dbName string, roomName string) ([]Lighting, error) {
+	collection := client.Database(dbName).Collection("Lighting")
+
+	// Use a timeout context for the operation
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	fmt.Printf("roomName DAl: ", roomName)
+	// Creating a filter to fetch lights only for the specified roomName
+	filter := bson.M{"Location": roomName}
+
+	cursor, err := collection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var lights []Lighting
+	for cursor.Next(ctx) {
+		var light Lighting
+		err := cursor.Decode(&light)
+		if err != nil {
+			return nil, err
+		}
+		lights = append(lights, light)
+	}
+
+	if err := cursor.Err(); err != nil {
+		return nil, err
+	}
+	fmt.Println("light from db dal: ", lights)
+	return lights, nil
 }
 
 func UpdateMessaging(client *mongo.Client, UUID []byte, name string, apptype string, function string, change string) {

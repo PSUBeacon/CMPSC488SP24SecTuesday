@@ -8,6 +8,7 @@ import removeIcon from '../img/recycle-bin-icon.png';
 import bedroom from '../img/bedroom.png';
 import livingRoomImage from '../img/livingRoom.png';
 import kitchenImage from '../img/kitchen.png';
+import axios from "axios";
 
 const Lighting = () => {
     const navigate = useNavigate();
@@ -19,19 +20,87 @@ const Lighting = () => {
     const [isLightOn, setIsLightOn] = useState(false);
     const [error, setError] = useState('');
     const [user, setUser] = useState(null);
-    const [isAccountPopupVisible, setIsAccountPopupVisible] = useState(false);
     const [lights, setLights] = useState([]);
     const uniqueRoomNames = [...new Set(lights.map(light => light.roomName))];
     const [roomName, setRoomName] = useState('');
     const [lightName, setLightName] = useState('');
+    const [lightStates, setLightStates] = useState({
+        '417293': false, // Initial state: off
+        '417294': false, // Initial state: off
+    });
+    useEffect(() => {
+        if (selectedRoom) {
+            const token = sessionStorage.getItem('token');
+            if (!token) {
+                navigate('/'); // Redirect to login page if token is not present
+                return;
+            }
 
+            axios.get(`http://localhost:8081/lighting?roomName=${encodeURIComponent(selectedRoom)}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(response => {
+                    setLights(response.data); // Set the fetched lights
+                    console.log("data", response.data)
+                })
+                .catch(error => {
+                    console.error('Error fetching lights:', error);
+                    setError('Could not fetch lights');
+                });
+        }
+    }, [selectedRoom, navigate]); // Add navigate as a dependency if it's used within the effect
+
+    const handleDimmerChange = (event) => {
+        setDimmerValue(parseInt(event.target.value)); // Parse to integer
+    };
+
+    const selectRoom = (roomName) => {
+        setSelectedRoom(roomName);
+    };
+
+
+    // useEffect(() => {
+    //     const token = sessionStorage.getItem('token');
+    //     const url = 'http://localhost:8081/lighting';
+    //
+    //     if (!token) {
+    //         navigate('/'); // Redirect to login page if token is not present
+    //         return;
+    //     }
+    //
+    //     fetch(url, {
+    //         method: 'GET',
+    //         headers: {
+    //             'Authorization': `Bearer ${token}`,
+    //             'Content-Type': 'application/json',
+    //         },
+    //     })
+    //         .then(response => response.json())
+    //         .then(response => {
+    //             if (response && response.data) {
+    //                 setUser(response.data.user);
+    //                 setAccountType(response.data.accountType);
+    //                 sessionStorage.setItem('accountType', response.data.accountType);
+    //             } else {
+    //                 setError('Unexpected response from server');
+    //             }
+    //         })
+    //         .catch(error => {
+    //             console.log('Fetch operation error:', error)
+    //         });
+    // }, [navigate]);
     const handleSelectLight = (lightId) => {
         setSelectedLight(lightId);
     };
 
     const toggleLight = () => {
+        lights.forEach(light => handleToggleLight(light.UUID));
         setIsLightOn(!isLightOn);
     };
+
     useEffect(() => {
         const storedLights = JSON.parse(localStorage.getItem('lights'));
         if (storedLights) {
@@ -46,16 +115,41 @@ const Lighting = () => {
         setLights(updatedLights);
     };
 
-    const handleLightOn = (index) => {
-        const updatedLights = [...lights];
-        updatedLights[index].isOn = true;
-        setLights(updatedLights);
-    };
 
-    const handleLightOff = (index) => {
-        const updatedLights = [...lights];
-        updatedLights[index].isOn = false;
-        setLights(updatedLights);
+    //combined on and off handlers
+    const handleToggleLight = (uuid) => {
+        const isTurningOn = !lightStates[uuid];
+        setLightStates(prevStates => ({...prevStates, [uuid]: isTurningOn}));
+
+        const serverUrl = 'http://localhost:8081/lighting';
+        const token = sessionStorage.getItem('token');
+
+        // Prepare the request body
+        const requestBody = {
+            uuid: uuid,
+            name: "Lighting",
+            apptype: "Lighting",
+            function: "Status",
+            change: isTurningOn ? "true" : "false",
+        };
+
+        // Send a POST request to toggle the light state
+        axios.post(serverUrl, requestBody, {headers: {'Authorization': `Bearer ${token}`}})
+            .then(response => {
+                if (response.status >= 200 && response.status < 300) {
+                    console.log(`Light ${isTurningOn ? 'turned on' : 'turned off'} successfully:`, response.data);
+                } else {
+                    console.error(`Failed to toggle the light ${isTurningOn ? 'on' : 'off'} with status:`, response.status);
+                }
+            })
+            .catch(error => {
+                console.error(`There was an error toggling the light ${isTurningOn ? 'on' : 'off'}:`, error);
+            });
+
+        // Log the action
+        setTimeout(() => {
+            console.log(`Light ${uuid} has been ${isTurningOn ? 'turned on' : 'turned off'}.`);
+        }, 1000);
     };
 
     const handleFormSubmit = (e) => {
@@ -129,35 +223,17 @@ const Lighting = () => {
                                     <button type="submit" className="submitButton">Add Light</button>
                                     <button type="button" className="submitButton"
                                             onClick={toggleLight}>{isLightOn ? 'Turn Off All Lights' : 'Turn On All Lights'}</button>
-
                                 </form>
                                 <div className="roomDropdown" style={{marginBottom: '20px', width: '72%'}}>
-                                    <label htmlFor="selectRoom">Select Room:</label>
-                                    <select id="selectRoom" onChange={(e) => setSelectedRoom(e.target.value)}>
-                                        <option value="">Select Room</option>
-                                        {uniqueRoomNames.map((room, index) => (
-                                            <option key={index} value={room}>{room}</option>
+                                    <label htmlFor="selectLight">Select Light:</label>
+                                    <select id="selectLight" value={selectedLight}
+                                            onChange={(e) => handleToggleLight(e.target.value)}>
+                                        <option value="">Select Light</option>
+                                        {lights.map((light, index) => (
+                                            <option key={index} value={light.UUID}>{light.Location}</option>
                                         ))}
                                     </select>
                                 </div>
-                                {selectedRoom && (
-                                    <ul className="lightList">
-                                        {lights.filter((light) => light.roomName === selectedRoom).map((light, index) => (
-                                            <li key={index} className="lightItem">
-                                                {light.lightName}
-                                                <div>
-                                                    <button style={{marginRight: '10px'}}
-                                                            onClick={() => handleLightOn(index)}>Turn On
-                                                    </button>
-                                                    <button onClick={() => handleLightOff(index)}>Turn Off</button>
-                                                    <img src={removeIcon} alt="Remove"
-                                                         style={{width: '20px', marginLeft: '10px', cursor: 'pointer'}}
-                                                         onClick={() => handleRemoveLight(index, selectedRoom)}/>
-                                                </div>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
                                 <div className="dimmerControl"
                                      style={{width: '72%', textAlign: 'center', marginTop: '20px'}}>
                                     <input
@@ -189,6 +265,7 @@ const Lighting = () => {
             </div>
         </div>
     );
+
 };
 
 export default Lighting;

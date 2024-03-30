@@ -367,6 +367,7 @@ func handleFunctionality() {
 		}
 		return
 	}
+	return
 }
 
 func main() {

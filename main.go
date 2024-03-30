@@ -149,8 +149,7 @@ func BlockReceiver() {
 				if err != nil {
 					panic(err)
 				}
-				fmt.Printf("got to the end of receiving")
-				handleFunctionality()
+				go handleFunctionality()
 				continue
 
 			}
@@ -181,8 +180,7 @@ func BlockReceiver() {
 					if err != nil {
 						panic(err)
 					}
-					fmt.Printf("got to the end of receiving")
-					handleFunctionality()
+					go handleFunctionality()
 				}
 				if verify == false {
 					fmt.Println("Invalid Block")
@@ -253,119 +251,101 @@ func handleFunctionality() {
 	if err != nil {
 		panic(err)
 	}
-
 	messageChange, _ := strconv.Atoi(messageData.Change)
-
 	if messageData.Name == "Lighting" {
-		for _, group := range [][]dal.Pi{UUIDsData.LightingUUIDs} {
-			for _, Pi := range group {
-				if Pi.UUID == messageData.UUID {
-					if messageData.Function == "Status" {
-						if messageData.Change == "false" {
-							fmt.Println("got to here")
-							lighting.UpdateStatus(false)
-						}
-						if messageData.Change == "true" {
-							lighting.UpdateStatus(true)
-						}
+		for i := 0; i < len(UUIDsData.LightingUUIDs); i++ {
+			if UUIDsData.LightingUUIDs[i] == messageData.UUID {
+				if messageData.Function == "Status" {
+					if messageData.Change == "false" {
+						lighting.UpdateStatus(false)
 					}
-					if messageData.Function == "Brightness" {
-						lighting.SetBrightness(messageChange)
+					if messageData.Change == "true" {
+						lighting.UpdateStatus(true)
 					}
+				}
+				if messageData.Function == "Brightness" {
+					lighting.SetBrightness(messageChange)
 				}
 			}
 		}
 	}
-
 	if messageData.Name == "HVAC" {
-		for _, group := range [][]dal.Pi{UUIDsData.HvacUUIDs} {
-			for _, Pi := range group {
-				if Pi.UUID == messageData.UUID {
-					if messageData.Change == "false" {
-						hvac.UpdateStatus(false)
-					}
-					if messageData.Change == "true" {
-						hvac.UpdateStatus(true)
-					}
-					if messageData.Function == "Fan" {
-						hvac.UpdateFanSpeed(messageChange)
-					}
-					if messageData.Function == "Temperature" {
-						hvac.UpdateTemperature(messageChange)
-					}
-					if messageData.Function == "Mode" {
-						hvac.UpdateMode(messageData.Change)
-					}
+		for i := 0; i < len(UUIDsData.HvacUUIDs); i++ {
+			if UUIDsData.HvacUUIDs[i] == messageData.UUID {
+				if messageData.Change == "false" {
+					hvac.UpdateStatus(false)
+				}
+				if messageData.Change == "true" {
+					hvac.UpdateStatus(true)
+				}
+				if messageData.Function == "Fan" {
+					hvac.UpdateFanSpeed(messageChange)
+				}
+				if messageData.Function == "Temperature" {
+					hvac.UpdateTemperature(messageChange)
+				}
+				if messageData.Function == "Mode" {
+					hvac.UpdateMode(messageData.Change)
 				}
 			}
 		}
 	}
 	if messageData.Name == "Security" {
-		for _, group := range [][]dal.Pi{UUIDsData.SecurityUUIDs} {
-			for _, Pi := range group {
-				if Pi.UUID == messageData.UUID {
-					if messageData.Function == "Status" {
-						if messageData.Change == "false" {
-							security.UpdateAlarmStatus(false)
-						}
-						if messageData.Change == "true" {
-							security.UpdateAlarmStatus(true)
-						}
+		for i := 0; i < len(UUIDsData.SecurityUUIDs); i++ {
+			if UUIDsData.SecurityUUIDs[i] == messageData.UUID {
+				if messageData.Function == "Status" {
+					if messageData.Change == "false" {
+						security.UpdateAlarmStatus(false)
 					}
-					//make this handle locks as well
+					if messageData.Change == "true" {
+						security.UpdateAlarmStatus(true)
+					}
 				}
 			}
 		}
 	}
-
 	if messageData.Name == "Appliances" {
-		for _, group := range [][]dal.Pi{UUIDsData.AppliancesUUIDs} {
-			for _, Pi := range group {
-				if Pi.UUID == messageData.UUID {
-					if messageData.Function == "Status" {
-						if messageData.Change == "false" {
-							appliances.UpdateStatus(false)
-						}
-						if messageData.Change == "true" {
-							appliances.UpdateStatus(true)
-						}
+		for i := 0; i < len(UUIDsData.AppliancesUUIDs); i++ {
+			if UUIDsData.AppliancesUUIDs[i] == messageData.UUID {
+				if messageData.Function == "Status" {
+					if messageData.Change == "false" {
+						appliances.UpdateStatus(false)
 					}
-					if messageData.Function == "Temperature" {
-						appliances.UpdateTemperature(messageChange)
+					if messageData.Change == "true" {
+						appliances.UpdateStatus(true)
 					}
-					if messageData.Function == "TimerStopTime" {
-						appliances.UpdateTimeStopTime(messageChange)
+				}
+				if messageData.Function == "Temperature" {
+					appliances.UpdateTemperature(messageChange)
+				}
+				if messageData.Function == "TimerStopTime" {
+					appliances.UpdateTimeStopTime(messageChange)
+				}
+				if messageData.Function == "Power" {
+					appliances.UpdatePower(messageChange)
+				}
+				if messageData.Function == "EnergySaveMode" {
+					if messageData.Change == "false" {
+						appliances.UpdateStatus(false)
 					}
-					if messageData.Function == "Power" {
-						appliances.UpdatePower(messageChange)
+					if messageData.Change == "true" {
+						appliances.UpdateStatus(true)
 					}
-					if messageData.Function == "EnergySaveMode" {
-						if messageData.Change == "false" {
-							appliances.UpdateStatus(false)
-						}
-						if messageData.Change == "true" {
-							appliances.UpdateStatus(true)
-						}
-					}
-					if messageData.Function == "WashTime" {
-						appliances.UpdateWashTime(messageChange)
-					}
+				}
+				if messageData.Function == "WashTime" {
+					appliances.UpdateWashTime(messageChange)
 				}
 			}
 		}
 	}
-
 	if messageData.Name == "Energy" {
-		for _, group := range [][]dal.Pi{UUIDsData.EnergyUUIDs} {
-			for _, Pi := range group {
-				if Pi.UUID == messageData.UUID {
-					if messageData.Function == "Status" {
-						//energy.UpdateAlarmStatus(messageData.StatusChange)
-					}
+		for i := 0; i < len(UUIDsData.EnergyUUIDs); i++ {
+			if UUIDsData.EnergyUUIDs[i] == messageData.UUID {
+				if messageData.Function == "Status" {
+					//energy.UpdateAlarmStatus(messageData.StatusChange)
 				}
 			}
 		}
-		return
 	}
 	return
 }

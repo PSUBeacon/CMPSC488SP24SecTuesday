@@ -6,7 +6,7 @@ body {
 
 .container {
 min-height: 100vh;
-background: url('./loginImage.png') no-repeat center center;
+background: url('../img/loginImage.png') no-repeat center center;
 background-size: cover;
 }
 

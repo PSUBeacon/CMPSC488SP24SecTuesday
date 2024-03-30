@@ -1,7 +1,7 @@
 // Preferences.js
 
 import React from 'react';
-import './Preferences.css'; // Import CSS file
+import '../CSS/Preferences.css'; // Import CSS file
 
 const Security = () => {
   return (

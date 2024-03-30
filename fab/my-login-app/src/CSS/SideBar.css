@@ -1,0 +1,8 @@
+.side-nav .nav-item.active {
+    background-color: #08192B;
+    border-left: 3px solid #0294A5;
+}
+
+.side-nav .nav-item.active a {
+    color: #50BCC0;
+}

@@ -11,7 +11,7 @@ import Energy from './Energy'; // Import Energy component
 import Settings from './Settings'; // Import your settings page component
 import Networking from './Networking'; //Import your networking page component
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './login.css';
+import '../CSS/login.css';
 
 
 function App() {

@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom'; // Import Link
 import 'bootstrap/dist/css/bootstrap.min.css';
-import loginImage from './loginImage.png';
-import logoImage from './logo.webp'; 
+import loginImage from '../img/loginImage.png';
+import logoImage from '../img/logo.webp';
 
 const LoginForm = () => {
   const [username, setUsername] = useState('');

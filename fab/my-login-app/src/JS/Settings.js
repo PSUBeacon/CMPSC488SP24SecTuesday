@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import logoImage from './logo.webp'; // Adjust the path as needed
-import './Settings.css'; // Adjust the path as necessary based on your file structure
+import logoImage from '../img/logo.webp';
+import '../CSS/Settings.css'; // Adjust the path as necessary based on your file structure
 import { Link } from 'react-router-dom'; // Import Link component
-import accountIcon from './account.png'
-import menuIcon from './menu.png'
+import accountIcon from '../img/account.png'
+import menuIcon from '../img/menu.png'
 import { Table } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom'; // Import useHistory for navigation
 

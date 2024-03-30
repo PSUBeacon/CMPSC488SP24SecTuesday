@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import loginImage from './loginImage.png';
-import logoImage from './logo.webp';
+import loginImage from '../img/loginImage.png';
+import logoImage from '../img/logo.webp';
 
 const SignUp = () => {
   // Removed email state

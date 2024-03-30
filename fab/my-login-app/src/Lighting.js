@@ -9,7 +9,7 @@ import notificationIcon from './notification.png'
 import accountIcon from './account.png'
 import settingsIcon from './settings.png'
 import menuIcon from './menu.png'
-import bedroomIcon from './bedroomIcon.jpg'
+import bedroom from './bedroom.png'
 import livingRoomImage from './livingRoom.png'
 import kitchenImage from './kitchen.png'
 import './Lighting.css';
@@ -245,7 +245,7 @@ const handleRemoveLight = (index, roomName) => {
         <div className="roomSelection" style={{ flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center', marginRight: '20px' }}>
           <h3 className="centered-title">Selecting a Room</h3>
           <div className="RoomCards" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '40px' }}>
-            <div className="card" style={{ marginBottom: '20px', border: selectedRoom === "Bedroom 1" ? '2px solid #0294A5' : 'none' }} onClick={() => {setRoomName("Bedroom 1"); setSelectedRoom("Bedroom 1");}}><img class="images" src={bedroomIcon} alt="Room 1" /></div>
+            <div className="card" style={{ marginBottom: '20px', border: selectedRoom === "Bedroom 1" ? '2px solid #0294A5' : 'none' }} onClick={() => {setRoomName("Bedroom "); setSelectedRoom("Bedroom 1");}}><img class="images" src={bedroom} alt="Room 1" /></div>
             <div className="card" style={{ marginBottom: '20px', border: selectedRoom === "Kitchen" ? '2px solid #0294A5' : 'none' }} onClick={() => {setRoomName("Kitchen"); setSelectedRoom("Kitchen");}}><img class="images" src={kitchenImage} alt="Kitchen" /></div>
             <div className="card" style={{ border: selectedRoom === "Living Room" ? '2px solid #0294A5' : 'none' }} onClick={() => {setRoomName("Living Room"); setSelectedRoom("Living Room");}}><img class="images" src={livingRoomImage} alt="Living Room" /></div>
           </div>

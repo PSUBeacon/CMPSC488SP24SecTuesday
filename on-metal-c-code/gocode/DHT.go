@@ -60,6 +60,7 @@ func readData(inPin int) ([5]byte, error) {
 	if err := rpio.Open(); err != nil {
 		return data, fmt.Errorf("unable to open GPIO: %w", err)
 	}
+
 	defer func() {
 		err := rpio.Close()
 		if err != nil {

@@ -260,6 +260,7 @@ func handleFunctionality() {
 				if Pi.UUID == messageData.UUID {
 					if messageData.Function == "Status" {
 						if messageData.Change == "false" {
+							fmt.Println("got to here")
 							lighting.UpdateStatus(false)
 						}
 						if messageData.Change == "true" {

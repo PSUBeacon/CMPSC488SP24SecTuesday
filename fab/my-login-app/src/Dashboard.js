@@ -109,15 +109,16 @@ const Dashboard = () => {
     
     return (
       <div className="camera-widget" style={{ position: 'relative', maxWidth: '100%', backgroundColor: '#12232E', borderRadius: '10px', overflow: 'hidden' }}>
-        {/* Live Feed */}
-        <img src={cameraFeeds[cameraView]} alt="Live feed" style={{ width: '100%', height: 'auto', display: 'block' }} />
+        {/* Live Feed Video */}
+        <video src={cameraFeeds[cameraView]} alt="Live feed" style={{ width: '100%', height: 'auto', display: 'block' }} controls autoplay loop muted>
+          Your browser does not support the video tag.
+        </video>
         
         {/* Camera View Buttons */}
         <div style={{ position: 'absolute', top: '10px', left: '10px', display: 'flex', gap: '5px' }}>
           <button onClick={() => setCameraView('livingroom')} style={{ padding: '5px', backgroundColor: cameraView === 'livingroom' ? '#4CAF50' : 'transparent' }}>R1</button>
           <button onClick={() => setCameraView('kitchen')} style={{ padding: '5px', backgroundColor: cameraView === 'kitchen' ? '#4CAF50' : 'transparent' }}>R2</button>
-          <button onClick={() => setCameraView('r3')} style={{ padding: '5px', backgroundColor: cameraView === 'r3' ? '#4CAF50' : 'transparent' }}>R3</button>
-          {/* Add more buttons for additional camera views as needed */}
+          <button onClick={() => setCameraView('bedroom')} style={{ padding: '5px', backgroundColor: cameraView === 'bedroom' ? '#4CAF50' : 'transparent' }}>R3</button>
         </div>
       </div>
     );
@@ -192,7 +193,7 @@ const Dashboard = () => {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
           <img src={bulbIcon} alt="Bedroom Light" style={{ width: '60px', height: 'auto', marginRight: '30px', marginBottom: '10px' }} />
           <div style={{ textAlign: 'center' }}>
-            <span style={{ color: "#95A4B6", fontSize: '20px' }}>Bedroom light:</span>
+            <span style={{ color: "#95A4B6", fontSize: '20px' }}>Livingroom light:</span>
             <p style={{ marginTop: '10px' }}>{lightStatus}</p>
           </div>
           <label className="toggle" style={{ display: 'block', margin: 'auto' }}>
@@ -377,7 +378,7 @@ const AppliancesWidget = () => {
               <div style={{ position: 'absolute', top: '10px', left: '10px', display: 'flex', gap: '5px' }}>
                 <button onClick={() => setCameraView('livingroom')} style={{ padding: '5px', color:'white',backgroundColor: cameraView === 'livingroom' ? '#0294A5' : '#08192B' }}>R1</button>
                 <button onClick={() => setCameraView('kitchen')} style={{ padding: '5px', color:'white', backgroundColor: cameraView === 'kitchen' ? '#0294A5' : '#08192B' }}>R2</button>
-                <button onClick={() => setCameraView('r3')} style={{ padding: '5px', color: 'white', backgroundColor: cameraView === 'r3' ? '#0294A5' : '#08192B' }}>R3</button>
+                <button onClick={() => setCameraView('bedroom')} style={{ padding: '5px', color: 'white', backgroundColor: cameraView === 'bedroom' ? '#0294A5' : '#08192B' }}>R3</button>
               </div>
       </div>
       

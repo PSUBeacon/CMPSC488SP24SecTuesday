@@ -8,12 +8,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
-	"log"
-
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options" 
 	"log"
- 
 	"strconv"
 	"time"
 )

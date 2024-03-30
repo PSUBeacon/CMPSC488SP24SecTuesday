@@ -15,8 +15,6 @@ require (
 	go.mongodb.org/mongo-driver v1.14.0
 	golang.org/x/crypto v0.21.0
 	golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8
-	periph.io/x/conn/v3 v3.7.0
-	periph.io/x/host/v3 v3.8.2
 	periph.io/x/periph v3.6.2+incompatible
 )
 

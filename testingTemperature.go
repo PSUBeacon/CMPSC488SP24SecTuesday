@@ -17,6 +17,6 @@ func main() {
 		log.Fatalf("Failed to read from DHT22 sensor: %s", err)
 	}
 
-	fmt.Printf("Temperature: %.2f°C\n", temperature)
+	fmt.Printf("Temperature: %.2f°F\n", (temperature*9/5)+32)
 	fmt.Printf("Humidity: %.2f%%\n", humidity)
 }

@@ -149,6 +149,7 @@ func BlockReceiver() {
 				if err != nil {
 					panic(err)
 				}
+				fmt.Printf("got to the end of receiving")
 				go handleFunctionality()
 				continue
 
@@ -180,6 +181,7 @@ func BlockReceiver() {
 					if err != nil {
 						panic(err)
 					}
+					fmt.Printf("got to the end of receiving")
 					go handleFunctionality()
 				}
 				if verify == false {

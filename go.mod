@@ -15,8 +15,6 @@ require (
 	go.mongodb.org/mongo-driver v1.14.0
 	golang.org/x/crypto v0.21.0
 	golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8
-	periph.io/x/conn/v3 v3.7.0
-	periph.io/x/host/v3 v3.8.2
 	periph.io/x/periph v3.6.2+incompatible
 )
 
@@ -25,6 +23,10 @@ require (
 	github.com/chenzhuoyu/base64x v0.0.0-20230717121745-296ad89f973d // indirect
 	github.com/chenzhuoyu/iasm v0.9.1 // indirect
 	github.com/creack/goselect v0.1.2 // indirect
+	github.com/d2r2/go-dht v0.0.0-20200119175940-4ba96621a218 // indirect
+	github.com/d2r2/go-logger v0.0.0-20210606094344-60e9d1233e22 // indirect
+	github.com/d2r2/go-shell v0.0.0-20211022052110-f591c27e3e2e // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect

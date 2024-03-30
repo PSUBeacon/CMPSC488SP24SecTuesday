@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	pinNumber = 4 // The GPIO pin connected to the DHT sensor
+	pinNumber = 4
 )
 
 func main() {

@@ -12,8 +12,8 @@ import menuIcon from './menu.png'
 import bulbIcon from './bulb-icon.png'
 import placeholderImage from './placeholderImage.jpg'; // Replace with the path to your placeholder image
 import livingRoomFootage from './livingRoomFootage1.gif'; 
+import bedRoomFootage from './bedRoomFootage.gif';
 import kitchenFootage from './kitchenFootage.gif'; 
-// Define the Dashboard component using a functional component pattern
 const Dashboard = () => {
 
  
@@ -88,7 +88,7 @@ const Dashboard = () => {
   const cameraFeeds = {
     livingroom: livingRoomFootage, // Replace with actual video feed or image
     kitchen: kitchenFootage, // Replace with the actual camera feed URL or image for the kitchen
-    r3: placeholderImage, //adding another tab to the camera views
+    bedroom: bedRoomFootage, //adding another tab to the camera views
   };
 
   const [isAccountPopupVisible, setIsAccountPopupVisible] = useState(false);

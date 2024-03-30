@@ -1,5 +1,5 @@
 package messaging
-
+ 
 import (
 	"CMPSC488SP24SecTuesday/blockchain"
 	"CMPSC488SP24SecTuesday/crypto"
@@ -238,8 +238,4 @@ func verifyBlockchain(currentblock blockchain.Block) bool {
 	//}
 	return false
 }
-
-//
-//func main() {
-//	BlockReceiver()
-//}
+ 

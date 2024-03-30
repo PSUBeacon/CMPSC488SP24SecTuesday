@@ -5,8 +5,8 @@ import (
 )
 
 // SetTemperature sets the desired temperature for the HVAC system.
-func UpdateTemperature(temperature int) {
-	//gocode.WriteLCD(temperature)
+func UpdateTemperature(temperature int) { 
+	//gocode.WriteLCD(temperature) 
 	fmt.Printf("%s temperature is set to %d°C\n", temperature)
 }
 
@@ -17,9 +17,10 @@ func UpdateFanSpeed(speed int) {
 
 // SetStatus sets the status (e.g., "Cool", "Heat", "Fan", "Off") for the HVAC system.
 func UpdateStatus(status bool) {
-	fmt.Printf("%s status is set to %s\n", status)
+	fmt.Printf("%s status is set to %s\n", status) 
 }
 
 func UpdateMode(mode string) {
 	fmt.Printf("%s mode is set to %s\n", mode)
 }
+ 

@@ -16,7 +16,7 @@ vendor/
 .DS_Store
 crypto/.env
 .vs/
-.vscode/
+.vscode/ 
 config.json
 fab-2
 
@@ -39,4 +39,4 @@ fab-2
 
 npm-debug.log*
 yarn-debug.log*
-yarn-error.log*
+yarn-error.log* 

@@ -1,6 +1,7 @@
-import React, {useEffect, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
-import {Link} from 'react-router-dom'; // Import Link from react-router-dom for navigation
+ 
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom'; // Import Link from react-router-dom for navigation 
 import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure Bootstrap CSS is imported to use its grid system and components
 import logoImage from './logo.webp';
 import houseImage from './houseImage.jpg';
@@ -27,7 +28,7 @@ const Appliances = () => {
     const [accountType, setAccountType] = useState('')
     const navigate = useNavigate(); // Instantiate useNavigate hook
     const [isNavVisible, setIsNavVisible] = useState(false);
-
+ 
     const appliances = [
         {icon: faMicrophone, name: 'Microwave', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
         {icon: faOtter, name: 'Oven', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
@@ -35,7 +36,22 @@ const Appliances = () => {
         {icon: faSnowflake, name: 'Freezer', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
         {icon: faBreadSlice, name: 'Toaster', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
         {icon: faSoap, name: 'Dishwasher', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
-    ];
+    ]; 
+    // const appliances = [
+    //     {icon: faMicrophone, name: 'Microwave', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
+    //     {icon: faOtter, name: 'Oven', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
+    //     {icon: faIceCream, name: 'Fridge', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
+    //     {icon: faSnowflake, name: 'Freezer', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
+    //     {icon: faBreadSlice, name: 'Toaster', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
+    //     {icon: faSoap, name: 'Dishwasher', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
+    // ];
+
+//     const [data, setData] = useState({});
+
+//     const now = new Date();
+//     const dateString = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+//     const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+ 
 
     useEffect(() => {
         const token = sessionStorage.getItem('token');
@@ -45,7 +61,7 @@ const Appliances = () => {
             navigate('/'); // Redirect to login page if token is not present
             return;
         }
-
+ 
         fetch(url, {
             method: 'GET',
             headers: {
@@ -67,6 +83,7 @@ const Appliances = () => {
                 console.log('Fetch operation error:', error)
             });
     }, [navigate]);
+ 
     const toggleNav = () => {
         setIsNavVisible(!isNavVisible);
     };
@@ -88,6 +105,7 @@ const Appliances = () => {
         livingroom: placeholderImage, // Replace with the actual camera feed URL or image for the living room
         kitchen: placeholderImage2, // Replace with the actual camera feed URL or image for the kitchen
         // Add more camera feeds as needed
+ 
     };
 
     const [isAccountPopupVisible, setIsAccountPopupVisible] = useState(false);
@@ -95,7 +113,7 @@ const Appliances = () => {
     const toggleAccountPopup = () => {
         setIsAccountPopupVisible(!isAccountPopupVisible);
     };
-
+ 
     const AccountPopup = ({isVisible, onClose}) => {
         if (!isVisible) return null;
 
@@ -170,10 +188,12 @@ const Appliances = () => {
                         <span id='menuText2'>Beacon</span>
                     </div>
                     <div>
-                        <span id='menuText'>March 05, 2024</span>
+ 
+                        <span id='menuText'>{dateString}</span>
                     </div>
                     <div>
-                        <span id='menuText'>11:48 AM</span>
+                        <span id='menuText'>{timeString}</span>
+ 
                     </div>
                     <div>
                         <div style={{position: 'relative'}}>
@@ -264,31 +284,65 @@ const Appliances = () => {
                     backgroundColor: '#0E2237'
                 }}>
                     <h2 style={{color: 'white'}}>Appliances</h2>
-                    <Table striped bordered hover variant="dark"
-                           style={{marginTop: '20px', backgroundColor: "#173350"}}>
-                        <thead>
-                        <tr>
-                            <th>Device</th>
-                            <th>Name</th>
-                            <th>Location</th>
-                            <th>Status</th>
-                            <th>Last Used</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {appliances.map((appliance, index) => (
-                            <tr key={index}>
-                                <td>
-                                    <FontAwesomeIcon icon={appliance.icon} style={{color: 'cyan'}}/>
-                                </td>
-                                <td>{appliance.name}</td>
-                                <td>{appliance.location}</td>
-                                <td>{appliance.status}</td>
-                                <td>{appliance.lastUsed}</td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </Table>
+ 
+                    {Object.keys(data).length > 0 ? (
+                        Object.entries(data).map(([key, appliances]) => (
+                            <div key={key} style={{alignItems: 'center', width: '70%', marginTop: '20px'}}>
+                                <h3>{key}</h3>
+                                <Table striped bordered hover variant="dark" style={{backgroundColor: "#173350"}}>
+                                    <thead>
+                                    <tr>
+                                        <th>Device</th>
+                                        <th>Name</th>
+                                        <th>Location</th>
+                                        <th>Status</th>
+                                        <th>Last Used</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {appliances.map((appliance, index) => (
+                                        <tr key={index}>
+                                            {/* Assuming the name is stored in a property called 'Name' */}
+                                            <td style={{width: '20%'}}>{key} - {appliance.UUID}</td>
+                                            <td style={{width: '20%'}}>{appliance.Label ? "Label" : ""}</td>
+                                            <td style={{width: '20%'}}>{appliance.Location}</td>
+                                            <td style={{width: '20%'}}>{appliance.Status ? "On" : "Off"}</td>
+                                            <td style={{width: '20%'}}>{appliance.LastChanged}</td>
+                                        </tr>
+                                    ))}
+                                    </tbody>
+                                </Table>
+                            </div>
+                        ))
+                    ) : (
+                        <p>Loading...</p>
+                    )}
+
+                    {/*<Table striped bordered hover variant="dark"*/}
+                    {/*       style={{marginTop: '20px', backgroundColor: "#173350"}}>*/}
+                    {/*    <thead>*/}
+                    {/*    <tr>*/}
+                    {/*        <th>Device</th>*/}
+                    {/*        <th>Name</th>*/}
+                    {/*        <th>Location</th>*/}
+                    {/*        <th>Status</th>*/}
+                    {/*        <th>Last Used</th>*/}
+                    {/*    </tr>*/}
+                    {/*    </thead>*/}
+                    {/*    <tbody>*/}
+                    {/*    {appliances.map((appliance, index) => (*/}
+                    {/*        <tr key={index}>*/}
+                    {/*            <td>*/}
+                    {/*                <FontAwesomeIcon icon={appliance.icon} style={{color: 'cyan'}}/>*/}
+                    {/*            </td>*/}
+                    {/*            <td>{appliance.name}</td>*/}
+                    {/*            <td>{appliance.location}</td>*/}
+                    {/*            <td>{appliance.status}</td>*/}
+                    {/*            <td>{appliance.lastUsed}</td>*/}
+                    {/*        </tr>*/}
+                    {/*    ))}*/}
+                    {/*    </tbody>*/}
+                    {/*</Table>*/} 
 
                 </main>
 

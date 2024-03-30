@@ -1,6 +1,8 @@
-import React, {useEffect, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
-import {Link} from 'react-router-dom'; // Import Link from react-router-dom for navigation
+ 
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom'; // Import Link from react-router-dom for navigation
+ 
 import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure Bootstrap CSS is imported to use its grid system and components
 import logoImage from './logo.webp';
 import houseImage from './houseImage.jpg';
@@ -27,16 +29,8 @@ const Energy = () => {
     const [accountType, setAccountType] = useState('')
     const navigate = useNavigate(); // Instantiate useNavigate hook
     const [isNavVisible, setIsNavVisible] = useState(false);
-    const energy = [
-        {Device: 'Microwave', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF'},
-        {Device: 'Oven', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF'},
-        {Device: 'Fridge', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF'},
-        {Device: 'Freezer', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF'},
-        {Device: 'Toaster', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF'},
-        {Device: 'Dishwasher', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF'},
-
-    ];
-
+ 
+ 
     useEffect(() => {
         const token = sessionStorage.getItem('token');
         const url = 'http://localhost:8081/energy';
@@ -66,7 +60,142 @@ const Energy = () => {
             .catch(error => {
                 console.log('Fetch operation error:', error)
             });
-    }, [navigate]);
+    }, [navigate]); 
+    // const energy = [
+    //     {Device: 'Microwave', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF'},
+    //     {Device: 'Oven', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF'},
+    //     {Device: 'Fridge', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF'},
+    //     {Device: 'Freezer', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF'},
+    //     {Device: 'Toaster', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF'},
+    //     {Device: 'Dishwasher', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF'},
+    //
+    // ];
+
+    // get token from browser
+    const token = localStorage.getItem('token')
+    // Configure the request headers to include the JWT
+    const config = {
+          headers: {
+            'Authorization': `Bearer ${token}`
+         }
+    };
+
+    const [data, setData] = useState({});
+
+    const now = new Date();
+    const dateString = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+//     useEffect(() => {
+//         const token = sessionStorage.getItem('token');
+//         if (!token) {
+//             navigate('/');
+//             return;
+//         }
+
+//         const fetchData = async () => {
+//             try {
+//                 const response = await fetch('http://localhost:8081/energy', {
+//                     method: 'POST',
+//                     headers: {
+//                         'Authorization': `Bearer ${token}`,
+//                         'Content-Type': 'application/json',
+//                     },
+//                     body: JSON.stringify({}),
+//                 });
+//                 if (!response.ok) throw new Error('Network response was not ok');
+//                 const jsonData = await response.json();
+//                 setData(jsonData);
+//             } catch (error) {
+//                 console.error('Failed to fetch data:', error);
+//             }
+//         };
+
+//         fetchData();
+//     }, [navigate]);
+
+
+
+
+    // const [data, setData] = useState(null);
+    //
+    // useEffect(() => {
+    //     const token = sessionStorage.getItem('token');
+    //     const url = 'http://localhost:8081/energy';
+    //
+    //     if (!token) {
+    //         navigate('/'); // Redirect to login page if token is not present
+    //         return;
+    //     }
+    //
+    //
+    //     const fetchData = async () => {
+    //         try {
+    //             const response = await fetch(url, {
+    //                 method: 'POST',
+    //                 headers: {
+    //                     'Authorization': `Bearer ${token}`,
+    //                     'Content-Type': 'application/json',
+    //                 },
+    //                 body: JSON.stringify({}),
+    //             })
+    //             const jsonData = await response.json();
+    //             console.log("DB Data", response)
+    //             setData(jsonData); // Update the state with the fetched data
+    //         } catch (error) {
+    //             console.error('Failed to fetch data:', error);
+    //         }
+    //     };
+    //
+    //     fetchData();
+    // }, [navigate]);
+
+
+    // Assuming 'data' is the object you've received from the fetch operation
+    //const data = response
+
+    // const dataContainer = document.getElementById('data-container');
+    //
+    // Object.keys(data).forEach((key) => {
+    //     // Create a table and a header with the appliance type
+    //     const table = document.createElement('table');
+    //     table.style.width = '100%'; // Set the table width
+    //     table.setAttribute('border', '1');
+    //     const caption = table.createCaption();
+    //     caption.textContent = key; // Set the appliance type as table caption
+    //
+    //     // Create the table header
+    //     const thead = document.createElement('thead');
+    //     table.appendChild(thead);
+    //     const headerRow = document.createElement('tr');
+    //     thead.appendChild(headerRow);
+    //
+    //     // Assuming all objects in the arrays have the same keys, use the first object to get headers
+    //     if (data[key].length > 0) {
+    //         Object.keys(data[key][0]).forEach((header) => {
+    //             const th = document.createElement('th');
+    //             th.textContent = header;
+    //             headerRow.appendChild(th);
+    //         });
+    //     }
+    //
+    //     // Create table body and rows for each item
+    //     const tbody = document.createElement('tbody');
+    //     data[key].forEach((item) => {
+    //         const row = document.createElement('tr');
+    //         Object.values(item).forEach((value) => {
+    //             const cell = document.createElement('td');
+    //             cell.textContent = value;
+    //             row.appendChild(cell);
+    //         });
+    //         tbody.appendChild(row);
+    //     });
+    //     table.appendChild(tbody);
+    //
+    //     // Append the table to the container
+    //     dataContainer.appendChild(table);
+    // });
+ 
     const toggleNav = () => {
         setIsNavVisible(!isNavVisible);
     };
@@ -94,6 +223,7 @@ const Energy = () => {
 
     const toggleAccountPopup = () => {
         setIsAccountPopupVisible(!isAccountPopupVisible);
+ 
     };
 
     const AccountPopup = ({isVisible, onClose}) => {
@@ -156,7 +286,7 @@ const Energy = () => {
             </div>
         );
     };
-
+ 
     // This is the JSX return statement where we layout our component's HTML structure
     return (
         <div style={{display: 'flex', minHeight: '100vh', flexDirection: 'column', backgroundColor: '#081624'}}>
@@ -170,10 +300,11 @@ const Energy = () => {
                         <span id='menuText2'>Beacon</span>
                     </div>
                     <div>
-                        <span id='menuText'>March 05, 2024</span>
+ 
+                        <span id='menuText'>{dateString}</span>
                     </div>
                     <div>
-                        <span id='menuText'>11:48 AM</span>
+                        <span id='menuText'>{timeString}</span> 
                     </div>
                     <div>
                         <div style={{position: 'relative'}}>
@@ -257,38 +388,47 @@ const Energy = () => {
 
                 <main style={{
                     flex: '1',
-                    padding: '1rem',
+ 
+                    padding: '0.5rem', 
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
                     backgroundColor: '#0E2237'
                 }}>
-                    <h2 style={{color: 'white'}}>Devices Using Energy</h2>
-                    <Table striped bordered hover variant="dark"
-                           style={{marginTop: '20px', backgroundColor: "#173350"}}>
-                        <thead>
-                        <tr>
-                            <th>Device</th>
-                            <th>Net loss Energy</th>
-                            <th>Net Gain Energy</th>
-                            <th>Battery %</th>
-                            <th>Status</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {energy.map((energy, index) => (
-                            <tr key={index}>
+ 
+                    <h2 style={{color: 'white'}}>Devices Energy Usage</h2>
 
-                                <td>{energy.Device}</td>
-                                <td>{energy.NetlossEnergy}</td>
-                                <td>{energy.NetgainEnergy}</td>
-                                <td>{energy.Battery}</td>
-                                <td>{energy.Status}</td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </Table>
-
+                    {Object.keys(data).length > 0 ? Object.entries(data).map(([key, appliances]) => (
+                        <div key={key} style={{alignItems: 'center', width: '70%'}}>
+                            <h3>{key}</h3>
+                            <Table striped bordered hover variant="dark"
+                                   style={{marginTop: '20px', backgroundColor: "#173350"}}>
+                                <thead>
+                                <tr>
+                                    <th>Device Name</th>
+                                    <th>Status</th>
+                                    <th>Energy Consumption, kWh</th>
+                                    <th>Action</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {appliances.map((appliance, index) => (
+                                    <tr key={index}>
+                                        <td style={{width: '25%'}}>{key} - {appliance.Location}</td> {/* NEED TO USE DEVICE NAME-LABEL */}
+                                        <td style={{width: '25%'}}>{appliance.Status ? "On" : "Off"}</td>
+                                        <td style={{width: '25%'}}>{appliance.EnergyConsumption}</td>
+                                        <td style={{width: '25%'}}>
+                                            {/* Implement actual toggle functionality as needed */}
+                                            <button onClick={() => console.log('Toggle', appliance.UUID)}>
+                                                Turn On/Off
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                                </tbody>
+                            </Table>
+                        </div>
+                    )) : <p>Loading...</p>} 
                 </main>
 
             </div>

@@ -20,7 +20,7 @@ func main() {
 	defer rpio.Close()
 
 	pin := rpio.Pin(pinNumber)
-	pin.Input() // Start with the pin in input mode
+	pin.Input()
 
 	triggerSensor(pin)
 
@@ -32,15 +32,13 @@ func main() {
 func triggerSensor(pin rpio.Pin) {
 	pin.Output()
 	pin.Low()
-	time.Sleep(18 * time.Millisecond) // Required to trigger the sensor
+	time.Sleep(18 * time.Millisecond)
 	pin.High()
-	time.Sleep(20 * time.Microsecond) // Short delay before setting to input mode
 	pin.Input()
 }
 
 func readData(pin rpio.Pin) []byte {
 	var data []byte
-	time.Sleep(40 * time.Millisecond) // Wait for sensor response
 	for i := 0; i < 40; i++ {
 		state := pin.Read()
 
@@ -49,6 +47,9 @@ func readData(pin rpio.Pin) []byte {
 		} else {
 			data = append(data, 0)
 		}
+
+		// Make sure this brace closes the for loop before the else statement.
+		// An incorrectly placed brace here might cause the syntax error.
 	}
 	return data
 }

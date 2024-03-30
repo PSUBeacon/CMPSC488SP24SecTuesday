@@ -150,7 +150,7 @@ func BlockReceiver() {
 					panic(err)
 				}
 				fmt.Printf("got to the end of receiving")
-				go handleFunctionality()
+				handleFunctionality()
 				continue
 
 			}
@@ -182,7 +182,7 @@ func BlockReceiver() {
 						panic(err)
 					}
 					fmt.Printf("got to the end of receiving")
-					go handleFunctionality()
+					handleFunctionality()
 				}
 				if verify == false {
 					fmt.Println("Invalid Block")

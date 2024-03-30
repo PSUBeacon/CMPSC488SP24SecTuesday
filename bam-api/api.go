@@ -1,7 +1,6 @@
 package main
 
 import (
-	messaging "CMPSC488SP24SecTuesday/AES-BlockChain-Communication"
 	"CMPSC488SP24SecTuesday/dal"
 	"bytes"
 	"context"
@@ -31,9 +30,11 @@ var secret = []byte("secret")
 
 var disconnectedPiNums []int
 
-func UpdateMissingPi(PiNum string) {
-	NumPi, _ := strconv.Atoi(PiNum)
-	disconnectedPiNums = append(disconnectedPiNums, NumPi)
+func UpdateMissingPi(PiNum []string) {
+	for i := 0; i < len(PiNum); i++ {
+		PiNumInt, _ := strconv.Atoi(PiNum[i])
+		disconnectedPiNums = append(disconnectedPiNums, PiNumInt)
+	}
 }
 
 func main() {
@@ -47,7 +48,22 @@ func main() {
 			log.Fatalf("Failed to disconnect from MongoDB: %v", er)
 		}
 	}()
-	go messaging.BlockReceiver()
+	//
+	//// Create a channel to receive the missingPi array from BlockReceiver
+	//missingPiChan := make(chan []string)
+	//// Run BlockReceiver as a goroutine
+	//go func() {
+	//	// Execute BlockReceiver and send the result to missingPiChan
+	//	missingPi := messaging.BlockReceiver()
+	//	missingPiChan <- missingPi
+	//}()
+	//
+	//// Receive the missingPi array from missingPiChan
+	//missingPi := <-missingPiChan
+	//
+	//// Update the disconnectedPiNums array with the missingPi array
+	//UpdateMissingPi(missingPi)
+
 	r := gin.Default()
 
 	// Configure CORS

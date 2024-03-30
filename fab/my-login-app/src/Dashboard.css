@@ -1,6 +1,6 @@
 body {
     color: white;
-    background-color: #0E2237;
+    background-color: #081624;
 }
 
 #title {
@@ -94,6 +94,7 @@ body {
   .houseInfo{
     text-align: center;
     margin-bottom: 20px;
+    color:#95A4B6
   }
 
   #circle2 {
@@ -144,4 +145,72 @@ body {
 .nav-item:hover {
   padding-left: 30px; /* Indent text to create sliding effect */
   border-left: 3px solid #0294A5; /* Visible border on hover */
+}
+
+/* Base styles for cards */
+.card {
+  width: 48%; /* Allows 2 cards to fit side by side with some space in between */
+  margin-bottom: 20px;
+}
+
+/* Ensure container flex properties are set correctly */
+.roomCards, .lightCards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+/* Adjust when screen width is too small for two cards side by side */
+@media (max-width: 300px) {
+  #menuIcon {
+   display:none;
+  }
+}
+
+
+/* CSS for sliding toggle buttons */
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+.toggle input[type="checkbox"] {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #0294A5;
+  border-radius: 34px;
+  transition: background-color 0.4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.4s;
+}
+
+.toggle input:checked + .slider {
+  background-color: #ccc;
+}
+
+.toggle input:checked + .slider:before {
+  transform: translateX(20px);
 }

@@ -52,7 +52,7 @@ func decryptAES(key, ciphertext []byte) ([]byte, error) {
 	return ciphertext, nil
 }
 
-func BlockReceiver() {
+func BlockReceiver() []string {
 	numConnections := 0
 	pinums := []string{"13", "16", "22", "25"}
 	var receivedPiNums []string
@@ -106,6 +106,7 @@ func BlockReceiver() {
 
 					fmt.Printf("Pi %v not connected\n", missingPi)
 					//go api.UpdateMissingPi(missingPi)
+					return missingPi
 
 				}
 				ticker.Reset(60 * time.Second)
@@ -174,7 +175,7 @@ func BlockReceiver() {
 
 					err := json.Unmarshal(jsonChainData, &chain)
 					if err != nil {
-						return
+						return []string{}
 					}
 
 					chain.Chain = append(chain.Chain, block)

@@ -1,8 +1,7 @@
-
-
+ 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom'; // Import Link from react-router-dom for navigation
+import { Link } from 'react-router-dom'; // Import Link from react-router-dom for navigation 
 import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure Bootstrap CSS is imported to use its grid system and components
 import logoImage from './logo.webp';
 import houseImage from './houseImage.jpg';
@@ -29,7 +28,15 @@ const Appliances = () => {
     const [accountType, setAccountType] = useState('')
     const navigate = useNavigate(); // Instantiate useNavigate hook
     const [isNavVisible, setIsNavVisible] = useState(false);
-
+ 
+    const appliances = [
+        {icon: faMicrophone, name: 'Microwave', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
+        {icon: faOtter, name: 'Oven', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
+        {icon: faIceCream, name: 'Fridge', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
+        {icon: faSnowflake, name: 'Freezer', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
+        {icon: faBreadSlice, name: 'Toaster', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
+        {icon: faSoap, name: 'Dishwasher', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
+    ]; 
     // const appliances = [
     //     {icon: faMicrophone, name: 'Microwave', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
     //     {icon: faOtter, name: 'Oven', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
@@ -39,11 +46,12 @@ const Appliances = () => {
     //     {icon: faSoap, name: 'Dishwasher', location: 'Kitchen', status: 'ON/OFF', lastUsed: 'MM/DD/YY 00:00'},
     // ];
 
-    const [data, setData] = useState({});
+//     const [data, setData] = useState({});
 
-    const now = new Date();
-    const dateString = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-    const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+//     const now = new Date();
+//     const dateString = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+//     const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+ 
 
     useEffect(() => {
         const token = sessionStorage.getItem('token');
@@ -53,29 +61,29 @@ const Appliances = () => {
             navigate('/'); // Redirect to login page if token is not present
             return;
         }
-
-        const fetchData = async () => {
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({}),
-                });
-                if (!response.ok) throw new Error('Network response was not ok');
-                const jsonData = await response.json();
-                setData(jsonData);
-            } catch (error) {
-                console.error('Failed to fetch data:', error);
-            }
-        };
-
-        fetchData();
+ 
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(response => response.json())
+            .then(response => {
+                if (response && response.data) {
+                    setUser(response.data.user);
+                    setAccountType(response.data.accountType);
+                    sessionStorage.setItem('accountType', response.data.accountType);
+                } else {
+                    setError('Unexpected response from server');
+                }
+            })
+            .catch(error => {
+                console.log('Fetch operation error:', error)
+            });
     }, [navigate]);
-
-
+ 
     const toggleNav = () => {
         setIsNavVisible(!isNavVisible);
     };
@@ -97,6 +105,7 @@ const Appliances = () => {
         livingroom: placeholderImage, // Replace with the actual camera feed URL or image for the living room
         kitchen: placeholderImage2, // Replace with the actual camera feed URL or image for the kitchen
         // Add more camera feeds as needed
+ 
     };
 
     const [isAccountPopupVisible, setIsAccountPopupVisible] = useState(false);
@@ -104,7 +113,7 @@ const Appliances = () => {
     const toggleAccountPopup = () => {
         setIsAccountPopupVisible(!isAccountPopupVisible);
     };
-
+ 
     const AccountPopup = ({isVisible, onClose}) => {
         if (!isVisible) return null;
 
@@ -179,10 +188,12 @@ const Appliances = () => {
                         <span id='menuText2'>Beacon</span>
                     </div>
                     <div>
+ 
                         <span id='menuText'>{dateString}</span>
                     </div>
                     <div>
                         <span id='menuText'>{timeString}</span>
+ 
                     </div>
                     <div>
                         <div style={{position: 'relative'}}>
@@ -273,6 +284,7 @@ const Appliances = () => {
                     backgroundColor: '#0E2237'
                 }}>
                     <h2 style={{color: 'white'}}>Appliances</h2>
+ 
                     {Object.keys(data).length > 0 ? (
                         Object.entries(data).map(([key, appliances]) => (
                             <div key={key} style={{alignItems: 'center', width: '70%', marginTop: '20px'}}>
@@ -330,7 +342,7 @@ const Appliances = () => {
                     {/*        </tr>*/}
                     {/*    ))}*/}
                     {/*    </tbody>*/}
-                    {/*</Table>*/}
+                    {/*</Table>*/} 
 
                 </main>
 

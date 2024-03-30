@@ -1,7 +1,8 @@
+ 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom for navigation
-
+ 
 import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure Bootstrap CSS is imported to use its grid system and components
 import logoImage from './logo.webp';
 import houseImage from './houseImage.jpg';
@@ -28,6 +29,38 @@ const Energy = () => {
     const [accountType, setAccountType] = useState('')
     const navigate = useNavigate(); // Instantiate useNavigate hook
     const [isNavVisible, setIsNavVisible] = useState(false);
+ 
+ 
+    useEffect(() => {
+        const token = sessionStorage.getItem('token');
+        const url = 'http://localhost:8081/energy';
+
+        if (!token) {
+            navigate('/'); // Redirect to login page if token is not present
+            return;
+        }
+
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(response => response.json())
+            .then(response => {
+                if (response && response.data) {
+                    setUser(response.data.user);
+                    setAccountType(response.data.accountType);
+                    sessionStorage.setItem('accountType', response.data.accountType);
+                } else {
+                    setError('Unexpected response from server');
+                }
+            })
+            .catch(error => {
+                console.log('Fetch operation error:', error)
+            });
+    }, [navigate]); 
     // const energy = [
     //     {Device: 'Microwave', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF'},
     //     {Device: 'Oven', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF'},
@@ -53,33 +86,33 @@ const Energy = () => {
     const dateString = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
 
-    useEffect(() => {
-        const token = sessionStorage.getItem('token');
-        if (!token) {
-            navigate('/');
-            return;
-        }
+//     useEffect(() => {
+//         const token = sessionStorage.getItem('token');
+//         if (!token) {
+//             navigate('/');
+//             return;
+//         }
 
-        const fetchData = async () => {
-            try {
-                const response = await fetch('http://localhost:8081/energy', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({}),
-                });
-                if (!response.ok) throw new Error('Network response was not ok');
-                const jsonData = await response.json();
-                setData(jsonData);
-            } catch (error) {
-                console.error('Failed to fetch data:', error);
-            }
-        };
+//         const fetchData = async () => {
+//             try {
+//                 const response = await fetch('http://localhost:8081/energy', {
+//                     method: 'POST',
+//                     headers: {
+//                         'Authorization': `Bearer ${token}`,
+//                         'Content-Type': 'application/json',
+//                     },
+//                     body: JSON.stringify({}),
+//                 });
+//                 if (!response.ok) throw new Error('Network response was not ok');
+//                 const jsonData = await response.json();
+//                 setData(jsonData);
+//             } catch (error) {
+//                 console.error('Failed to fetch data:', error);
+//             }
+//         };
 
-        fetchData();
-    }, [navigate]);
+//         fetchData();
+//     }, [navigate]);
 
 
 
@@ -162,8 +195,7 @@ const Energy = () => {
     //     // Append the table to the container
     //     dataContainer.appendChild(table);
     // });
-
-
+ 
     const toggleNav = () => {
         setIsNavVisible(!isNavVisible);
     };
@@ -191,6 +223,7 @@ const Energy = () => {
 
     const toggleAccountPopup = () => {
         setIsAccountPopupVisible(!isAccountPopupVisible);
+ 
     };
 
     const AccountPopup = ({isVisible, onClose}) => {
@@ -253,7 +286,7 @@ const Energy = () => {
             </div>
         );
     };
-
+ 
     // This is the JSX return statement where we layout our component's HTML structure
     return (
         <div style={{display: 'flex', minHeight: '100vh', flexDirection: 'column', backgroundColor: '#081624'}}>
@@ -267,10 +300,11 @@ const Energy = () => {
                         <span id='menuText2'>Beacon</span>
                     </div>
                     <div>
+ 
                         <span id='menuText'>{dateString}</span>
                     </div>
                     <div>
-                        <span id='menuText'>{timeString}</span>
+                        <span id='menuText'>{timeString}</span> 
                     </div>
                     <div>
                         <div style={{position: 'relative'}}>
@@ -354,12 +388,14 @@ const Energy = () => {
 
                 <main style={{
                     flex: '1',
-                    padding: '0.5rem',
+ 
+                    padding: '0.5rem', 
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
                     backgroundColor: '#0E2237'
                 }}>
+ 
                     <h2 style={{color: 'white'}}>Devices Energy Usage</h2>
 
                     {Object.keys(data).length > 0 ? Object.entries(data).map(([key, appliances]) => (
@@ -392,7 +428,7 @@ const Energy = () => {
                                 </tbody>
                             </Table>
                         </div>
-                    )) : <p>Loading...</p>}
+                    )) : <p>Loading...</p>} 
                 </main>
 
             </div>

@@ -1,6 +1,6 @@
-package gocode
+package main
 
-import ( 
+import (
 	"fmt"
 	"os"
 	"time"
@@ -170,6 +170,5 @@ func drawA(dinPin, csPin, clkPin rpio.Pin) {
 func clearMatrix(csPin, dinPin, clkPin rpio.Pin) {
 	for row := 0; row < 8; row++ {
 		sendData(csPin, dinPin, clkPin, byte(row+1), 0x00)
- 
 	}
 }

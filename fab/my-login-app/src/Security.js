@@ -1,7 +1,6 @@
-
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom'; // Import Link from react-router-dom for navigation
+import React, {useState, useEffect} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {Link} from 'react-router-dom'; // Import Link from react-router-dom for navigation
 import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure Bootstrap CSS is imported to use its grid system and components
 import logoImage from './logo.webp';
 import houseImage from './houseImage.jpg';
@@ -14,9 +13,8 @@ import doorLockIcon from './doorLockIcon.png';
 import './Security.css'; // Import your CSS file here
 
 
-
 const Security = () => {
-
+ 
     // States for date and time
     const [currentDate, setCurrentDate] = useState(new Date().toLocaleDateString());
     const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
@@ -32,9 +30,9 @@ const Security = () => {
     }, []);
 
     const navigate = useNavigate(); // Instantiate useNavigate hook
-    const [isNavVisible, setIsNavVisible] = useState(false);
+    const [isNavVisible, setIsNavVisible] = useState(false); 
     const [dashboardMessage, setDashboardMessage] = useState('');
-    const [accountType ,setAccountType] = useState('')
+    const [accountType, setAccountType] = useState('')
     // States for each device
     const [deviceData, setDeviceData] = useState({
         HVAC: {},
@@ -61,8 +59,13 @@ const Security = () => {
 
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        const url = 'http://localhost:8081/dashboard';
+        const token = sessionStorage.getItem('token');
+        const url = 'http://localhost:8081/security';
+
+        if (!token) {
+            navigate('/'); // Redirect to login page if token is not present
+            return;
+        }
 
         fetch(url, {
             method: 'GET',
@@ -72,29 +75,24 @@ const Security = () => {
             },
         })
             .then(response => response.json())
-            .then(data => {
-                console.log(data);
-                // Update state for each device if present in response
-                const updatedDeviceData = { ...deviceData };
-                Object.keys(updatedDeviceData).forEach(device => {
-                    if (data[device]) {
-                        localStorage.setItem(device, JSON.stringify(data[device]));
-                        updatedDeviceData[device] = data[device];
-                    }
-                });
-                setDeviceData(updatedDeviceData);
-                setDashboardMessage(data.message);
-
-                // Store accountType in session storage
-                setAccountType(data.accountType);
-                sessionStorage.setItem('accountType', data.accountType);
+            .then(response => {
+                if (response && response.data) {
+                    setUser(response.data.user);
+                    setAccountType(response.data.accountType);
+                    sessionStorage.setItem('accountType', response.data.accountType);
+                } else {
+                    setError('Unexpected response from server');
+                }
             })
-            .catch(error => console.error('Fetch operation error:', error));
-    }, []);
+            .catch(error => {
+                console.log('Fetch operation error:', error)
+            });
+    }, [navigate]);
 
     const toggleNav = () => {
         setIsNavVisible(!isNavVisible);
     };
+ 
 
     const goToSettings = () => {
         navigate('/settings');
@@ -159,13 +157,14 @@ const Security = () => {
                             <button onClick={toggleAccountPopup} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>
                                 <img src={accountIcon} alt="account" style={{ marginRight: '10px' }} id = "menuIcon2"/>
                             </button>
-                            <AccountPopup isVisible={isAccountPopupVisible} onClose={() => setIsAccountPopupVisible(false)} />
+                            <AccountPopup isVisible={isAccountPopupVisible} onClose={() => setIsAccountPopupVisible(false)} /> 
                         </div>
                     </div>
                 </div>
             </nav>
 
             {/* Side Navbar and Dashboard Content */}
+ 
             <div style={{ display: 'flex', flex: '1' }}>
                 {/* Side Navbar */}
                 <aside className={`side-nav ${isNavVisible ? '' : 'hidden'}`} style={{ backgroundColor: '#0E2237', color: 'white', width: '250px', padding: '1rem' }}>          <div class="houseInfo">
@@ -214,7 +213,7 @@ const Security = () => {
                             </li>
                             <li className="nav-item"style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
                                 <Link to="/energy" style={{ color: '#95A4B6', textDecoration: 'none' }}>
-                                    <i className="fas fa-bolt" style={{ marginRight: '10px' }}></i>
+                                    <i className="fas fa-bolt" style={{ marginRight: '10px' }}></i> 
                                     Energy
                                 </Link>
                             </li>
@@ -222,7 +221,7 @@ const Security = () => {
                     </nav>
                 </aside>
 
-
+ 
                 <main style={{ flex: '1', padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: '#0E2237', width: '100%'}}>
 
                     {/* Content Block */}
@@ -260,7 +259,7 @@ const Security = () => {
                                         </label>
                                     </div>
                                 </div>
-
+ 
 
 
                             </div>

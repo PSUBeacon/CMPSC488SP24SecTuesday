@@ -20,7 +20,7 @@ const Dashboard = () => {
     const [error, setError] = useState('');
     const navigate = useNavigate(); // Instantiate useNavigate hook
     const [isNavVisible, setIsNavVisible] = useState(false);
-
+ 
     const [dashboardMessage, setDashboardMessage] = useState('');
     const [accountType, setAccountType] = useState('')
     // States for each device
@@ -73,6 +73,7 @@ const Dashboard = () => {
                     setError('Unexpected response from server');
                 }
             })
+ 
             .catch(error => console.error('Fetch operation error:', error));
     }, []);
 
@@ -254,6 +255,7 @@ const AppliancesWidget = () => {
 
   );
 };
+ 
 
 
     const AccountPopup = ({isVisible, onClose}) => {
@@ -278,6 +280,7 @@ const AppliancesWidget = () => {
         );
     };
 
+ 
   // This is the JSX return statement where we layout our component's HTML structure
   return (
     <div style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column', backgroundColor: '#081624' }}>
@@ -453,6 +456,6 @@ const AppliancesWidget = () => {
 
       </div>
     </div>
-  );
+  ); 
 };
 export default Dashboard;

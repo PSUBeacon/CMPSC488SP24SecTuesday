@@ -3,7 +3,8 @@ import {useNavigate} from 'react-router-dom';
 import {Link} from 'react-router-dom'; // Import Link from react-router-dom for navigation
 import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure Bootstrap CSS is imported to use its grid system and components
 import logoImage from './logo.webp';
-import removeIcon from './recycle-bin-icon.png';  
+ 
+import removeIcon from './recycle-bin-icon.png';   
 import houseImage from './houseImage.jpg';
 import notificationIcon from './notification.png'
 import accountIcon from './account.png'
@@ -16,14 +17,111 @@ import placeholderImage from './placeholderImage.jpg'; // Replace with the path 
 import placeholderImage2 from './placeholderImage2.jpg'; // Replace with the path to your placeholder image
 import './Lighting.css';
 
+ 
 // Define the Dashboard component using a functional component pattern
 const Lighting= () => {
 
 
+    useEffect(() => {
+        const token = sessionStorage.getItem('token');
+        const url = 'http://localhost:8081/lighting';
+
+        if (!token) {
+            navigate('/'); // Redirect to login page if token is not present
+            return;
+        }
+
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(response => response.json())
+            .then(response => {
+                if (response && response.data) {
+                    setUser(response.data.user);
+                    setAccountType(response.data.accountType);
+                    sessionStorage.setItem('accountType', response.data.accountType);
+                } else {
+                    setError('Unexpected response from server');
+                }
+            })
+            .catch(error => {
+                console.log('Fetch operation error:', error)
+            });
+    }, [navigate]);
 
   const navigate = useNavigate(); // Instantiate useNavigate hook
   const [selectedLight, setSelectedLight] = useState(null);
-    
+    const handleTurnOn = () => {
+        setIsLightOn(true);
+        const serverUrl = 'http://localhost:8081/lighting';
+
+        // Define the body of the request based on your Go server's expected input.
+        const requestBody = {
+
+            uuid: '417293',
+            name: "Lighting",
+            apptype: "Lighting",
+            function: "Status",
+            change: "true"
+
+        };
+
+        const token = sessionStorage.getItem('token')
+        // Send a POST request to turn the light on.
+        axios.post(serverUrl, requestBody, {headers: {'Authorization': `Bearer ${token}`}})
+            .then(response => {
+                // Check if response is successful (status code 2xx)
+                if (response.status >= 200 && response.status < 300) {
+                    console.log('Request succeeded');
+                    // Access response data if available
+                    if (response.data) {
+                        console.log(response.data);
+                    }
+                } else {
+                    // Handle unsuccessful response
+                    console.error('Request failed with status:', response.status);
+                }
+            })
+            .catch(error => {
+                // Handle error
+                console.error('There was an error!', error);
+            });
+        setTimeout(() => {
+            console.log('Light turned on');
+        }, 1000); //
+    };
+
+    const handleTurnOff = () => {
+        setIsLightOn(false);
+        const serverUrl = 'http://localhost:8081/lighting';
+
+        // Define the body of the request based on your Go server's expected input.
+        const requestBody = {
+            uuid: '417293',
+            name: "Lighting",
+            apptype: "Lighting",
+            function: "Status",
+            change: "false",
+
+        };
+
+        const token = sessionStorage.getItem('token')
+        // Send a POST request to turn the light on.
+        axios.post(serverUrl, requestBody, {headers: {'Authorization': `Bearer ${token}`}})
+            .then(response => {
+                console.log(response.data);
+            })
+            .catch(error => {
+                console.error('There was an error!', error);
+            });
+        setTimeout(() => {
+            console.log('Light turned off');
+        }, 1000);
+    };
   // Function to handle card click
   const handleSelectLight = (lightId) => {
     setSelectedLight(lightId); // Update the selected light state
@@ -320,7 +418,7 @@ const handleRemoveLight = (index, roomName) => {
 
       </div>
     </div>
-  );
+  ); 
 };
 
 export default Lighting;

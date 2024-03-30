@@ -1,4 +1,7 @@
 // HVAC.js
+ 
+ 
+ 
 import './HVAC.css'; // Import CSS file
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -98,7 +101,37 @@ const updateDeviceData = (key, value) => {
     setSecondFloorHVACStatus(newStatus);
     updateDeviceData('secondFloorStatus', newStatus);
 };
+  
+    useEffect(() => {
+        const token = sessionStorage.getItem('token');
+        const url = 'http://localhost:8081/hvac';
 
+        if (!token) {
+            navigate('/'); // Redirect to login page if token is not present
+            return;
+        }
+
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(response => response.json())
+            .then(response => {
+                if (response && response.data) {
+                    setUser(response.data.user);
+                    setAccountType(response.data.accountType);
+                    sessionStorage.setItem('accountType', response.data.accountType);
+                } else {
+                    setError('Unexpected response from server');
+                }
+            })
+            .catch(error => {
+                console.log('Fetch operation error:', error)
+            });
+    }, [navigate]);
 const toggleBasementHVACStatus = () => {
     const newStatus = !basementHVACStatus;
     setBasementHVACStatus(newStatus);
@@ -614,7 +647,7 @@ const toggleBasementHVACStatus = () => {
 
       </div>
     </div>
-  );
+  ); 
 };
 
 export default HVAC;

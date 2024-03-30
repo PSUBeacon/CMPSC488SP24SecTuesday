@@ -11,9 +11,8 @@ import (
 	"log"
 
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options" 
-	"log"
- 
+	"go.mongodb.org/mongo-driver/mongo/options"
+
 	"strconv"
 	"time"
 )
@@ -144,7 +143,7 @@ type SmartHomeDB struct {
 	Oven           []Oven
 	SecuritySystem []SecuritySystem
 	SolarPanel     []SolarPanel
-	Toaster        []Toaster 
+	Toaster        []Toaster
 	Users          []User
 }
 
@@ -168,7 +167,7 @@ type MessagingStruct struct {
 	Function string `json:"Function"` //function being changed ex(brightness)
 	Change   string `json:"Change"`   //actual change being made ex(100) for brightness
 }
- 
+
 type LoggingStruct struct {
 	DeviceID string    `json:"DeviceID"`
 	Function string    `json:"Function"`
@@ -242,7 +241,7 @@ func FetchUser(client *mongo.Client, key, value string) (*User, error) {
 
 	return &user, nil // Return pointer to user and nil error if user found
 }
- 
+
 func deleteUser(client *mongo.Client, key, value string) error {
 	collection := client.Database(dbName).Collection("users")
 	filter := bson.M{key: value}
@@ -250,7 +249,7 @@ func deleteUser(client *mongo.Client, key, value string) error {
 	_, err := collection.DeleteOne(context.Background(), filter)
 	return err
 }
- 
+
 func UpdateMessaging(client *mongo.Client, UUID []byte, name string, apptype string, function string, change string) {
 	var messageRequest MessagingStruct
 	messageRequest.UUID = string(UUID)

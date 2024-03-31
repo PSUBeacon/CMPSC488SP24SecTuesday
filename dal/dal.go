@@ -152,6 +152,15 @@ type SmartHomeDB struct {
 	Users          []User
 }
 
+type Appliances struct {
+	Dishwasher []Dishwasher
+	Fridge     []Fridge
+	Toaster    []Toaster
+	Lighting   []Lighting
+	Microwave  []Microwave
+	Oven       []Oven
+}
+
 type UUIDsConfig struct {
 	LightingUUIDs   []Pi
 	HvacUUIDs       []Pi
@@ -394,32 +403,64 @@ func UpdateMessaging(client *mongo.Client, UUID []byte, name string, apptype str
 	return
 }
 
-func FetchLogging(client *mongo.Client) ([]LoggingStruct, error) {
+//func FetchLogging(client *mongo.Client) ([]LoggingStruct, error) {
+//	collection := client.Database(dbName).Collection("Logging")
+//
+//	filter := bson.M{}
+//
+//	var logs []LoggingStruct
+//	cursor, err := collection.Find(context.TODO(), filter)
+//	if err != nil {
+//		// Some error occurred
+//		return nil, err
+//	}
+//
+//	for cursor.Next(context.TODO()) {
+//		var logging LoggingStruct
+//		if err := cursor.Decode(&logging); err != nil {
+//			// Error decoding the document
+//			return nil, err
+//		}
+//		logs = append(logs, logging)
+//	}
+//
+//	if err := cursor.Err(); err != nil {
+//		// Some error occurred during iteration
+//		return nil, err
+//	}
+//
+//	return logs, nil
+//}
+
+func FetchLogging(client *mongo.Client, dbName string) ([]LoggingStruct, error) {
 	collection := client.Database(dbName).Collection("Logging")
 
+	// Use a timeout context for the operation
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	// Creating a filter to fetch lights only for the specified roomName
 	filter := bson.M{}
 
-	var logs []LoggingStruct
-	cursor, err := collection.Find(context.TODO(), filter)
+	cursor, err := collection.Find(ctx, filter)
 	if err != nil {
-		// Some error occurred
 		return nil, err
 	}
+	defer cursor.Close(ctx)
 
-	for cursor.Next(context.TODO()) {
+	var logs []LoggingStruct
+	for cursor.Next(ctx) {
 		var logging LoggingStruct
-		if err := cursor.Decode(&logging); err != nil {
-			// Error decoding the document
+		err := cursor.Decode(&logging)
+		if err != nil {
 			return nil, err
 		}
 		logs = append(logs, logging)
 	}
 
 	if err := cursor.Err(); err != nil {
-		// Some error occurred during iteration
 		return nil, err
 	}
-
+	fmt.Println("light from db dal: ", logs)
 	return logs, nil
 }
 

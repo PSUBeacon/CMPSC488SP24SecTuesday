@@ -85,6 +85,7 @@ func main() {
 	protectedRoutes.GET("/security", GetSecurity)
 
 	protectedRoutes.POST("/appliances", updateIoT)
+	protectedRoutes.GET("/appliances", GetAppliances)
 
 	protectedRoutes.POST("/energy", updateIoT)
 
@@ -104,12 +105,20 @@ func main() {
 		dashboardGroup.GET("/status", statusResp)
 	}
 
-	networkingGroup := r.Group("/networking", dashboardHandler)
-	networkingGroup.Use(authMiddleware())
+	networkingGroup := r.Group("/networking")
+	networkingGroup.Use()
 	{
 		networkingGroup.GET("/", me)
 		networkingGroup.GET("/GetNetLogs", GetNetLogs)
 		networkingGroup.GET("/status", statusResp)
+	}
+
+	appliancesGroup := r.Group("/appliances", dashboardHandler)
+	appliancesGroup.Use()
+	{
+		appliancesGroup.GET("/", me)
+		appliancesGroup.GET("/me", me)
+		appliancesGroup.GET("/status", statusResp)
 	}
 
 	go r.Run(":8081")
@@ -117,19 +126,7 @@ func main() {
 	//	log.Fatal("Server startup error:", err)
 	//}
 	// Create a channel to receive the missingPi array from BlockReceiver
-	//missingPiChan := make(chan []string)
-	//// Run BlockReceiver as a goroutine
-	//go func() {
-	//	// Execute BlockReceiver and send the result to missingPiChan
-	//	missingPi := messaging.BlockReceiver()
-	//	missingPiChan <- missingPi
-	//}()
 	//
-	//// Receive the missingPi array from missingPiChan
-	//missingPi := <-missingPiChan
-	//
-	////// Update the disconnectedPiNums array with the missingPi array
-	//UpdateMissingPi(missingPi)
 
 	select {}
 }
@@ -190,6 +187,16 @@ func GetLights(c *gin.Context) {
 	}
 	//fmt.Printf("Light:", lights)
 	c.JSON(http.StatusOK, lights)
+}
+
+func GetAppliances(c *gin.Context) {
+
+	appliances, err := dal.FetchCollections(client, "smartHomeDB")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, appliances)
 }
 
 func findPiByUUID(allPis [][]dal.Pi, uuidToFind string) (dal.Pi, bool) {
@@ -444,12 +451,23 @@ func dashboardHandler(c *gin.Context) {
 
 func GetNetLogs(c *gin.Context) {
 
-	logs, err := dal.FetchLogging(client)
+	//logs, err := dal.FetchLogging(client, "smartHomeDB")
+	//if err != nil {
+	//	fmt.Printf(err.Error())
+	//	c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	//	return
+	//}
+	//fmt.Printf("Logs:", logs)
+	//c.JSON(http.StatusOK, logs)
+
+	logs, err := dal.FetchLogging(client, "smartHomeDB")
 	if err != nil {
+		fmt.Printf(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	//fmt.Printf("Light:", lights)
+	// Remove the problematic line fmt.Printf("Logs:", logs)
+
 	c.JSON(http.StatusOK, logs)
 }
 

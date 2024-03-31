@@ -18,7 +18,7 @@ const Security = () => {
     const [dashboardMessage, setDashboardMessage] = useState('');
     const [lockStates, setLockStates] = useState({
         '502857': false, // Initial state: off
-        '502858': false, // Initial state: off
+        //'502858': false, // Initial state: off
     });
     // States for each device
     const [deviceData, setDeviceData] = useState({
@@ -37,14 +37,17 @@ const Security = () => {
         Object.keys(lockStates).forEach(uuid => {
             handleToggleLock(uuid);
         });
+        setIsLocked(!isLocked);
     };
+
+
     // Add a function to handle selecting a room:
     const selectRoom = (roomName) => {
         setSelectedRoom(roomName);
     };
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         const url = 'http://localhost:8081/security';
 
         fetch(url, {
@@ -61,7 +64,7 @@ const Security = () => {
                 const updatedDeviceData = {...deviceData};
                 Object.keys(updatedDeviceData).forEach(device => {
                     if (data[device]) {
-                        localStorage.setItem(device, JSON.stringify(data[device]));
+                        sessionStorage.setItem(device, JSON.stringify(data[device]));
                         updatedDeviceData[device] = data[device];
                     }
                 });
@@ -95,11 +98,13 @@ const Security = () => {
             change: isLocking ? "true" : "false",
         };
 
-        axios.post(serverUrl, requestBody, {
+        fetch(serverUrl, {
+            method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
-            }
+            },
+            body: JSON.stringify(requestBody),
         })
             .then(response => {
                 if (response.status >= 200 && response.status < 300) {

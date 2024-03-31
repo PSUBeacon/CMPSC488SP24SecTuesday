@@ -19,14 +19,15 @@ const Appliances = () => {
 
 
     // URL of the API you want to fetch from
-    const apiUrl = 'https://localhost:8081/Appliances'
+    const apiUrl = 'https://localhost:8081/appliances'
 
-// Use fetch to get the data from the API
+    // Use fetch to get the data from the API
     async function logAppliances() {
         const response = await fetch(apiUrl);
-        const movies = await response.json();
-        console.log();
+        const appliances = await response.json();
+        console.log(appliances);
     }
+
 
     const [dishwasher, setDishwasher] = useState([
         {

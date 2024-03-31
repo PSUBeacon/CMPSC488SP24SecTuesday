@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	// Open and map memory to access GPIO, check for errors
+	// Open and map memory to access GPIO, check for error
 	if err := rpio.Open(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)

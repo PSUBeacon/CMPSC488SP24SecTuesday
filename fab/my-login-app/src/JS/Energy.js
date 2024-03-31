@@ -17,6 +17,7 @@ import {
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
+
 // Define the Dashboard component using a functional component pattern
 const Energy = () => {
     const [accountType, setAccountType] = useState('');
@@ -25,67 +26,38 @@ const Energy = () => {
     const [user, setUser] = useState(null);
     const [error, setError] = useState('');
 
-    const energy = [
-        {Device: 'Microwave', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF'},
-        {Device: 'Oven', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF'},
-        {Device: 'Fridge', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF'},
-        {Device: 'Freezer', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF'},
-        {Device: 'Toaster', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF'},
-        {Device: 'Dishwasher', NetlossEnergy: '%', NetgainEnergy: '%', Battery: '%', Status: 'ON/OFF'},
-
-    ];
-
-    {/*solar panel statistics table*/
-    }
-    const solarPanel = [
-        {TotalEnergy: 'KW', EnergyUsedToday: 'KW'},
-        {TotalEnergy: 'KW', EnergyUsedToday: 'KW'},
-
-    ];
 
     const handleGoToAppliances = () => {
         navigate('/appliances'); // Adjust the route as necessary
     };
 
-    // Object that holds the URLs for your camera feeds
-    const cameraFeeds = {
-        livingroom: placeholderImage, // Replace with the actual camera feed URL or image for the living room
-        kitchen: placeholderImage2, // Replace with the actual camera feed URL or image for the kitchen
-        // Add more camera feeds as needed
-    };
+    const [data, setData] = useState({});
 
     useEffect(() => {
         const token = sessionStorage.getItem('token');
-        const url = 'http://localhost:8081/energy';
-
         if (!token) {
-            navigate('/'); // Redirect to login page if token is not present
+            navigate('/');
             return;
-        }
-
-        fetch(url, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            },
-        })
-            .then(response => response.json())
-            .then(response => {
-                if (response && response.data) {
-                    setUser(response.data.user);
-                    setAccountType(response.data.accountType);
-                    sessionStorage.setItem('accountType', response.data.accountType);
-                } else {
-                    setError('Unexpected response from server');
+            }
+            const fetchData = async () => {
+            try {
+                    const response = await fetch('http://localhost:8081/energy', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                    'Content-Type': 'application/json',
+                                },
+                        body: JSON.stringify({}),
+                        });
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    const jsonData = await response.json();
+                    setData(jsonData);
+                } catch (error) {
+                    console.error('Failed to fetch data:', error);
                 }
-            })
-            .catch(error => {
-                console.log('Fetch operation error:', error)
-            });
-
-
-    }, [navigate]);
+            };
+            fetchData();
+            }, [navigate]);
 
     // This is the JSX return statement where we lay out our component's HTML structure
     return (
@@ -101,68 +73,39 @@ const Energy = () => {
                     alignItems: 'center',
                     backgroundColor: '#0E2237'
                 }}>
-                    <h2 style={{color: 'white'}}>Devices Using Energy</h2>
-                    <Table striped bordered hover variant="dark"
-                           style={{marginTop: '20px', backgroundColor: "#173350"}}>
-                        <thead>
+                <h2 style={{color: 'white'}}>Devices Energy Usage</h2>
+                {Object.keys(data).length > 0 ? Object.entries(data).map(([key, appliances]) => (
+                    <div key={key} style={{alignItems: 'center', width: '70%'}}>
+                            <h3>{key}</h3>
+                            <Table striped bordered hover variant="dark"
+                       style={{marginTop: '20px', backgroundColor: "#173350"}}>
+                    <thead>
                         <tr>
-                            <th>
-                                Device
-                                <button onClick={handleGoToAppliances} style={{
-                                    marginLeft: '10px',
-                                    padding: '2px 6px',
-                                    fontSize: '0.8em',
-                                    background: '#0294A5',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '4px',
-                                    cursor: 'pointer'
-                                }}>
-                                    See More
-                                </button>
-                            </th>
-                            <th>Net loss Energy</th>
-                            <th>Net Gain Energy</th>
-                            <th>Battery %</th>
+                            <th>Device Name</th>
                             <th>Status</th>
+                            <th>Energy Consumption, kWh</th>
+                            <th>Action</th>
                         </tr>
-                        </thead>
-                        <tbody>
-                        {energy.map((energy, index) => (
-                            <tr key={index}>
-                                <td>{energy.Device}</td>
-                                <td>{energy.NetlossEnergy}</td>
-                                <td>{energy.NetgainEnergy}</td>
-                                <td>{energy.Battery}</td>
-                                <td>{energy.Status}</td>
+                    </thead>
+                    <tbody>
+                    {appliances.map((appliance, index) => (
+                        <tr key={index}>
+                                <td style={{width: '25%'}}>{key} - {appliance.Location}</td> {/* NEED TO USE DEVICE NAME-LABEL */}
+                                <td style={{width: '25%'}}>{appliance.Status ? "On" : "Off"}</td>
+                                <td style={{width: '25%'}}>{appliance.EnergyConsumption}</td>
+                                <td style={{width: '25%'}}>
+                                    {/* Implement actual toggle functionality as needed */}
+                                    <button onClick={() => console.log('Toggle', appliance.UUID)}>
+                                        Turn On/Off
+                                    </button>
+                                </td>
                             </tr>
                         ))}
-                        </tbody>
-                    </Table>
-
-                    {/*this is the table for the solar panel content*/}
-                    <h2 style={{color: 'white'}}>Solar Panel Statistics</h2>
-                    <Table striped bordered hover variant="dark"
-                           style={{marginTop: '20px', backgroundColor: "#173350"}}>
-                        <thead>
-                        <tr>
-                            <th>Total Energy</th>
-                            <th>Energy Used Today</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {solarPanel.map((solarPanel, index) => (
-                            <tr key={index}>
-
-                                <td>{solarPanel.TotalEnergy}</td>
-                                <td>{solarPanel.EnergyUsedToday}</td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </Table>
-
+                    </tbody>
+                </Table>
+            </div>
+            )) : <p>Loading...</p>}
                 </main>
-
             </div>
         </div>
     );

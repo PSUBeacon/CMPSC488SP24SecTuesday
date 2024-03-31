@@ -77,9 +77,6 @@ const Appliances = () => {
                     backgroundColor: '#0E2237'
                 }}>
                     <h2 style={{color: 'white'}}>Appliances</h2>
-                    <div style={{alignSelf: 'flex-start', width: '100%'}}>
-                        <h3 style={{color: 'white', marginLeft: '1rem'}}>Dishwasher</h3>
-                    </div>
                     {Object.keys(data).length > 0 ? (
                         Object.entries(data).map(([key, appliances]) => (
                                 <div key={key} style={{alignItems: 'center', width: '70%', marginTop: '20px'}}>

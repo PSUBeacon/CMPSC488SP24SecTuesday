@@ -16,59 +16,67 @@ import Sidebar from "../components/Sidebar";
 
 // Define the Dashboard component using a functional component pattern
 const Networking = () => {
-
-    const navigate = useNavigate(); // Instantiate useNavigate hook
     const [isAccountPopupVisible, setIsAccountPopupVisible] = useState(false);
     const [isNavVisible, setIsNavVisible] = useState(false);
     const [dashboardMessage, setDashboardMessage] = useState('');
     const [accountType, setAccountType] = useState('')
     const [user, setUser] = useState(null);
     const [error, setError] = useState('');
-    // States for each device
-    const [deviceData, setDeviceData] = useState({
-        HVAC: {},
-        Dishwasher: {},
-        Fridge: {},
-        Lighting: {},
-        Microwave: {},
-        Oven: {},
-        SecuritySystem: {},
-        SolarPanel: {},
-        Toaster: {},
-    });
-
+    const [Logs, setLogs] = useState([]);
     const [currentView, setCurrentView] = useState('iotLogs'); // New state to track current view
-
-    // Define your IoT Logs data similar to how you have solarPanel data
-    const iotLogs = [
-        {Time: '00:00', Activity: 'Light Turned On', User: 'x'},
-        {Time: '00:00', Activity: 'Light Turned Off', User: 'x'},
-        {Time: '00:00', Activity: 'Light Turned Off', User: 'x'},
-        {Time: '00:00', Activity: 'Light Turned Off', User: 'x'},
-        {Time: '00:00', Activity: 'Light Turned Off', User: 'x'},
-        // Add more IoT device log entries as needed
-    ];
-// Function to change view
+    // Function to change view
     const changeView = (view) => {
         setCurrentView(view);
     };
+    const navigate = useNavigate(); // Instantiate useNavigate hook
+    // Define your IoT Logs data similar to how you have solarPanel data
+    const iotLogs = [];
+    const token = sessionStorage.getItem('token');
+    const url = "http://localhost:8081/networking/GetNetLogs";
+
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Store the fetched data into networkLogs
+            iotLogs.push(...data);
+            setLogs(data)
+            console.log('IOT logs:', iotLogs); // You can process or log the data here
+        })
+        .catch(error => {
+            // Handle errors
+            console.error('Error fetching logs:', error);
+        });
+
     const iotLogsTable = (
         <div>
             <h2 style={{color: '#173350'}}>IOT Logs</h2>
             <Table striped bordered hover variant="dark" style={{marginTop: '20px', backgroundColor: "#173350"}}>
                 <thead>
                 <tr>
+                    <th>DeviceID</th>
+                    <th>Function</th>
+                    <th>Change</th>
                     <th>Time</th>
-                    <th>Activity</th>
-                    <th>User</th>
                 </tr>
                 </thead>
                 <tbody>
                 {iotLogs.map((log, index) => (
                     <tr key={index}>
+                        <td>{log.DeviceID}</td>
+                        <td>{log.Function}</td>
+                        <td>{log.Change}</td>
                         <td>{log.Time}</td>
-                        <td>{log.Activity}</td>
-                        <td>{log.User}</td>
                     </tr>
                 ))}
                 </tbody>
@@ -108,37 +116,6 @@ const Networking = () => {
         </div>
     );
 
-    useEffect(() => {
-        const token = sessionStorage.getItem('token');
-        const url = 'http://localhost:8081/networking';
-
-        fetch(url, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            },
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-                // Update state for each device if present in response
-                const updatedDeviceData = {...deviceData};
-                Object.keys(updatedDeviceData).forEach(device => {
-                    if (data[device]) {
-                        sessionStorage.setItem(device, JSON.stringify(data[device]));
-                        updatedDeviceData[device] = data[device];
-                    }
-                });
-                setDeviceData(updatedDeviceData);
-                setDashboardMessage(data.message);
-
-                // Store accountType in session storage
-                setAccountType(data.accountType);
-                sessionStorage.setItem('accountType', data.accountType);
-            })
-            .catch(error => console.error('Fetch operation error:', error));
-    }, []);
 
     const [cameraView, setCameraView] = useState('livingroom'); // Default camera view
 

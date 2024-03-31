@@ -17,6 +17,17 @@ const Appliances = () => {
     const [user, setUser] = useState(null);
     const [isNavVisible, setIsNavVisible] = useState(false);
 
+
+    // URL of the API you want to fetch from
+    const apiUrl = 'https://localhost:8081/Appliances'
+
+// Use fetch to get the data from the API
+    async function logAppliances() {
+        const response = await fetch(apiUrl);
+        const movies = await response.json();
+        console.log();
+    }
+
     const [dishwasher, setDishwasher] = useState([
         {
             Device: "Dishwasher",
@@ -35,6 +46,7 @@ const Appliances = () => {
             WashTime: "00:00"
         },
     ]);
+
 
     //this const is also for the freezer
     const [fridge, setFridge] = useState([ // <-- Initialize fridge state and setter
@@ -75,18 +87,6 @@ const Appliances = () => {
             EnergySavingMode: "KW"
         },
     ]);
-
-    const [hvac, setHvac] = useState([
-        {Device: "HVAC", Name: "N/A", Location: 'N/A', Status: 'ON', LastUsed: 'MM/DD/YY 00:00'},
-        {Device: "HVAC", Name: "N/A", Location: 'N/A', Status: 'ON', LastUsed: 'MM/DD/YY 00:00'},
-    ]);
-
-
-    const [lighting, setLighting] = useState([
-        {Device: "Lighting", Name: "N/A", Location: 'N/A', Status: 'ON', LastUsed: 'MM/DD/YY 00:00'},
-        {Device: "Lighting", Name: "N/A", Location: 'N/A', Status: 'ON', LastUsed: 'MM/DD/YY 00:00'},
-    ]);
-
 
     const [microwave, setMicrowave] = useState([
         {
@@ -287,92 +287,6 @@ const Appliances = () => {
                                 <td>{fridgeItem.LastUsed}</td>
                                 <td>{fridgeItem.Temp}</td>
                                 <td>{fridgeItem.EnergySavingMode}</td>
-                            </tr>
-                        ))}
-
-                        </tbody>
-                    </Table>
-
-                    {/*hvac table*/}
-                    <div style={{alignSelf: 'flex-start', width: '100%'}}>
-                        <h3 style={{color: 'white', marginLeft: '1rem', marginTop: '10px'}}>HVAC</h3>
-                    </div>
-                    <Table striped bordered hover variant="dark"
-                           style={{marginTop: '20px', backgroundColor: "#173350"}}>
-                        <thead>
-                        <tr>
-                            <th>Device</th>
-                            <th>Name</th>
-                            <th>Location</th>
-                            <th>Status</th>
-                            <th>Last Used</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {hvac.map((hvacItem, index) => (
-                            <tr key={index}>
-                                <td>{hvacItem.Device}</td>
-                                <td>{hvacItem.Name}</td>
-                                <td>{hvacItem.Location}</td>
-                                {/* Replace the current display of "Status" with a button */}
-                                <td>
-                                    <button
-                                        onClick={() => {
-                                            const updatedHvac = [...hvac];
-                                            updatedHvac[index] = {
-                                                ...hvacItem,
-                                                Status: hvacItem.Status === 'ON' ? 'OFF' : 'ON'
-                                            };
-                                            setHvac(updatedHvac);
-                                        }}
-                                    >
-                                        {hvacItem.Status}
-                                    </button>
-                                </td>
-                                <td>{hvacItem.LastUsed}</td>
-                            </tr>
-                        ))}
-
-                        </tbody>
-                    </Table>
-
-                    {/*Lighting table*/}
-                    <div style={{alignSelf: 'flex-start', width: '100%'}}>
-                        <h3 style={{color: 'white', marginLeft: '1rem', marginTop: '10px'}}>Lighting</h3>
-                    </div>
-                    <Table striped bordered hover variant="dark"
-                           style={{marginTop: '20px', backgroundColor: "#173350"}}>
-                        <thead>
-                        <tr>
-                            <th>Device</th>
-                            <th>Name</th>
-                            <th>Location</th>
-                            <th>Status</th>
-                            <th>Last Used</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {lighting.map((lightingItem, index) => (
-                            <tr key={index}>
-                                <td>{lightingItem.Device}</td>
-                                <td>{lightingItem.Name}</td>
-                                <td>{lightingItem.Location}</td>
-                                {/* Replace the current display of "Status" with a button */}
-                                <td>
-                                    <button
-                                        onClick={() => {
-                                            const updatedLighting = [...lighting];
-                                            updatedLighting[index] = {
-                                                ...lightingItem,
-                                                Status: lightingItem.Status === 'ON' ? 'OFF' : 'ON'
-                                            };
-                                            setLighting(updatedLighting);
-                                        }}
-                                    >
-                                        {lightingItem.Status}
-                                    </button>
-                                </td>
-                                <td>{lightingItem.LastUsed}</td>
                             </tr>
                         ))}
 

@@ -42,6 +42,7 @@ func ConnectToMongoDB() (*mongo.Client, error) {
 // IOT Structure to fit system info
 type Dishwasher struct {
 	UUID              string    `json:"UUID"`
+	Location          string    `json:"Location"`
 	Status            string    `json:"Status"`
 	WashTime          int       `json:"WashTime"`
 	TimerStopTime     time.Time `json:"TimerStopTime"`
@@ -51,6 +52,7 @@ type Dishwasher struct {
 
 type Fridge struct {
 	UUID                string    `json:"UUID"`
+	Location            string    `json:"Location"`
 	Status              string    `json:"Status"`
 	TemperatureSettings int       `json:"TemperatureSettings"`
 	EnergyConsumption   int       `json:"EnergyConsumption"`
@@ -81,6 +83,7 @@ type Lighting struct {
 
 type Microwave struct {
 	UUID              string    `json:"UUID"`
+	Location          string    `json:"Location"`
 	Status            string    `json:"Status"`
 	Power             int       `json:"Power"`
 	TimerStopTime     time.Time `json:"TimerStopTime"`
@@ -90,6 +93,7 @@ type Microwave struct {
 
 type Oven struct {
 	UUID                string    `json:"UUID"`
+	Location            string    `json:"Location"`
 	Status              string    `json:"Status"`
 	TemperatureSettings int       `json:"TemperatureSettings"`
 	TimerStopTime       time.Time `json:"TimerStopTime"`
@@ -100,13 +104,16 @@ type Oven struct {
 type SecuritySystem struct {
 	UUID              string    `json:"UUID"`
 	Location          string    `json:"Location"`
+	SensorType        string    `json:"SensorType"`
 	Status            string    `json:"Status"`
+	LockStatus        string    `json:"LockStatus"`
 	EnergyConsumption int       `json:"EnergyConsumption"`
 	LastTriggered     time.Time `json:"LastTriggered"`
 }
 
 type SolarPanel struct {
 	UUID                 string    `json:"UUID"`
+	Location             string    `json:"Location"`
 	PanelID              string    `json:"PanelID"`
 	Status               string    `json:"Status"`
 	EnergyGeneratedToday int       `json:"EnergyGeneratedToday"`
@@ -116,6 +123,7 @@ type SolarPanel struct {
 
 type Toaster struct {
 	UUID                string    `json:"UUID"`
+	Location            string    `json:"Location"`
 	Status              string    `json:"Status"`
 	TemperatureSettings int       `json:"TemperatureSettings"`
 	TimerStopTime       time.Time `json:"TimerStopTime"`
@@ -124,9 +132,11 @@ type Toaster struct {
 }
 
 type User struct {
-	Username string `json:"Username"`
-	Password string `json:"Password"`
-	Role     string `json:"Role"`
+	Username  string `json:"Username"`
+	Password  string `json:"Password"`
+	FirstName string `json:"FirstName"`
+	LastName  string `json:"LastName"`
+	Role      string `json:"Role"`
 }
 
 type SmartHomeDB struct {
@@ -143,16 +153,21 @@ type SmartHomeDB struct {
 }
 
 type UUIDsConfig struct {
-	LightingUUIDs   []string
-	HvacUUIDs       []string
-	SecurityUUIDs   []string
-	AppliancesUUIDs []string
-	EnergyUUIDs     []string
+	LightingUUIDs   []Pi
+	HvacUUIDs       []Pi
+	SecurityUUIDs   []Pi
+	AppliancesUUIDs []Pi
+	EnergyUUIDs     []Pi
 }
 
 type Pi struct {
 	Pinum int    `json:"Pinum"`
 	UUID  string `json:"UUID"`
+}
+
+type Ping struct {
+	Pinum   int    `json:"Pinum"`
+	Message string `json:"Message"`
 }
 
 type MessagingStruct struct {
@@ -168,6 +183,10 @@ type LoggingStruct struct {
 	Function string    `json:"Function"`
 	Change   string    `json:"Change"`
 	Time     time.Time `json:"Time"`
+}
+
+type LoggingALL struct {
+	Logs []LoggingStruct
 }
 
 func FetchCollections(client *mongo.Client, dbName string) (*SmartHomeDB, error) {
@@ -276,6 +295,43 @@ func FetchLights(client *mongo.Client, dbName string, roomName string) ([]Lighti
 	return lights, nil
 }
 
+//func FetchHVAC(client *mongo.Client, dbName string) ([]HVAC, error) {
+//	collection := client.Database(dbName).Collection("HVAC")
+//
+//	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+//	defer cancel()
+//
+//}
+
+func FetchSecurity(client *mongo.Client, dbName string) ([]SecuritySystem, error) {
+	collection := client.Database(dbName).Collection("SecuritySystem")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	cursor, err := collection.Find(ctx, bson.M{})
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var security []SecuritySystem
+	for cursor.Next(ctx) {
+		var s SecuritySystem
+		err := cursor.Decode(&s)
+		if err != nil {
+			return nil, err
+		}
+		security = append(security, s)
+	}
+
+	if err := cursor.Err(); err != nil {
+		return nil, err
+	}
+	fmt.Println("Security from DB: ", security)
+	return security, nil
+}
+
 func UpdateMessaging(client *mongo.Client, UUID []byte, name string, apptype string, function string, change string) {
 	var messageRequest MessagingStruct
 	messageRequest.UUID = string(UUID)
@@ -284,11 +340,11 @@ func UpdateMessaging(client *mongo.Client, UUID []byte, name string, apptype str
 	messageRequest.Function = function
 	messageRequest.Change = change
 	message, err := json.Marshal(messageRequest)
+	fmt.Println("message is:", message)
 	if err != nil {
 		fmt.Printf("Error marshaling JSON message: %v", err)
 		return
 	}
-	fmt.Println("message is:", message)
 	messaging.BroadCastMessage(message)
 
 	var logg LoggingStruct
@@ -336,6 +392,35 @@ func UpdateMessaging(client *mongo.Client, UUID []byte, name string, apptype str
 	_, err = Logging.InsertOne(context.Background(), logg)
 
 	return
+}
+
+func FetchLogging(client *mongo.Client) ([]LoggingStruct, error) {
+	collection := client.Database(dbName).Collection("Logging")
+
+	filter := bson.M{}
+
+	var logs []LoggingStruct
+	cursor, err := collection.Find(context.TODO(), filter)
+	if err != nil {
+		// Some error occurred
+		return nil, err
+	}
+
+	for cursor.Next(context.TODO()) {
+		var logging LoggingStruct
+		if err := cursor.Decode(&logging); err != nil {
+			// Error decoding the document
+			return nil, err
+		}
+		logs = append(logs, logging)
+	}
+
+	if err := cursor.Err(); err != nil {
+		// Some error occurred during iteration
+		return nil, err
+	}
+
+	return logs, nil
 }
 
 //func PrintSmartHomeDBContents(smartHomeDB *SmartHomeDB) string {

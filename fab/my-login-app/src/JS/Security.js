@@ -6,6 +6,7 @@ import doorLockIcon from '../img/doorLockIcon.png';
 import '../CSS/Security.css';
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar"; // Import your CSS file here
+import axios from "axios";
 
 const Security = () => {
     const navigate = useNavigate(); // Instantiate useNavigate hook
@@ -15,7 +16,10 @@ const Security = () => {
     const [isLocked, setIsLocked] = useState(false); //need this for the toggle and also the two lines below
     const [selectedRoom, setSelectedRoom] = useState(null);
     const [dashboardMessage, setDashboardMessage] = useState('');
-
+    const [lockStates, setLockStates] = useState({
+        '502857': false, // Initial state: off
+        '502858': false, // Initial state: off
+    });
     // States for each device
     const [deviceData, setDeviceData] = useState({
         HVAC: {},
@@ -30,7 +34,9 @@ const Security = () => {
     });
 
     const toggleLock = () => {
-        setIsLocked(!isLocked);
+        Object.keys(lockStates).forEach(uuid => {
+            handleToggleLock(uuid);
+        });
     };
     // Add a function to handle selecting a room:
     const selectRoom = (roomName) => {
@@ -39,7 +45,7 @@ const Security = () => {
 
     useEffect(() => {
         const token = localStorage.getItem('token');
-        const url = 'http://localhost:8081/dashboard';
+        const url = 'http://localhost:8081/security';
 
         fetch(url, {
             method: 'GET',
@@ -69,7 +75,49 @@ const Security = () => {
             .catch(error => console.error('Fetch operation error:', error));
     }, []);
 
-    // This is the JSX return statement where we layout our component's HTML structure
+    const handleToggleLock = (uuid) => {
+        const isLocking = !lockStates[uuid];
+        setLockStates(prevStates => ({...prevStates, [uuid]: isLocking}));
+
+        const token = sessionStorage.getItem('token');
+        if (!token) {
+            console.error("Authorization token not found.");
+            return;
+        }
+
+        const serverUrl = 'http://localhost:8081/security';
+        // Prepare the request body
+        const requestBody = {
+            uuid: uuid,
+            name: "SecuritySystem",
+            apptype: "Security",
+            function: "Status",
+            change: isLocking ? "true" : "false",
+        };
+
+        axios.post(serverUrl, requestBody, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response => {
+                if (response.status >= 200 && response.status < 300) {
+                    console.log(`Lock ${isLocking ? 'locked' : 'unlocked'} successfully:`, response.data);
+                } else {
+                    console.error(`Failed to toggle the lock ${isLocking ? 'locked' : 'unlocked'} with status:`, response.status);
+                }
+            })
+            .catch(error => {
+                console.error(`There was an error toggling the lock ${isLocking ? 'locked' : 'unlocked'}:`, error);
+            });
+
+        setTimeout(() => {
+            console.log(`Lock ${uuid} has been ${isLocking ? 'locked' : 'unlocked'}.`);
+        }, 1000);
+    };
+
+    // This is the JSX return statement where we lay out our component's HTML structure
     return (
         <div style={{display: 'flex', minHeight: '100vh', flexDirection: 'column', backgroundColor: '#081624'}}>
             <Header accountType={accountType}/>
@@ -95,29 +143,29 @@ const Security = () => {
                             width: '100%',
                             flexWrap: 'wrap'
                         }}>
-                            {/* Room Selection */}
-                            <div className="roomSelection"
-                                 style={{flexBasis: '100%', maxWidth: '300px', margin: '0 auto'}}>
-                                <h3 className="centered-title">Selecting a Door</h3>
-                                <div className="roomCards" style={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    padding: '0px'
-                                }}>
-                                    {/* Room cards */}
-                                    <div className={selectedRoom === "Room 1" ? "card selected" : "card"}
-                                         onClick={() => selectRoom("Room 1")}
-                                         style={{marginBottom: '20px', width: '100%'}}>
-                                        <img className="image" src={bedroomIcon} alt="Room 1"/>
-                                    </div>
-                                    <div className={selectedRoom === "Room 2" ? "card selected" : "card"}
-                                         onClick={() => selectRoom("Room 2")}
-                                         style={{marginBottom: '20px', width: '100%'}}>
-                                        <img className="image" src={bedroomIcon} alt="Room 2"/>
-                                    </div>
-                                </div>
-                            </div>
+                            {/*/!* Room Selection *!/*/}
+                            {/*<div className="roomSelection"*/}
+                            {/*     style={{flexBasis: '100%', maxWidth: '300px', margin: '0 auto'}}>*/}
+                            {/*    <h3 className="centered-title">Selecting a Door</h3>*/}
+                            {/*    <div className="roomCards" style={{*/}
+                            {/*        display: 'flex',*/}
+                            {/*        flexDirection: 'column',*/}
+                            {/*        alignItems: 'center',*/}
+                            {/*        padding: '0px'*/}
+                            {/*    }}>*/}
+                            {/*        /!* Room cards *!/*/}
+                            {/*        <div className={selectedRoom === "Room 1" ? "card selected" : "card"}*/}
+                            {/*             onClick={() => selectRoom("Room 1")}*/}
+                            {/*             style={{marginBottom: '20px', width: '100%'}}>*/}
+                            {/*            <img className="image" src={bedroomIcon} alt="Room 1"/>*/}
+                            {/*        </div>*/}
+                            {/*        <div className={selectedRoom === "Room 2" ? "card selected" : "card"}*/}
+                            {/*             onClick={() => selectRoom("Room 2")}*/}
+                            {/*             style={{marginBottom: '20px', width: '100%'}}>*/}
+                            {/*            <img className="image" src={bedroomIcon} alt="Room 2"/>*/}
+                            {/*        </div>*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
 
 
                             {/* Light Selection */}

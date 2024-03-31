@@ -242,7 +242,7 @@ func handleFunctionality() {
 
 	var messageData dal.MessagingStruct
 	var UUIDsData dal.UUIDsConfig
-
+	fmt.Println(messageData)
 	err = json.Unmarshal([]byte(latestBlockData), &messageData)
 
 	jsonconfigData, err := os.ReadFile("config.json")
@@ -251,9 +251,7 @@ func handleFunctionality() {
 	if err != nil {
 		panic(err)
 	}
-
 	messageChange, _ := strconv.Atoi(messageData.Change)
-
 	if messageData.Name == "Lighting" {
 		for _, group := range [][]dal.Pi{UUIDsData.LightingUUIDs} {
 			for _, Pi := range group {
@@ -273,7 +271,6 @@ func handleFunctionality() {
 			}
 		}
 	}
-
 	if messageData.Name == "HVAC" {
 		for _, group := range [][]dal.Pi{UUIDsData.HvacUUIDs} {
 			for _, Pi := range group {
@@ -309,12 +306,10 @@ func handleFunctionality() {
 							security.UpdateAlarmStatus(true)
 						}
 					}
-					//make this handle locks as well
 				}
 			}
 		}
 	}
-
 	if messageData.Name == "Appliances" {
 		for _, group := range [][]dal.Pi{UUIDsData.AppliancesUUIDs} {
 			for _, Pi := range group {
@@ -351,7 +346,6 @@ func handleFunctionality() {
 			}
 		}
 	}
-
 	if messageData.Name == "Energy" {
 		for _, group := range [][]dal.Pi{UUIDsData.EnergyUUIDs} {
 			for _, Pi := range group {
@@ -362,10 +356,10 @@ func handleFunctionality() {
 				}
 			}
 		}
-		return
+
 	}
 }
 
 func main() {
-	BlockReceiver()
+	go BlockReceiver()
 }

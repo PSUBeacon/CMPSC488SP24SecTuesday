@@ -22,6 +22,8 @@ const HVAC = () => {
         Toaster: {},
     });
     const navigate = useNavigate(); // Instantiate useNavigate hook
+    const [user, setUser] = useState(null);
+    const [error, setError] = useState('');
     const [dashboardMessage, setDashboardMessage] = useState('');
     const [isNavVisible, setIsNavVisible] = useState(false);
     const [accountType, setAccountType] = useState('')
@@ -83,8 +85,13 @@ const HVAC = () => {
     };
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        const url = 'http://localhost:8081/dashboard';
+        const token = sessionStorage.getItem('token');
+        const url = 'http://localhost:8081/hvac';
+
+        if (!token) {
+            navigate('/'); // Redirect to login page if token is not present
+            return;
+        }
 
         fetch(url, {
             method: 'GET',
@@ -94,25 +101,21 @@ const HVAC = () => {
             },
         })
             .then(response => response.json())
-            .then(data => {
-                console.log(data);
-                // Update state for each device if present in response
-                const updatedDeviceData = {...deviceData};
-                Object.keys(updatedDeviceData).forEach(device => {
-                    if (data[device]) {
-                        localStorage.setItem(device, JSON.stringify(data[device]));
-                        updatedDeviceData[device] = data[device];
-                    }
-                });
-                setDeviceData(updatedDeviceData);
-                setDashboardMessage(data.message);
-
-                // Store accountType in session storage
-                setAccountType(data.accountType);
-                sessionStorage.setItem('accountType', data.accountType);
+            .then(response => {
+                if (response && response.data) {
+                    setUser(response.data.user);
+                    setAccountType(response.data.accountType);
+                    sessionStorage.setItem('accountType', response.data.accountType);
+                } else {
+                    setError('Unexpected response from server');
+                }
             })
-            .catch(error => console.error('Fetch operation error:', error));
-    }, []);
+            .catch(error => {
+                console.log('Fetch operation error:', error)
+            });
+
+
+    }, [navigate]);
 
     // Function to update HVAC status in device data
     const updateHVACStatus = (status) => {
@@ -322,7 +325,8 @@ const HVAC = () => {
                             {/* Second Column (Basement Floor) */}
                             {/* Second Column - Mode */}
                             <div>
-                                <h4 style={{textAlign: "center", marginBottom: '20px', color: '#95A4B6'}}>Basement</h4>
+                                <h4 style={{textAlign: "center", marginBottom: '20px', color: '#95A4B6'}}>First
+                                    Floor</h4>
 
                                 <div className="data-item">
                                     <div className="data-icon">

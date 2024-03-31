@@ -48,21 +48,6 @@ func main() {
 			log.Fatalf("Failed to disconnect from MongoDB: %v", er)
 		}
 	}()
-	//
-	//// Create a channel to receive the missingPi array from BlockReceiver
-	//missingPiChan := make(chan []string)
-	//// Run BlockReceiver as a goroutine
-	//go func() {
-	//	// Execute BlockReceiver and send the result to missingPiChan
-	//	missingPi := messaging.BlockReceiver()
-	//	missingPiChan <- missingPi
-	//}()
-	//
-	//// Receive the missingPi array from missingPiChan
-	//missingPi := <-missingPiChan
-	//
-	//// Update the disconnectedPiNums array with the missingPi array
-	//UpdateMissingPi(missingPi)
 
 	r := gin.Default()
 
@@ -92,12 +77,18 @@ func main() {
 
 	// This ones should be protected
 	protectedRoutes.POST("/lighting", updateIoT)
-	protectedRoutes.POST("/hvac", updateIoT)
-	protectedRoutes.POST("/security", updateIoT)
-	protectedRoutes.POST("/appliances", updateIoT)
-	protectedRoutes.POST("/energy", updateIoT)
-	protectedRoutes.POST("/net-events", updateIoT)
+	protectedRoutes.GET("/lighting", GetLights)
 
+	protectedRoutes.POST("/hvac", updateIoT)
+
+	protectedRoutes.POST("/security", updateIoT)
+	protectedRoutes.GET("/security", GetSecurity)
+
+	protectedRoutes.POST("/appliances", updateIoT)
+
+	protectedRoutes.POST("/energy", updateIoT)
+
+	//protectedRoutes.POST("/networking", updateIoT)
 	// use JWT middleware for all protected routes
 	//r.Use(authMiddleware())
 
@@ -113,11 +104,34 @@ func main() {
 		dashboardGroup.GET("/status", statusResp)
 	}
 
-	err := r.Run(":8081")
-	if err != nil {
-		log.Fatal("Server startup error:", err)
+	networkingGroup := r.Group("/networking", dashboardHandler)
+	networkingGroup.Use(authMiddleware())
+	{
+		networkingGroup.GET("/", me)
+		networkingGroup.GET("/GetNetLogs", GetNetLogs)
+		networkingGroup.GET("/status", statusResp)
 	}
 
+	go r.Run(":8081")
+	//if err != nil {
+	//	log.Fatal("Server startup error:", err)
+	//}
+	// Create a channel to receive the missingPi array from BlockReceiver
+	//missingPiChan := make(chan []string)
+	//// Run BlockReceiver as a goroutine
+	//go func() {
+	//	// Execute BlockReceiver and send the result to missingPiChan
+	//	missingPi := messaging.BlockReceiver()
+	//	missingPiChan <- missingPi
+	//}()
+	//
+	//// Receive the missingPi array from missingPiChan
+	//missingPi := <-missingPiChan
+	//
+	////// Update the disconnectedPiNums array with the missingPi array
+	//UpdateMissingPi(missingPi)
+
+	select {}
 }
 
 func updateIoT(c *gin.Context) {
@@ -138,27 +152,44 @@ func updateIoT(c *gin.Context) {
 	jsonconfigData, _ := os.ReadFile("config.json")
 	_ = json.Unmarshal(jsonconfigData, &UUIDsData)
 
-	allPis := [][]dal.Pi{
-		UUIDsData.LightingUUIDs,
-		UUIDsData.HvacUUIDs,
-		UUIDsData.SecurityUUIDs,
-		UUIDsData.AppliancesUUIDs,
-		UUIDsData.EnergyUUIDs,
-	}
+	//allPis := [][]dal.Pi{
+	//	UUIDsData.LightingUUIDs,
+	//	UUIDsData.HvacUUIDs,
+	//	UUIDsData.SecurityUUIDs,
+	//	UUIDsData.AppliancesUUIDs,
+	//	UUIDsData.EnergyUUIDs,
+	//}
 	//UpdateMissingPi(messaging.)
-	foundPi, found := findPiByUUID(allPis, req.UUID)
-	if found {
-		for i := 0; i < len(disconnectedPiNums); i++ {
-			if foundPi.Pinum == disconnectedPiNums[i] {
-				fmt.Println("Pi is disconnected")
-			}
-		}
-	}
-	if !found {
-		dal.UpdateMessaging(client, []byte(req.UUID), req.Name, req.AppType, req.Function, req.Change)
-		c.JSON(http.StatusOK, gin.H{"message": "IOT updated successfully"})
-	}
+	//foundPi, found := findPiByUUID(allPis, req.UUID)
+	//if found {
+	//	for i := 0; i < len(disconnectedPiNums); i++ {
+	//		if foundPi.Pinum == disconnectedPiNums[i] {
+	//			fmt.Println("Pi is disconnected")
+	//		}
+	//	}
+	//}
+	//if !found {
+	//	dal.UpdateMessaging(client, []byte(req.UUID), req.Name, req.AppType, req.Function, req.Change)
+	//	c.JSON(http.StatusOK, gin.H{"message": "IOT updated successfully"})
+	//}
+	dal.UpdateMessaging(client, []byte(req.UUID), req.Name, req.AppType, req.Function, req.Change)
 
+}
+
+func GetLights(c *gin.Context) {
+	room := c.Query("roomName")
+	if room == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Room name is required"})
+		return
+	}
+	//fmt.Printf("Room name: %s\n", room)
+	lights, err := dal.FetchLights(client, "smartHomeDB", room)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	//fmt.Printf("Light:", lights)
+	c.JSON(http.StatusOK, lights)
 }
 
 func findPiByUUID(allPis [][]dal.Pi, uuidToFind string) (dal.Pi, bool) {
@@ -391,3 +422,52 @@ func dashboardHandler(c *gin.Context) {
 		c.JSON(http.StatusForbidden, gin.H{"error": "Invalid role or insufficient privileges"})
 	}
 }
+
+//func GetNetLogs(c *gin.Context) {
+//	fetchedLogs, err := dal.FetchLogging(client)
+//
+//	if err != nil {
+//		c.JSON(http.StatusUnauthorized, gin.H{"error": err}) // Use generic error message
+//		return
+//	}
+//
+//	logsJSON, err := json.Marshal(fetchedLogs)
+//	if err != nil {
+//		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to marshal logs to JSON"})
+//		return
+//	}
+//
+//	// Return JSON response
+//	//c.JSON(http.StatusOK, lights)
+//	c.Data(http.StatusOK, "application/json", logsJSON)
+//}
+
+func GetNetLogs(c *gin.Context) {
+
+	logs, err := dal.FetchLogging(client)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	//fmt.Printf("Light:", lights)
+	c.JSON(http.StatusOK, logs)
+}
+
+//func getHVAC(c *gin.Context) {
+//}
+
+func GetSecurity(c *gin.Context) {
+	security, err := dal.FetchSecurity(client, "smartHomeDB")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, security)
+}
+
+//
+//func GetAppliances(c *gin.Context) {
+//}
+//
+//func GetEnergy(c *gin.Context) {
+//}

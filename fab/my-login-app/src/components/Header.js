@@ -23,7 +23,7 @@ const Header = ({accountType}) => {
 
     // Handles the user sign-out process
     const signOut = () => {
-        localStorage.removeItem('token');
+        sessionStorage.removeItem('token');
         setIsAccountPopupVisible(false); // Close the account popup
         navigate('/'); // Navigate to home or sign-in page
     };

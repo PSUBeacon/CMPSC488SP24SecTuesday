@@ -39,7 +39,7 @@ const Security = () => {
 
     useEffect(() => {
         const token = localStorage.getItem('token');
-        const url = 'http://localhost:8081/dashboard';
+        const url = 'http://localhost:8081/security';
 
         fetch(url, {
             method: 'GET',
@@ -95,29 +95,29 @@ const Security = () => {
                             width: '100%',
                             flexWrap: 'wrap'
                         }}>
-                            {/* Room Selection */}
-                            <div className="roomSelection"
-                                 style={{flexBasis: '100%', maxWidth: '300px', margin: '0 auto'}}>
-                                <h3 className="centered-title">Selecting a Door</h3>
-                                <div className="roomCards" style={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    padding: '0px'
-                                }}>
-                                    {/* Room cards */}
-                                    <div className={selectedRoom === "Room 1" ? "card selected" : "card"}
-                                         onClick={() => selectRoom("Room 1")}
-                                         style={{marginBottom: '20px', width: '100%'}}>
-                                        <img className="image" src={bedroomIcon} alt="Room 1"/>
-                                    </div>
-                                    <div className={selectedRoom === "Room 2" ? "card selected" : "card"}
-                                         onClick={() => selectRoom("Room 2")}
-                                         style={{marginBottom: '20px', width: '100%'}}>
-                                        <img className="image" src={bedroomIcon} alt="Room 2"/>
-                                    </div>
-                                </div>
-                            </div>
+                            {/*/!* Room Selection *!/*/}
+                            {/*<div className="roomSelection"*/}
+                            {/*     style={{flexBasis: '100%', maxWidth: '300px', margin: '0 auto'}}>*/}
+                            {/*    <h3 className="centered-title">Selecting a Door</h3>*/}
+                            {/*    <div className="roomCards" style={{*/}
+                            {/*        display: 'flex',*/}
+                            {/*        flexDirection: 'column',*/}
+                            {/*        alignItems: 'center',*/}
+                            {/*        padding: '0px'*/}
+                            {/*    }}>*/}
+                            {/*        /!* Room cards *!/*/}
+                            {/*        <div className={selectedRoom === "Room 1" ? "card selected" : "card"}*/}
+                            {/*             onClick={() => selectRoom("Room 1")}*/}
+                            {/*             style={{marginBottom: '20px', width: '100%'}}>*/}
+                            {/*            <img className="image" src={bedroomIcon} alt="Room 1"/>*/}
+                            {/*        </div>*/}
+                            {/*        <div className={selectedRoom === "Room 2" ? "card selected" : "card"}*/}
+                            {/*             onClick={() => selectRoom("Room 2")}*/}
+                            {/*             style={{marginBottom: '20px', width: '100%'}}>*/}
+                            {/*            <img className="image" src={bedroomIcon} alt="Room 2"/>*/}
+                            {/*        </div>*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
 
 
                             {/* Light Selection */}

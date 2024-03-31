@@ -143,11 +143,11 @@ type SmartHomeDB struct {
 }
 
 type UUIDsConfig struct {
-	LightingUUIDs   []Pi
-	HvacUUIDs       []Pi
-	SecurityUUIDs   []Pi
-	AppliancesUUIDs []Pi
-	EnergyUUIDs     []Pi
+	LightingUUIDs   []string
+	HvacUUIDs       []string
+	SecurityUUIDs   []string
+	AppliancesUUIDs []string
+	EnergyUUIDs     []string
 }
 
 type Pi struct {
@@ -288,6 +288,7 @@ func UpdateMessaging(client *mongo.Client, UUID []byte, name string, apptype str
 		fmt.Printf("Error marshaling JSON message: %v", err)
 		return
 	}
+	fmt.Println("message is:", message)
 	messaging.BroadCastMessage(message)
 
 	var logg LoggingStruct

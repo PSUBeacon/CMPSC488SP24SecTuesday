@@ -24,6 +24,8 @@ const Dashboard = () => {
     const [isNavVisible, setIsNavVisible] = useState(false);
     const [dashboardMessage, setDashboardMessage] = useState('');
     const [accountType, setAccountType] = useState('')
+    const [user, setUser] = useState(null);
+    const [error, setError] = useState('');
     // States for each device
     const [deviceData, setDeviceData] = useState({
         HVAC: {},
@@ -39,8 +41,13 @@ const Dashboard = () => {
 
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         const url = 'http://localhost:8081/dashboard';
+
+        if (!token) {
+            navigate('/'); // Redirect to login page if token is not present
+            return;
+        }
 
         fetch(url, {
             method: 'GET',
@@ -50,25 +57,21 @@ const Dashboard = () => {
             },
         })
             .then(response => response.json())
-            .then(data => {
-                console.log(data);
-                // Update state for each device if present in response
-                const updatedDeviceData = {...deviceData};
-                Object.keys(updatedDeviceData).forEach(device => {
-                    if (data[device]) {
-                        localStorage.setItem(device, JSON.stringify(data[device]));
-                        updatedDeviceData[device] = data[device];
-                    }
-                });
-                setDeviceData(updatedDeviceData);
-                setDashboardMessage(data.message);
-
-                // Store accountType in session storage
-                setAccountType(data.accountType);
-                sessionStorage.setItem('accountType', data.accountType);
+            .then(response => {
+                if (response && response.data) {
+                    setUser(response.data.user);
+                    setAccountType(response.data.accountType);
+                    sessionStorage.setItem('accountType', response.data.accountType);
+                } else {
+                    setError('Unexpected response from server');
+                }
             })
-            .catch(error => console.error('Fetch operation error:', error));
-    }, []);
+            .catch(error => {
+                console.log('Fetch operation error:', error)
+            });
+
+
+    }, [navigate]);
 
     // Object that holds the URLs for your camera feeds
     const cameraFeeds = {

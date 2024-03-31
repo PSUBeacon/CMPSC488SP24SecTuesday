@@ -153,6 +153,40 @@ const Appliances = () => {
         },
     ]);
 
+    // Protect Endpoint
+    useEffect(() => {
+        const token = sessionStorage.getItem('token');
+        const url = 'http://localhost:8081/appliances';
+
+        if (!token) {
+            navigate('/'); // Redirect to login page if token is not present
+            return;
+        }
+
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(response => response.json())
+            .then(response => {
+                if (response && response.data) {
+                    setUser(response.data.user);
+                    setAccountType(response.data.accountType);
+                    sessionStorage.setItem('accountType', response.data.accountType);
+                } else {
+                    setError('Unexpected response from server');
+                }
+            })
+            .catch(error => {
+                console.log('Fetch operation error:', error)
+            });
+
+
+    }, [navigate]);
+
     // This is the JSX return statement where we layout our component's HTML structure
     return (
         <div style={{display: 'flex', minHeight: '100vh', flexDirection: 'column', backgroundColor: '#081624'}}>

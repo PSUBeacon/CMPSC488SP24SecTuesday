@@ -22,6 +22,8 @@ const Networking = () => {
     const [isNavVisible, setIsNavVisible] = useState(false);
     const [dashboardMessage, setDashboardMessage] = useState('');
     const [accountType, setAccountType] = useState('')
+    const [user, setUser] = useState(null);
+    const [error, setError] = useState('');
     // States for each device
     const [deviceData, setDeviceData] = useState({
         HVAC: {},
@@ -107,8 +109,8 @@ const Networking = () => {
     );
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        const url = 'http://localhost:8081/dashboard';
+        const token = sessionStorage.getItem('token');
+        const url = 'http://localhost:8081/networking';
 
         fetch(url, {
             method: 'GET',
@@ -124,7 +126,7 @@ const Networking = () => {
                 const updatedDeviceData = {...deviceData};
                 Object.keys(updatedDeviceData).forEach(device => {
                     if (data[device]) {
-                        localStorage.setItem(device, JSON.stringify(data[device]));
+                        sessionStorage.setItem(device, JSON.stringify(data[device]));
                         updatedDeviceData[device] = data[device];
                     }
                 });

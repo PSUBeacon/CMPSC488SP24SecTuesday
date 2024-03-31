@@ -43,7 +43,7 @@ func ConnectToMongoDB() (*mongo.Client, error) {
 type Dishwasher struct {
 	UUID              string    `json:"UUID"`
 	Location          string    `json:"Location"`
-	Status            bool      `json:"Status"`
+	Status            string    `json:"Status"`
 	WashTime          int       `json:"WashTime"`
 	TimerStopTime     time.Time `json:"TimerStopTime"`
 	EnergyConsumption int       `json:"EnergyConsumption"`
@@ -53,7 +53,7 @@ type Dishwasher struct {
 type Fridge struct {
 	UUID                string    `json:"UUID"`
 	Location            string    `json:"Location"`
-	Status              bool      `json:"Status"`
+	Status              string    `json:"Status"`
 	TemperatureSettings int       `json:"TemperatureSettings"`
 	EnergyConsumption   int       `json:"EnergyConsumption"`
 	LastChanged         time.Time `json:"LastChanged"`
@@ -66,7 +66,7 @@ type HVAC struct {
 	Temperature       int       `json:"Temperature"`
 	Humidity          int       `json:"Humidity"`
 	FanSpeed          int       `json:"FanSpeed"`
-	Status            bool      `json:"Status"`
+	Status            string    `json:"Status"`
 	Mode              string    `json:"Mode"`
 	EnergyConsumption int       `json:"EnergyConsumption"`
 	LastChanged       time.Time `json:"LastChanged"`
@@ -76,7 +76,7 @@ type Lighting struct {
 	UUID              string    `json:"UUID"`
 	Location          string    `json:"Location"`
 	Brightness        int       `json:"Brightness"`
-	Status            bool      `json:"Status"`
+	Status            string    `json:"Status"`
 	EnergyConsumption int       `json:"EnergyConsumption"`
 	LastChanged       time.Time `json:"LastChanged"`
 }
@@ -84,7 +84,7 @@ type Lighting struct {
 type Microwave struct {
 	UUID              string    `json:"UUID"`
 	Location          string    `json:"Location"`
-	Status            bool      `json:"Status"`
+	Status            string    `json:"Status"`
 	Power             int       `json:"Power"`
 	TimerStopTime     time.Time `json:"TimerStopTime"`
 	EnergyConsumption int       `json:"EnergyConsumption"`
@@ -94,7 +94,7 @@ type Microwave struct {
 type Oven struct {
 	UUID                string    `json:"UUID"`
 	Location            string    `json:"Location"`
-	Status              bool      `json:"Status"`
+	Status              string    `json:"Status"`
 	TemperatureSettings int       `json:"TemperatureSettings"`
 	TimerStopTime       time.Time `json:"TimerStopTime"`
 	EnergyConsumption   int       `json:"EnergyConsumption"`
@@ -105,7 +105,7 @@ type SecuritySystem struct {
 	UUID              string    `json:"UUID"`
 	Location          string    `json:"Location"`
 	SensorType        string    `json:"SensorType"`
-	Status            bool      `json:"Status"`
+	Status            string    `json:"Status"`
 	LockStatus        string    `json:"LockStatus"`
 	EnergyConsumption int       `json:"EnergyConsumption"`
 	LastTriggered     time.Time `json:"LastTriggered"`
@@ -115,7 +115,7 @@ type SolarPanel struct {
 	UUID                 string    `json:"UUID"`
 	Location             string    `json:"Location"`
 	PanelID              string    `json:"PanelID"`
-	Status               bool      `json:"Status"`
+	Status               string    `json:"Status"`
 	EnergyGeneratedToday int       `json:"EnergyGeneratedToday"`
 	PowerOutput          int       `json:"PowerOutput"`
 	LastChanged          time.Time `json:"LastChanged"`
@@ -124,7 +124,7 @@ type SolarPanel struct {
 type Toaster struct {
 	UUID                string    `json:"UUID"`
 	Location            string    `json:"Location"`
-	Status              bool      `json:"Status"`
+	Status              string    `json:"Status"`
 	TemperatureSettings int       `json:"TemperatureSettings"`
 	TimerStopTime       time.Time `json:"TimerStopTime"`
 	EnergyConsumption   int       `json:"EnergyConsumption"`

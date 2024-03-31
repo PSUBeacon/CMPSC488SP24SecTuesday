@@ -84,10 +84,8 @@ func main() {
 	protectedRoutes.POST("/security", updateIoT)
 	protectedRoutes.GET("/security", GetSecurity)
 
-	protectedRoutes.POST("/appliances", updateIoT)
-	protectedRoutes.GET("/appliances", GetAppliances)
-
-	protectedRoutes.POST("/energy", updateIoT)
+	protectedRoutes.POST("/appliances", getAppliancesData)
+	protectedRoutes.POST("/energy", getAppliancesData)
 
 	//protectedRoutes.POST("/networking", updateIoT)
 	// use JWT middleware for all protected routes
@@ -189,25 +187,33 @@ func GetLights(c *gin.Context) {
 	c.JSON(http.StatusOK, lights)
 }
 
-func GetAppliances(c *gin.Context) {
+func getAppliancesData(c *gin.Context) {
+	//var req dal.UpdateLightingRequest
+	var req dal.SmartHomeDB
+	requestBody, _ := ioutil.ReadAll(c.Request.Body)
+	//fmt.Printf("Received request body: %s\n", string(requestBody))
+	// Reset the request body to be able to parse it again
+	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
 
-	appliances, err := dal.FetchCollections(client, "smartHomeDB")
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	if err := c.ShouldBindJSON(&req); err != nil {
+		//fmt.Printf("Error binding JSON: %v\n", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, appliances)
-}
 
-func findPiByUUID(allPis [][]dal.Pi, uuidToFind string) (dal.Pi, bool) {
-	for _, category := range allPis {
-		for _, pi := range category {
-			if pi.UUID == uuidToFind {
-				return pi, true
-			}
-		}
+	// Fetch smart home data
+	smartHomeDB, err := dal.FetchCollections(client, "smartHomeDB")
+	if err != nil {
+		//fmt.Printf("SMDB data error: %s\n", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch smart home data"})
+		return
 	}
-	return dal.Pi{}, false
+
+	//fmt.Printf("%+v\n", smartHomeDB)
+
+	// Respond to the FE request, indicating success.
+	c.JSON(http.StatusOK, smartHomeDB)
+
 }
 
 func statusResp(c *gin.Context) {

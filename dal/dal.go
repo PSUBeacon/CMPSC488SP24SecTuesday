@@ -149,7 +149,7 @@ type SmartHomeDB struct {
 	SecuritySystem []SecuritySystem
 	SolarPanel     []SolarPanel
 	Toaster        []Toaster
-	Users          []User
+	//Users          []User
 }
 
 type Appliances struct {

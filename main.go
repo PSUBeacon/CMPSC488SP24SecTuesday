@@ -251,22 +251,20 @@ func handleFunctionality() {
 	}
 	messageChange, _ := strconv.Atoi(messageData.Change)
 	if messageData.Name == "Lighting" {
-		for _, group := range [][]dal.Pi{UUIDsData.LightingUUIDs} {
-			for _, Pi := range group {
-				if Pi.UUID == messageData.UUID {
-					if messageData.Function == "Status" {
-						if messageData.Change == "false" {
-							fmt.Println("inside the status false")
-							lighting.UpdateStatus(false)
-						}
-						if messageData.Change == "true" {
-							fmt.Println("inside the status false")
-							lighting.UpdateStatus(true)
-						}
+		for _, Pi := range UUIDsData.LightingUUIDs {
+			if Pi.UUID == messageData.UUID {
+				if messageData.Function == "Status" {
+					if messageData.Change == "false" {
+						fmt.Println("inside the status false")
+						lighting.UpdateStatus(false)
 					}
-					if messageData.Function == "Brightness" {
-						lighting.SetBrightness(messageChange)
+					if messageData.Change == "true" {
+						fmt.Println("inside the status false")
+						lighting.UpdateStatus(true)
 					}
+				}
+				if messageData.Function == "Brightness" {
+					lighting.SetBrightness(messageChange)
 				}
 			}
 		}

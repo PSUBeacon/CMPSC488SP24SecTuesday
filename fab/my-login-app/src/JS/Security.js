@@ -16,8 +16,8 @@ const Security = () => {
     const [selectedRoom, setSelectedRoom] = useState(null);
     const [dashboardMessage, setDashboardMessage] = useState('');
     const [lockStates, setLockStates] = useState({
-        '502857': false, // Initial state: off
-        //'502858': false, // Initial state: off
+        '502857': 'locked', // Initial state: off
+        '502858': 'locked', // Initial state: off
     });
     // States for each device
     const [deviceData, setDeviceData] = useState({
@@ -32,11 +32,12 @@ const Security = () => {
         Toaster: {},
     });
 
-    const toggleLock = () => {
-        Object.keys(lockStates).forEach(uuid => {
-            handleToggleLock(uuid);
-        });
-        setIsLocked(!isLocked);
+    const toggleLock = (uuid) => {
+        const newLockState = lockStates[uuid] === 'locked' ? 'unlocked' : 'locked';
+        setLockStates(prevStates => ({
+            ...prevStates,
+            [uuid]: newLockState // Toggle the lock state individually
+        }));
     };
 
     // Add a function to handle selecting a room:
@@ -68,8 +69,6 @@ const Security = () => {
                 });
                 setDeviceData(updatedDeviceData);
                 setDashboardMessage(data.message);
-
-                // Store accountType in session storage
                 setAccountType(data.accountType);
                 sessionStorage.setItem('accountType', data.accountType);
             })
@@ -77,7 +76,7 @@ const Security = () => {
     }, []);
 
     const handleToggleLock = (uuid) => {
-        const isLocking = !lockStates[uuid];
+        const isLocking = lockStates[uuid] === 'locked' ? 'unlocked' : 'locked';
         setLockStates(prevStates => ({...prevStates, [uuid]: isLocking}));
 
         const token = sessionStorage.getItem('token');
@@ -93,7 +92,7 @@ const Security = () => {
             name: "SecuritySystem",
             apptype: "Security",
             function: "Status",
-            change: isLocking ? "true" : "false",
+            change: isLocking,
         };
 
         fetch(serverUrl, {
@@ -106,18 +105,14 @@ const Security = () => {
         })
             .then(response => {
                 if (response.ok) {
-                    console.log(`Lock ${isLocking ? 'unlocked' : 'locked'} successfully:`);
+                    console.log(`Lock ${uuid} has been ${isLocking === 'locked' ? 'locked' : 'unlocked'} successfully.`);
                 } else {
-                    throw new Error(`Failed to toggle the lock ${isLocking ? 'unlocked' : 'locked'} with status: ${response.status}`);
+                    throw new Error(`Failed to toggle the lock ${uuid} to ${isLocking === 'locked' ? 'locked' : 'unlocked'} with status: ${response.status}`);
                 }
             })
             .catch(error => {
-                console.error(`There was an error toggling the lock ${isLocking ? 'unlocked' : 'locked'}:`, error);
+                console.error(`There was an error toggling the lock ${uuid} to ${isLocking === 'locked' ? 'locked' : 'unlocked'}:`, error);
             });
-
-        setTimeout(() => {
-            console.log(`Lock ${uuid} has been ${isLocking ? 'unlocked' : 'locked'}.`);
-        }, 1000);
     };
 
     // This is the JSX return statement where we lay out our component's HTML structure
@@ -142,37 +137,11 @@ const Security = () => {
                             display: 'flex',
                             flexDirection: 'row',
                             justifyContent: 'center',
-                            gap: '20px',
+                            gap: '0px',
                             width: '100%',
                             flexWrap: 'wrap'
                         }}>
-                            {/*/!* Room Selection *!/*/}
-                            {/*<div className="roomSelection"*/}
-                            {/*     style={{flexBasis: '100%', maxWidth: '300px', margin: '0 auto'}}>*/}
-                            {/*    <h3 className="centered-title">Selecting a Door</h3>*/}
-                            {/*    <div className="roomCards" style={{*/}
-                            {/*        display: 'flex',*/}
-                            {/*        flexDirection: 'column',*/}
-                            {/*        alignItems: 'center',*/}
-                            {/*        padding: '0px'*/}
-                            {/*    }}>*/}
-                            {/*        /!* Room cards *!/*/}
-                            {/*        <div className={selectedRoom === "Room 1" ? "card selected" : "card"}*/}
-                            {/*             onClick={() => selectRoom("Room 1")}*/}
-                            {/*             style={{marginBottom: '20px', width: '100%'}}>*/}
-                            {/*            <img className="image" src={bedroomIcon} alt="Room 1"/>*/}
-                            {/*        </div>*/}
-                            {/*        <div className={selectedRoom === "Room 2" ? "card selected" : "card"}*/}
-                            {/*             onClick={() => selectRoom("Room 2")}*/}
-                            {/*             style={{marginBottom: '20px', width: '100%'}}>*/}
-                            {/*            <img className="image" src={bedroomIcon} alt="Room 2"/>*/}
-                            {/*        </div>*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-
-
-                            {/* Light Selection */}
-                            <div className="lightSelection" style={{flexBasis: '48%'}}>
+                            <div className="doorSelection" style={{flexBasis: '48%'}}>
                                 <h3 className="centered-title">Your Lock</h3>
 
                                 <div className="lightCards" style={{
@@ -191,7 +160,34 @@ const Security = () => {
                                         <img className="lockImage" src={doorLockIcon} alt="Lock Icon"/>
                                         {/* Toggle switch with ON/OFF labels */}
                                         <label className="switch">
-                                            <input type="checkbox" checked={isLocked} onChange={toggleLock} />
+                                            <input type="checkbox" checked= {lockStates['502857'] === 'unlocked'} onChange={() => handleToggleLock('502857')}/>
+                                            <span className="slider round"> {isLocked}</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="doorSelection1" style={{flexBasis: '48%'}}>
+                                <h3 className="centered-title">Your Lock</h3>
+
+                                <div className="lightCards" style={{
+                                    display: 'flex',
+                                    flexWrap: 'wrap',
+                                    justifyContent: 'space-around',
+                                    padding: '0px'
+                                }}>
+                                    {/* Lock card */}
+                                    <div className="card" style={{
+                                        width: '100%',
+                                        maxWidth: '300px',
+                                        textAlign: 'center',
+                                        padding: '20px'
+                                    }}>
+                                        <img className="lockImage" src={doorLockIcon} alt="Lock Icon"/>
+                                        {/* Toggle switch with ON/OFF labels */}
+                                        <label className="switch">
+                                            <input type="checkbox" checked= {lockStates['502858'] === 'unlocked'}
+                                                   onChange={() => handleToggleLock('502858')}/>
                                             <span className="slider round"> {isLocked}</span>
                                         </label>
                                     </div>

@@ -246,15 +246,16 @@ func handleFunctionality() {
 	jsonconfigData, err := os.ReadFile("config.json")
 
 	err = json.Unmarshal(jsonconfigData, &UUIDsData)
+	fmt.Println("This is the uuids", UUIDsData)
 	if err != nil {
 		panic(err)
 	}
 	messageChange, _ := strconv.Atoi(messageData.Change)
-	var Pi dal.Pi
+	var raspPi dal.Pi
 	if messageData.Name == "Lighting" {
 		fmt.Println("Got past the name")
-		for Pi = range UUIDsData.LightingUUIDs {
-			if Pi.UUID == messageData.UUID {
+		for raspPi = range UUIDsData.LightingUUIDs {
+			if raspPi.UUID == messageData.UUID {
 				fmt.Println("got past the loop")
 				if messageData.Function == "Status" {
 					if messageData.Change == "false" {

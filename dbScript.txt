@@ -1,0 +1,253 @@
+
+db = db.getSiblingDB('admin');
+
+
+
+
+
+db.createUser({
+
+  user: 'adminDB',
+
+  pwd: '%25R37=LA^ZX', 
+
+  roles: [{ role: 'userAdminAnyDatabase', db: 'admin' }]
+
+});
+
+
+db = db.getSiblingDB('smartHomeDB');
+
+
+db.createCollection('Dishwasher');
+
+db.Dishwasher.insertMany([
+  {
+    UUID: '036821',
+    Location: 'Kitchen',
+    Status: "true",
+    WashTime: 60,
+    TimerStopTime: new ISODate('2024-02-22T17:51:03.043Z'),
+    EnergyConsumption: 3,
+    LastChanged: new ISODate('2024-02-22T17:51:03.043Z')
+  },
+  {
+    UUID: '036822',
+    Location: 'Kitchen',
+    Status: "true",
+    WashTime: 45,
+    TimerStopTime: new ISODate('2024-02-23T17:51:03.043Z'), 
+    EnergyConsumption: 4,
+    LastChanged: new ISODate('2024-02-23T17:51:03.043Z')
+  }
+]);
+
+db.createCollection('Fridge');
+db.Fridge.insertMany([
+  {
+    UUID: '939368',
+    Location: 'Kitchen',
+    Status: "true",
+    TemperatureSettings: 37,
+    EnergyConsumption: 2,
+    LastChanged: new ISODate('2024-02-22T17:47:18.622Z'),
+    EnergySaveMode: false
+  },
+  {
+    UUID: '939369',
+    Location: 'Kitchen',
+    Status: "true",
+    TemperatureSettings: 34,
+    EnergyConsumption: 1,
+    LastChanged: new ISODate('2024-02-23T17:47:18.622Z'),
+    EnergySaveMode: true
+  }
+]);
+
+db.createCollection('HVAC');
+db.HVAC.insertMany([
+  {
+    UUID: '050336',
+    Location: '2nd Floor',
+    Temperature: 70,
+    Humidity: 40,
+    FanSpeed: 2, 
+    Status: "true",
+    Mode: "heat",
+    EnergyConsumption: 8,
+    LastChanged: new ISODate('2024-02-22T17:35:41.213Z')
+  },
+  {
+    UUID: '050337',
+    Location: 'Basement',
+    Temperature: 65,
+    Humidity: 50,
+    FanSpeed: 1,
+    Status: "true",
+    Mode: "cool",
+    EnergyConsumption: 7,
+    LastChanged: new ISODate('2024-02-23T17:35:41.213Z')
+  }
+]);
+
+db.createCollection('Lighting');
+db.Lighting.insertMany([
+  {
+    UUID: '417293',
+    Location: 'Bedroom',
+    Brightness: 50,
+    Status: "true",
+    EnergyConsumption: 5,
+    LastChanged: new ISODate('2024-02-22T17:39:02.938Z')
+  },
+  {
+    UUID: '417294',
+    Location: 'Kitchen',
+    Brightness: 75,
+    Status: "true",
+    EnergyConsumption: 4,
+    LastChanged: new ISODate('2024-02-23T17:39:02.938Z')
+  }
+]);
+
+db.createCollection('Microwave');
+db.Microwave.insertMany([
+  {
+    UUID: '589272',
+    Location: 'Kitchen',
+    Status: "true",
+    Power: 800,
+    TimerStopTime: new ISODate('2024-02-22T17:48:42.830Z'),
+    EnergyConsumption: 1,
+    LastChanged: new ISODate('2024-02-22T17:48:42.830Z')
+  },
+  {
+    UUID: '589273',
+    Location: 'Kitchen',
+    Status: "true",
+    Power: 1000,
+    TimerStopTime: new ISODate('2024-02-23T17:48:42.830Z'),
+    EnergyConsumption: 2,
+    LastChanged: new ISODate('2024-02-23T17:48:42.830Z')
+  }
+]);
+
+db.createCollection('Oven');
+db.Oven.insertMany([
+  {
+    UUID: '947268',
+    Location: 'Kitchen',
+    Status: "true",
+    TemperatureSettings: 350,
+    TimerStopTime: new ISODate('2024-02-22T17:50:14.327Z'),
+    EnergyConsumption: 3,
+    LastChanged: new ISODate('2024-02-22T17:50:14.327Z')
+  },
+  {
+    UUID: '947269',
+    Location: 'Kitchen',
+    Status: "true",
+    TemperatureSettings: 300,
+    TimerStopTime: new ISODate('2024-02-23T17:50:14.327Z'),
+    EnergyConsumption: 4,
+    LastChanged: new ISODate('2024-02-23T17:50:14.327Z')
+  }
+]);
+
+db.createCollection('SecuritySystem');
+db.SecuritySystem.insertMany([
+  {
+    UUID: '502857',
+    Location: 'Back Door',
+    SensorType: 'Motion',
+    Status: "true",
+    LockStatus: "true",
+    EnergyConsumption: 10,
+    LastTriggered: new ISODate('2024-02-22T17:42:36.207Z')
+  },
+  {
+    UUID: '502858',
+    Location: 'Front Door',
+    SensorType: 'Camera',
+    Status: "true",
+    LockStatus: "true",
+    EnergyConsumption: 8,
+    LastTriggered: new ISODate('2024-02-23T17:42:36.207Z')
+  }
+]);
+
+db.createCollection('SolarPanel');
+db.SolarPanel.insertMany([
+  {
+    UUID: '636712',
+    Location: 'Roof',
+    PanelID: 'Panel1',
+    Status: "true",
+    EnergyGeneratedToday: 30,
+    PowerOutput: 15,
+    LastChanged: new ISODate('2024-02-22T17:33:50.153Z')
+  },
+  {
+    UUID: '636713',
+    Location: 'Roof',
+    PanelID: 'Panel2',
+    Status: "true",
+    EnergyGeneratedToday: 25,
+    PowerOutput: 10,
+    LastChanged: new ISODate('2024-02-23T17:33:50.153Z')
+  }
+]);
+
+db.createCollection('Toaster');
+db.Toaster.insertMany([
+  {
+    UUID: '998256',
+Location: "Kitchen",
+    Status: "true",
+    TemperatureSettings: 250,
+    TimerStopTime: new ISODate('2024-02-22T17:49:33.694Z'),
+    EnergyConsumption: 1,
+    LastChanged: new ISODate('2024-02-22T17:49:33.694Z')
+  },
+  {
+    UUID: '998257',
+Location: "Kitchen",
+    Status: "false",
+    TemperatureSettings: 300,
+    TimerStopTime: new ISODate('2024-02-23T17:49:33.694Z'),
+    EnergyConsumption: 2,
+    LastChanged: new ISODate('2024-02-23T17:49:33.694Z')
+  }
+]);
+
+db.createCollection('Users');
+db.Users.insertOne({
+  username: "beaconuser",
+  password: "$2y$10$m.yZC0lz8ZM68nGljOCV3u73GY0Z1wTr9wm.LGhLllvlTXV1VvglS",
+  fName: "Steve",
+  lName: "Jones",
+  role: "admin"
+})
+db.Users.insertOne({
+  username: "houseuser",
+  password: "$2y$10$ZKOjc4qFO7Jr5D9ifVQtAezvYnYywIwVl1oL0.EFLxuHTtkt3beVq",
+  fName: "Bob",
+  lName: "Smith",
+  role: "user"
+})
+
+
+db.createCollection('Logging');
+
+db.Logging.insertOne({
+DeviceID: "light1",
+Function: "status",
+Change: false,
+Time: new ISODate('2024-02-23T17:49:33.694Z')
+});
+
+
+
+
+
+

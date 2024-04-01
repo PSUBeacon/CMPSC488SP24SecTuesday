@@ -162,11 +162,11 @@ type Appliances struct {
 }
 
 type UUIDsConfig struct {
-	LightingUUIDs   []Pi
-	HvacUUIDs       []Pi
-	SecurityUUIDs   []Pi
-	AppliancesUUIDs []Pi
-	EnergyUUIDs     []Pi
+	Lighting   []Pi `json:"lighting"`
+	Hvac       []Pi `json:"hvac"`
+	Security   []Pi `json:"security"`
+	Appliances []Pi `json:"appliances"`
+	Energy     []Pi `json:"energy"`
 }
 
 type Pi struct {

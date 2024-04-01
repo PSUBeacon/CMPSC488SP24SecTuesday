@@ -241,6 +241,7 @@ func handleFunctionality() {
 
 	var messageData dal.MessagingStruct
 	var UUIDsData dal.UUIDsConfig
+
 	err = json.Unmarshal([]byte(latestBlockData), &messageData)
 	fmt.Println(messageData)
 	jsonconfigData, err := os.ReadFile("config.json")
@@ -249,11 +250,13 @@ func handleFunctionality() {
 	if err != nil {
 		panic(err)
 	}
+
 	messageChange, _ := strconv.Atoi(messageData.Change)
+
 	fmt.Println("This is the uuids", UUIDsData)
 	if messageData.Name == "Lighting" {
 		fmt.Println("Got past the name")
-		for _, Pi := range UUIDsData.LightingUUIDs {
+		for _, Pi := range UUIDsData.Lighting {
 			if Pi.UUID == messageData.UUID {
 				fmt.Println("got past the loop")
 				if messageData.Function == "Status" {
@@ -273,7 +276,7 @@ func handleFunctionality() {
 		}
 	}
 	if messageData.Name == "HVAC" {
-		for _, group := range [][]dal.Pi{UUIDsData.HvacUUIDs} {
+		for _, group := range [][]dal.Pi{UUIDsData.Hvac} {
 			for _, Pi := range group {
 				if Pi.UUID == messageData.UUID {
 					if messageData.Change == "false" {
@@ -296,7 +299,7 @@ func handleFunctionality() {
 		}
 	}
 	if messageData.Name == "Security" {
-		for _, group := range [][]dal.Pi{UUIDsData.SecurityUUIDs} {
+		for _, group := range [][]dal.Pi{UUIDsData.Security} {
 			for _, Pi := range group {
 				if Pi.UUID == messageData.UUID {
 					if messageData.Function == "Status" {
@@ -312,7 +315,7 @@ func handleFunctionality() {
 		}
 	}
 	if messageData.Name == "Appliances" {
-		for _, group := range [][]dal.Pi{UUIDsData.AppliancesUUIDs} {
+		for _, group := range [][]dal.Pi{UUIDsData.Appliances} {
 			for _, Pi := range group {
 				if Pi.UUID == messageData.UUID {
 					if messageData.Function == "Status" {
@@ -348,7 +351,7 @@ func handleFunctionality() {
 		}
 	}
 	if messageData.Name == "Energy" {
-		for _, group := range [][]dal.Pi{UUIDsData.EnergyUUIDs} {
+		for _, group := range [][]dal.Pi{UUIDsData.Energy} {
 			for _, Pi := range group {
 				if Pi.UUID == messageData.UUID {
 					if messageData.Function == "Status" {

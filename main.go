@@ -250,10 +250,10 @@ func handleFunctionality() {
 		panic(err)
 	}
 	messageChange, _ := strconv.Atoi(messageData.Change)
-
+	var Pi dal.Pi
 	if messageData.Name == "Lighting" {
 		fmt.Println("Got past the name")
-		for _, Pi := range UUIDsData.LightingUUIDs {
+		for Pi = range UUIDsData.LightingUUIDs {
 			if Pi.UUID == messageData.UUID {
 				fmt.Println("got past the loop")
 				if messageData.Function == "Status" {

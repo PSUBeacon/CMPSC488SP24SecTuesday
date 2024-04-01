@@ -5,7 +5,7 @@ body {
 
 #title {
   color: azure;
-  vertical-align:-webkit-baseline-middle;
+  vertical-align:middle;
   font-size: 35px;
   margin-left: 10px;
 }
@@ -203,12 +203,18 @@ body {
   left: 2px;
   bottom: 2px;
   background-color: white;
+  -webkit-transition: .4s;
   border-radius: 50%;
   transition: transform 0.4s;
 }
 
 .toggle input:checked + .slider {
-  background-color: #ccc;
+  background-color: #00FF00;
+
+}
+
+input:not(:checked) + .slider {
+  background-color: #808080;
 }
 
 .toggle input:checked + .slider:before {

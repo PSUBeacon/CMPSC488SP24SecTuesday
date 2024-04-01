@@ -161,6 +161,7 @@ func drawA(dinPin, csPin, clkPin rpio.Pin) {
 }
 
 func MatrixStatus(dinPin, csPin, clkPin rpio.Pin, status bool) {
+	initializeMatrix(dinPin, csPin, clkPin)
 	if status == false {
 		clearMatrix(csPin, dinPin, clkPin)
 	}

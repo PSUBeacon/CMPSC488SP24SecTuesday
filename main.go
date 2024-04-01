@@ -361,5 +361,5 @@ func handleFunctionality() {
 }
 
 func main() {
-	go BlockReceiver()
+	BlockReceiver()
 }

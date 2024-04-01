@@ -75,7 +75,7 @@ func main() {
 	protectedRoutes.Use(authMiddleware())
 
 	// This ones should be protected
-	protectedRoutes.POST("/lighting")
+	protectedRoutes.POST("/lighting", updateIoT)
 	protectedRoutes.GET("/lighting", GetLights)
 
 	protectedRoutes.POST("/hvac")
@@ -132,47 +132,47 @@ func main() {
 	select {}
 }
 
-//func updateIoT(c *gin.Context) {
-//	//var req dal.UpdateLightingRequest
-//	var req dal.MessagingStruct
-//	requestBody, _ := ioutil.ReadAll(c.Request.Body)
-//	//fmt.Printf("Received request body: %s\n", string(requestBody))
-//	// Reset the request body to be able to parse it again
-//	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
-//
-//	if err := c.ShouldBindJSON(&req); err != nil {
-//		fmt.Printf("Error binding JSON: %v\n", err)
-//		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-//		return
-//	}
-//
-//	var UUIDsData dal.UUIDsConfig
-//	jsonconfigData, _ := os.ReadFile("config.json")
-//	_ = json.Unmarshal(jsonconfigData, &UUIDsData)
-//
-//	//allPis := [][]dal.Pi{
-//	//	UUIDsData.LightingUUIDs,
-//	//	UUIDsData.HvacUUIDs,
-//	//	UUIDsData.SecurityUUIDs,
-//	//	UUIDsData.AppliancesUUIDs,
-//	//	UUIDsData.EnergyUUIDs,
-//	//}
-//	//UpdateMissingPi(messaging.)
-//	//foundPi, found := findPiByUUID(allPis, req.UUID)
-//	//if found {
-//	//	for i := 0; i < len(disconnectedPiNums); i++ {
-//	//		if foundPi.Pinum == disconnectedPiNums[i] {
-//	//			fmt.Println("Pi is disconnected")
-//	//		}
-//	//	}
-//	//}
-//	//if !found {
-//	//	dal.UpdateMessaging(client, []byte(req.UUID), req.Name, req.AppType, req.Function, req.Change)
-//	//	c.JSON(http.StatusOK, gin.H{"message": "IOT updated successfully"})
-//	//}
-//	dal.UpdateMessaging(client, []byte(req.UUID), req.Name, req.AppType, req.Function, req.Change)
-//
-//}
+func updateIoT(c *gin.Context) {
+	//var req dal.UpdateLightingRequest
+	var req dal.MessagingStruct
+	requestBody, _ := ioutil.ReadAll(c.Request.Body)
+	//fmt.Printf("Received request body: %s\n", string(requestBody))
+	// Reset the request body to be able to parse it again
+	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		fmt.Printf("Error binding JSON: %v\n", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	//var UUIDsData dal.UUIDsConfig
+	//jsonconfigData, _ := os.ReadFile("config.json")
+	//_ = json.Unmarshal(jsonconfigData, &UUIDsData)
+
+	//allPis := [][]dal.Pi{
+	//	UUIDsData.LightingUUIDs,
+	//	UUIDsData.HvacUUIDs,
+	//	UUIDsData.SecurityUUIDs,
+	//	UUIDsData.AppliancesUUIDs,
+	//	UUIDsData.EnergyUUIDs,
+	//}
+	//UpdateMissingPi(messaging.)
+	//foundPi, found := findPiByUUID(allPis, req.UUID)
+	//if found {
+	//	for i := 0; i < len(disconnectedPiNums); i++ {
+	//		if foundPi.Pinum == disconnectedPiNums[i] {
+	//			fmt.Println("Pi is disconnected")
+	//		}
+	//	}
+	//}
+	//if !found {
+	//	dal.UpdateMessaging(client, []byte(req.UUID), req.Name, req.AppType, req.Function, req.Change)
+	//	c.JSON(http.StatusOK, gin.H{"message": "IOT updated successfully"})
+	//}
+	dal.UpdateMessaging(client, []byte(req.UUID), req.Name, req.AppType, req.Function, req.Change)
+
+}
 
 func GetLights(c *gin.Context) {
 	room := c.Query("roomName")

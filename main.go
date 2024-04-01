@@ -220,7 +220,6 @@ func verifyBlockchain(currentblock blockchain.Block) bool {
 		fmt.Println("block and chain is valid")
 		return true
 	}
-	//}
 	return false
 }
 
@@ -358,6 +357,7 @@ func handleFunctionality() {
 		}
 
 	}
+	return
 }
 
 func main() {

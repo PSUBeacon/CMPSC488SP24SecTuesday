@@ -4,7 +4,6 @@ import (
 	"CMPSC488SP24SecTuesday/dal"
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
@@ -76,20 +75,16 @@ func main() {
 	protectedRoutes.Use(authMiddleware())
 
 	// This ones should be protected
-	protectedRoutes.POST("/lighting", updateIoT)
+	protectedRoutes.POST("/lighting")
 	protectedRoutes.GET("/lighting", GetLights)
 
-	protectedRoutes.POST("/hvac", updateIoT)
+	protectedRoutes.POST("/hvac")
 
-	protectedRoutes.POST("/security", updateIoT)
+	protectedRoutes.POST("/security")
 	protectedRoutes.GET("/security", GetSecurity)
 
 	protectedRoutes.POST("/appliances", getAppliancesData)
 	protectedRoutes.POST("/energy", getAppliancesData)
-
-	//protectedRoutes.POST("/networking", updateIoT)
-	// use JWT middleware for all protected routes
-	//r.Use(authMiddleware())
 
 	//ADJUSTMENT:
 
@@ -111,6 +106,14 @@ func main() {
 		networkingGroup.GET("/status", statusResp)
 	}
 
+	securityGroup := r.Group("/security")
+	securityGroup.Use()
+	{
+		securityGroup.GET("/", me)
+		securityGroup.GET("/GetSecurity", GetSecurity)
+		securityGroup.GET("/status", statusResp)
+	}
+
 	appliancesGroup := r.Group("/appliances", dashboardHandler)
 	appliancesGroup.Use()
 	{
@@ -129,47 +132,47 @@ func main() {
 	select {}
 }
 
-func updateIoT(c *gin.Context) {
-	//var req dal.UpdateLightingRequest
-	var req dal.MessagingStruct
-	requestBody, _ := ioutil.ReadAll(c.Request.Body)
-	//fmt.Printf("Received request body: %s\n", string(requestBody))
-	// Reset the request body to be able to parse it again
-	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
-
-	if err := c.ShouldBindJSON(&req); err != nil {
-		fmt.Printf("Error binding JSON: %v\n", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	var UUIDsData dal.UUIDsConfig
-	jsonconfigData, _ := os.ReadFile("config.json")
-	_ = json.Unmarshal(jsonconfigData, &UUIDsData)
-
-	//allPis := [][]dal.Pi{
-	//	UUIDsData.LightingUUIDs,
-	//	UUIDsData.HvacUUIDs,
-	//	UUIDsData.SecurityUUIDs,
-	//	UUIDsData.AppliancesUUIDs,
-	//	UUIDsData.EnergyUUIDs,
-	//}
-	//UpdateMissingPi(messaging.)
-	//foundPi, found := findPiByUUID(allPis, req.UUID)
-	//if found {
-	//	for i := 0; i < len(disconnectedPiNums); i++ {
-	//		if foundPi.Pinum == disconnectedPiNums[i] {
-	//			fmt.Println("Pi is disconnected")
-	//		}
-	//	}
-	//}
-	//if !found {
-	//	dal.UpdateMessaging(client, []byte(req.UUID), req.Name, req.AppType, req.Function, req.Change)
-	//	c.JSON(http.StatusOK, gin.H{"message": "IOT updated successfully"})
-	//}
-	dal.UpdateMessaging(client, []byte(req.UUID), req.Name, req.AppType, req.Function, req.Change)
-
-}
+//func updateIoT(c *gin.Context) {
+//	//var req dal.UpdateLightingRequest
+//	var req dal.MessagingStruct
+//	requestBody, _ := ioutil.ReadAll(c.Request.Body)
+//	//fmt.Printf("Received request body: %s\n", string(requestBody))
+//	// Reset the request body to be able to parse it again
+//	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
+//
+//	if err := c.ShouldBindJSON(&req); err != nil {
+//		fmt.Printf("Error binding JSON: %v\n", err)
+//		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+//		return
+//	}
+//
+//	var UUIDsData dal.UUIDsConfig
+//	jsonconfigData, _ := os.ReadFile("config.json")
+//	_ = json.Unmarshal(jsonconfigData, &UUIDsData)
+//
+//	//allPis := [][]dal.Pi{
+//	//	UUIDsData.LightingUUIDs,
+//	//	UUIDsData.HvacUUIDs,
+//	//	UUIDsData.SecurityUUIDs,
+//	//	UUIDsData.AppliancesUUIDs,
+//	//	UUIDsData.EnergyUUIDs,
+//	//}
+//	//UpdateMissingPi(messaging.)
+//	//foundPi, found := findPiByUUID(allPis, req.UUID)
+//	//if found {
+//	//	for i := 0; i < len(disconnectedPiNums); i++ {
+//	//		if foundPi.Pinum == disconnectedPiNums[i] {
+//	//			fmt.Println("Pi is disconnected")
+//	//		}
+//	//	}
+//	//}
+//	//if !found {
+//	//	dal.UpdateMessaging(client, []byte(req.UUID), req.Name, req.AppType, req.Function, req.Change)
+//	//	c.JSON(http.StatusOK, gin.H{"message": "IOT updated successfully"})
+//	//}
+//	dal.UpdateMessaging(client, []byte(req.UUID), req.Name, req.AppType, req.Function, req.Change)
+//
+//}
 
 func GetLights(c *gin.Context) {
 	room := c.Query("roomName")
@@ -435,25 +438,6 @@ func dashboardHandler(c *gin.Context) {
 		c.JSON(http.StatusForbidden, gin.H{"error": "Invalid role or insufficient privileges"})
 	}
 }
-
-//func GetNetLogs(c *gin.Context) {
-//	fetchedLogs, err := dal.FetchLogging(client)
-//
-//	if err != nil {
-//		c.JSON(http.StatusUnauthorized, gin.H{"error": err}) // Use generic error message
-//		return
-//	}
-//
-//	logsJSON, err := json.Marshal(fetchedLogs)
-//	if err != nil {
-//		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to marshal logs to JSON"})
-//		return
-//	}
-//
-//	// Return JSON response
-//	//c.JSON(http.StatusOK, lights)
-//	c.Data(http.StatusOK, "application/json", logsJSON)
-//}
 
 func GetNetLogs(c *gin.Context) {
 

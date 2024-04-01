@@ -6,7 +6,6 @@ import doorLockIcon from '../img/doorLockIcon.png';
 import '../CSS/Security.css';
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar"; // Import your CSS file here
-import axios from "axios";
 
 const Security = () => {
     const navigate = useNavigate(); // Instantiate useNavigate hook
@@ -39,7 +38,6 @@ const Security = () => {
         });
         setIsLocked(!isLocked);
     };
-
 
     // Add a function to handle selecting a room:
     const selectRoom = (roomName) => {
@@ -107,18 +105,18 @@ const Security = () => {
             body: JSON.stringify(requestBody),
         })
             .then(response => {
-                if (response.status >= 200 && response.status < 300) {
-                    console.log(`Lock ${isLocking ? 'locked' : 'unlocked'} successfully:`, response.data);
+                if (response.ok) {
+                    console.log(`Lock ${isLocking ? 'unlocked' : 'locked'} successfully:`);
                 } else {
-                    console.error(`Failed to toggle the lock ${isLocking ? 'locked' : 'unlocked'} with status:`, response.status);
+                    throw new Error(`Failed to toggle the lock ${isLocking ? 'unlocked' : 'locked'} with status: ${response.status}`);
                 }
             })
             .catch(error => {
-                console.error(`There was an error toggling the lock ${isLocking ? 'locked' : 'unlocked'}:`, error);
+                console.error(`There was an error toggling the lock ${isLocking ? 'unlocked' : 'locked'}:`, error);
             });
 
         setTimeout(() => {
-            console.log(`Lock ${uuid} has been ${isLocking ? 'locked' : 'unlocked'}.`);
+            console.log(`Lock ${uuid} has been ${isLocking ? 'unlocked' : 'locked'}.`);
         }, 1000);
     };
 
@@ -191,18 +189,14 @@ const Security = () => {
                                         padding: '20px'
                                     }}>
                                         <img className="lockImage" src={doorLockIcon} alt="Lock Icon"/>
-                                        {/*toggle function*/}
+                                        {/* Toggle switch with ON/OFF labels */}
                                         <label className="switch">
-                                            <input type="checkbox" checked={isLocked} onChange={toggleLock}/>
-                                            <span className="slider round"></span>
+                                            <input type="checkbox" checked={isLocked} onChange={toggleLock} />
+                                            <span className="slider round"> {isLocked}</span>
                                         </label>
                                     </div>
                                 </div>
-
-
                             </div>
-
-
                         </div>
                     </div>
                 </main>

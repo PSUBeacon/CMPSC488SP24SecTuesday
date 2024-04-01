@@ -223,19 +223,27 @@ const Lighting = () => {
                                                onChange={(e) => setLightName(e.target.value)}/>
                                     </div>
                                     <button type="submit" className="submitButton">Add Light</button>
-                                    <button type="button" className="submitButton"
-                                            onClick={toggleLight}>{isLightOn ? 'Turn Off All Lights' : 'Turn On All Lights'}</button>
                                 </form>
-                                <div className="roomDropdown" style={{marginBottom: '20px', width: '72%'}}>
-                                    <label htmlFor="selectLight">Select Light:</label>
-                                    <select id="selectLight" value={selectedLight}
-                                            onChange={(e) => handleToggleLight(e.target.value)}>
-                                        <option value="">Select Light</option>
-                                        {lights.map((light, index) => (
-                                            <option key={index} value={light.UUID}>{light.Location}</option>
-                                        ))}
-                                    </select>
+
+                                <div className="roomDropdown" style={{
+                                    marginBottom: '20px',
+                                    width: '72%',
+                                    display: 'flex',
+                                    alignItems: 'center'
+                                }}>
+                                    <div style={{marginRight: '10px', display: 'flex', alignItems: 'center'}}>
+                                        <select id="selectLight" value={selectedLight} style={{marginLeft: '5px'}}>
+                                            <option value="">Select Light</option>
+                                            {lights.map((light, index) => (
+                                                <option key={index} value={light.UUID}>{light.Location}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <button type="button" className="submitButton" onClick={toggleLight}
+                                            style={{marginLeft: '10px'}}>{isLightOn ? 'Turn On' : 'Turn Off'}</button>
                                 </div>
+
+
                                 <div className="dimmerControl"
                                      style={{width: '72%', textAlign: 'center', marginTop: '20px'}}>
                                     <input

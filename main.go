@@ -241,9 +241,8 @@ func handleFunctionality() {
 
 	var messageData dal.MessagingStruct
 	var UUIDsData dal.UUIDsConfig
-	fmt.Println(messageData)
 	err = json.Unmarshal([]byte(latestBlockData), &messageData)
-
+	fmt.Println(messageData)
 	jsonconfigData, err := os.ReadFile("config.json")
 
 	err = json.Unmarshal(jsonconfigData, &UUIDsData)
@@ -257,9 +256,11 @@ func handleFunctionality() {
 				if Pi.UUID == messageData.UUID {
 					if messageData.Function == "Status" {
 						if messageData.Change == "false" {
+							fmt.Println("inside the status false")
 							lighting.UpdateStatus(false)
 						}
 						if messageData.Change == "true" {
+							fmt.Println("inside the status false")
 							lighting.UpdateStatus(true)
 						}
 					}

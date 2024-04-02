@@ -27,7 +27,7 @@ func FanStatus(fanPin uint8, status bool) {
 	}
 }
 
-func setFanSpeed(fanPin uint8, speed int) {
+func SetFanSpeed(fanPin uint8, speed int) {
 	if err := rpio.Open(); err != nil {
 		fmt.Println("Unable to open GPIO:", err)
 		return
@@ -37,4 +37,18 @@ func setFanSpeed(fanPin uint8, speed int) {
 	pin.Mode(rpio.Pwm)
 	pin.Freq(64000)
 	pin.DutyCycle(uint32(speed), 100)
+}
+
+// Set the intensity (brightness) of the LED matrix
+func setSpeed(intensity byte) {
+	dinPin := rpio.Pin(dinPinNumber)
+	csPin := rpio.Pin(csPinNumber)
+	clkPin := rpio.Pin(clkPinNumber)
+
+	initializeMatrix(dinPin, csPin, clkPin)
+
+	if intensity > 0x0F {
+		intensity = 0x0F // Maximum intensity value is 0x0F
+	}
+	sendData(csPin, dinPin, clkPin, 0x0A, intensity)
 }

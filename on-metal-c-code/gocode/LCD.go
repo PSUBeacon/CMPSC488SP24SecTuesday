@@ -12,9 +12,14 @@ type LCD interface {
 }
 
 func WriteLCD(LCDMessage string) string {
+	rownum := 1
 	if len(LCDMessage) > 16 {
+
+		rownum = 2
 		return "LCD message longer than 16"
+
 	}
+
 	// Configure this line with the device location and address of your device
 	lcdDevice, err := i2c.Open(&i2c.Devfs{Dev: "/dev/i2c-1"}, 0x27)
 	if err != nil {
@@ -28,7 +33,7 @@ func WriteLCD(LCDMessage string) string {
 	}
 
 	// Write a string to row 1, position 0 (ie, the start of the line)
-	err = lcdDisplay.WriteString(LCDMessage, 1, 0)
+	err = lcdDisplay.WriteString(LCDMessage, rownum, 0)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -15,7 +15,7 @@ const Lighting = () => {
     const [selectedLight, setSelectedLight] = useState(null);
     const [isNavVisible, setIsNavVisible] = useState(false);
     const [accountType, setAccountType] = useState('');
-    const [dimmerValue, setDimmerValue] = useState(75);
+    const [dimmerValue, setDimmerValue] = useState();
     const [selectedRoom, setSelectedRoom] = useState(null);
     const [isLightOn, setIsLightOn] = useState(false);
     const [error, setError] = useState('');
@@ -54,7 +54,35 @@ const Lighting = () => {
     }, [selectedRoom, navigate]); // Add navigate as a dependency if it's used within the effect
 
     const handleDimmerChange = (event) => {
-        setDimmerValue(parseInt(event.target.value)); // Parse to integer
+        const serverUrl = 'http://localhost:8081/lighting';
+        const token = sessionStorage.getItem('token');
+
+        // Prepare the request body
+        const requestBody = {
+            uuid: uuid,
+            name: "Lighting",
+            apptype: "Lighting",
+            function: "Brightness",
+            change: event,
+        };
+
+        // Send a POST request to toggle the light state
+        axios.post(serverUrl, requestBody, {headers: {'Authorization': `Bearer ${token}`}})
+            .then(response => {
+                if (response.status >= 200 && response.status < 300) {
+                    console.log(`Light ${isTurningOn ? 'turned on' : 'turned off'} successfully:`, response.data);
+                } else {
+                    console.error(`Failed to toggle the light ${isTurningOn ? 'on' : 'off'} with status:`, response.status);
+                }
+            })
+            .catch(error => {
+                console.error(`There was an error toggling the light ${isTurningOn ? 'on' : 'off'}:`, error);
+            });
+
+        // Log the action
+        setTimeout(() => {
+            console.log(`Light ${uuid} has been ${isTurningOn ? 'turned on' : 'turned off'}.`);
+        }, 1000);
     };
 
     const selectRoom = (roomName) => {
@@ -253,7 +281,7 @@ const Lighting = () => {
                                         min="0"
                                         max="100"
                                         value={dimmerValue}
-                                        onChange={(e) => setDimmerValue(e.target.value)}
+                                        onChange={(e) => handleDimmerChange(dimmerValue)}
                                         style={{
                                             WebkitAppearance: 'none',
                                             width: '100%',

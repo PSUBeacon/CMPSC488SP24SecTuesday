@@ -1,22 +1,60 @@
 package hvac
 
 import (
+	"CMPSC488SP24SecTuesday/on-metal-c-code/gocode"
 	"fmt"
 )
 
+const temperaturePin = 4
+const fanPin = uint8(18)
+
+var mode string
+
 // SetTemperature sets the desired temperature for the HVAC system.
-func UpdateTemperature(temperature int) {
-	fmt.Printf("%s temperature is set to %d°C\n", temperature)
+func UpdateTemperature(newTemperature int) {
+	currentTemp, err := gocode.ReadTemperature(temperaturePin, 22)
+	if err != nil {
+		fmt.Println("Error reading Temperature:", err)
+		return
+	}
+	intCurrTemp := int(currentTemp)
+	if newTemperature == intCurrTemp {
+		gocode.FanStatus(fanPin, false)
+		fmt.Printf("%s Temperature is set to %d°C\n", newTemperature)
+	}
+	if mode == "Cool" && newTemperature < intCurrTemp {
+		gocode.FanStatus(fanPin, true)
+		UpdateTemperature(newTemperature)
+	}
+	if mode == "Cool" && newTemperature > intCurrTemp {
+		gocode.FanStatus(fanPin, false)
+	}
+	if mode == "Heat" && newTemperature > intCurrTemp {
+		gocode.FanStatus(fanPin, true)
+		UpdateTemperature(newTemperature)
+	}
+	if mode == "Heat" && newTemperature < intCurrTemp {
+		gocode.FanStatus(fanPin, false)
+	}
+
 }
 
 // SetFanSpeed sets the fan speed for the HVAC system.
 func UpdateFanSpeed(speed int) {
+	gocode.SetFanSpeed(fanPin, speed)
 	fmt.Printf("%s fan speed is set to %s%%\n", speed)
 }
 
 // SetStatus sets the status (e.g., "Cool", "Heat", "Fan", "Off") for the HVAC system.
 func UpdateStatus(status bool) {
-	fmt.Printf("%s status is set to %s\n", status)
+	if status == true {
+		gocode.FanStatus(fanPin, true)
+		fmt.Printf("%s status is set to %s\n", status)
+	}
+	if status == false {
+		gocode.FanStatus(fanPin, false)
+		fmt.Printf("%s status is set to %s\n", status)
+	}
 }
 
 func UpdateMode(mode string) {

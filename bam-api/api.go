@@ -69,6 +69,7 @@ func main() {
 	r.GET("/status", statusResp)
 	r.POST("/login", loginHandler)
 	r.GET("/logout", logout)
+	r.POST("/signup", singup)
 
 	// Apply JWT middleware to protected routes
 	protectedRoutes := r.Group("/")
@@ -308,6 +309,14 @@ func logout(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Successfully logged out"})
+}
+
+func signupHandler(c *gin.Context) {
+	var signupData struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+		Email    s
+	}
 }
 
 func AuthRequired(c *gin.Context) {

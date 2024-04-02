@@ -14,7 +14,6 @@ const (
 // TurnOn turns the lighting on.
 func UpdateStatus(newStatus bool) {
 	fmt.Printf("%s is now turned \n", newStatus)
-	gocode.DrawLightbulb(9, 4, 10)
 	gocode.MatrixStatus(9, 4, 10, newStatus)
 
 }

@@ -1,3 +1,4 @@
+// File: gocode/servo.go
 package gocode
 
 import (
@@ -18,18 +19,13 @@ func TurnServoTo90Degrees() {
 
 	// Define the GPIO pin
 	servoPin := rpio.Pin(18) // Use the correct pin for your setup
-	servoPin.Output()        // Set the pin to output mode
+	servoPin.Mode(rpio.Pwm)  // Set the pin to PWM mode
 
-	// Manually generate the PWM signal for 90 degrees
-	// Adjust the pulse width for your specific servo
-	pulseWidth := 1500 * time.Microsecond // Pulse width for 90 degrees
-	period := 20 * time.Millisecond       // Period of the PWM signal (20ms is common for servos)
+	// Manually control PWM for servo
+	const dutyCycle = 150               // Adjust this value for 90 degrees based on your servo
+	servoPin.Freq(50 * 1000)            // Set frequency to 50Hz
+	servoPin.DutyCycle(dutyCycle, 1000) // Set duty cycle
 
-	start := time.Now()
-	for time.Since(start) < 1*time.Second { // Generate the signal for 1 second
-		servoPin.High()                 // Set the pin high
-		time.Sleep(pulseWidth)          // Wait for the pulse width duration
-		servoPin.Low()                  // Set the pin low
-		time.Sleep(period - pulseWidth) // Wait for the rest of the period
-	}
+	// Wait for the servo to move
+	time.Sleep(1 * time.Second)
 }

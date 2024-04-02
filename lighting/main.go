@@ -11,10 +11,12 @@ const (
 	clkPinNumber = 10 // GPIO pin for CLK
 )
 
+var GlobBrightness = 15
+
 // TurnOn turns the lighting on.
 func UpdateStatus(newStatus bool) {
 	fmt.Printf("%s is now turned \n", newStatus)
-	gocode.MatrixStatus(9, 4, 10, newStatus)
+	gocode.MatrixStatus(9, 4, 10, newStatus, GlobBrightness)
 
 }
 
@@ -28,6 +30,7 @@ func SetBrightness(brightness int) {
 	//gocode.DrawLightbulb(9, 4, 10)
 	//time.Sleep(3 * time.Second)
 	//gocode.ClearMatrix(9, 4, 10)
+	GlobBrightness = brightness
 	gocode.SetIntensity(9, 4, 10, brightness)
 	fmt.Printf("%s brightness is set to %s\n", brightness)
 }

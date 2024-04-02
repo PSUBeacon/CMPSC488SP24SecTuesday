@@ -73,7 +73,7 @@ func sendByte(dinPin, clkPin rpio.Pin, data byte) {
 }
 
 // Drawing functions
-func DrawLightbulb(dinPin, csPin, clkPin rpio.Pin) {
+func DrawLightbulb(dinPin, csPin, clkPin rpio.Pin, brightness int) {
 
 	ClearMatrix(csPin, dinPin, clkPin)
 	lightbulbPattern := []byte{
@@ -88,8 +88,9 @@ func DrawLightbulb(dinPin, csPin, clkPin rpio.Pin) {
 	}
 	for row, pattern := range lightbulbPattern {
 		sendData(csPin, dinPin, clkPin, byte(row+1), pattern)
+		sendData(csPin, dinPin, clkPin, 0x0A, byte(brightness))
 	}
-	time.Sleep(3 * time.Second)
+	time.Sleep(2 * time.Second)
 	ClearMatrix(csPin, dinPin, clkPin)
 }
 
@@ -119,6 +120,8 @@ func drawLock(dinPin, csPin, clkPin rpio.Pin) {
 	for row, pattern := range lockPattern {
 		sendData(csPin, dinPin, clkPin, byte(row+1), pattern)
 	}
+	time.Sleep(2 * time.Second)
+	ClearMatrix(csPin, dinPin, clkPin)
 }
 
 func drawH(dinPin, csPin, clkPin rpio.Pin) {
@@ -177,7 +180,7 @@ func drawA(dinPin, csPin, clkPin rpio.Pin) {
 	}
 }
 
-func MatrixStatus(dinPin, csPin, clkPin rpio.Pin, status bool) {
+func MatrixStatus(dinPin, csPin, clkPin rpio.Pin, status bool, brightness int) {
 	if err := rpio.Open(); err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
 		os.Exit(1)
@@ -189,7 +192,7 @@ func MatrixStatus(dinPin, csPin, clkPin rpio.Pin, status bool) {
 	clkPin.Output()
 	initializeMatrix(dinPin, csPin, clkPin)
 
-	DrawLightbulb(dinPin, csPin, clkPin)
+	DrawLightbulb(dinPin, csPin, clkPin, brightness)
 
 	if status == false {
 		ClearMatrix(csPin, dinPin, clkPin)

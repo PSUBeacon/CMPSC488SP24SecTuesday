@@ -298,6 +298,7 @@ func handleFunctionality() {
 			}
 		}
 	}
+
 	if messageData.Name == "Security" {
 		for _, group := range [][]dal.Pi{UUIDsData.Security} {
 			for _, Pi := range group {

@@ -81,7 +81,7 @@ func main() {
 
 	protectedRoutes.POST("/hvac")
 
-	protectedRoutes.POST("/security")
+	protectedRoutes.POST("/security", updateIoT)
 	protectedRoutes.GET("/security", GetSecurity)
 
 	protectedRoutes.POST("/appliances", getAppliancesData)

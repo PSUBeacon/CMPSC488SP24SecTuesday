@@ -13,41 +13,8 @@ const (
 	clkPinNumber = 10 // GPIO pin for CLK
 )
 
-func TurnOff() {
-
-	dinPin := rpio.Pin(dinPinNumber)
-	csPin := rpio.Pin(csPinNumber)
-	clkPin := rpio.Pin(clkPinNumber)
-	initializeMatrix(dinPin, csPin, clkPin)
-	dinPin.Output()
-	csPin.Output()
-	clkPin.Output()
-
-	for row := 0; row < 8; row++ {
-		sendData(csPin, dinPin, clkPin, byte(row+1), 0x00)
-	}
-}
-
 // Initialize the LED matrix
 func initializeMatrix(dinPin, csPin, clkPin rpio.Pin) {
-	if err := rpio.Open(); err != nil {
-		_, err := fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
-		if err != nil {
-			return
-		}
-		os.Exit(1)
-	}
-	defer func() {
-		err := rpio.Close()
-		if err != nil {
-
-		}
-	}()
-
-	dinPin.Output()
-	csPin.Output()
-	clkPin.Output()
-
 	// Set the scan-limit to show all 8 digits
 	sendData(csPin, dinPin, clkPin, 0x0B, 0x07)
 
@@ -98,6 +65,17 @@ func sendByte(dinPin, clkPin rpio.Pin, data byte) {
 
 // Drawing functions
 func drawLightbulb(dinPin, csPin, clkPin rpio.Pin) {
+	if err := rpio.Open(); err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
+		os.Exit(1)
+	}
+	defer rpio.Close()
+
+	dinPin.Output()
+	csPin.Output()
+	clkPin.Output()
+	initializeMatrix(dinPin, csPin, clkPin)
+
 	clearMatrix(csPin, dinPin, clkPin)
 	lightbulbPattern := []byte{
 		0b00111100,
@@ -115,6 +93,17 @@ func drawLightbulb(dinPin, csPin, clkPin rpio.Pin) {
 }
 
 func drawLock(dinPin, csPin, clkPin rpio.Pin) {
+	if err := rpio.Open(); err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
+		os.Exit(1)
+	}
+	defer rpio.Close()
+
+	dinPin.Output()
+	csPin.Output()
+	clkPin.Output()
+	initializeMatrix(dinPin, csPin, clkPin)
+
 	clearMatrix(csPin, dinPin, clkPin)
 	lockPattern := []byte{
 		0b00111100,
@@ -132,6 +121,17 @@ func drawLock(dinPin, csPin, clkPin rpio.Pin) {
 }
 
 func drawH(dinPin, csPin, clkPin rpio.Pin) {
+	if err := rpio.Open(); err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
+		os.Exit(1)
+	}
+	defer rpio.Close()
+
+	dinPin.Output()
+	csPin.Output()
+	clkPin.Output()
+	initializeMatrix(dinPin, csPin, clkPin)
+
 	clearMatrix(csPin, dinPin, clkPin)
 	hPattern := []byte{
 		0b10000001,
@@ -149,6 +149,17 @@ func drawH(dinPin, csPin, clkPin rpio.Pin) {
 }
 
 func drawA(dinPin, csPin, clkPin rpio.Pin) {
+	if err := rpio.Open(); err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
+		os.Exit(1)
+	}
+	defer rpio.Close()
+
+	dinPin.Output()
+	csPin.Output()
+	clkPin.Output()
+	initializeMatrix(dinPin, csPin, clkPin)
+
 	clearMatrix(csPin, dinPin, clkPin)
 	hPattern := []byte{
 		0b00011000,
@@ -166,6 +177,15 @@ func drawA(dinPin, csPin, clkPin rpio.Pin) {
 }
 
 func MatrixStatus(dinPin, csPin, clkPin rpio.Pin, status bool) {
+	if err := rpio.Open(); err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
+		os.Exit(1)
+	}
+	defer rpio.Close()
+
+	dinPin.Output()
+	csPin.Output()
+	clkPin.Output()
 	initializeMatrix(dinPin, csPin, clkPin)
 
 	if status == false {

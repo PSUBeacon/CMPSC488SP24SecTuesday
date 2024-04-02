@@ -89,9 +89,9 @@ const Security = () => {
         // Prepare the request body
         const requestBody = {
             uuid: uuid,
-            name: "SecuritySystem",
+            name: "Security",
             apptype: "Security",
-            function: "Status",
+            function: "LockStatus",
             change: isLocking,
         };
 

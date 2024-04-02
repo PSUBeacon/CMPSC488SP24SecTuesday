@@ -310,6 +310,14 @@ func handleFunctionality() {
 							security.UpdateAlarmStatus(true)
 						}
 					}
+					if messageData.Function == "LockStatus" {
+						if messageData.Change == "false" {
+							security.LockOrUnlock(false)
+						}
+						if messageData.Change == "true" {
+							security.LockOrUnlock(true)
+						}
+					}
 				}
 			}
 		}

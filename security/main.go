@@ -1,6 +1,7 @@
 package security
 
 import (
+	"CMPSC488SP24SecTuesday/on-metal-c-code/gocode"
 	"fmt"
 )
 
@@ -19,7 +20,8 @@ func UpdateAlarmStatus(status bool) {
 
 // Creates a lock or unlock feature
 func LockOrUnlock(lock bool) {
-
+	fmt.Println("Door is ", lock)
+	gocode.TurnServoTo90Degrees()
 }
 
 // creates Padlock

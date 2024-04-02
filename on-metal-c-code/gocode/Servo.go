@@ -8,20 +8,31 @@ import (
 	"github.com/stianeikeland/go-rpio/v4"
 )
 
-func TurnServoMotor90Degrees() {
+func TurnServoTo90Degrees() {
+	// Open and map memory to access gpio, check for errors
 	if err := rpio.Open(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 	defer rpio.Close()
 
-	pin := rpio.Pin(18)
-	pin.Mode(rpio.Pwm)
-	pin.Freq(50)
+	// Define the GPIO pin
+	servoPin := rpio.Pin(18) // Use the correct pin for your setup
+	servoPin.Mode(rpio.Pwm)  // Set the pin to PWM mode
 
-	// Set the servo to the 90-degree position
-	pin.DutyCycle(0, 7.5)
+	// Set the PWM parameters for the servo
+	const (
+		period    = 20 * time.Millisecond
+		fullCycle = 20 // This is equivalent to 50 Hz
+		dutyCycle = 1  // Duty cycle for 90 degrees, adjust as needed
+	)
 
-	// Wait for the servo to reach the desired position
-	time.Sleep(300 * time.Millisecond)
+	// Calculate the number of cycles for the given duty cycle
+	cycles := uint32((fullCycle * dutyCycle) / 100)
+
+	// Manually control PWM for servo
+	for {
+		servoPin.DutyCycle(cycles, fullCycle)
+		time.Sleep(period)
+	}
 }

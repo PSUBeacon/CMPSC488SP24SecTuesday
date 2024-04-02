@@ -21,7 +21,7 @@ func UpdateAlarmStatus(status bool) {
 // Creates a lock or unlock feature
 func LockOrUnlock(lock bool) {
 	fmt.Println("Door is ", lock)
-	gocode.TurnServoMotor90Degrees()
+	gocode.TurnServoTo90Degrees()
 }
 
 // creates Padlock

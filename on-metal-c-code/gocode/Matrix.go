@@ -45,8 +45,6 @@ func SetIntensity(dinPin, csPin, clkPin rpio.Pin, intensity int) {
 	initializeMatrix(dinPin, csPin, clkPin)
 
 	intensityByte := byte(intensity)
-
-	DrawLightbulb(dinPin, csPin, clkPin)
 	if intensity > 0x0F {
 		intensity = 0x0F // Maximum intensity value is 0x0F
 	}

@@ -24,15 +24,12 @@ func TurnServoTo90Degrees() {
 	const (
 		period    = 20 * time.Millisecond
 		fullCycle = 20 // This is equivalent to 50 Hz
-		dutyCycle = 1  // Duty cycle for 90 degrees, adjust as needed
+		dutyCycle = 7  // Duty cycle for 90 degrees, adjust as needed
 	)
 
 	// Calculate the number of cycles for the given duty cycle
-	cycles := uint32((fullCycle * dutyCycle) / 100)
+	cycles := uint32((fullCycle * dutyCycle) / 10)
 
-	// Manually control PWM for servo
-	for {
-		servoPin.DutyCycle(cycles, fullCycle)
-		time.Sleep(period)
-	}
+	servoPin.DutyCycle(cycles, fullCycle)
+	time.Sleep(300 * time.Millisecond)
 }

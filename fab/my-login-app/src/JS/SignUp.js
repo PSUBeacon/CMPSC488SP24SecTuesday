@@ -23,7 +23,8 @@ const SignUp = () => {
                 username,
                 password,
             });
-            // Handle successful sign-up
+
+
             console.log('Sign up successful:', response.data);
         } catch (error) {
             setError('Failed to sign up. Please try again.');

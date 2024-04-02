@@ -29,13 +29,21 @@ func initializeMatrix(dinPin, csPin, clkPin rpio.Pin) {
 }
 
 // Set the intensity (brightness) of the LED matrix
-func SetIntensity(intensity int) {
-	intensityByte := byte(intensity)
-	dinPin := rpio.Pin(dinPinNumber)
-	csPin := rpio.Pin(csPinNumber)
-	clkPin := rpio.Pin(clkPinNumber)
+func SetIntensity(dinPin, csPin, clkPin rpio.Pin, intensity int) {
+
+	if err := rpio.Open(); err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
+		os.Exit(1)
+	}
+	defer rpio.Close()
+
+	dinPin.Output()
+	csPin.Output()
+	clkPin.Output()
 
 	initializeMatrix(dinPin, csPin, clkPin)
+
+	intensityByte := byte(intensity)
 
 	if intensity > 0x0F {
 		intensity = 0x0F // Maximum intensity value is 0x0F

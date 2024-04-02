@@ -239,8 +239,10 @@ var jwtKey = []byte(getJwtKey())
 func loginHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	var loginData struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
+		FirstName string `json:"firstname"`
+		LastName  string `json:"lastname"`
+		Username  string `json:"username"`
+		Password  string `json:"password"`
 	}
 
 	if err := c.BindJSON(&loginData); err != nil {

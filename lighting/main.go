@@ -25,6 +25,6 @@ func SetBrightness(brightness int) {
 	//} else if brightness > 100 {
 	//	brightness = 100
 	//}
-	gocode.SetIntensity(brightness)
+	gocode.SetIntensity(9, 4, 10, brightness)
 	fmt.Printf("%s brightness is set to %s\n", brightness)
 }

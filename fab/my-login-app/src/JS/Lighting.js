@@ -277,7 +277,7 @@ const Lighting = () => {
                                         </select>
                                     </div>
                                     <button type="button" className="submitButton" onClick={toggleLight}
-                                            style={{marginLeft: '10px'}}>{isLightOn ? 'Turn On' : 'Turn Off'}</button>
+                                            style={{marginLeft: '10px'}}>{isLightOn ? 'Turn Off' : 'Turn On'}</button>
                                 </div>
 
                                 <div className="dimmerControl"
@@ -286,8 +286,8 @@ const Lighting = () => {
                                         type="range"
                                         id="dimmer"
                                         name="dimmer"
-                                        min="0"
-                                        max="100"
+                                        min="1"
+                                        max="15"
                                         value={dimmerValue}
                                         onChange={(e) => setDimmerValue(e.target.value)} // Update dimmerValue as the slider is moved
                                         onMouseUp={(e) => {

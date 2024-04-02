@@ -142,7 +142,7 @@ const Security = () => {
                             flexWrap: 'wrap'
                         }}>
                             <div className="doorSelection" style={{flexBasis: '48%'}}>
-                                <h3 className="centered-title">Your Lock</h3>
+                                <h3 className="centered-title">Back Door</h3>
 
                                 <div className="lightCards" style={{
                                     display: 'flex',
@@ -160,7 +160,8 @@ const Security = () => {
                                         <img className="lockImage" src={doorLockIcon} alt="Lock Icon"/>
                                         {/* Toggle switch with ON/OFF labels */}
                                         <label className="switch">
-                                            <input type="checkbox" checked= {lockStates['502857'] === 'unlocked'} onChange={() => handleToggleLock('502857')}/>
+                                            <input type="checkbox" checked={lockStates['502857'] === 'unlocked'}
+                                                   onChange={() => handleToggleLock('502857')}/>
                                             <span className="slider round"> {isLocked}</span>
                                         </label>
                                     </div>
@@ -168,7 +169,7 @@ const Security = () => {
                             </div>
 
                             <div className="doorSelection1" style={{flexBasis: '48%'}}>
-                                <h3 className="centered-title">Your Lock</h3>
+                                <h3 className="centered-title">Front Door</h3>
 
                                 <div className="lightCards" style={{
                                     display: 'flex',
@@ -186,7 +187,7 @@ const Security = () => {
                                         <img className="lockImage" src={doorLockIcon} alt="Lock Icon"/>
                                         {/* Toggle switch with ON/OFF labels */}
                                         <label className="switch">
-                                            <input type="checkbox" checked= {lockStates['502858'] === 'unlocked'}
+                                            <input type="checkbox" checked={lockStates['502858'] === 'unlocked'}
                                                    onChange={() => handleToggleLock('502858')}/>
                                             <span className="slider round"> {isLocked}</span>
                                         </label>

@@ -85,7 +85,7 @@ func DrawLightbulb(dinPin, csPin, clkPin rpio.Pin) {
 	clkPin.Output()
 	initializeMatrix(dinPin, csPin, clkPin)
 
-	clearMatrix(csPin, dinPin, clkPin)
+	ClearMatrix(csPin, dinPin, clkPin)
 	lightbulbPattern := []byte{
 		0b00111100,
 		0b01111110,
@@ -113,7 +113,7 @@ func drawLock(dinPin, csPin, clkPin rpio.Pin) {
 	clkPin.Output()
 	initializeMatrix(dinPin, csPin, clkPin)
 
-	clearMatrix(csPin, dinPin, clkPin)
+	ClearMatrix(csPin, dinPin, clkPin)
 	lockPattern := []byte{
 		0b00111100,
 		0b00100100,
@@ -141,7 +141,7 @@ func drawH(dinPin, csPin, clkPin rpio.Pin) {
 	clkPin.Output()
 	initializeMatrix(dinPin, csPin, clkPin)
 
-	clearMatrix(csPin, dinPin, clkPin)
+	ClearMatrix(csPin, dinPin, clkPin)
 	hPattern := []byte{
 		0b10000001,
 		0b10000001,
@@ -169,7 +169,7 @@ func drawA(dinPin, csPin, clkPin rpio.Pin) {
 	clkPin.Output()
 	initializeMatrix(dinPin, csPin, clkPin)
 
-	clearMatrix(csPin, dinPin, clkPin)
+	ClearMatrix(csPin, dinPin, clkPin)
 	hPattern := []byte{
 		0b00011000,
 		0b00111100,
@@ -198,7 +198,7 @@ func MatrixStatus(dinPin, csPin, clkPin rpio.Pin, status bool) {
 	initializeMatrix(dinPin, csPin, clkPin)
 
 	if status == false {
-		clearMatrix(csPin, dinPin, clkPin)
+		ClearMatrix(csPin, dinPin, clkPin)
 	}
 	if status == true {
 		OnPattern := []byte{
@@ -218,7 +218,7 @@ func MatrixStatus(dinPin, csPin, clkPin rpio.Pin, status bool) {
 }
 
 // Clear the LED matrix
-func clearMatrix(csPin, dinPin, clkPin rpio.Pin) {
+func ClearMatrix(csPin, dinPin, clkPin rpio.Pin) {
 	for row := 0; row < 8; row++ {
 		sendData(csPin, dinPin, clkPin, byte(row+1), 0x00)
 	}

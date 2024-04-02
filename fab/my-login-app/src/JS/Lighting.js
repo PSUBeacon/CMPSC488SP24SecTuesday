@@ -261,7 +261,14 @@ const Lighting = () => {
                                 }}>
                                     <div style={{marginRight: '10px', display: 'flex', alignItems: 'center'}}>
                                         <select id="selectLight" value={selectedLight}
-                                                onChange={(e) => setSelectedLight(e.target.value)}
+                                                onChange={(e) => {
+                                                    const selectedUUID = e.target.value;
+                                                    setSelectedLight(selectedUUID);
+                                                    const selectedLightObj = lights.find(light => light.UUID === selectedUUID);
+                                                    if (selectedLightObj) {
+                                                        setDimmerValue(selectedLightObj.Brightness); // Assuming each light object has a Brightness property
+                                                    }
+                                                }}
                                                 style={{marginLeft: '5px'}}>
                                             <option value="">Select Light</option>
                                             {lights.map((light, index) => (
@@ -273,7 +280,6 @@ const Lighting = () => {
                                             style={{marginLeft: '10px'}}>{isLightOn ? 'Turn On' : 'Turn Off'}</button>
                                 </div>
 
-
                                 <div className="dimmerControl"
                                      style={{width: '72%', textAlign: 'center', marginTop: '20px'}}>
                                     <input
@@ -283,11 +289,10 @@ const Lighting = () => {
                                         min="0"
                                         max="100"
                                         value={dimmerValue}
+                                        onChange={(e) => setDimmerValue(e.target.value)} // Update dimmerValue as the slider is moved
                                         onMouseUp={(e) => {
-                                            const newBrightness = e.target.value;
-                                            setDimmerValue(newBrightness); // Update the dimmerValue state
                                             if (selectedLight) {
-                                                handleDimmerChange(selectedLight, newBrightness); // Call the function with the selected light's UUID and new brightness
+                                                handleDimmerChange(selectedLight, e.target.value); // Call the function with the selected light's UUID and new brightness
                                             }
                                         }}
                                         style={{
@@ -311,7 +316,6 @@ const Lighting = () => {
             </div>
         </div>
     );
-
 };
 
 export default Lighting;

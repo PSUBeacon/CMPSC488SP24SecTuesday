@@ -73,7 +73,7 @@ func sendByte(dinPin, clkPin rpio.Pin, data byte) {
 }
 
 // Drawing functions
-func drawLightbulb(dinPin, csPin, clkPin rpio.Pin) {
+func DrawLightbulb(dinPin, csPin, clkPin rpio.Pin) {
 	if err := rpio.Open(); err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
 		os.Exit(1)

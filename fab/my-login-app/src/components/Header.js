@@ -10,6 +10,8 @@ const Header = ({accountType}) => {
     const [isNavVisible, setIsNavVisible] = useState(false);
     const [isAccountPopupVisible, setIsAccountPopupVisible] = useState(false);
     const navigate = useNavigate();
+    const fname = sessionStorage.getItem('lastname')
+    const lname = sessionStorage.getItem('firstname')
 
     // Toggles the navigation menu's visibility
     const toggleNav = () => {
@@ -75,7 +77,7 @@ const Header = ({accountType}) => {
                             color: 'white',
                             borderRadius: '2px',
                         }}>
-                            <p>John Doe</p> {/* Dynamically replace with actual user name */}
+                            <p>{fname} {lname}</p> {/* Dynamically replace with actual user name */}
                             {accountType && <p>{accountType}</p>}
                             <button onClick={signOut} className="signout">Sign Out</button>
                         </div>

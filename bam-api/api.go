@@ -239,10 +239,8 @@ var jwtKey = []byte(getJwtKey())
 func loginHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	var loginData struct {
-		FirstName string `json:"firstname"`
-		LastName  string `json:"lastname"`
-		Username  string `json:"username"`
-		Password  string `json:"password"`
+		Username string `json:"username"`
+		Password string `json:"password"`
 	}
 
 	if err := c.BindJSON(&loginData); err != nil {
@@ -294,7 +292,9 @@ func loginHandler(c *gin.Context) {
 		return
 	}
 	// Return the JWT token in the response
-	c.JSON(http.StatusOK, gin.H{"token": tokenString})
+	c.JSON(http.StatusOK, gin.H{"token": tokenString,
+		"firstname": fetchedUser.FirstName,
+		"lastname":  fetchedUser.LastName})
 
 }
 

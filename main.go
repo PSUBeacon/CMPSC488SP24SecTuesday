@@ -147,7 +147,7 @@ func BlockReceiver() {
 				if err != nil {
 					panic(err)
 				}
-				fmt.Println("Got to functionality")
+				//fmt.Println("Got to functionality")
 				go handleFunctionality()
 				continue
 
@@ -179,7 +179,7 @@ func BlockReceiver() {
 					if err != nil {
 						panic(err)
 					}
-					fmt.Println("Got to functionality")
+					//fmt.Println("Got to functionality")
 					go handleFunctionality()
 				}
 				if verify == false {
@@ -253,19 +253,19 @@ func handleFunctionality() {
 
 	messageChange, _ := strconv.Atoi(messageData.Change)
 
-	fmt.Println("This is the uuids", UUIDsData)
+	//fmt.Println("This is the uuids", UUIDsData)
 	if messageData.Name == "Lighting" {
-		fmt.Println("Got past the name")
+		//fmt.Println("Got past the name")
 		for _, Pi := range UUIDsData.Lighting {
 			if Pi.UUID == messageData.UUID {
-				fmt.Println("got past the loop")
+				//fmt.Println("got past the loop")
 				if messageData.Function == "Status" {
 					if messageData.Change == "false" {
-						fmt.Println("inside the status false")
+						//fmt.Println("inside the status false")
 						lighting.UpdateStatus(false)
 					}
 					if messageData.Change == "true" {
-						fmt.Println("inside the status false")
+						//fmt.Println("inside the status false")
 						lighting.UpdateStatus(true)
 					}
 				}

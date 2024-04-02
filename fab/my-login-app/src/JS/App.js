@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import LoginForm from './LoginForm';
 import Dashboard from './Dashboard';
 import SignUp from './SignUp';
@@ -15,24 +15,23 @@ import '../CSS/login.css';
 
 
 function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<LoginForm />} />
-        <Route path="/dashboard" element={<Dashboard />}>
-        </Route>
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/security" element={<Security />} />
-        <Route path="/lighting" element={<Lighting />} />
-        <Route path="/networking" element={<Networking />} />
-        <Route path="/hvac" element={<HVAC />} />
-        <Route path="/appliances" element={<Appliances />} />
-        <Route path="/energy" element={<Energy />} />
-        <Route path="/signup" element={<SignUp />} />
-        
-      </Routes>
-    </Router>
-  );
+    return (
+        <Router>
+            <Routes>
+                <Route path="/" element={<LoginForm/>}/>
+                <Route path="/dashboard" element={<Dashboard/>}>
+                </Route>
+                <Route path="/settings" element={<Settings/>}/>
+                <Route path="/security" element={<Security/>}/>
+                <Route path="/lighting" element={<Lighting/>}/>
+                <Route path="/networking" element={<Networking/>}/>
+                <Route path="/hvac" element={<HVAC/>}/>
+                <Route path="/appliances" element={<Appliances/>}/>
+                <Route path="/energy" element={<Energy/>}/>
+                <Route path="/signup" element={<SignUp/>}/>
+            </Routes>
+        </Router>
+    );
 }
 
 export default App;

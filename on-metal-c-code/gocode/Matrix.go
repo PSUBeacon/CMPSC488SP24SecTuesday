@@ -43,6 +43,11 @@ func initializeMatrix(dinPin, csPin, clkPin rpio.Pin) {
 
 		}
 	}()
+
+	dinPin.Output()
+	csPin.Output()
+	clkPin.Output()
+
 	// Set the scan-limit to show all 8 digits
 	sendData(csPin, dinPin, clkPin, 0x0B, 0x07)
 
@@ -161,35 +166,7 @@ func drawA(dinPin, csPin, clkPin rpio.Pin) {
 }
 
 func MatrixStatus(dinPin, csPin, clkPin rpio.Pin, status bool) {
-	if err := rpio.Open(); err != nil {
-		_, err := fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
-		if err != nil {
-			return
-		}
-		os.Exit(1)
-	}
-	defer func() {
-		err := rpio.Close()
-		if err != nil {
-
-		}
-	}()
-
-	dinPin.Output()
-	csPin.Output()
-	clkPin.Output()
-
-	// Set the scan-limit to show all 8 digits
-	sendData(csPin, dinPin, clkPin, 0x0B, 0x07)
-
-	// Use normal operation mode (not test mode)
-	sendData(csPin, dinPin, clkPin, 0x0F, 0x00)
-
-	// Set the intensity (brightness) of the display
-	sendData(csPin, dinPin, clkPin, 0x0A, 0x0F)
-
-	// Turn on the display
-	sendData(csPin, dinPin, clkPin, 0x0C, 0x01)
+	initializeMatrix(dinPin, csPin, clkPin)
 
 	if status == false {
 		clearMatrix(csPin, dinPin, clkPin)

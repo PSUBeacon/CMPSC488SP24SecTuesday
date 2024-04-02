@@ -174,6 +174,11 @@ func MatrixStatus(dinPin, csPin, clkPin rpio.Pin, status bool) {
 
 		}
 	}()
+
+	dinPin.Output()
+	csPin.Output()
+	clkPin.Output()
+
 	// Set the scan-limit to show all 8 digits
 	sendData(csPin, dinPin, clkPin, 0x0B, 0x07)
 

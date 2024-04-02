@@ -3,6 +3,7 @@ package gocode
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/stianeikeland/go-rpio/v4"
 )
@@ -99,6 +100,8 @@ func DrawLightbulb(dinPin, csPin, clkPin rpio.Pin) {
 	for row, pattern := range lightbulbPattern {
 		sendData(csPin, dinPin, clkPin, byte(row+1), pattern)
 	}
+	time.Sleep(3 * time.Second)
+	ClearMatrix(csPin, dinPin, clkPin)
 }
 
 func drawLock(dinPin, csPin, clkPin rpio.Pin) {
@@ -217,8 +220,7 @@ func MatrixStatus(dinPin, csPin, clkPin rpio.Pin, status bool) {
 	}
 }
 
-// Clear the LED matrix
-func ClearMatrix(csPin, dinPin, clkPin rpio.Pin) {
+func TurnOffMatrix(dinPin, csPin, clkPin rpio.Pin) {
 	if err := rpio.Open(); err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
 		os.Exit(1)
@@ -229,6 +231,23 @@ func ClearMatrix(csPin, dinPin, clkPin rpio.Pin) {
 	csPin.Output()
 	clkPin.Output()
 	initializeMatrix(dinPin, csPin, clkPin)
+	OnPattern := []byte{
+		0b00000000,
+		0b00000000,
+		0b00000000,
+		0b00000000,
+		0b00000000,
+		0b00000000,
+		0b00000000,
+		0b00000000,
+	}
+	for row, pattern := range OnPattern {
+		sendData(csPin, dinPin, clkPin, byte(row+1), pattern)
+	}
+}
+
+// Clear the LED matrix
+func ClearMatrix(csPin, dinPin, clkPin rpio.Pin) {
 
 	for row := 0; row < 8; row++ {
 		sendData(csPin, dinPin, clkPin, byte(row+1), 0x00)

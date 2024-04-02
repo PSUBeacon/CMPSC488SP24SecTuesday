@@ -271,6 +271,16 @@ func FetchUser(client *mongo.Client, userName string) (User, error) {
 	return user, nil
 }
 
+func CreateUser(client *mongo.Client, user *User) error {
+	collection := client.Database(dbName).Collection("Users")
+	_, err := collection.InsertOne(context.TODO(), user)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func FetchLights(client *mongo.Client, dbName string, roomName string) ([]Lighting, error) {
 	collection := client.Database(dbName).Collection("Lighting")
 

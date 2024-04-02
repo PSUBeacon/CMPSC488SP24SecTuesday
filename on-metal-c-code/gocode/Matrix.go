@@ -29,7 +29,8 @@ func initializeMatrix(dinPin, csPin, clkPin rpio.Pin) {
 }
 
 // Set the intensity (brightness) of the LED matrix
-func setIntensity(intensity byte) {
+func SetIntensity(intensity int) {
+	intensityByte := byte(intensity)
 	dinPin := rpio.Pin(dinPinNumber)
 	csPin := rpio.Pin(csPinNumber)
 	clkPin := rpio.Pin(clkPinNumber)
@@ -39,7 +40,7 @@ func setIntensity(intensity byte) {
 	if intensity > 0x0F {
 		intensity = 0x0F // Maximum intensity value is 0x0F
 	}
-	sendData(csPin, dinPin, clkPin, 0x0A, intensity)
+	sendData(csPin, dinPin, clkPin, 0x0A, intensityByte)
 }
 
 // Send data to the LED matrix

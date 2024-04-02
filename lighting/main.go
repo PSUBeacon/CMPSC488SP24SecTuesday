@@ -20,10 +20,11 @@ func UpdateStatus(newStatus bool) {
 
 // SetBrightness sets the brightness of the lighting.
 func SetBrightness(brightness int) {
-	if brightness < 0 {
-		brightness = 0
-	} else if brightness > 100 {
-		brightness = 100
-	}
+	//if brightness < 0 {
+	//	brightness = 0
+	//} else if brightness > 100 {
+	//	brightness = 100
+	//}
+	gocode.SetIntensity(brightness)
 	fmt.Printf("%s brightness is set to %s\n", brightness)
 }

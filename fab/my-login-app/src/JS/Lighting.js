@@ -53,7 +53,7 @@ const Lighting = () => {
         }
     }, [selectedRoom, navigate]); // Add navigate as a dependency if it's used within the effect
 
-    const handleDimmerChange = (event) => {
+    const handleDimmerChange = (uuid, brightness) => {
         const serverUrl = 'http://localhost:8081/lighting';
         const token = sessionStorage.getItem('token');
 
@@ -63,25 +63,25 @@ const Lighting = () => {
             name: "Lighting",
             apptype: "Lighting",
             function: "Brightness",
-            change: event,
+            change: brightness,
         };
 
         // Send a POST request to toggle the light state
         axios.post(serverUrl, requestBody, {headers: {'Authorization': `Bearer ${token}`}})
             .then(response => {
                 if (response.status >= 200 && response.status < 300) {
-                    console.log(`Light ${isTurningOn ? 'turned on' : 'turned off'} successfully:`, response.data);
+                    console.log(`Light dimmed successfully:`, response.data);
                 } else {
-                    console.error(`Failed to toggle the light ${isTurningOn ? 'on' : 'off'} with status:`, response.status);
+                    console.error(`Failed to dim the light  with status:`, response.status);
                 }
             })
             .catch(error => {
-                console.error(`There was an error toggling the light ${isTurningOn ? 'on' : 'off'}:`, error);
+                console.error(`There was an error toggling the brightness `, error);
             });
 
         // Log the action
         setTimeout(() => {
-            console.log(`Light ${uuid} has been ${isTurningOn ? 'turned on' : 'turned off'}.`);
+            console.log(`Light has been dimmed.`);
         }, 1000);
     };
 
@@ -260,7 +260,9 @@ const Lighting = () => {
                                     alignItems: 'center'
                                 }}>
                                     <div style={{marginRight: '10px', display: 'flex', alignItems: 'center'}}>
-                                        <select id="selectLight" value={selectedLight} style={{marginLeft: '5px'}}>
+                                        <select id="selectLight" value={selectedLight}
+                                                onChange={(e) => setSelectedLight(e.target.value)}
+                                                style={{marginLeft: '5px'}}>
                                             <option value="">Select Light</option>
                                             {lights.map((light, index) => (
                                                 <option key={index} value={light.UUID}>{light.Location}</option>
@@ -281,7 +283,13 @@ const Lighting = () => {
                                         min="0"
                                         max="100"
                                         value={dimmerValue}
-                                        onChange={(e) => handleDimmerChange(dimmerValue)}
+                                        onMouseUp={(e) => {
+                                            const newBrightness = e.target.value;
+                                            setDimmerValue(newBrightness); // Update the dimmerValue state
+                                            if (selectedLight) {
+                                                handleDimmerChange(selectedLight, newBrightness); // Call the function with the selected light's UUID and new brightness
+                                            }
+                                        }}
                                         style={{
                                             WebkitAppearance: 'none',
                                             width: '100%',

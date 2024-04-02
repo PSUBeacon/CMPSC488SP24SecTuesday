@@ -69,7 +69,7 @@ func main() {
 	r.GET("/status", statusResp)
 	r.POST("/login", loginHandler)
 	r.GET("/logout", logout)
-	r.POST("/signup", singup)
+	r.POST("/signup", signupHandler)
 
 	// Apply JWT middleware to protected routes
 	protectedRoutes := r.Group("/")
@@ -313,10 +313,44 @@ func logout(c *gin.Context) {
 
 func signupHandler(c *gin.Context) {
 	var signupData struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
-		Email    s
+		Firstname string `json:"firstname"`
+		Lastname  string `json:"lastname"`
+		Password  string `json:"password"`
+		Username  string `json:"username"`
 	}
+
+	if err := c.BindJSON(&signupData); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON"})
+	}
+
+	//existingUser, err := dal.FetchUser(client, signupData.Username)
+	//if err == nil {
+	//	c.JSON(http.StatusConflict, gin.H{"error": "Username already exists"})
+	//	return
+	//}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(signupData.Password), bcrypt.DefaultCost)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
+		return
+	}
+
+	newUser := &dal.User{
+		Username:  signupData.Username,
+		Password:  string(hashedPassword),
+		FirstName: signupData.Firstname,
+		LastName:  signupData.Lastname,
+		Role:      "user",
+	}
+
+	err = dal.CreateUser(client, newUser)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "User created succesfully"})
+
 }
 
 func AuthRequired(c *gin.Context) {

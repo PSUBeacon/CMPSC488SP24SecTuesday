@@ -15,10 +15,10 @@ import (
 
 const (
 	servoPinName     = "GPIO18"
-	pulseFrequency   = 20 * time.Millisecond // Common period for servo control
-	minPulseWidth    = 1 * time.Second
-	maxPulseWidth    = 2 * time.Second
-	rotationDuration = 1 * time.Second // Duration to send the signal, allowing full rotation
+	pulseFrequency   = 20 * time.Millisecond   // Common period for servo control
+	minPulseWidth    = 500 * time.Microsecond  // Adjusted minimum pulse width for SC90
+	maxPulseWidth    = 2400 * time.Microsecond // Adjusted maximum pulse width for SC90
+	rotationDuration = 1 * time.Second         // Duration to send the signal, allowing full rotation
 )
 
 func main() {

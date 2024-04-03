@@ -68,10 +68,16 @@ func displayLCD() {
 	if err != nil {
 		return
 	}
-	
-
+	if currentTemp > 999 {
+		currentTemp = 999
+	}
 	intCurrTemp := int(currentTemp)
-	gocode.WriteLCD("Temp:" + string(rune(intCurrTemp)) + "°C Set:" + string(rune(tempToSet)) + "°C Mode:" + mode + " Fan:" + fanStatus)
+	// Hardcode Mode, Temperature to set, Status
+	mode = "Heat"
+	tempToSet = 74
+	fanStatus = "ON"
+
+	gocode.WriteLCD("Now:" + string(rune(intCurrTemp)) + "F Set:" + string(rune(tempToSet)) + "FMode:" + mode + " Fan:" + fanStatus)
 }
 
 //func main() {

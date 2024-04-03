@@ -16,9 +16,9 @@ import (
 const (
 	servoPinName     = "GPIO18"
 	pulseFrequency   = 20 * time.Millisecond   // Common period for servo control
-	minPulseWidth    = 500 * time.Microsecond  // Adjusted minimum pulse width for SC90
-	maxPulseWidth    = 2400 * time.Microsecond // Adjusted maximum pulse width for SC90
-	rotationDuration = 1 * time.Second         // Duration to send the signal, allowing full rotation
+	minPulseWidth    = 700 * time.Microsecond  // Adjusted minimum pulse width for smoother operation
+	maxPulseWidth    = 2300 * time.Microsecond // Adjusted maximum pulse width for smoother operation
+	rotationDuration = 2 * time.Second         // Longer duration for smoother motion
 )
 
 func main() {
@@ -31,7 +31,7 @@ func main() {
 		log.Fatalf("Failed to find pin %s", servoPinName)
 	}
 
-	fmt.Println("Servo door hinge control started. Type 'open' to open or 'close' to close the door. Press Ctrl+C to exit.")
+	fmt.Println("Servo control started. Type 'open' to open or 'close' to close. Press Ctrl+C to exit.")
 
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)

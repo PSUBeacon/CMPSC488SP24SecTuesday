@@ -314,13 +314,37 @@ func FetchLights(client *mongo.Client, dbName string, roomName string) ([]Lighti
 	return lights, nil
 }
 
-//func FetchHVAC(client *mongo.Client, dbName string) ([]HVAC, error) {
-//	collection := client.Database(dbName).Collection("HVAC")
-//
-//	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-//	defer cancel()
-//
-//}
+func FetchHVAC(client *mongo.Client, dbName string) ([]HVAC, error) {
+	collection := client.Database(dbName).Collection("HVAC")
+
+	// Use a timeout context for the operation
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	// Creating a filter to fetch lights only for the specified roomName
+	filter := bson.M{}
+
+	cursor, err := collection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var Hvacs []HVAC
+	for cursor.Next(ctx) {
+		var Hvac HVAC
+		err := cursor.Decode(&Hvac)
+		if err != nil {
+			return nil, err
+		}
+		Hvacs = append(Hvacs, Hvac)
+	}
+
+	if err := cursor.Err(); err != nil {
+		return nil, err
+	}
+	fmt.Println("hvac from db dal: ", Hvacs)
+	return Hvacs, nil
+}
 
 func FetchSecurity(client *mongo.Client, dbName string) ([]SecuritySystem, error) {
 	collection := client.Database(dbName).Collection("SecuritySystem")

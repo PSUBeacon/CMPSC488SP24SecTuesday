@@ -79,24 +79,31 @@ func main() {
 	protectedRoutes.POST("/lighting", updateIoT)
 	protectedRoutes.GET("/lighting", GetLights)
 
-	protectedRoutes.POST("/hvac")
+	protectedRoutes.POST("/hvac", updateIoT)
+	protectedRoutes.GET("/hvac", GetHVAC)
 
-	protectedRoutes.POST("/security", updateIoT)
-	protectedRoutes.GET("/security", GetSecurity)
+	//protectedRoutes.POST("/security", updateIoT)
+	//protectedRoutes.GET("/security", GetSecurity)
 
 	protectedRoutes.POST("/appliances", getAppliancesData)
 	protectedRoutes.POST("/energy", getAppliancesData)
 
 	//ADJUSTMENT:
-
 	// Combined route group for both admin and user dashboards
 	dashboardGroup := r.Group("/dashboard", dashboardHandler)
 	dashboardGroup.Use(authMiddleware()) // Apply authMiddleware to protect the route
 	{
-		// Combined dashboard route for admin and user
 		dashboardGroup.POST("/", me)
-		dashboardGroup.GET("/me", me) // Use an empty string for the base path of the group
+		dashboardGroup.GET("/me", me)
 		dashboardGroup.GET("/status", statusResp)
+	}
+
+	hvacGroup := r.Group("/hvac")
+	hvacGroup.Use()
+	{
+		hvacGroup.POST("/", me)
+		hvacGroup.GET("/GetHVAC", GetHVAC)
+		hvacGroup.GET("/status", statusResp)
 	}
 
 	networkingGroup := r.Group("/networking")
@@ -189,6 +196,19 @@ func GetLights(c *gin.Context) {
 	}
 	//fmt.Printf("Light:", lights)
 	c.JSON(http.StatusOK, lights)
+}
+
+func GetHVAC(c *gin.Context) {
+
+	//fmt.Printf("Room name: %s\n", room)
+	hvacs, err := dal.FetchHVAC(client, "smartHomeDB")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	//fmt.Println("hvacs: ", hvacs)
+	c.JSON(http.StatusOK, hvacs)
+
 }
 
 func getAppliancesData(c *gin.Context) {
@@ -505,9 +525,6 @@ func GetNetLogs(c *gin.Context) {
 
 	c.JSON(http.StatusOK, logs)
 }
-
-//func getHVAC(c *gin.Context) {
-//}
 
 func GetSecurity(c *gin.Context) {
 	security, err := dal.FetchSecurity(client, "smartHomeDB")

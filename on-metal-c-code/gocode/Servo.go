@@ -2,13 +2,12 @@ package gocode
 
 import (
 	"fmt"
+	"github.com/stianeikeland/go-rpio/v4"
 	"os"
 	"time"
-
-	"github.com/stianeikeland/go-rpio/v4"
 )
 
-func TurnServoTo90Degrees() {
+func TurnServo() {
 	// Open and map memory to access gpio, check for errors
 	if err := rpio.Open(); err != nil {
 		fmt.Println(err)

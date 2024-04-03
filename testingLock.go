@@ -16,8 +16,8 @@ import (
 const (
 	servoPinName     = "GPIO18"
 	pulseFrequency   = 20 * time.Millisecond // Common period for servo control
-	minPulseWidth    = 1 * time.Second
-	maxPulseWidth    = 2 * time.Second
+	minPulseWidth    = 600 * time.Microsecond
+	maxPulseWidth    = 2400 * time.Microsecond
 	rotationDuration = 1 * time.Second // Duration to send the signal, allowing full rotation
 )
 

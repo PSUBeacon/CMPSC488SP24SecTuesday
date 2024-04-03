@@ -38,11 +38,11 @@ func WriteLCD(LCDMessage string) string {
 		line2 := strings.Join(lines[16:], "")
 
 		// Write to both lines
-		err = lcdDisplay.WriteString(line1, 0, 0)
+		err = lcdDisplay.WriteString(line1, 1, 0)
 		if err != nil {
 			log.Fatal(err)
 		}
-		err = lcdDisplay.WriteString(line2, 1, 0)
+		err = lcdDisplay.WriteString(line2, 2, 0)
 		if err != nil {
 			log.Fatal(err)
 		}

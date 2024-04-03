@@ -289,12 +289,15 @@ const Lighting = () => {
                                         id="dimmer"
                                         name="dimmer"
                                         min="1"
-                                        max="15"
-                                        value={dimmerValue}
-                                        onChange={(e) => setDimmerValue(e.target.value)} // Update dimmerValue as the slider is moved
+                                        max="100"
+                                        value={Math.round((dimmerValue - 1) / 14 * 99) + 1}
+                                        onChange={(e) => {
+                                            const newValue = Math.round((e.target.value - 1) / 99 * 14) + 1;
+                                            setDimmerValue(newValue);
+                                        }}
                                         onMouseUp={(e) => {
                                             if (selectedLight) {
-                                                handleDimmerChange(selectedLight, e.target.value); // Call the function with the selected light's UUID and new brightness
+                                                handleDimmerChange(selectedLight, dimmerValue);
                                             }
                                         }}
                                         style={{
@@ -309,7 +312,10 @@ const Lighting = () => {
                                         }}
                                     />
                                     <label htmlFor="dimmer"
-                                           style={{color: '#fff', marginTop: '5px'}}>{dimmerValue}%</label>
+                                           style={{
+                                               color: '#fff',
+                                               marginTop: '5px'
+                                           }}>{Math.round((dimmerValue - 1) / 14 * 99) + 1}%</label>
                                 </div>
                             </div>
                         </div>
@@ -317,7 +323,8 @@ const Lighting = () => {
                 </main>
             </div>
         </div>
-    );
+    )
+        ;
 };
 
 export default Lighting;

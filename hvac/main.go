@@ -64,15 +64,16 @@ func UpdateMode(mode string) {
 }
 
 func DisplayLCDHVAC() {
-	currentTemp, err := gocode.ReadTemperature(temperaturePin, 22)
-	if err != nil {
-		return
-	}
-	if currentTemp > 999 {
-		currentTemp = 999
-	}
-	intCurrTemp := int(currentTemp)
-	// Hardcode Mode, Temperature to set, Status
+	//currentTemp, err := gocode.ReadTemperature(temperaturePin, 22)
+	//if err != nil {
+	//	return
+	//}
+	//if currentTemp > 999 {
+	//	currentTemp = 999
+	//}
+	//intCurrTemp := int(currentTemp)
+	// Hardcode current temp, Mode, Temperature to set, Status
+	intCurrTemp := 76
 	mode = "Heat"
 	tempToSet = 74
 	fanStatus = "ON"

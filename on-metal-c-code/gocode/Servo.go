@@ -19,16 +19,11 @@ func TurnServo() {
 	servoPin := rpio.Pin(18) // Use the correct pin for your setup
 	servoPin.Mode(rpio.Pwm)  // Set the pin to PWM mode
 
-	// Set the PWM parameters for the servo
-	const (
-		period    = 20 * time.Millisecond
-		fullCycle = 20 // This is equivalent to 50 Hz
-		dutyCycle = 7  // Duty cycle for 90 degrees, adjust as needed
-	)
+	// Manually control PWM for servo
+	const dutyCycle = 150               // Adjust this value for 90 degrees based on your servo
+	servoPin.Freq(50 * 1000)            // Set frequency to 50Hz
+	servoPin.DutyCycle(dutyCycle, 1000) // Set duty cycle
 
-	// Calculate the number of cycles for the given duty cycle
-	cycles := uint32((fullCycle * dutyCycle) / 10)
-
-	servoPin.DutyCycle(cycles, fullCycle)
-	time.Sleep(300 * time.Millisecond)
+	// Wait for the servo to move
+	time.Sleep(1 * time.Second)
 }

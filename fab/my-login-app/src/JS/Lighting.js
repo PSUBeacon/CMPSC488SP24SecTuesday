@@ -28,6 +28,8 @@ const Lighting = () => {
         '417293': false, // Initial state: off
         '417294': false, // Initial state: off
     });
+
+
     useEffect(() => {
         if (selectedRoom) {
             const token = sessionStorage.getItem('token');

@@ -3,6 +3,7 @@ module CMPSC488SP24SecTuesday
 go 1.22
 
 require (
+	github.com/d2r2/go-dht v0.0.0-20200119175940-4ba96621a218
 	github.com/gin-contrib/cors v1.5.0
 	github.com/gin-contrib/sessions v1.0.0
 	github.com/gin-gonic/gin v1.9.1
@@ -15,7 +16,8 @@ require (
 	go.mongodb.org/mongo-driver v1.14.0
 	golang.org/x/crypto v0.21.0
 	golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8
-	periph.io/x/periph v3.7.0+incompatible
+	periph.io/x/conn/v3 v3.7.0
+	periph.io/x/host/v3 v3.8.2
 )
 
 require (
@@ -23,7 +25,6 @@ require (
 	github.com/chenzhuoyu/base64x v0.0.0-20230717121745-296ad89f973d // indirect
 	github.com/chenzhuoyu/iasm v0.9.1 // indirect
 	github.com/creack/goselect v0.1.2 // indirect
-	github.com/d2r2/go-dht v0.0.0-20200119175940-4ba96621a218 // indirect
 	github.com/d2r2/go-logger v0.0.0-20210606094344-60e9d1233e22 // indirect
 	github.com/d2r2/go-shell v0.0.0-20211022052110-f591c27e3e2e // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -35,7 +36,6 @@ require (
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
-	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/gorilla/context v1.1.2 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
 	github.com/gorilla/sessions v1.2.2 // indirect
@@ -66,5 +66,4 @@ require (
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	tinygo.org/x/drivers v0.27.0 // indirect
 )

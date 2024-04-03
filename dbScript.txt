@@ -242,7 +242,7 @@ db.createCollection('Logging');
 db.Logging.insertOne({
 DeviceID: "light1",
 Function: "status",
-Change: false,
+Change: "false",
 Time: new ISODate('2024-02-23T17:49:33.694Z')
 });
 

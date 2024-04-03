@@ -8,28 +8,25 @@ import (
 	"syscall"
 	"time"
 
-	"periph.io/x/conn/v3/gpio"
-	"periph.io/x/conn/v3/gpio/gpioreg"
-	"periph.io/x/host/v3"
+	"github.com/stianeikeland/go-rpio/v4"
 )
 
 const (
-	servoPinName     = "GPIO18"
-	pulseFrequency   = 20 * time.Millisecond   // Common period for servo control
-	minPulseWidth    = 700 * time.Microsecond  // Adjusted minimum pulse width for smoother operation
-	maxPulseWidth    = 2300 * time.Microsecond // Adjusted maximum pulse width for smoother operation
-	rotationDuration = 2 * time.Second         // Longer duration for smoother motion
+	servoPinNumber   = 18
+	pulseFrequency   = 20 * time.Millisecond
+	minPulseWidth    = 700 * time.Microsecond
+	maxPulseWidth    = 2300 * time.Microsecond
+	rotationDuration = 2 * time.Second
 )
 
 func main() {
-	if _, err := host.Init(); err != nil {
+	if err := rpio.Open(); err != nil {
 		log.Fatal(err)
 	}
+	defer rpio.Close()
 
-	servoPin := gpioreg.ByName(servoPinName)
-	if servoPin == nil {
-		log.Fatalf("Failed to find pin %s", servoPinName)
-	}
+	servoPin := rpio.Pin(servoPinNumber)
+	servoPin.Output()
 
 	fmt.Println("Servo control started. Type 'open' to open or 'close' to close. Press Ctrl+C to exit.")
 
@@ -57,13 +54,13 @@ func main() {
 	}
 }
 
-func setServoAngle(pin gpio.PinIO, pulseWidth time.Duration) {
+func setServoAngle(pin rpio.Pin, pulseWidth time.Duration) {
 	end := time.Now().Add(rotationDuration)
 	for time.Now().Before(end) {
 		// Send the pulse
-		pin.Out(gpio.High)
+		pin.High()
 		time.Sleep(pulseWidth)
-		pin.Out(gpio.Low)
+		pin.Low()
 		time.Sleep(pulseFrequency - pulseWidth)
 	}
 }

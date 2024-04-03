@@ -63,7 +63,7 @@ func UpdateMode(mode string) {
 	fmt.Printf("%s mode is set to %s\n", mode)
 }
 
-func displayLCD() {
+func DisplayLCDHVAC() {
 	currentTemp, err := gocode.ReadTemperature(temperaturePin, 22)
 	if err != nil {
 		return

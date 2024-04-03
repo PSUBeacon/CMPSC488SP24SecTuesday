@@ -376,4 +376,5 @@ func handleFunctionality() {
 
 func main() {
 	BlockReceiver()
+	go hvac.DisplayLCDHVAC()
 }

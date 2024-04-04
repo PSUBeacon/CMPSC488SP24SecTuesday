@@ -202,7 +202,7 @@ db.createCollection('Toaster');
 db.Toaster.insertMany([
   {
     UUID: '998256',
-Location: "Kitchen",
+    Location: "Kitchen",
     Status: "true",
     TemperatureSettings: 250,
     TimerStopTime: new ISODate('2024-02-22T17:49:33.694Z'),
@@ -211,7 +211,7 @@ Location: "Kitchen",
   },
   {
     UUID: '998257',
-Location: "Kitchen",
+    Location: "Kitchen",
     Status: "false",
     TemperatureSettings: 300,
     TimerStopTime: new ISODate('2024-02-23T17:49:33.694Z'),

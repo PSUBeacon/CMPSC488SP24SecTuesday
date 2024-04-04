@@ -51,7 +51,7 @@ Our mission is to design and develop a unified and secure smart home ecosystem l
 
 ## 📇 Database
 - Contains user collection comprised of name, role, and login credentials.
-- Stores various device collections which corrspond with IoT devices.
+- Stores various device collections which correspond with IoT devices.
 - Log collection to track IoT device updates.
 
 ## 🖥 Development Environment

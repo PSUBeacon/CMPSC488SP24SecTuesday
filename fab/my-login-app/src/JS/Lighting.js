@@ -11,6 +11,8 @@ import kitchenImage from '../img/kitchen.png';
 import axios from "axios";
 
 const Lighting = () => {
+    document.title = 'BEACON | Lighting';
+
     const navigate = useNavigate();
     const [selectedLight, setSelectedLight] = useState(null);
     const [isNavVisible, setIsNavVisible] = useState(false);
@@ -28,7 +30,6 @@ const Lighting = () => {
         '417293': false, // Initial state: off
         '417294': false, // Initial state: off
     });
-
 
     useEffect(() => {
         if (selectedRoom) {

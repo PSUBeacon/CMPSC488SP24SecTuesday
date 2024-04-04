@@ -86,7 +86,8 @@ func main() {
 	protectedRoutes.GET("/security", GetSecurity)
 
 	protectedRoutes.POST("/appliances", getAppliancesData)
-	protectedRoutes.POST("/energy", getAppliancesData)
+
+	protectedRoutes.POST("/energy", updateIoT)
 
 	//ADJUSTMENT:
 	// Combined route group for both admin and user dashboards
@@ -130,6 +131,13 @@ func main() {
 		appliancesGroup.GET("/status", statusResp)
 	}
 
+	energyGroup := r.Group("/energy")
+	appliancesGroup.Use()
+	{
+		energyGroup.GET("/", me)
+		energyGroup.POST("/GetEnergy", getAppliancesData)
+		energyGroup.GET("/status", statusResp)
+	}
 	go r.Run(":8081")
 	//if err != nil {
 	//	log.Fatal("Server startup error:", err)

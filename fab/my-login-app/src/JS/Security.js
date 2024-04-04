@@ -1,25 +1,23 @@
 import React, {useState, useEffect} from 'react';
-import {useNavigate} from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure Bootstrap CSS is imported to use its grid system and components
-import bedroomIcon from '../img/bedroomIcon.jpg';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import doorLockIcon from '../img/doorLockIcon.png';
-import '../CSS/Security.css';
 import Header from "../components/Header";
-import Sidebar from "../components/Sidebar"; // Import your CSS file here
+import Sidebar from "../components/Sidebar";
+import HomeAlarm from "../components/SecuritySystem";
+import '../CSS/Security.css';
+import PadlockAnimation from "../components/Lock";
 
 const Security = () => {
-    const navigate = useNavigate(); // Instantiate useNavigate hook
+    document.title = 'BEACON | Security';
+
     const [isNavVisible, setIsNavVisible] = useState(false);
-    const [accountType, setAccountType] = useState('')
-    const [dimmerValue, setDimmerValue] = useState(75); // State to keep track of dimmer value
-    const [isLocked, setIsLocked] = useState(false); //need this for the toggle and also the two lines below
-    const [selectedRoom, setSelectedRoom] = useState(null);
-    const [dashboardMessage, setDashboardMessage] = useState('');
+    const [accountType, setAccountType] = useState('');
     const [lockStates, setLockStates] = useState({
-        '502857': 'locked', // Initial state: off
-        '502858': 'locked', // Initial state: off
+        '502857': 'locked',
+        '502858': 'locked',
     });
-    // States for each device
+    const [securityStatus, setSecurityStatus] = useState(['Armed', 'Disarmed']);
+    const [securityCode, setSecurityCode] = useState(['', '', '', '']);
     const [deviceData, setDeviceData] = useState({
         HVAC: {},
         Dishwasher: {},
@@ -32,17 +30,12 @@ const Security = () => {
         Toaster: {},
     });
 
-    const toggleLock = (uuid) => {
-        const newLockState = lockStates[uuid] === 'locked' ? 'unlocked' : 'locked';
-        setLockStates(prevStates => ({
-            ...prevStates,
-            [uuid]: newLockState // Toggle the lock state individually
-        }));
-    };
-
-    // Add a function to handle selecting a room:
-    const selectRoom = (roomName) => {
-        setSelectedRoom(roomName);
+    const handleSecurityCodeInput = (digit, index) => {
+        setSecurityCode(prevCode => {
+            const newCode = [...prevCode];
+            newCode[index] = digit;
+            return newCode;
+        });
     };
 
     useEffect(() => {
@@ -59,7 +52,6 @@ const Security = () => {
             .then(response => response.json())
             .then(data => {
                 console.log(data);
-                // Update state for each device if present in response
                 const updatedDeviceData = {...deviceData};
                 Object.keys(updatedDeviceData).forEach(device => {
                     if (data[device]) {
@@ -68,7 +60,6 @@ const Security = () => {
                     }
                 });
                 setDeviceData(updatedDeviceData);
-                setDashboardMessage(data.message);
                 setAccountType(data.accountType);
                 sessionStorage.setItem('accountType', data.accountType);
             })
@@ -77,7 +68,6 @@ const Security = () => {
 
     const handleToggleLock = (uuid) => {
         const isLocking = lockStates[uuid] === 'locked' ? 'unlocked' : 'locked';
-        setLockStates(prevStates => ({...prevStates, [uuid]: isLocking}));
 
         const token = sessionStorage.getItem('token');
         if (!token) {
@@ -86,7 +76,6 @@ const Security = () => {
         }
 
         const serverUrl = 'http://localhost:8081/security';
-        // Prepare the request body
         const requestBody = {
             uuid: uuid,
             name: "Security",
@@ -106,6 +95,7 @@ const Security = () => {
             .then(response => {
                 if (response.ok) {
                     console.log(`Lock ${uuid} has been ${isLocking === 'locked' ? 'locked' : 'unlocked'} successfully.`);
+                    setLockStates(prevStates => ({...prevStates, [uuid]: isLocking}));
                 } else {
                     throw new Error(`Failed to toggle the lock ${uuid} to ${isLocking === 'locked' ? 'locked' : 'unlocked'} with status: ${response.status}`);
                 }
@@ -115,7 +105,6 @@ const Security = () => {
             });
     };
 
-    // This is the JSX return statement where we lay out our component's HTML structure
     return (
         <div style={{display: 'flex', minHeight: '100vh', flexDirection: 'column', backgroundColor: '#081624'}}>
             <Header accountType={accountType}/>
@@ -130,69 +119,37 @@ const Security = () => {
                     backgroundColor: '#0E2237',
                     width: '100%'
                 }}>
-                    {/* Content Block */}
-                    <div className="contentBlock" style={{display: 'flex', width: '100%', flexWrap: 'wrap'}}>
-                        {/* Lights Control Section */}
-                        <div className="lightsControl" style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            justifyContent: 'center',
-                            gap: '0px',
-                            width: '100%',
-                            flexWrap: 'wrap'
-                        }}>
-                            <div className="doorSelection" style={{flexBasis: '48%'}}>
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '100%',
+                        marginTop: '2rem'
+                    }}>
+                        <div className="doorSelection Lock" style={{marginRight: '2rem'}}>
+                            <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
                                 <h3 className="centered-title">Back Door</h3>
-
-                                <div className="lightCards" style={{
-                                    display: 'flex',
-                                    flexWrap: 'wrap',
-                                    justifyContent: 'space-around',
-                                    padding: '0px'
-                                }}>
-                                    {/* Lock card */}
-                                    <div className="card" style={{
-                                        width: '100%',
-                                        maxWidth: '300px',
-                                        textAlign: 'center',
-                                        padding: '20px'
-                                    }}>
-                                        <img className="lockImage" src={doorLockIcon} alt="Lock Icon"/>
-                                        {/* Toggle switch with ON/OFF labels */}
-                                        <label className="switch">
-                                            <input type="checkbox" checked={lockStates['502857'] === 'unlocked'}
-                                                   onChange={() => handleToggleLock('502857')}/>
-                                            <span className="slider round"> {isLocked}</span>
-                                        </label>
-                                    </div>
-                                </div>
+                                <img className="lockImage" src={doorLockIcon} alt="Lock Icon"
+                                     style={{width: '100px', height: 'auto'}}/>
+                                <PadlockAnimation
+                                    isLocked={lockStates['502857'] === 'locked'}
+                                    handleToggleLock={() => handleToggleLock('502857')}
+                                />
                             </div>
-
-                            <div className="doorSelection1" style={{flexBasis: '48%'}}>
+                        </div>
+                        <div className="contentBlock" style={{margin: '5rem'}}>
+                            <HomeAlarm/>
+                        </div>
+                        <div className="doorSelection1 Lock" style={{}}>
+                            <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
                                 <h3 className="centered-title">Front Door</h3>
+                                <img className="lockImage" src={doorLockIcon} alt="Lock Icon"
+                                     style={{width: '100px', height: 'auto'}}/>
 
-                                <div className="lightCards" style={{
-                                    display: 'flex',
-                                    flexWrap: 'wrap',
-                                    justifyContent: 'space-around',
-                                    padding: '0px'
-                                }}>
-                                    {/* Lock card */}
-                                    <div className="card" style={{
-                                        width: '100%',
-                                        maxWidth: '300px',
-                                        textAlign: 'center',
-                                        padding: '20px'
-                                    }}>
-                                        <img className="lockImage" src={doorLockIcon} alt="Lock Icon"/>
-                                        {/* Toggle switch with ON/OFF labels */}
-                                        <label className="switch">
-                                            <input type="checkbox" checked={lockStates['502858'] === 'unlocked'}
-                                                   onChange={() => handleToggleLock('502858')}/>
-                                            <span className="slider round"> {isLocked}</span>
-                                        </label>
-                                    </div>
-                                </div>
+                                <PadlockAnimation
+                                    isLocked={lockStates['502858'] === 'locked'}
+                                    handleToggleLock={() => handleToggleLock('502858')}
+                                />
                             </div>
                         </div>
                     </div>
@@ -203,4 +160,3 @@ const Security = () => {
 };
 
 export default Security;
-

@@ -17,7 +17,7 @@ import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 
 const Dashboard = () => {
-
+    document.title = 'BEACON | Dashboard';
 
     const [cameraView, setCameraView] = useState('livingroom'); // Default camera view
     const navigate = useNavigate(); // Instantiate useNavigate hook

@@ -1,0 +1,158 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.menu-icon {
+    display: none;
+    cursor: pointer;
+}
+
+.menu-icon div {
+    width: 30px;
+    height: 3px;
+    background-color: #ecf0f1;
+    margin: 6px 0;
+    transition: transform 0.3s ease; /* Smooth transition for hamburger icon animation */
+}
+
+.nav {
+    display: none;
+}
+
+.nav ul {
+    list-style: none;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.nav ul li {
+    margin: 0 15px;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+}
+
+
+.nav ul li a {
+    display: flex;
+    color: #333;
+    padding: 10px;
+    text-decoration: none;
+    text-align: center;
+}
+
+@media screen and (min-width: 769px) {
+    .nav ul li a {
+        display: none;
+    }
+}
+
+/* Hover effect for nav links */
+.nav ul li a:hover,
+.nav ul li a:focus { /* Also apply to focus for accessibility */
+    color: #00aaff; /* Example hover color */
+}
+
+.close-btn {
+    display: none; /* Hide close button by default */
+    color: #fff;
+    font-size: 2rem;
+}
+
+.menu-icon {
+    display: none;
+    cursor: pointer;
+}
+
+.menu-icon div {
+    width: 30px;
+    height: 3px;
+    background-color: #ecf0f1;
+    margin: 6px 0;
+    transition: transform 0.3s ease; /* Smooth transition for hamburger icon animation */
+}
+
+.nav-text {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .nav-text {
+        display: inline;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .nav ul li a {
+        color: white;
+        justify-content: center;
+        align-items: center;
+        text-decoration: none;
+        padding: 10px; /* Add padding for larger click area */
+        position: relative; /* Needed to position the pseudo-elements */
+
+
+    }
+
+    .settingsDiv {
+        display: none;
+    }
+
+    .nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background-color: black;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-out;
+        z-index: 998;
+    }
+
+    .nav.open {
+        transform: translateX(0);
+    }
+
+    .nav ul {
+        width: 100%; /* Full width for the vertical menu */
+        display: flex; /* This needs to be overridden */
+        flex-direction: column; /* Stack items vertically */
+        align-items: center;
+        justify-content: center;
+    }
+
+    .nav ul li {
+        width: 100%; /* List items take full width */
+        margin: 10px 0; /* Spacing between stacked items */
+        align-items: center;
+        justify-content: center;
+    }
+
+    .menu-icon {
+        display: block;
+    }
+
+    .close-btn {
+        display: block; /* Show the close button */
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: none;
+        border: none;
+    }
+
+    .nav ul li a {
+        font-size: 2rem; /* Smaller font size for mobile links */
+        color: white;
+        align-items: center;
+        justify-content: center;
+    }
+}

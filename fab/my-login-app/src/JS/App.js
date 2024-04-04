@@ -13,14 +13,12 @@ import Networking from './Networking'; //Import your networking page component
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../CSS/login.css';
 
-
 function App() {
     return (
         <Router>
             <Routes>
                 <Route path="/" element={<LoginForm/>}/>
-                <Route path="/dashboard" element={<Dashboard/>}>
-                </Route>
+                <Route path="/dashboard" element={<Dashboard/>}/>
                 <Route path="/settings" element={<Settings/>}/>
                 <Route path="/security" element={<Security/>}/>
                 <Route path="/lighting" element={<Lighting/>}/>

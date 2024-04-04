@@ -5,6 +5,8 @@ import loginImage from '../img/loginImage.png';
 import logoImage from '../img/logo.webp';
 
 const SignUp = () => {
+    document.title = 'BEACON | Sign Up';
+
     // Removed email state
     const [firstName, setFirstName] = useState(''); // Added firstName state
     const [lastName, setLastName] = useState(''); // Added lastName state

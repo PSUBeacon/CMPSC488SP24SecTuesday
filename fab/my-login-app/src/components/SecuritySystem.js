@@ -1,13 +1,10 @@
-// HomeAlarm.js
-
 import React, {useState} from 'react';
 import '../CSS/SecuritySystem.css';
-import PadlockAnimation from './Lock'
+import PadlockAnimation from './Lock';
 
 function HomeAlarm() {
     const [inputCode, setInputCode] = useState('');
     const [displayCode, setDisplayCode] = useState('');
-
 
     const handleNumberPress = (number) => {
         if (inputCode.length < 6) {
@@ -16,19 +13,54 @@ function HomeAlarm() {
         }
     };
 
-    const handleArmHome = () => {
+    const handleArm = () => {
         console.log('ARM HOME pressed with code:', inputCode);
-        // Add logic for when ARM HOME is pressed
+        sendCodeToBackend(inputCode, "true");
     };
 
-    const handleArmAway = () => {
+    const handleDisarm = () => {
         console.log('ARM AWAY pressed with code:', inputCode);
-        // Add logic for when ARM AWAY is pressed
+        sendCodeToBackend(inputCode, "false");
     };
 
     const handleClear = () => {
         setInputCode('');
         setDisplayCode('');
+    };
+
+    const sendCodeToBackend = (code, AlarmStatus) => {
+        const token = sessionStorage.getItem('token');
+        if (!token) {
+            console.error("Authorization token not found.");
+            return;
+        }
+        const serverUrl = 'http://localhost:8081/security/system';
+        const requestData = {
+            code: code,
+            status: AlarmStatus,
+        };
+
+        fetch(serverUrl, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestData),
+        })
+            .then(response => {
+                if (response.ok) {
+                    console.log(`Code ${code} has been sent to the backend successfully.`);
+                    // Reset the input code and display code after sending to the backend
+                    setInputCode('');
+                    setDisplayCode('');
+                } else {
+                    throw new Error(`Failed to send the code ${code} to the backend with status: ${response.status}`);
+                }
+            })
+            .catch(error => {
+                console.error(`There was an error sending the code ${code} to the backend:`, error);
+            });
     };
 
     return (
@@ -44,8 +76,8 @@ function HomeAlarm() {
                     />
                 </div>
                 <div className="buttons-row">
-                    <button className="ArmKey" onClick={handleArmHome}>ARM</button>
-                    <button className="DisarmKey" onClick={handleArmAway}>DISARM</button>
+                    <button className="ArmKey" onClick={handleArm}>ARM</button>
+                    <button className="DisarmKey" onClick={handleDisarm}>DISARM</button>
                 </div>
                 <div className="code-entry">
                     <div className="numbers-grid">

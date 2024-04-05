@@ -6,10 +6,13 @@ import Sidebar from "../components/Sidebar";
 import HomeAlarm from "../components/SecuritySystem";
 import '../CSS/Security.css';
 import PadlockAnimation from "../components/Lock";
+import {useNavigate} from "react-router-dom";
 
 const Security = () => {
     document.title = 'BEACON | Security';
-
+    const navigate = useNavigate();
+    const [error, setError] = useState('');
+    const [user, setUser] = useState(null);
     const [isNavVisible, setIsNavVisible] = useState(false);
     const [accountType, setAccountType] = useState('');
     const [lockStates, setLockStates] = useState({
@@ -42,6 +45,11 @@ const Security = () => {
         const token = sessionStorage.getItem('token');
         const url = 'http://localhost:8081/security';
 
+        if (!token) {
+            navigate('/'); // Redirect to login page if token is not present
+            return;
+        }
+
         fetch(url, {
             method: 'GET',
             headers: {
@@ -50,21 +58,19 @@ const Security = () => {
             },
         })
             .then(response => response.json())
-            .then(data => {
-                console.log(data);
-                const updatedDeviceData = {...deviceData};
-                Object.keys(updatedDeviceData).forEach(device => {
-                    if (data[device]) {
-                        sessionStorage.setItem(device, JSON.stringify(data[device]));
-                        updatedDeviceData[device] = data[device];
-                    }
-                });
-                setDeviceData(updatedDeviceData);
-                setAccountType(data.accountType);
-                sessionStorage.setItem('accountType', data.accountType);
+            .then(response => {
+                if (response && response.data) {
+                    setUser(response.data.user);
+                    setAccountType(response.data.accountType);
+                    sessionStorage.setItem('accountType', response.data.accountType);
+                } else {
+                    setError('Unexpected response from server');
+                }
             })
-            .catch(error => console.error('Fetch operation error:', error));
-    }, []);
+            .catch(error => {
+                console.log('Fetch operation error:', error)
+            });
+    }, [navigate]);
 
     const handleToggleLock = (uuid) => {
         const isLocking = lockStates[uuid] === 'locked' ? 'unlocked' : 'locked';

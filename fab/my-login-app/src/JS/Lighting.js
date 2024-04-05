@@ -95,7 +95,7 @@ const Lighting = () => {
 
     useEffect(() => {
         const token = sessionStorage.getItem('token');
-        const url = 'http://localhost:8081/lighting';
+        const url = `http://localhost:8081/lighting?roomName=${encodeURIComponent(selectedRoom)}`;
 
         if (!token) {
             navigate('/'); // Redirect to login page if token is not present

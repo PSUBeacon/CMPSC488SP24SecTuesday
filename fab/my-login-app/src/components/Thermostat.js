@@ -1,16 +1,47 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import '../CSS/Thermostat.css';
+import axios from "axios";
 
-const ModeToggle = ({initialMode, onModeChange}) => {
-    const [mode, setMode] = useState(initialMode);
+let func;
+let temperature, setTemperature, mode, setMode, fanSpeed, setFanSpeed;
+let INITuuid;
+
+const sendServerRequest = () => {
+    const requestBody = {
+        UUID: INITuuid,
+        Name: "HVAC",
+        AppType: "HVAC",
+        Function: func,
+        Change: func === "Mode" ? mode :
+            func === "Temperature" ? JSON.stringify(temperature) :
+                func === "FanSpeed" ? JSON.stringify(fanSpeed) :
+                    mode === "off" ? "false" : "true",
+    };
+
+    try {
+        const response = axios.post('http://localhost:8081/hvac/updateHVAC', requestBody, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+    } catch (error) {
+        console.error('Failed to send settings to server:', error);
+    }
+};
+
+const ModeToggle = ({initialMode, onModeChange, initialStatus}) => {
+    const [mode, setMode] = useState(initialStatus == 'false' ? 'off' : initialMode);
 
     const handleModeChange = (newMode) => {
         setMode(newMode);
         onModeChange(newMode);
+        func = mode === "cool" || mode === "heat" ? "Mode" : "Status";
+        sendServerRequest();
     };
 
     return (
         <div className="mode-toggle">
+            <span className="mode-label">Mode:</span>
             <button
                 className={`mode-button ${mode === 'cool' ? 'active' : ''}`}
                 onClick={() => handleModeChange('cool')}
@@ -39,25 +70,28 @@ const FanSpeedToggle = ({initialFanSpeed, onFanSpeedChange}) => {
     const handleFanSpeedChange = (newFanSpeed) => {
         setFanSpeed(newFanSpeed);
         onFanSpeedChange(newFanSpeed);
+        func = "FanSpeed";
+        sendServerRequest();
     };
 
     return (
         <div className="fan-speed-toggle">
+            <span className="mode-label">Fan:</span>
             <button
-                className={`fan-speed-button ${fanSpeed === 'low' ? 'active' : ''}`}
-                onClick={() => handleFanSpeedChange('low')}
+                className={`fan-speed-button ${fanSpeed === 1 ? 'active' : ''}`}
+                onClick={() => handleFanSpeedChange(1)}
             >
                 Low
             </button>
             <button
-                className={`fan-speed-button ${fanSpeed === 'medium' ? 'active' : ''}`}
-                onClick={() => handleFanSpeedChange('medium')}
+                className={`fan-speed-button ${fanSpeed === 2 ? 'active' : ''}`}
+                onClick={() => handleFanSpeedChange(2)}
             >
                 Medium
             </button>
             <button
-                className={`fan-speed-button ${fanSpeed === 'high' ? 'active' : ''}`}
-                onClick={() => handleFanSpeedChange('high')}
+                className={`fan-speed-button ${fanSpeed === 3 ? 'active' : ''}`}
+                onClick={() => handleFanSpeedChange(3)}
             >
                 High
             </button>
@@ -65,10 +99,19 @@ const FanSpeedToggle = ({initialFanSpeed, onFanSpeedChange}) => {
     );
 };
 
-const NestThermostat = ({initialTemperature, initialMode, initialHumidity, initialFanSpeed, initialPU}) => {
-    const [temperature, setTemperature] = useState(initialTemperature || 76);
-    const [mode, setMode] = useState(initialMode);
-    const [fanSpeed, setFanSpeed] = useState(initialFanSpeed);
+const NestThermostat = ({
+                            uuid,
+                            initialTemperature,
+                            initialMode,
+                            initialHumidity,
+                            initialFanSpeed,
+                            initialStatus,
+                            initialPU
+                        }) => {
+    [temperature, setTemperature] = useState(initialTemperature || 76);
+    [mode, setMode] = useState(initialMode);
+    [fanSpeed, setFanSpeed] = useState(initialFanSpeed);
+    INITuuid = uuid;
 
     const minTemp = 60;
     const maxTemp = 90;
@@ -92,16 +135,18 @@ const NestThermostat = ({initialTemperature, initialMode, initialHumidity, initi
 
     const handleDecrement = useCallback(
         () => {
-            console.log('Decrement button clicked');
+            func = "Temperature"
             handleTemperatureChange(Math.max(temperature - 1, minTemp));
+            sendServerRequest();
         },
         [temperature, minTemp, handleTemperatureChange]
     );
 
     const handleIncrement = useCallback(
         () => {
-            console.log('Increment button clicked');
+            func = "Temperature"
             handleTemperatureChange(Math.min(temperature + 1, maxTemp));
+            sendServerRequest();
         },
         [temperature, maxTemp, handleTemperatureChange]
     );
@@ -109,7 +154,7 @@ const NestThermostat = ({initialTemperature, initialMode, initialHumidity, initi
     return (
         <div className="thermostat-container">
             <div className="thermostat">
-                <ModeToggle initialMode={initialMode} onModeChange={setMode}/>
+                <ModeToggle initialMode={initialMode} onModeChange={setMode} initialStatus={initialStatus}/>
                 <FanSpeedToggle initialFanSpeed={initialFanSpeed} onFanSpeedChange={setFanSpeed}/>
                 <svg viewBox="0 0 100 100" className="thermostat-dial">
                     <circle cx="50" cy="50" r="45" className="dial-background"/>
@@ -150,8 +195,8 @@ const NestThermostat = ({initialTemperature, initialMode, initialHumidity, initi
                     <button onClick={handleIncrement} className="temperature-button">
                         +
                     </button>
-                    <div className="humidity-display">Initial Humidity: {initialHumidity}</div>
-                    <div className="humidity-display">Power Usage: {initialPU}</div>
+                    <div className="humidity-display">Humidity: {initialHumidity}%</div>
+                    <div className="humidity-display">Power Usage: {initialPU}kW</div>
                 </div>
             </div>
         </div>

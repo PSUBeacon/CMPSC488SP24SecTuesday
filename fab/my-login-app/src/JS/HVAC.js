@@ -23,6 +23,7 @@ const HVAC = () => {
         SolarPanel: {},
         Toaster: {},
     });
+
     const navigate = useNavigate(); // Instantiate useNavigate hook
     const [user, setUser] = useState(null);
     const [error, setError] = useState('');
@@ -32,7 +33,6 @@ const HVAC = () => {
     const [basementHVACStatus, setBasementHVACStatus] = useState(deviceData.HVAC.Status);
 
     const [floorData, setFloorData] = useState([]);
-
 
     useEffect(() => {
         const token = sessionStorage.getItem('token');
@@ -59,7 +59,7 @@ const HVAC = () => {
 
     useEffect(() => {
         const token = sessionStorage.getItem('token');
-        const url = 'http://localhost:8081/hvac';
+        const url = 'http://localhost:8081/hvac/';
 
         if (!token) {
             navigate('/'); // Redirect to login page if token is not present
@@ -117,12 +117,12 @@ const HVAC = () => {
                                 <h4 style={{
                                     textAlign: "center",
                                     marginBottom: '20px',
-                                    color: '#95A4B6'
-                                }}>{floor.location}</h4>
-
+                                    color: 'White'
+                                }}>{floor.Location}</h4>
                                 <NestThermostat initialTemperature={floor.Temperature}
                                                 initialFanSpeed={floor.FanSpeed} initialMode={floor.Mode}
-                                                initialHumidity={floor.Humidity} initialPU={floor.EnergyConsumption}/>
+                                                initialHumidity={floor.Humidity} initialPU={floor.EnergyConsumption}
+                                                initialStatus={floor.Status} uuid={floor.uuid}/>
                             </div>
                         ))}
                     </div>

@@ -72,3 +72,7 @@ func ClearLCD() {
 
 	}
 }
+
+func main() {
+	WriteLCD("488 is pain")
+}

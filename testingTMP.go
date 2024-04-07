@@ -2,56 +2,21 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"time"
-
-	"github.com/stianeikeland/go-rpio/v4"
+	"github.com/d2r2/go-dht"
+	"log"
 )
 
 func main() {
-	// Open and map memory to access GPIO, check for error
-	if err := rpio.Open(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+	// Use GPIO pin 4, for example, change this to the pin you've connected your DHT22 sensor to.
+	// Make sure to run your program with root permissions to access GPIO pins.
+	sensorType := dht.DHT22
+
+	// Read data from the sensor
+	temperature, humidity, _, err := dht.ReadDHTxxWithRetry(sensorType, 4, false, 10)
+	if err != nil {
+		log.Fatalf("Failed to read from DHT22 sensor: %s", err)
 	}
-	defer rpio.Close()
 
-	// Define your SDA and SCL pins manually
-	var sdaPin rpio.Pin = rpio.Pin(2) // Example pin, adjust based on your SDA
-	var sclPin rpio.Pin = rpio.Pin(3) // Example pin, adjust based on your SCL
-
-	// Initialize pins
-	sdaPin.Input()  // Set SDA to input for reading data
-	sdaPin.PullUp() // Typically, I2C lines are pull-up
-	sclPin.Output() // Set SCL to output to control the clock
-
-	// Example function calls
-	// Note: You would need to implement these functions based on I2C protocol specifications
-	i2cStartCondition(sdaPin, sclPin)
-	i2cStopCondition(sdaPin, sclPin)
-
-	// Implementing bit-banging for I2C involves detailed functions for each step of communication
+	fmt.Printf("Temperature: %.2f°F\n", (temperature*9/5)+32)
+	fmt.Printf("Humidity: %.2f%%\n", humidity)
 }
-
-func i2cStartCondition(sdaPin rpio.Pin, sclPin rpio.Pin) {
-	// Example of how to start condition might be implemented
-	// This is highly simplified and not directly usable
-	sdaPin.Output()
-	sdaPin.Low()
-	time.Sleep(time.Microsecond * 10)
-	sclPin.Low()
-}
-
-func i2cStopCondition(sdaPin rpio.Pin, sclPin rpio.Pin) {
-	// Example of how a stop condition might be implemented
-	// This is highly simplified and not directly usable
-	sdaPin.Output()
-	sdaPin.Low()
-	time.Sleep(time.Microsecond * 10)
-	sclPin.High()
-	time.Sleep(time.Microsecond * 10)
-	sdaPin.High()
-}
-
-// Note: Implementing a full I2C protocol with just GPIO manipulation requires
-// functions to write bits, read bits, generate clock signals, handle timing, etc.

@@ -63,6 +63,12 @@ const Sidebar = ({ isNavVisible }) => {
                             Energy
                         </Link>
                     </li>
+                    <li className={`nav-item ${isPathActive('/documentation') ? 'active' : ''}`} style={{ margin: '0.5rem 0', padding: '0.5rem' }}>
+                        <Link to="/documentation" style={{ color: isPathActive('/documentation') ? '#50BCC0' : '#95A4B6', textDecoration: 'none' }}>
+                            <i className="fas fa-bolt" style={{ marginRight: '10px' }}></i>
+                            User Manual
+                        </Link>
+                    </li>
                 </ul>
             </nav>
         </aside>

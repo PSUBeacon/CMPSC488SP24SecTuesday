@@ -2,30 +2,30 @@ package main
 
 import (
 	"fmt"
-	"github.com/d2r2/go-dht"
 	"log"
+	"time"
+
+	"github.com/d2r2/go-dht"
+	"github.com/stianeikeland/go-rpio/v4"
 )
 
 func main() {
-	// Use GPIO pin 4, for example, change this to the pin you've connected your sensor to.
-	// Make sure to run your program with root permissions to access GPIO pins.
-	pin := 4
+	if err := rpio.Open(); err != nil {
+		log.Fatalf("Failed to open GPIO: %s", err)
+	}
+	defer rpio.Close()
 
-	// Specify the sensor type (DHT11 or DHT22)
+	pin := rpio.Pin(4)
+	pin.PullUp()
+	pin.Input()
+	time.Sleep(2 * time.Second) // Allow sensor to stabilize
+
 	sensorType := dht.DHT11
 
-	// Read data from the sensor
-	temperature, humidity, _, err := dht.ReadDHTxxWithRetry(sensorType, pin, false, 10)
+	temperature, humidity, _, err := sensor.ReadDHTxxWithRetry(sensorType, pin, rpio.PullUp, 10)
 	if err != nil {
-		log.Fatalf("Failed to read from sensor: %s", err)
+		log.Fatalf("Failed to read DHT11: %s", err)
 	}
 
-	// Print the results based on the sensor type
-	if sensorType == dht.DHT11 {
-		fmt.Printf("Temperature: %.0f°F\n", (temperature*9/5)+32)
-		fmt.Printf("Humidity: %.0f%%\n", humidity)
-	} else if sensorType == dht.DHT22 {
-		fmt.Printf("Temperature: %.2f°F\n", (temperature*9/5)+32)
-		fmt.Printf("Humidity: %.2f%%\n", humidity)
-	}
+	fmt.Printf("Temperature: %.2f°C, Humidity: %.2f%%\n", temperature, humidity)
 }

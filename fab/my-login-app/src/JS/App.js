@@ -10,6 +10,7 @@ import Appliances from './Appliances'; // Import Appliances component
 import Energy from './Energy'; // Import Energy component
 import Settings from './Settings'; // Import your settings page component
 import Networking from './Networking'; //Import your networking page component
+import Documentation from './Documentation';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../CSS/login.css';
 
@@ -27,6 +28,7 @@ function App() {
                 <Route path="/appliances" element={<Appliances/>}/>
                 <Route path="/energy" element={<Energy/>}/>
                 <Route path="/signup" element={<SignUp/>}/>
+                <Route path="/documentation" element={<Documentation/>}/>
             </Routes>
         </Router>
     );

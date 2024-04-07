@@ -2,20 +2,30 @@ package main
 
 import (
 	"fmt"
-	"github.com/d2r2/go-dht"
 	"log"
+	"time"
+
+	"github.com/d2r2/go-dht"
+	"github.com/stianeikeland/go-rpio/v4"
 )
 
 func main() {
-	// Use GPIO pin 4, for example, change this to the pin you've connected your DHT22 sensor to
-	// Make sure to run your program with root permissions to access GPIO pins
+	if err := rpio.Open(); err != nil {
+		log.Fatalf("Failed to open GPIO: %s", err)
+	}
+	defer rpio.Close()
+
+	pin := rpio.Pin(4)
+	pin.PullUp()
+	pin.Input()
+	time.Sleep(2 * time.Second) // Allow sensor to stabilize
+
 	sensorType := dht.DHT11
 
-	// Read data from the sensor
-	temperature, _, _, err := dht.ReadDHTxxWithRetry(sensorType, 4, false, 10)
+	temperature, humidity, _, err := sensor.ReadDHTxxWithRetry(sensorType, pin, rpio.PullUp, 10)
 	if err != nil {
-		log.Fatalf("Failed to read from DHT11 sensor: %s", err)
+		log.Fatalf("Failed to read DHT11: %s", err)
 	}
 
-	fmt.Printf("Temperature: %.2f°F\n", (temperature*9/5)+32)
+	fmt.Printf("Temperature: %.2f°C, Humidity: %.2f%%\n", temperature, humidity)
 }

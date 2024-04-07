@@ -224,15 +224,15 @@ db.createCollection('Users');
 db.Users.insertOne({
   username: "beaconuser",
   password: "$2y$10$m.yZC0lz8ZM68nGljOCV3u73GY0Z1wTr9wm.LGhLllvlTXV1VvglS",
-  fName: "Steve",
-  lName: "Jones",
+  firstname: "Steve",
+  lastname: "Jones",
   role: "admin"
 })
 db.Users.insertOne({
   username: "houseuser",
   password: "$2y$10$ZKOjc4qFO7Jr5D9ifVQtAezvYnYywIwVl1oL0.EFLxuHTtkt3beVq",
-  fName: "Bob",
-  lName: "Smith",
+  firstname: "Bob",
+  lastname: "Smith",
   role: "user"
 })
 

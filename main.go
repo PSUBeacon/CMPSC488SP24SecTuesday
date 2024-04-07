@@ -1,7 +1,6 @@
 package main
 
 import (
-	messaging "CMPSC488SP24SecTuesday/AES-BlockChain-Communication"
 	"CMPSC488SP24SecTuesday/appliances"
 	"CMPSC488SP24SecTuesday/blockchain"
 	"CMPSC488SP24SecTuesday/crypto"
@@ -19,7 +18,6 @@ import (
 	"log"
 	"os"
 	"strconv"
-	"time"
 )
 
 func decryptAES(key, ciphertext []byte) ([]byte, error) {
@@ -83,7 +81,7 @@ func BlockReceiver() {
 
 	fmt.Println("Waiting for incoming messages...")
 
-	ticker := time.NewTicker(60 * time.Second)
+	//ticker := time.NewTicker(60 * time.Second)
 
 	// Use ReadBytes or ReadString to dynamically handle incoming data
 	for {
@@ -94,11 +92,11 @@ func BlockReceiver() {
 			if err != nil {
 				log.Fatal("Error reading byte:", err)
 			}
-			if ticker == nil {
-				go messaging.BroadCastMessage([]byte("pi # connected"))
-				ticker.Reset(60 * time.Second)
+			//if ticker == nil {
+			//go messaging.BroadCastMessage([]byte("pi # connected"))
+			//ticker.Reset(60 * time.Second)
 
-			}
+			//}
 
 			// Check for the UTF-8 encoding of '♄' the hex value is (E2 99 B4)
 			if len(message) >= 2 && message[len(message)-2] == 0xE2 && message[len(message)-1] == 0x99 && b == 0xB4 {
@@ -149,6 +147,7 @@ func BlockReceiver() {
 				if err != nil {
 					panic(err)
 				}
+				//fmt.Println("Got to functionality")
 				go handleFunctionality()
 				continue
 
@@ -180,6 +179,7 @@ func BlockReceiver() {
 					if err != nil {
 						panic(err)
 					}
+					//fmt.Println("Got to functionality")
 					go handleFunctionality()
 				}
 				if verify == false {
@@ -220,7 +220,6 @@ func verifyBlockchain(currentblock blockchain.Block) bool {
 		fmt.Println("block and chain is valid")
 		return true
 	}
-	//}
 	return false
 }
 
@@ -242,37 +241,42 @@ func handleFunctionality() {
 
 	var messageData dal.MessagingStruct
 	var UUIDsData dal.UUIDsConfig
-	fmt.Println(messageData)
-	err = json.Unmarshal([]byte(latestBlockData), &messageData)
 
+	err = json.Unmarshal([]byte(latestBlockData), &messageData)
+	fmt.Println(messageData)
 	jsonconfigData, err := os.ReadFile("config.json")
 
 	err = json.Unmarshal(jsonconfigData, &UUIDsData)
 	if err != nil {
 		panic(err)
 	}
+
 	messageChange, _ := strconv.Atoi(messageData.Change)
+
+	//fmt.Println("This is the uuids", UUIDsData)
 	if messageData.Name == "Lighting" {
-		for _, group := range [][]dal.Pi{UUIDsData.LightingUUIDs} {
-			for _, Pi := range group {
-				if Pi.UUID == messageData.UUID {
-					if messageData.Function == "Status" {
-						if messageData.Change == "false" {
-							lighting.UpdateStatus(false)
-						}
-						if messageData.Change == "true" {
-							lighting.UpdateStatus(true)
-						}
+		//fmt.Println("Got past the name")
+		for _, Pi := range UUIDsData.Lighting {
+			if Pi.UUID == messageData.UUID {
+				//fmt.Println("got past the loop")
+				if messageData.Function == "Status" {
+					if messageData.Change == "false" {
+						//fmt.Println("inside the status false")
+						lighting.UpdateStatus(false)
 					}
-					if messageData.Function == "Brightness" {
-						lighting.SetBrightness(messageChange)
+					if messageData.Change == "true" {
+						//fmt.Println("inside the status false")
+						lighting.UpdateStatus(true)
 					}
+				}
+				if messageData.Function == "Brightness" {
+					lighting.SetBrightness(messageChange)
 				}
 			}
 		}
 	}
 	if messageData.Name == "HVAC" {
-		for _, group := range [][]dal.Pi{UUIDsData.HvacUUIDs} {
+		for _, group := range [][]dal.Pi{UUIDsData.Hvac} {
 			for _, Pi := range group {
 				if Pi.UUID == messageData.UUID {
 					if messageData.Change == "false" {
@@ -294,8 +298,9 @@ func handleFunctionality() {
 			}
 		}
 	}
+
 	if messageData.Name == "Security" {
-		for _, group := range [][]dal.Pi{UUIDsData.SecurityUUIDs} {
+		for _, group := range [][]dal.Pi{UUIDsData.Security} {
 			for _, Pi := range group {
 				if Pi.UUID == messageData.UUID {
 					if messageData.Function == "Status" {
@@ -306,12 +311,20 @@ func handleFunctionality() {
 							security.UpdateAlarmStatus(true)
 						}
 					}
+					if messageData.Function == "LockStatus" {
+						if messageData.Change == "false" {
+							security.LockOrUnlock(false)
+						}
+						if messageData.Change == "true" {
+							security.LockOrUnlock(true)
+						}
+					}
 				}
 			}
 		}
 	}
 	if messageData.Name == "Appliances" {
-		for _, group := range [][]dal.Pi{UUIDsData.AppliancesUUIDs} {
+		for _, group := range [][]dal.Pi{UUIDsData.Appliances} {
 			for _, Pi := range group {
 				if Pi.UUID == messageData.UUID {
 					if messageData.Function == "Status" {
@@ -347,7 +360,7 @@ func handleFunctionality() {
 		}
 	}
 	if messageData.Name == "Energy" {
-		for _, group := range [][]dal.Pi{UUIDsData.EnergyUUIDs} {
+		for _, group := range [][]dal.Pi{UUIDsData.Energy} {
 			for _, Pi := range group {
 				if Pi.UUID == messageData.UUID {
 					if messageData.Function == "Status" {
@@ -358,8 +371,10 @@ func handleFunctionality() {
 		}
 
 	}
+	return
 }
 
 func main() {
-	go BlockReceiver()
+	go hvac.DisplayLCDHVAC()
+	BlockReceiver()
 }

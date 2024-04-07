@@ -4,13 +4,13 @@ import (
 	"CMPSC488SP24SecTuesday/dal"
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
@@ -70,6 +70,7 @@ func main() {
 	r.GET("/status", statusResp)
 	r.POST("/login", loginHandler)
 	r.GET("/logout", logout)
+	r.POST("/signup", signupHandler)
 
 	// Apply JWT middleware to protected routes
 	protectedRoutes := r.Group("/")
@@ -79,57 +80,71 @@ func main() {
 	protectedRoutes.POST("/lighting", updateIoT)
 	protectedRoutes.GET("/lighting", GetLights)
 
-	protectedRoutes.POST("/hvac", updateIoT)
-
 	protectedRoutes.POST("/security", updateIoT)
 	protectedRoutes.GET("/security", GetSecurity)
 
-	protectedRoutes.POST("/appliances", updateIoT)
+	protectedRoutes.POST("/appliances", getAppliancesData)
 
 	protectedRoutes.POST("/energy", updateIoT)
 
-	//protectedRoutes.POST("/networking", updateIoT)
-	// use JWT middleware for all protected routes
-	//r.Use(authMiddleware())
-
 	//ADJUSTMENT:
-
 	// Combined route group for both admin and user dashboards
-	dashboardGroup := r.Group("/dashboard", dashboardHandler)
-	dashboardGroup.Use(authMiddleware()) // Apply authMiddleware to protect the route
+	dashboardGroup := r.Group("/dashboard")
+	dashboardGroup.Use() // Apply authMiddleware to protect the route
 	{
-		// Combined dashboard route for admin and user
-		dashboardGroup.POST("/", me)
-		dashboardGroup.GET("/me", me) // Use an empty string for the base path of the group
+		dashboardGroup.GET("/", dashboardHandler)
+		dashboardGroup.GET("/GetDashboard", getDashboardItems)
+		dashboardGroup.GET("/me", me)
 		dashboardGroup.GET("/status", statusResp)
 	}
 
-	networkingGroup := r.Group("/networking", dashboardHandler)
-	networkingGroup.Use(authMiddleware())
+	hvacGroup := r.Group("/hvac")
+	hvacGroup.Use()
+	{
+		hvacGroup.GET("/", GetHVAC)
+		hvacGroup.POST("/updateHVAC", updateThermostat)
+		hvacGroup.GET("/GetHVAC", GetHVAC)
+		hvacGroup.GET("/status", statusResp)
+	}
+
+	networkingGroup := r.Group("/networking")
+	networkingGroup.Use()
 	{
 		networkingGroup.GET("/", me)
 		networkingGroup.GET("/GetNetLogs", GetNetLogs)
 		networkingGroup.GET("/status", statusResp)
 	}
 
-	go r.Run(":8081")
+	securityGroup := r.Group("/security")
+	securityGroup.Use()
+	{
+		securityGroup.GET("/", me)
+		securityGroup.GET("/GetSecurity", GetSecurity)
+		securityGroup.POST("/system", VerifySecurityCode)
+		securityGroup.GET("/status", statusResp)
+	}
+
+	appliancesGroup := r.Group("/appliances", dashboardHandler)
+	appliancesGroup.Use()
+	{
+		appliancesGroup.GET("/", me)
+		appliancesGroup.GET("/me", me)
+		appliancesGroup.GET("/status", statusResp)
+	}
+
+	energyGroup := r.Group("/energy")
+	appliancesGroup.Use()
+	{
+		energyGroup.GET("/", me)
+		energyGroup.POST("/GetEnergy", getAppliancesData)
+		energyGroup.GET("/status", statusResp)
+	}
+	go r.Run(":8080")
 	//if err != nil {
 	//	log.Fatal("Server startup error:", err)
 	//}
 	// Create a channel to receive the missingPi array from BlockReceiver
-	//missingPiChan := make(chan []string)
-	//// Run BlockReceiver as a goroutine
-	//go func() {
-	//	// Execute BlockReceiver and send the result to missingPiChan
-	//	missingPi := messaging.BlockReceiver()
-	//	missingPiChan <- missingPi
-	//}()
 	//
-	//// Receive the missingPi array from missingPiChan
-	//missingPi := <-missingPiChan
-	//
-	////// Update the disconnectedPiNums array with the missingPi array
-	//UpdateMissingPi(missingPi)
 
 	select {}
 }
@@ -148,9 +163,9 @@ func updateIoT(c *gin.Context) {
 		return
 	}
 
-	var UUIDsData dal.UUIDsConfig
-	jsonconfigData, _ := os.ReadFile("config.json")
-	_ = json.Unmarshal(jsonconfigData, &UUIDsData)
+	//var UUIDsData dal.UUIDsConfig
+	//jsonconfigData, _ := os.ReadFile("config.json")
+	//_ = json.Unmarshal(jsonconfigData, &UUIDsData)
 
 	//allPis := [][]dal.Pi{
 	//	UUIDsData.LightingUUIDs,
@@ -192,15 +207,137 @@ func GetLights(c *gin.Context) {
 	c.JSON(http.StatusOK, lights)
 }
 
-func findPiByUUID(allPis [][]dal.Pi, uuidToFind string) (dal.Pi, bool) {
-	for _, category := range allPis {
-		for _, pi := range category {
-			if pi.UUID == uuidToFind {
-				return pi, true
-			}
-		}
+func updateThermostat(c *gin.Context) {
+	var req dal.ThermMessagingStruct
+	requestBody, _ := ioutil.ReadAll(c.Request.Body)
+	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		fmt.Printf("Error binding JSON: %v\n", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
-	return dal.Pi{}, false
+
+	//fmt.Println([]byte(req.UUID), req.Name, req.AppType, req.Function, req.Change)
+	//fmt.Printf("\n%T\n", req.Change)
+	dal.UpdateThermMessaging(client, []byte(req.UUID), req.Name, req.AppType, req.Function, req.Change)
+
+}
+
+func VerifySecurityCode(c *gin.Context) {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
+
+	var req struct {
+		Code   string `json:"code"`
+		Status string `json:"status"`
+	}
+	fmt.Println("Alarm Status: ", req.Status)
+	requestBody, _ := ioutil.ReadAll(c.Request.Body)
+	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		fmt.Printf("Error binding JSON: %v\n", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	securityKey := os.Getenv("SECURITY_KEY")
+	if securityKey == "" {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Security key not found"})
+		return
+	}
+
+	if req.Code == securityKey {
+		c.JSON(http.StatusOK, gin.H{"message": "Security code verified"})
+		fmt.Println("Key is valid ", req.Code)
+		dal.UpdateMessaging(client, []byte("502857"), "Security", "SecuritySystem", "Status", req.Status)
+		dal.UpdateMessaging(client, []byte("502858"), "Security", "SecuritySystem", "Status", req.Status)
+	} else {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid security code"})
+	}
+}
+
+func GetHVAC(c *gin.Context) {
+
+	//fmt.Printf("Room name: %s\n", room)
+	hvacs, err := dal.FetchHVAC(client, "smartHomeDB")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	//fmt.Println("hvacs: ", hvacs)
+	c.JSON(http.StatusOK, hvacs)
+
+}
+
+func getAppliancesData(c *gin.Context) {
+	//var req dal.UpdateLightingRequest
+	var req dal.SmartHomeDB
+	requestBody, _ := ioutil.ReadAll(c.Request.Body)
+	//fmt.Printf("Received request body: %s\n", string(requestBody))
+	// Reset the request body to be able to parse it again
+	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		//fmt.Printf("Error binding JSON: %v\n", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Fetch smart home data
+	smartHomeDB, err := dal.FetchCollections(client, "smartHomeDB")
+	if err != nil {
+		//fmt.Printf("SMDB data error: %s\n", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch smart home data"})
+		return
+	}
+
+	//fmt.Printf("%+v\n", smartHomeDB)
+
+	// Respond to the FE request, indicating success.
+	c.JSON(http.StatusOK, smartHomeDB)
+
+}
+
+func getDashboardItems(c *gin.Context) {
+	// Fetch the user's account type from the session
+	accountType := c.GetString("accountType")
+	if accountType == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	// Fetch the smart home data from the database
+	smartHomeData, err := dal.FetchCollections(client, "smartHomeDB")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch smart home data"})
+		return
+	}
+
+	// Prepare the response data
+	dashboardData := make(map[string]interface{})
+
+	// Extract the relevant data for each category
+	dashboardData["hvac"] = smartHomeData.HVAC
+	dashboardData["lighting"] = smartHomeData.Lighting
+	dashboardData["securitySystem"] = smartHomeData.SecuritySystem
+	dashboardData["solarPanel"] = smartHomeData.SolarPanel
+
+	// Extract appliance data
+	applianceData := dal.Appliances{
+		Dishwasher: smartHomeData.Dishwasher,
+		Fridge:     smartHomeData.Fridge,
+		Toaster:    smartHomeData.Toaster,
+		Lighting:   smartHomeData.Lighting,
+		Microwave:  smartHomeData.Microwave,
+		Oven:       smartHomeData.Oven,
+	}
+	dashboardData["appliances"] = applianceData
+
+	c.JSON(http.StatusOK, gin.H{"data": dashboardData})
 }
 
 func statusResp(c *gin.Context) {
@@ -275,7 +412,9 @@ func loginHandler(c *gin.Context) {
 		return
 	}
 	// Return the JWT token in the response
-	c.JSON(http.StatusOK, gin.H{"token": tokenString})
+	c.JSON(http.StatusOK, gin.H{"token": tokenString,
+		"firstname": fetchedUser.FirstName,
+		"lastname":  fetchedUser.LastName})
 
 }
 
@@ -292,6 +431,48 @@ func logout(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Successfully logged out"})
+}
+
+func signupHandler(c *gin.Context) {
+	var signupData struct {
+		Firstname string `json:"firstname"`
+		Lastname  string `json:"lastname"`
+		Password  string `json:"password"`
+		Username  string `json:"username"`
+	}
+
+	if err := c.BindJSON(&signupData); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON"})
+	}
+
+	//existingUser, err := dal.FetchUser(client, signupData.Username)
+	//if err == nil {
+	//	c.JSON(http.StatusConflict, gin.H{"error": "Username already exists"})
+	//	return
+	//}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(signupData.Password), bcrypt.DefaultCost)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
+		return
+	}
+
+	newUser := &dal.User{
+		Username:  signupData.Username,
+		Password:  string(hashedPassword),
+		FirstName: signupData.Firstname,
+		LastName:  signupData.Lastname,
+		Role:      "user",
+	}
+
+	err = dal.CreateUser(client, newUser)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "User created succesfully"})
+
 }
 
 func AuthRequired(c *gin.Context) {
@@ -423,38 +604,16 @@ func dashboardHandler(c *gin.Context) {
 	}
 }
 
-//func GetNetLogs(c *gin.Context) {
-//	fetchedLogs, err := dal.FetchLogging(client)
-//
-//	if err != nil {
-//		c.JSON(http.StatusUnauthorized, gin.H{"error": err}) // Use generic error message
-//		return
-//	}
-//
-//	logsJSON, err := json.Marshal(fetchedLogs)
-//	if err != nil {
-//		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to marshal logs to JSON"})
-//		return
-//	}
-//
-//	// Return JSON response
-//	//c.JSON(http.StatusOK, lights)
-//	c.Data(http.StatusOK, "application/json", logsJSON)
-//}
-
 func GetNetLogs(c *gin.Context) {
-
-	logs, err := dal.FetchLogging(client)
+	logs, err := dal.FetchLogging(client, "smartHomeDB")
 	if err != nil {
+		fmt.Printf(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	//fmt.Printf("Light:", lights)
+
 	c.JSON(http.StatusOK, logs)
 }
-
-//func getHVAC(c *gin.Context) {
-//}
 
 func GetSecurity(c *gin.Context) {
 	security, err := dal.FetchSecurity(client, "smartHomeDB")
@@ -464,10 +623,3 @@ func GetSecurity(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, security)
 }
-
-//
-//func GetAppliances(c *gin.Context) {
-//}
-//
-//func GetEnergy(c *gin.Context) {
-//}

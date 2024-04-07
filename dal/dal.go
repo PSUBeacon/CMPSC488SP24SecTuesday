@@ -149,15 +149,24 @@ type SmartHomeDB struct {
 	SecuritySystem []SecuritySystem
 	SolarPanel     []SolarPanel
 	Toaster        []Toaster
-	Users          []User
+	//Users          []User
+}
+
+type Appliances struct {
+	Dishwasher []Dishwasher
+	Fridge     []Fridge
+	Toaster    []Toaster
+	Lighting   []Lighting
+	Microwave  []Microwave
+	Oven       []Oven
 }
 
 type UUIDsConfig struct {
-	LightingUUIDs   []Pi
-	HvacUUIDs       []Pi
-	SecurityUUIDs   []Pi
-	AppliancesUUIDs []Pi
-	EnergyUUIDs     []Pi
+	Lighting   []Pi `json:"lighting"`
+	Hvac       []Pi `json:"hvac"`
+	Security   []Pi `json:"security"`
+	Appliances []Pi `json:"appliances"`
+	Energy     []Pi `json:"energy"`
 }
 
 type Pi struct {
@@ -171,6 +180,14 @@ type Ping struct {
 }
 
 type MessagingStruct struct {
+	UUID     string `json:"UUID"`
+	Name     string `json:"Name"`     //type item being changes ex(Lighting) or (HVAC)
+	AppType  string `json:"AppType"`  //Which Type of appliance it is
+	Function string `json:"Function"` //function being changed ex(brightness)
+	Change   string `json:"Change"`   //actual change being made ex(100) for brightness
+}
+
+type ThermMessagingStruct struct {
 	UUID     string `json:"UUID"`
 	Name     string `json:"Name"`     //type item being changes ex(Lighting) or (HVAC)
 	AppType  string `json:"AppType"`  //Which Type of appliance it is
@@ -262,13 +279,34 @@ func FetchUser(client *mongo.Client, userName string) (User, error) {
 	return user, nil
 }
 
+func CreateUser(client *mongo.Client, user *User) error {
+	collection := client.Database(dbName).Collection("Users")
+
+	// Check if the user already exists in DB
+	var existingUser User
+	filter := bson.M{"username": user.Username}
+	err := collection.FindOne(context.TODO(), filter).Decode(&existingUser)
+	if err == nil {
+		return fmt.Errorf("username %s already exists", user.Username)
+	} else if !errors.Is(err, mongo.ErrNoDocuments) {
+		return err
+	}
+
+	_, err = collection.InsertOne(context.TODO(), user)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func FetchLights(client *mongo.Client, dbName string, roomName string) ([]Lighting, error) {
 	collection := client.Database(dbName).Collection("Lighting")
 
 	// Use a timeout context for the operation
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	fmt.Printf("roomName DAl: ", roomName)
+	fmt.Printf("roomName DAl %s: ", roomName)
 	// Creating a filter to fetch lights only for the specified roomName
 	filter := bson.M{"Location": roomName}
 
@@ -295,13 +333,37 @@ func FetchLights(client *mongo.Client, dbName string, roomName string) ([]Lighti
 	return lights, nil
 }
 
-//func FetchHVAC(client *mongo.Client, dbName string) ([]HVAC, error) {
-//	collection := client.Database(dbName).Collection("HVAC")
-//
-//	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-//	defer cancel()
-//
-//}
+func FetchHVAC(client *mongo.Client, dbName string) ([]HVAC, error) {
+	collection := client.Database(dbName).Collection("HVAC")
+
+	// Use a timeout context for the operation
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	// Creating a filter to fetch lights only for the specified roomName
+	filter := bson.M{}
+
+	cursor, err := collection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var Hvacs []HVAC
+	for cursor.Next(ctx) {
+		var Hvac HVAC
+		err := cursor.Decode(&Hvac)
+		if err != nil {
+			return nil, err
+		}
+		Hvacs = append(Hvacs, Hvac)
+	}
+
+	if err := cursor.Err(); err != nil {
+		return nil, err
+	}
+	fmt.Println("hvac from db dal: ", Hvacs)
+	return Hvacs, nil
+}
 
 func FetchSecurity(client *mongo.Client, dbName string) ([]SecuritySystem, error) {
 	collection := client.Database(dbName).Collection("SecuritySystem")
@@ -309,7 +371,8 @@ func FetchSecurity(client *mongo.Client, dbName string) ([]SecuritySystem, error
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	cursor, err := collection.Find(ctx, bson.M{})
+	filter := bson.M{}
+	cursor, err := collection.Find(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
@@ -340,7 +403,7 @@ func UpdateMessaging(client *mongo.Client, UUID []byte, name string, apptype str
 	messageRequest.Function = function
 	messageRequest.Change = change
 	message, err := json.Marshal(messageRequest)
-	fmt.Println("message is:", message)
+	//fmt.Println("message is:", message)
 	if err != nil {
 		fmt.Printf("Error marshaling JSON message: %v", err)
 		return
@@ -394,32 +457,98 @@ func UpdateMessaging(client *mongo.Client, UUID []byte, name string, apptype str
 	return
 }
 
-func FetchLogging(client *mongo.Client) ([]LoggingStruct, error) {
-	collection := client.Database(dbName).Collection("Logging")
-
-	filter := bson.M{}
-
-	var logs []LoggingStruct
-	cursor, err := collection.Find(context.TODO(), filter)
+func UpdateThermMessaging(client *mongo.Client, UUID []byte, name string, apptype string, function string, change string) {
+	var messageRequest ThermMessagingStruct
+	messageRequest.UUID = string(UUID)
+	messageRequest.Name = name
+	messageRequest.AppType = apptype
+	messageRequest.Function = function
+	messageRequest.Change = change
+	message, err := json.Marshal(messageRequest)
+	//fmt.Println("message is:", message)
 	if err != nil {
-		// Some error occurred
-		return nil, err
+		fmt.Printf("Error marshaling JSON message: %v", err)
+		return
+	}
+	messaging.BroadCastMessage(message)
+
+	var logg LoggingStruct
+	// Update the MongoDB collection using JSON
+	collection := client.Database("smartHomeDB").Collection(apptype)
+	Logging := client.Database("smartHomeDB").Collection("Logging")
+	filter := bson.M{"UUID": messageRequest.UUID}
+
+	var updatedValue interface{}
+	switch function {
+	case "Temperature", "FanSpeed":
+		updatedValue, _ = strconv.Atoi(change)
+	default:
+		updatedValue = change
 	}
 
-	for cursor.Next(context.TODO()) {
+	update := map[string]interface{}{
+		"$set": map[string]interface{}{
+			function: updatedValue,
+		},
+	}
+	fmt.Println(update)
+
+	updateJSON, err := json.Marshal(update)
+	if err != nil {
+		fmt.Printf("Error marshaling update JSON: %v", err)
+		return
+	}
+
+	var updateDoc bson.M
+	if err := bson.UnmarshalExtJSON(updateJSON, true, &updateDoc); err != nil {
+		fmt.Printf("Error unmarshaling update JSON: %v", err)
+		return
+	}
+
+	_, err = collection.UpdateOne(context.Background(), filter, updateDoc)
+	if err != nil {
+		fmt.Printf("Error updating document: %v", err)
+		return
+	}
+
+	logg.DeviceID = name
+	logg.Function = function
+	logg.Change = change
+	logg.Time = time.Now()
+	_, err = Logging.InsertOne(context.Background(), logg)
+
+	return
+}
+
+func FetchLogging(client *mongo.Client, dbName string) ([]LoggingStruct, error) {
+	collection := client.Database(dbName).Collection("Logging")
+
+	// Use a timeout context for the operation
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	// Creating a filter to fetch lights only for the specified roomName
+	filter := bson.M{}
+
+	cursor, err := collection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var logs []LoggingStruct
+	for cursor.Next(ctx) {
 		var logging LoggingStruct
-		if err := cursor.Decode(&logging); err != nil {
-			// Error decoding the document
+		err := cursor.Decode(&logging)
+		if err != nil {
 			return nil, err
 		}
 		logs = append(logs, logging)
 	}
 
 	if err := cursor.Err(); err != nil {
-		// Some error occurred during iteration
 		return nil, err
 	}
-
+	fmt.Println("light from db dal: ", logs)
 	return logs, nil
 }
 

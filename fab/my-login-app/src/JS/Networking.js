@@ -13,9 +13,11 @@ import placeholderImage2 from '../img/placeholderImage2.jpg'; // Replace with th
 import {Table} from 'react-bootstrap';
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
+import axios from "axios";
 
 // Define the Dashboard component using a functional component pattern
 const Networking = () => {
+    document.title = 'BEACON | Logs';
     const [isAccountPopupVisible, setIsAccountPopupVisible] = useState(false);
     const [isNavVisible, setIsNavVisible] = useState(false);
     const [dashboardMessage, setDashboardMessage] = useState('');
@@ -30,34 +32,85 @@ const Networking = () => {
     };
     const navigate = useNavigate(); // Instantiate useNavigate hook
     // Define your IoT Logs data similar to how you have solarPanel data
-    const iotLogs = [];
+    let iotLogs = [
+        // {DeviceID: 'Port 80', Function: 'Port 20', "Change": 'true', "Time": "0:000"}
+    ];
     const token = sessionStorage.getItem('token');
     const url = "http://localhost:8081/networking/GetNetLogs";
 
-    fetch(url, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-        },
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            // Store the fetched data into networkLogs
-            iotLogs.push(...data);
-            setLogs(data)
-            console.log('IOT logs:', iotLogs); // You can process or log the data here
-        })
-        .catch(error => {
-            // Handle errors
-            console.error('Error fetching logs:', error);
-        });
+    // fetch(url, {
+    //     method: 'GET',
+    //     headers: {
+    //         'Authorization': `Bearer ${token}`,
+    //         'Content-Type': 'application/json',
+    //     },
+    // })
+    //     .then(response => {
+    //         if (!response.ok) {
+    //             throw new Error('Network response was not ok');
+    //         }
+    //         return response.json();
+    //     })
+    //     .then(data => {
+    //         // Store the fetched data into networkLogs
+    //         iotLogs.push(...data);
+    //         setLogs(data)
+    //         console.log('IOT logs:', iotLogs); // You can process or log the data here
+    //     })
+    //     .catch(error => {
+    //         // Handle errors
+    //         console.error('Error fetching logs:', error);
+    //     });
 
+    useEffect(() => {
+
+            const token = sessionStorage.getItem('token');
+            if (!token) {
+                navigate('/'); // Redirect to login page if token is not present
+                return;
+            }
+
+            // axios.get(`http://localhost:8081/networking/GetNetLogs`, {
+            //     headers: {
+            //         'Authorization': `Bearer ${token}`,
+            //         'Content-Type': 'application/json',
+            //     },
+            // })
+            //     .then(response => {
+            //         setLogs(response.data); // Set the fetched lights
+            //         //console.log("data", response.data)
+            //     })
+            //     .catch(error => {
+            //         console.error('Error fetching logs:', error);
+            //         setError('Could not fetch logs');
+            //     });
+
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Store the fetched data into networkLogs
+                    iotLogs.push(...data);
+                    setLogs(data)
+                    console.log('IOT logs:', iotLogs);// You can process or log the data here
+                })
+                .catch(error => {
+                    // Handle errors
+                    console.error('Error fetching logs:', error);
+                });
+        },
+        []
+    );
     const iotLogsTable = (
         <div>
             <h2 style={{color: '#173350'}}>IOT Logs</h2>
@@ -71,7 +124,7 @@ const Networking = () => {
                 </tr>
                 </thead>
                 <tbody>
-                {iotLogs.map((log, index) => (
+                {Logs.map((log, index) => (
                     <tr key={index}>
                         <td>{log.DeviceID}</td>
                         <td>{log.Function}</td>

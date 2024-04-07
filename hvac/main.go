@@ -1,62 +1,84 @@
 package hvac
 
 import (
+	"CMPSC488SP24SecTuesday/on-metal-c-code/gocode"
 	"fmt"
 )
 
-// HVAC represents an HVAC system with temperature control, fan speed, and mode.
-type HVAC struct {
-	Name              string
-	Temperature       int    // Desired temperature in Celsius
-	FanSpeed          string // Fan speed ("Off" , "Low", "Medium", "High")
-	Humidity          int    // Humidity %
-	Status            string // HVAC mode (e.g., "Cool", "Heat", "Fan", "Off")
-	Location          string // Location of device
-	EnergyConsumption int
-	LastChanged       string
-}
+const temperaturePin = 4
+const fanPin = uint8(18)
 
-// NewHVAC creates a new HVAC instance with the given name and initial settings.
-func NewHVAC(name string) *HVAC {
-	return &HVAC{
-		Name:              name,
-		Temperature:       25, // Initial temperature setting
-		Humidity:          80,
-		FanSpeed:          "Low", // Initial fan speed setting (50%)
-		Status:            "Off", // Initial mode is Off
-		Location:          "Kitchen",
-		EnergyConsumption: 10,
-		LastChanged:       "2023-10-01T18:30:00Z",
-	}
-}
+var mode string
+var tempToSet int
+var fanStatus string
 
 // SetTemperature sets the desired temperature for the HVAC system.
-func UpdateTemperature(temperature int) {
-	fmt.Printf("%s temperature is set to %d°C\n", temperature)
+func UpdateTemperature(newTemperature int) {
+	currentTemp, err := gocode.ReadTemperature(temperaturePin, 22)
+	if err != nil {
+		fmt.Println("Error reading Temperature:", err)
+		return
+	}
+	intCurrTemp := int(currentTemp)
+	if newTemperature == intCurrTemp {
+		gocode.FanStatus(fanPin, false)
+		fmt.Printf("%s Temperature is set to %d°C\n", newTemperature)
+	}
+	if mode == "Cool" && newTemperature < intCurrTemp {
+		gocode.FanStatus(fanPin, true)
+		UpdateTemperature(newTemperature)
+	}
+	if mode == "Cool" && newTemperature > intCurrTemp {
+		gocode.FanStatus(fanPin, false)
+	}
+	if mode == "Heat" && newTemperature > intCurrTemp {
+		gocode.FanStatus(fanPin, true)
+		UpdateTemperature(newTemperature)
+	}
+	if mode == "Heat" && newTemperature < intCurrTemp {
+		gocode.FanStatus(fanPin, false)
+	}
+
 }
 
 // SetFanSpeed sets the fan speed for the HVAC system.
 func UpdateFanSpeed(speed int) {
+	gocode.SetFanSpeed(fanPin, speed)
 	fmt.Printf("%s fan speed is set to %s%%\n", speed)
 }
 
 // SetStatus sets the status (e.g., "Cool", "Heat", "Fan", "Off") for the HVAC system.
 func UpdateStatus(status bool) {
-	fmt.Printf("%s status is set to %s\n", status)
+	if status == true {
+		gocode.FanStatus(fanPin, true)
+		fmt.Printf("%s status is set to %s\n", status)
+	}
+	if status == false {
+		gocode.FanStatus(fanPin, false)
+		fmt.Printf("%s status is set to %s\n", status)
+	}
 }
 
 func UpdateMode(mode string) {
 	fmt.Printf("%s mode is set to %s\n", mode)
 }
 
-func (h *HVAC) SetHumidity(humidity int) {
-	if humidity < 0 {
-		humidity = 0 // Ensure humidity is not set below 0%
-	} else if humidity > 100 {
-		humidity = 100 // Ensure humidity does not exceed 100%
-	}
-	h.Humidity = humidity
-	fmt.Printf("%s humidity is set to %d%%\n", h.Name, h.Humidity)
+func DisplayLCDHVAC() {
+	//currentTemp, err := gocode.ReadTemperature(temperaturePin, 22)
+	//if err != nil {
+	//	return
+	//}
+	//if currentTemp > 999 {
+	//	currentTemp = 999
+	//}
+	//intCurrTemp := int(currentTemp)
+	// Hardcode current temp, Mode, Temperature to set, Status
+	intCurrTemp := 76
+	mode = "Heat"
+	tempToSet = 74
+	fanStatus = "ON"
+
+	gocode.WriteLCD("Now:" + string(rune(intCurrTemp)) + "F Set:" + string(rune(tempToSet)) + "FMode:" + mode + " Fan:" + fanStatus)
 }
 
 //func main() {

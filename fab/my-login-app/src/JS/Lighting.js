@@ -11,11 +11,13 @@ import kitchenImage from '../img/kitchen.png';
 import axios from "axios";
 
 const Lighting = () => {
+    document.title = 'BEACON | Lighting';
+
     const navigate = useNavigate();
     const [selectedLight, setSelectedLight] = useState(null);
     const [isNavVisible, setIsNavVisible] = useState(false);
     const [accountType, setAccountType] = useState('');
-    const [dimmerValue, setDimmerValue] = useState(75);
+    const [dimmerValue, setDimmerValue] = useState();
     const [selectedRoom, setSelectedRoom] = useState(null);
     const [isLightOn, setIsLightOn] = useState(false);
     const [error, setError] = useState('');
@@ -28,6 +30,7 @@ const Lighting = () => {
         '417293': false, // Initial state: off
         '417294': false, // Initial state: off
     });
+
     useEffect(() => {
         if (selectedRoom) {
             const token = sessionStorage.getItem('token');
@@ -53,8 +56,36 @@ const Lighting = () => {
         }
     }, [selectedRoom, navigate]); // Add navigate as a dependency if it's used within the effect
 
-    const handleDimmerChange = (event) => {
-        setDimmerValue(parseInt(event.target.value)); // Parse to integer
+    const handleDimmerChange = (uuid, brightness) => {
+        const serverUrl = 'http://localhost:8081/lighting';
+        const token = sessionStorage.getItem('token');
+
+        // Prepare the request body
+        const requestBody = {
+            uuid: uuid,
+            name: "Lighting",
+            apptype: "Lighting",
+            function: "Brightness",
+            change: brightness,
+        };
+
+        // Send a POST request to toggle the light state
+        axios.post(serverUrl, requestBody, {headers: {'Authorization': `Bearer ${token}`}})
+            .then(response => {
+                if (response.status >= 200 && response.status < 300) {
+                    console.log(`Light dimmed successfully:`, response.data);
+                } else {
+                    console.error(`Failed to dim the light  with status:`, response.status);
+                }
+            })
+            .catch(error => {
+                console.error(`There was an error toggling the brightness `, error);
+            });
+
+        // Log the action
+        setTimeout(() => {
+            console.log(`Light has been dimmed.`);
+        }, 1000);
     };
 
     const selectRoom = (roomName) => {
@@ -64,7 +95,7 @@ const Lighting = () => {
 
     useEffect(() => {
         const token = sessionStorage.getItem('token');
-        const url = 'http://localhost:8081/lighting';
+        const url = `http://localhost:8081/lighting?roomName=${encodeURIComponent(selectedRoom)}`;
 
         if (!token) {
             navigate('/'); // Redirect to login page if token is not present
@@ -223,29 +254,53 @@ const Lighting = () => {
                                                onChange={(e) => setLightName(e.target.value)}/>
                                     </div>
                                     <button type="submit" className="submitButton">Add Light</button>
-                                    <button type="button" className="submitButton"
-                                            onClick={toggleLight}>{isLightOn ? 'Turn Off All Lights' : 'Turn On All Lights'}</button>
                                 </form>
-                                <div className="roomDropdown" style={{marginBottom: '20px', width: '72%'}}>
-                                    <label htmlFor="selectLight">Select Light:</label>
-                                    <select id="selectLight" value={selectedLight}
-                                            onChange={(e) => handleToggleLight(e.target.value)}>
-                                        <option value="">Select Light</option>
-                                        {lights.map((light, index) => (
-                                            <option key={index} value={light.UUID}>{light.Location}</option>
-                                        ))}
-                                    </select>
+
+                                <div className="roomDropdown" style={{
+                                    marginBottom: '20px',
+                                    width: '72%',
+                                    display: 'flex',
+                                    alignItems: 'center'
+                                }}>
+                                    <div style={{marginRight: '10px', display: 'flex', alignItems: 'center'}}>
+                                        <select id="selectLight" value={selectedLight}
+                                                onChange={(e) => {
+                                                    const selectedUUID = e.target.value;
+                                                    setSelectedLight(selectedUUID);
+                                                    const selectedLightObj = lights.find(light => light.UUID === selectedUUID);
+                                                    if (selectedLightObj) {
+                                                        setDimmerValue(selectedLightObj.Brightness); // Assuming each light object has a Brightness property
+                                                    }
+                                                }}
+                                                style={{marginLeft: '5px'}}>
+                                            <option value="">Select Light</option>
+                                            {lights.map((light, index) => (
+                                                <option key={index} value={light.UUID}>{light.Location}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <button type="button" className="submitButton" onClick={toggleLight}
+                                            style={{marginLeft: '10px'}}>{isLightOn ? 'Turn Off' : 'Turn On'}</button>
                                 </div>
+
                                 <div className="dimmerControl"
                                      style={{width: '72%', textAlign: 'center', marginTop: '20px'}}>
                                     <input
                                         type="range"
                                         id="dimmer"
                                         name="dimmer"
-                                        min="0"
+                                        min="1"
                                         max="100"
-                                        value={dimmerValue}
-                                        onChange={(e) => setDimmerValue(e.target.value)}
+                                        value={Math.round((dimmerValue - 1) / 14 * 99) + 1}
+                                        onChange={(e) => {
+                                            const newValue = Math.round((e.target.value - 1) / 99 * 14) + 1;
+                                            setDimmerValue(newValue);
+                                        }}
+                                        onMouseUp={(e) => {
+                                            if (selectedLight) {
+                                                handleDimmerChange(selectedLight, dimmerValue);
+                                            }
+                                        }}
                                         style={{
                                             WebkitAppearance: 'none',
                                             width: '100%',
@@ -258,7 +313,10 @@ const Lighting = () => {
                                         }}
                                     />
                                     <label htmlFor="dimmer"
-                                           style={{color: '#fff', marginTop: '5px'}}>{dimmerValue}%</label>
+                                           style={{
+                                               color: '#fff',
+                                               marginTop: '5px'
+                                           }}>{Math.round((dimmerValue - 1) / 14 * 99) + 1}%</label>
                                 </div>
                             </div>
                         </div>
@@ -266,8 +324,8 @@ const Lighting = () => {
                 </main>
             </div>
         </div>
-    );
-
+    )
+        ;
 };
 
 export default Lighting;

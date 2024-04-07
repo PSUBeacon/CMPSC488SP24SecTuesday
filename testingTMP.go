@@ -12,11 +12,10 @@ func main() {
 	sensorType := dht.DHT22
 
 	// Read data from the sensor
-	temperature, humidity, _, err := dht.ReadDHTxxWithRetry(sensorType, 4, false, 10)
+	temperature, _, _, err := dht.ReadDHTxxWithRetry(sensorType, 4, false, 10)
 	if err != nil {
 		log.Fatalf("Failed to read from DHT22 sensor: %s", err)
 	}
 
 	fmt.Printf("Temperature: %.2f°F\n", (temperature*9/5)+32)
-	fmt.Printf("Humidity: %.2f%%\n", humidity)
 }

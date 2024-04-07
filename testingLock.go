@@ -16,7 +16,7 @@ const (
 	pulseFrequency   = 20 * time.Millisecond
 	minPulseWidth    = 700 * time.Microsecond
 	maxPulseWidth    = 1500 * time.Microsecond
-	rotationDuration = 2 * time.Second
+	rotationDuration = 1 * time.Second
 )
 
 func main() {

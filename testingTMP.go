@@ -8,7 +8,7 @@ import (
 
 func main() {
 	// Use GPIO pin 4, for example, change this to the pin you've connected your DHT22 sensor to.
-	// Make sure to run your program with root permissions to access GPIO pins.
+	// Make sure to run your program with root permissions to access GPIO pins
 	sensorType := dht.DHT22
 
 	// Read data from the sensor

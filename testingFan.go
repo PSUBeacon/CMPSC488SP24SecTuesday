@@ -32,7 +32,7 @@ func main() {
 	}
 
 	// Use gpioreg GPIO pin registry to find a GPIO pin by name.
-	pin := gpioreg.ByName("GPIO4")
+	pin := gpioreg.ByName("GPIO7")
 	if pin == nil {
 		log.Fatalf("Failed to find GPIO4")
 	}

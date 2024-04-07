@@ -1,41 +1,45 @@
 /* login.css */
 
 body {
-  background-color: #0E2237;
+  background-color: #0e2237;
 }
 
-.container {
-min-height: 100vh;
-background: url('../img/loginImage.png') no-repeat center center;
-background-size: cover;
-}
+/* .container {
+  min-height: 100vh;
+  background: url("../img/loginImage.png") no-repeat center center;
+  background-size: cover;
+} */
 
 @media (max-width: 768px) {
-.container {
-  background: none;
+  .container {
+    background: none;
+  }
+
+  .form-container {
+    width: 100%;
+    background: rgba(
+      0,
+      0,
+      0,
+      0.8
+    ); /* Optional: Darker for better readability */
+  }
 }
 
 .form-container {
-  width: 100%;
-  background: rgba(0, 0, 0, 0.8); /* Optional: Darker for better readability */
+  width: 30%;
+  min-height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
 }
-}
-
-.form-container {
-width: 30%;
-min-height: 100vh;
-background: rgba(0, 0, 0, 0.5);
-}
-
 
 @media (max-width: 768px) {
   .bg-image {
-    background-position: top center; 
+    background-position: top center;
   }
 }
 
 button {
-  background-color: #50BCC0;
+  background-color: #50bcc0;
 }
 
 #circle {
@@ -48,17 +52,18 @@ button {
 }
 
 @media (max-width: 985px) {
-  .col-md-8, .col-md-4 {
+  .col-md-8,
+  .col-md-4 {
     /* Adjusts columns to full width for devices smaller than 985px */
     flex: 0 0 100%;
     max-width: 100%;
   }
-  
+
   .d-none.d-md-flex {
     /* Hides the image column on devices smaller than 985px */
     display: none !important;
   }
-  
+
   .login {
     /* Centers the form vertically and horizontally */
     display: flex;

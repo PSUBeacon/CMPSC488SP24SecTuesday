@@ -17,6 +17,7 @@ import axios from "axios";
 
 // Define the Dashboard component using a functional component pattern
 const Networking = () => {
+    document.title = 'BEACON | Logs';
     const [isAccountPopupVisible, setIsAccountPopupVisible] = useState(false);
     const [isNavVisible, setIsNavVisible] = useState(false);
     const [dashboardMessage, setDashboardMessage] = useState('');

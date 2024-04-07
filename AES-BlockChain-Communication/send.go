@@ -56,7 +56,7 @@ func BroadCastMessage(messageToSend []byte) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("This is the length of whats in the file: ", len(jsonChainData))
+	//fmt.Println("This is the length of whats in the file: ", len(jsonChainData))
 	//Checks if there is an existing chain or if this is the start of the chain
 	if chainlen == 0 {
 		// Create a new blockchain
@@ -93,7 +93,7 @@ func BroadCastMessage(messageToSend []byte) {
 
 	if chainlen > 0 {
 		statusCheck := send(nil, "check")
-		fmt.Println("This is the status check part: ", statusCheck)
+		//fmt.Println("This is the status check part: ", statusCheck)
 		if statusCheck == "sendit" {
 			var jsonChain blockchain.Blockchain
 			err := json.Unmarshal(jsonChainData, &jsonChain)
@@ -153,7 +153,7 @@ func send(message []byte, statusCheck string) string {
 	//port, err := serial.Open("/dev/ttyUSB0", mode)
 	//The port code below is for sending from computer to pi
 
-	fmt.Println(statusCheck)
+	//fmt.Println(statusCheck)
 
 	port, err := serial.Open("COM4", mode)
 	if statusCheck == "check" || statusCheck == "send" {
@@ -179,7 +179,7 @@ func send(message []byte, statusCheck string) string {
 		message = append(message, delimiter...)
 
 		// Send a message to the server
-		fmt.Println(len(message))
+		//fmt.Println(len(message))
 		_, err = port.Write(message)
 		if err != nil {
 			log.Println("Error sending message:", err)

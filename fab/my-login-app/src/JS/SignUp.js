@@ -5,12 +5,16 @@ import loginImage from '../img/loginImage.png';
 import logoImage from '../img/logo.webp';
 
 const SignUp = () => {
+    document.title = 'BEACON | Sign Up';
+
     // Removed email state
     const [firstName, setFirstName] = useState(''); // Added firstName state
     const [lastName, setLastName] = useState(''); // Added lastName state
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [isSignUpSuccess, setIsSignUpSuccess] = useState(false);
+
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -18,17 +22,23 @@ const SignUp = () => {
 
         try {
             const response = await axios.post(serverUrl, {
-                firstName, // Added firstName
-                lastName, // Added lastName
+                firstName,
+                lastName,
                 username,
                 password,
             });
 
-
             console.log('Sign up successful:', response.data);
+            setIsSignUpSuccess(true);
+            setError('');
         } catch (error) {
-            setError('Failed to sign up. Please try again.');
+            if (error.response && error.response.data && error.response.data.error) {
+                setError(error.response.data.error);
+            } else {
+                setError('Failed to sign up. Username already exists in the system');
+            }
             console.error('Sign up error:', error.toJSON());
+            setIsSignUpSuccess(false);
         }
     };
 
@@ -44,7 +54,6 @@ const SignUp = () => {
                         minHeight: '100vh'
                     }}
                 >
-                    {/* This div will contain the background image */}
                 </div>
 
                 {/* The login form column that takes 30% of the page */}
@@ -59,6 +68,11 @@ const SignUp = () => {
                             }}/>
                             <h3 className="display-4 mb-5 text-center text-white">Sign Up</h3>
                             {error && <div className="alert alert-danger" role="alert">{error}</div>}
+                            {isSignUpSuccess && (
+                                <div className="alert alert-success" role="alert">
+                                    Sign up successful! Please log in.
+                                </div>
+                            )}
                             <form onSubmit={handleSubmit}>
                                 {/* First Name Field */}
                                 <div>

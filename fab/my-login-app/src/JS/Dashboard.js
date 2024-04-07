@@ -2,12 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {Link} from 'react-router-dom'; // Import Link from react-router-dom for navigation
 import 'bootstrap/dist/css/bootstrap.min.css';
-import logoImage from '../img/logo.webp';
-import houseImage from '../img/houseImage.jpg';
 import doorLockIcon from '../img/doorLockIcon.png';
-import settingsIcon from '../img/settings.png';
-import accountIcon from '../img/account.png';
-import menuIcon from '../img/menu.png';
 import bulbIcon from '../img/bulb-icon.png';
 import placeholderImage from '../img/placeholderImage.jpg';
 import livingRoomFootage from '../img/livingRoomFootage1.gif';
@@ -15,9 +10,10 @@ import bedRoomFootage from '../img/BedroomFootage.gif';
 import kitchenFootage from '../img/kitchenFootage.gif';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
+import PadlockAnimation from "../components/Lock";
 
 const Dashboard = () => {
-
+    document.title = 'BEACON | Dashboard';
 
     const [cameraView, setCameraView] = useState('livingroom'); // Default camera view
     const navigate = useNavigate(); // Instantiate useNavigate hook
@@ -26,6 +22,10 @@ const Dashboard = () => {
     const [accountType, setAccountType] = useState('')
     const [user, setUser] = useState(null);
     const [error, setError] = useState('');
+    const [lockStates, setLockStates] = useState({
+        '502857': 'locked',
+        '502858': 'locked',
+    });
     // States for each device
     const [deviceData, setDeviceData] = useState({
         HVAC: {},
@@ -69,9 +69,8 @@ const Dashboard = () => {
             .catch(error => {
                 console.log('Fetch operation error:', error)
             });
-
-
     }, [navigate]);
+
 
     // Object that holds the URLs for your camera feeds
     const cameraFeeds = {
@@ -82,13 +81,6 @@ const Dashboard = () => {
 
 
     const CameraWidget = () => {
-
-        const cameraFeeds = {
-            livingroom: 'livingRoomFootage.mp4', // Replace with actual video feed or image
-            kitchen: 'kitchenFootage.mp4', // Replace with actual video feed or image for kitchen
-            r3: placeholderImage,
-            // Add more camera feeds as needed
-        };
 
         return (
             <div className="camera-widget" style={{
@@ -133,19 +125,51 @@ const Dashboard = () => {
             backDoor: 'Locked',
         });
 
-        const toggleLockStatus = (door) => {
+        const handleToggleLock = (door) => {
             setLocksStatus(prevStatus => ({
                 ...prevStatus,
                 [door]: prevStatus[door] === 'Locked' ? 'Unlocked' : 'Locked',
             }));
         };
 
-        // Assuming you have a state to track the light status and its setter function
+        // State to track the light status
         const [lightStatus, setLightStatus] = useState('Off');
 
-        const toggleLightStatus = () => {
-            // Toggle the light status
-            setLightStatus(prevStatus => prevStatus === 'Off' ? 'On' : 'Off');
+        const handleToggleLight = () => {
+            const isTurningOn = lightStatus === 'Off';
+            setLightStatus(isTurningOn ? 'On' : 'Off');
+
+            const serverUrl = 'http://localhost:8081/lighting';
+            const token = sessionStorage.getItem('token');
+
+            // Prepare the request body
+            const requestBody = {
+                uuid: "417294",
+                name: "Lighting",
+                apptype: "Lighting",
+                function: "Status",
+                change: isTurningOn ? "true" : "false",
+            };
+
+            // Send the request to the server
+            fetch(serverUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody),
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Light status updated successfully');
+                    } else {
+                        console.error('Failed to update light status');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating light status:', error);
+                });
         };
 
         return (
@@ -164,45 +188,22 @@ const Dashboard = () => {
                     {/* Front Door Lock */}
                     <div style={{flex: '1', maxWidth: '250px', textAlign: 'center'}}>
                         <p style={{color: "#95A4B6", marginRight: '20px'}}>Front Door</p>
-                        <img src={doorLockIcon} alt="Front Door" style={{
-                            width: '50%',
-                            height: 'auto',
-                            marginBottom: '10px'
-                        }}/> {/* Replace with lock icon */}
-                        <p style={{
-                            color: "#95A4B6",
-                            marginRight: '20px'
-                        }}>{locksStatus.frontDoor === 'Unlocked' ? 'Unlocked' : 'Locked'}</p>
-                        <label className="toggle" style={{display: 'block', margin: 'auto',}}>
-                            <input
-                                type="checkbox"
-                                checked={locksStatus.frontDoor === 'Unlocked'}
-                                onChange={() => toggleLockStatus('frontDoor')}
-                            />
-                            <span className="slider"></span>
-                        </label>
+                        <img className="lockImage" src={doorLockIcon} alt="Lock Icon"
+                             style={{width: '100px', height: 'auto'}}/>
+                        <PadlockAnimation
+                            isLocked={lockStates['502858'] === 'locked'}
+                            handleToggleLock={() => handleToggleLock('502858')}/>
                     </div>
 
                     {/* Back Door Lock */}
                     <div style={{flex: '1', maxWidth: '250px', textAlign: 'center'}}>
+
                         <p style={{color: "#95A4B6", marginRight: '20px'}}>Back Door</p>
-                        <img src={doorLockIcon} alt="Back Door" style={{
-                            width: '50%',
-                            height: 'auto',
-                            marginBottom: '10px'
-                        }}/> {/* Replace with lock icon */}
-                        <p style={{
-                            color: "#95A4B6",
-                            marginRight: '20px'
-                        }}>{locksStatus.backDoor === 'Unlocked' ? 'Unlocked' : 'Locked'}</p>
-                        <label className="toggle" style={{display: 'block', margin: 'auto'}}>
-                            <input
-                                type="checkbox"
-                                checked={locksStatus.backDoor === 'Unlocked'}
-                                onChange={() => toggleLockStatus('backDoor')}
-                            />
-                            <span className="slider"></span>
-                        </label>
+                        <img className="lockImage" src={doorLockIcon} alt="Lock Icon"
+                             style={{width: '100px', height: 'auto'}}/>
+                        <PadlockAnimation
+                            isLocked={lockStates['502858'] === 'locked'}
+                            handleToggleLock={() => handleToggleLock('502858')}/>
                     </div>
                 </div>
                 <div>
@@ -247,8 +248,8 @@ const Dashboard = () => {
                         <label className="toggle" style={{display: 'block', margin: 'auto'}}>
                             <input
                                 type="checkbox"
-                                checked={lightStatus === 'Off'}
-                                onChange={toggleLightStatus}
+                                checked={lightStatus === 'On'}
+                                onChange={handleToggleLight}
                             />
                             <span className="slider"></span>
                         </label>
@@ -274,34 +275,19 @@ const Dashboard = () => {
                     display: 'flex',
                     justifyContent: 'space-around'
                 }}>
-                    {/* Fridge Status */}
-                    <div style={{textAlign: 'center'}}>
-                        <span style={{color: "#95A4B6", margin: '6px'}}>Fridge</span>
-                        <p>{deviceData.Fridge.Status}</p>
-                    </div>
-
-                    {/* Dishwasher Status */}
-                    <div style={{textAlign: 'center'}}>
-                        <span style={{color: "#95A4B6", margin: '6px'}}>Dishwasher</span>
-                        <p>{deviceData.Dishwasher.Status}</p>
-                    </div>
-
-                    {/* Oven Status */}
-                    <div style={{textAlign: 'center'}}>
-                        <span style={{color: "#95A4B6", margin: '6px'}}>Oven</span>
-                        <p>{deviceData.Oven.Status}</p>
-                    </div>
-
-                    {/* Toaster Status */}
-                    <div style={{textAlign: 'center'}}>
-                        <span style={{color: "#95A4B6", margin: '6px'}}>Toaster</span>
-                        <p>{deviceData.Toaster.Status}</p>
-                    </div>
-
+                    {/* Iterate over the deviceData object */}
+                    {Object.entries(deviceData).map(([deviceName, deviceInfo]) => (
+                        // Only render the device if its status is available and not an empty string
+                        deviceInfo.Status && deviceInfo.Status !== '' && (
+                            <div key={deviceName} style={{textAlign: 'center'}}>
+                                <span style={{color: "#95A4B6", margin: '6px'}}>{deviceName}</span>
+                                <p>{deviceInfo.Status}</p>
+                                {console.log(deviceInfo.Status)}
+                            </div>
+                        )
+                    ))}
                 </div>
-
             </div>
-
         );
     };
 
@@ -443,30 +429,32 @@ const Dashboard = () => {
                                 <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around'}}>
                                     <div style={{textAlign: "center", margin: '6px'}}>
                                         <p style={{color: "#95A4B6"}}>Power</p>
-                                        {deviceData.HVAC.Temperature && (
-                                            <p style={{fontSize: '22px'}}>{deviceData.SolarPanel.EnergyGeneratedToday}kw</p>
-                                        )}</div>
+                                        {deviceData.solarPanel && deviceData.solarPanel[0] && deviceData.solarPanel[0].EnergyGeneratedToday && (
+                                            <p style={{fontSize: '22px'}}>{deviceData.solarPanel[0].EnergyGeneratedToday}kw</p>
+                                        )}
+                                    </div>
                                     <div style={{textAlign: "center", margin: '6px'}}>
                                         <p style={{color: "#95A4B6"}}>Temperature</p>
-                                        {deviceData.HVAC.Temperature && (
-                                            <p style={{fontSize: '22px'}}>{deviceData.HVAC.Temperature}</p>
-                                        )}</div>
-
+                                        {deviceData.hvac && deviceData.hvac[0] && deviceData.hvac[0].Temperature && (
+                                            <p style={{fontSize: '22px'}}>{deviceData.hvac[0].Temperature}</p>
+                                        )}
+                                    </div>
                                     <div style={{textAlign: "center", margin: '6px'}}>
                                         <p style={{color: "#95A4B6"}}> Humidity</p>
-                                        {deviceData.HVAC.Temperature && (
-                                            <p style={{fontSize: '22px'}}>{deviceData.HVAC.Humidity}</p>
-                                        )}</div>
-
+                                        {deviceData.hvac && deviceData.hvac[0] && deviceData.hvac[0].Humidity && (
+                                            <p style={{fontSize: '22px'}}>{deviceData.hvac[0].Humidity}</p>
+                                        )}
+                                    </div>
                                     <div style={{textAlign: "center", margin: '6px'}}>
                                         <p style={{color: "#95A4B6"}}>Security</p>
-                                        {deviceData.HVAC.Temperature && (
+                                        {deviceData.securitySystem && deviceData.securitySystem[0] && deviceData.securitySystem[0].Status && (
                                             <p style={{
                                                 color: 'green',
                                                 fontWeight: 'bold',
                                                 fontSize: '22px'
-                                            }}>{deviceData.SecuritySystem.Status}</p>
-                                        )}</div>
+                                            }}>{deviceData.securitySystem[0].Status}</p>
+                                        )}
+                                    </div>
                                 </div>
 
                             </div>

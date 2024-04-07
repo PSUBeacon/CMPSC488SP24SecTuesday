@@ -10,6 +10,7 @@ import (
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
@@ -79,21 +80,20 @@ func main() {
 	protectedRoutes.POST("/lighting", updateIoT)
 	protectedRoutes.GET("/lighting", GetLights)
 
-	protectedRoutes.POST("/hvac", updateIoT)
-	protectedRoutes.GET("/hvac", GetHVAC)
-
 	protectedRoutes.POST("/security", updateIoT)
 	protectedRoutes.GET("/security", GetSecurity)
 
 	protectedRoutes.POST("/appliances", getAppliancesData)
-	protectedRoutes.POST("/energy", getAppliancesData)
+
+	protectedRoutes.POST("/energy", updateIoT)
 
 	//ADJUSTMENT:
 	// Combined route group for both admin and user dashboards
-	dashboardGroup := r.Group("/dashboard", dashboardHandler)
-	dashboardGroup.Use(authMiddleware()) // Apply authMiddleware to protect the route
+	dashboardGroup := r.Group("/dashboard")
+	dashboardGroup.Use() // Apply authMiddleware to protect the route
 	{
-		dashboardGroup.POST("/", me)
+		dashboardGroup.GET("/", dashboardHandler)
+		dashboardGroup.GET("/GetDashboard", getDashboardItems)
 		dashboardGroup.GET("/me", me)
 		dashboardGroup.GET("/status", statusResp)
 	}
@@ -101,7 +101,8 @@ func main() {
 	hvacGroup := r.Group("/hvac")
 	hvacGroup.Use()
 	{
-		hvacGroup.POST("/", me)
+		hvacGroup.GET("/", GetHVAC)
+		hvacGroup.POST("/updateHVAC", updateThermostat)
 		hvacGroup.GET("/GetHVAC", GetHVAC)
 		hvacGroup.GET("/status", statusResp)
 	}
@@ -119,6 +120,7 @@ func main() {
 	{
 		securityGroup.GET("/", me)
 		securityGroup.GET("/GetSecurity", GetSecurity)
+		securityGroup.POST("/system", VerifySecurityCode)
 		securityGroup.GET("/status", statusResp)
 	}
 
@@ -130,7 +132,14 @@ func main() {
 		appliancesGroup.GET("/status", statusResp)
 	}
 
-	go r.Run(":8081")
+	energyGroup := r.Group("/energy")
+	appliancesGroup.Use()
+	{
+		energyGroup.GET("/", me)
+		energyGroup.POST("/GetEnergy", getAppliancesData)
+		energyGroup.GET("/status", statusResp)
+	}
+	go r.Run(":8080")
 	//if err != nil {
 	//	log.Fatal("Server startup error:", err)
 	//}
@@ -198,6 +207,59 @@ func GetLights(c *gin.Context) {
 	c.JSON(http.StatusOK, lights)
 }
 
+func updateThermostat(c *gin.Context) {
+	var req dal.ThermMessagingStruct
+	requestBody, _ := ioutil.ReadAll(c.Request.Body)
+	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		fmt.Printf("Error binding JSON: %v\n", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	//fmt.Println([]byte(req.UUID), req.Name, req.AppType, req.Function, req.Change)
+	//fmt.Printf("\n%T\n", req.Change)
+	dal.UpdateThermMessaging(client, []byte(req.UUID), req.Name, req.AppType, req.Function, req.Change)
+
+}
+
+func VerifySecurityCode(c *gin.Context) {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
+
+	var req struct {
+		Code   string `json:"code"`
+		Status string `json:"status"`
+	}
+	fmt.Println("Alarm Status: ", req.Status)
+	requestBody, _ := ioutil.ReadAll(c.Request.Body)
+	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		fmt.Printf("Error binding JSON: %v\n", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	securityKey := os.Getenv("SECURITY_KEY")
+	if securityKey == "" {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Security key not found"})
+		return
+	}
+
+	if req.Code == securityKey {
+		c.JSON(http.StatusOK, gin.H{"message": "Security code verified"})
+		fmt.Println("Key is valid ", req.Code)
+		dal.UpdateMessaging(client, []byte("502857"), "Security", "SecuritySystem", "Status", req.Status)
+		dal.UpdateMessaging(client, []byte("502858"), "Security", "SecuritySystem", "Status", req.Status)
+	} else {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid security code"})
+	}
+}
+
 func GetHVAC(c *gin.Context) {
 
 	//fmt.Printf("Room name: %s\n", room)
@@ -238,6 +300,44 @@ func getAppliancesData(c *gin.Context) {
 	// Respond to the FE request, indicating success.
 	c.JSON(http.StatusOK, smartHomeDB)
 
+}
+
+func getDashboardItems(c *gin.Context) {
+	// Fetch the user's account type from the session
+	accountType := c.GetString("accountType")
+	if accountType == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	// Fetch the smart home data from the database
+	smartHomeData, err := dal.FetchCollections(client, "smartHomeDB")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch smart home data"})
+		return
+	}
+
+	// Prepare the response data
+	dashboardData := make(map[string]interface{})
+
+	// Extract the relevant data for each category
+	dashboardData["hvac"] = smartHomeData.HVAC
+	dashboardData["lighting"] = smartHomeData.Lighting
+	dashboardData["securitySystem"] = smartHomeData.SecuritySystem
+	dashboardData["solarPanel"] = smartHomeData.SolarPanel
+
+	// Extract appliance data
+	applianceData := dal.Appliances{
+		Dishwasher: smartHomeData.Dishwasher,
+		Fridge:     smartHomeData.Fridge,
+		Toaster:    smartHomeData.Toaster,
+		Lighting:   smartHomeData.Lighting,
+		Microwave:  smartHomeData.Microwave,
+		Oven:       smartHomeData.Oven,
+	}
+	dashboardData["appliances"] = applianceData
+
+	c.JSON(http.StatusOK, gin.H{"data": dashboardData})
 }
 
 func statusResp(c *gin.Context) {
@@ -505,23 +605,12 @@ func dashboardHandler(c *gin.Context) {
 }
 
 func GetNetLogs(c *gin.Context) {
-
-	//logs, err := dal.FetchLogging(client, "smartHomeDB")
-	//if err != nil {
-	//	fmt.Printf(err.Error())
-	//	c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	//	return
-	//}
-	//fmt.Printf("Logs:", logs)
-	//c.JSON(http.StatusOK, logs)
-
 	logs, err := dal.FetchLogging(client, "smartHomeDB")
 	if err != nil {
 		fmt.Printf(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	// Remove the problematic line fmt.Printf("Logs:", logs)
 
 	c.JSON(http.StatusOK, logs)
 }
@@ -534,10 +623,3 @@ func GetSecurity(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, security)
 }
-
-//
-//func GetAppliances(c *gin.Context) {
-//}
-//
-//func GetEnergy(c *gin.Context) {
-//}

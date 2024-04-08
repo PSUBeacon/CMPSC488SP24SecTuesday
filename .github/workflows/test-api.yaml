@@ -1,0 +1,26 @@
+name: Test API
+
+on:
+  push:
+    branches:
+      - main
+      - testing
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo:4.4.14
+        ports:
+          - 27017:27017
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Restore MongoDB backup
+        run: |
+          docker run --network host -v db-schema/:/backup mongo:4.4.14 mongorestore --host localhost --port 27017 /backup/smartHomeDB
+

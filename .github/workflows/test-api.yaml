@@ -49,11 +49,11 @@ jobs:
             go build "${folder[i]}/${file_name[i]}"
           done
 
-       - name: Run Binary
-         run: | 
-           ./bam-api/api & 
-           echo "API started"
+      - name: Run Binary
+        run: | 
+          ./bam-api/api & 
+          echo "API started"
 
-       - name: Run Functional Tests
-         run: |
-           go test -v ./tests/...
+      - name: Run Functional Tests
+        run: |
+          go test -v ./tests/...

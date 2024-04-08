@@ -22,5 +22,5 @@ jobs:
 
       - name: Restore MongoDB backup
         run: |
-          docker run --network host -v db-schema/:/backup mongo:4.4.14 mongorestore --host localhost --port 27017 /backup/smartHomeDB
+          docker run --network host -v db-schema:/backup mongo:4.4.14 mongorestore --host localhost --port 27017 /backup/smartHomeDB
 

@@ -139,7 +139,7 @@ func main() {
 		energyGroup.POST("/GetEnergy", getAppliancesData)
 		energyGroup.GET("/status", statusResp)
 	}
-	go r.Run(":8080")
+	go r.Run(":8081")
 	//if err != nil {
 	//	log.Fatal("Server startup error:", err)
 	//}

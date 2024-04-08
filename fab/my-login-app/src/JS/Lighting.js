@@ -31,6 +31,7 @@ const Lighting = () => {
         '417294': false, // Initial state: off
     });
 
+
     useEffect(() => {
         if (selectedRoom) {
             const token = sessionStorage.getItem('token');
@@ -66,7 +67,7 @@ const Lighting = () => {
             name: "Lighting",
             apptype: "Lighting",
             function: "Brightness",
-            change: brightness,
+            change: JSON.stringify(brightness),
         };
 
         // Send a POST request to toggle the light state

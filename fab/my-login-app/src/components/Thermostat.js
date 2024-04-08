@@ -3,12 +3,12 @@ import '../CSS/Thermostat.css';
 import axios from "axios";
 
 let func;
-let temperature, setTemperature, mode, setMode, fanSpeed, setFanSpeed;
-let INITuuid;
+let temperature, setTemperature, mode, setMode, fanSpeed, setFanSpeed, inituuid, setInituuid;
+
 
 const sendServerRequest = () => {
     const requestBody = {
-        UUID: INITuuid,
+        UUID: inituuid,
         Name: "HVAC",
         AppType: "HVAC",
         Function: func,
@@ -30,13 +30,13 @@ const sendServerRequest = () => {
 };
 
 const ModeToggle = ({initialMode, onModeChange, initialStatus}) => {
-    const [mode, setMode] = useState(initialStatus == 'false' ? 'off' : initialMode);
+    [mode, setMode] = useState(initialStatus == 'false' ? 'off' : initialMode);
 
-    const handleModeChange = (newMode) => {
-        setMode(newMode);
-        onModeChange(newMode);
-        func = mode === "cool" || mode === "heat" ? "Mode" : "Status";
-        sendServerRequest();
+    const handleModeChange = async (newMode) => {
+        await setMode(newMode);
+        await onModeChange(newMode);
+        func = newMode === "cool" || newMode === "heat" ? "Mode" : "Status";
+        await sendServerRequest();
     };
 
     return (
@@ -65,13 +65,13 @@ const ModeToggle = ({initialMode, onModeChange, initialStatus}) => {
 };
 
 const FanSpeedToggle = ({initialFanSpeed, onFanSpeedChange}) => {
-    const [fanSpeed, setFanSpeed] = useState(initialFanSpeed);
+    [fanSpeed, setFanSpeed] = useState(initialFanSpeed);
 
-    const handleFanSpeedChange = (newFanSpeed) => {
-        setFanSpeed(newFanSpeed);
-        onFanSpeedChange(newFanSpeed);
+    const handleFanSpeedChange = async (newFanSpeed) => {
+        await setFanSpeed(newFanSpeed);
+        await onFanSpeedChange(newFanSpeed);
         func = "FanSpeed";
-        sendServerRequest();
+        await sendServerRequest();
     };
 
     return (
@@ -99,6 +99,7 @@ const FanSpeedToggle = ({initialFanSpeed, onFanSpeedChange}) => {
     );
 };
 
+
 const NestThermostat = ({
                             uuid,
                             initialTemperature,
@@ -111,7 +112,7 @@ const NestThermostat = ({
     [temperature, setTemperature] = useState(initialTemperature || 76);
     [mode, setMode] = useState(initialMode);
     [fanSpeed, setFanSpeed] = useState(initialFanSpeed);
-    INITuuid = uuid;
+    [inituuid, setInituuid] = useState(uuid);
 
     const minTemp = 60;
     const maxTemp = 90;
@@ -133,22 +134,33 @@ const NestThermostat = ({
         [setTemperature, minTemp, maxTemp]
     );
 
-    const handleDecrement = useCallback(
-        () => {
-            func = "Temperature"
-            handleTemperatureChange(Math.max(temperature - 1, minTemp));
-            sendServerRequest();
-        },
-        [temperature, minTemp, handleTemperatureChange]
-    );
+    // const handleDecrement = useCallback(
+    //     () => {
+    //         func = "Temperature"
+    //         handleTemperatureChange(Math.max(temperature - 1, minTemp));
+    //         sendServerRequest();
+    //     },
+    //     [temperature, minTemp, handleTemperatureChange]
+    // );
+    //
+    // const handleIncrement = useCallback(
+    //     () => {
+    //         func = "Temperature"
+    //         handleTemperatureChange(Math.min(temperature + 1, maxTemp));
+    //         sendServerRequest();
+    //     },
+    //     [temperature, maxTemp, handleTemperatureChange]
+    // );
 
-    const handleIncrement = useCallback(
-        () => {
-            func = "Temperature"
-            handleTemperatureChange(Math.min(temperature + 1, maxTemp));
-            sendServerRequest();
+    const handleSliderChange = useCallback(
+        (event) => {
+            const inputTemp = parseInt(event.target.value, 10);
+            if (!isNaN(inputTemp) && inputTemp >= minTemp && inputTemp <= maxTemp) {
+                handleTemperatureChange(inputTemp);
+                sendServerRequest();
+            }
         },
-        [temperature, maxTemp, handleTemperatureChange]
+        [handleTemperatureChange, minTemp, maxTemp]
     );
 
     return (
@@ -179,25 +191,40 @@ const NestThermostat = ({
                         />
                     ))}
                 </svg>
+
+                {/*<div className="temperature-controls">*/}
+                {/*    <input*/}
+                {/*        type="number"*/}
+                {/*        value={temperature}*/}
+                {/*        min={minTemp}*/}
+                {/*        max={maxTemp}*/}
+                {/*        onChange={handleInputChange}*/}
+                {/*        className="temperature-input"*/}
+                {/*        style={{display: 'none'}}*/}
+                {/*    />*/}
+                {/*    <button onClick={handleDecrement} className="temperature-button">*/}
+                {/*        -*/}
+                {/*    </button>*/}
+                {/*    <button onClick={handleIncrement} className="temperature-button">*/}
+                {/*        +*/}
+                {/*    </button>*/}
+                {/*    <div className="humidity-display">Humidity: {initialHumidity}%</div>*/}
+                {/*    <div className="humidity-display">Power Usage: {initialPU}kW</div>*/}
+                {/*</div>*/}
+
                 <div className="temperature-controls">
                     <input
-                        type="number"
+                        type="range"
                         value={temperature}
                         min={minTemp}
                         max={maxTemp}
-                        onChange={handleInputChange}
-                        className="temperature-input"
-                        style={{display: 'none'}}
+                        onChange={handleSliderChange}
+                        className="temperature-slider"
                     />
-                    <button onClick={handleDecrement} className="temperature-button">
-                        -
-                    </button>
-                    <button onClick={handleIncrement} className="temperature-button">
-                        +
-                    </button>
                     <div className="humidity-display">Humidity: {initialHumidity}%</div>
                     <div className="humidity-display">Power Usage: {initialPU}kW</div>
                 </div>
+
             </div>
         </div>
     );

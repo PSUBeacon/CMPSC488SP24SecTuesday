@@ -118,11 +118,12 @@ const HVAC = () => {
                                     textAlign: "center",
                                     marginBottom: '20px',
                                     color: 'White'
-                                }}>{floor.Location}</h4>
+                                }}>{floor.Location} {floor.UUID}</h4>
+                                <p></p>
                                 <NestThermostat initialTemperature={floor.Temperature}
                                                 initialFanSpeed={floor.FanSpeed} initialMode={floor.Mode}
                                                 initialHumidity={floor.Humidity} initialPU={floor.EnergyConsumption}
-                                                initialStatus={floor.Status} uuid={floor.uuid}/>
+                                                initialStatus={floor.Status} uuid={floor.UUID}/>
                             </div>
                         ))}
                     </div>

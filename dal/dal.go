@@ -261,6 +261,7 @@ func FetchUser(client *mongo.Client, userName string) (User, error) {
 	collection := client.Database(dbName).Collection("Users")
 
 	// Create a filter to specify the criteria of the query
+	fmt.Println("All Users", collection)
 	filter := bson.M{"username": userName}
 
 	// Finding multiple documents returns a cursor
@@ -275,7 +276,8 @@ func FetchUser(client *mongo.Client, userName string) (User, error) {
 		return User{}, err
 	}
 
-	fmt.Printf("Username: %s, Role: %s\n", user.Username, user.Role)
+	//fmt.Printf("Username: %s, Role: %s\n", user.Username, user.Role)
+	fmt.Println("the user: ", user)
 	return user, nil
 }
 
@@ -402,8 +404,8 @@ func UpdateMessaging(client *mongo.Client, UUID []byte, name string, apptype str
 	messageRequest.AppType = apptype
 	messageRequest.Function = function
 	messageRequest.Change = change
-	message, err := json.Marshal(messageRequest)
 	//fmt.Println("message is:", message)
+	message, err := json.Marshal(messageRequest)
 	if err != nil {
 		fmt.Printf("Error marshaling JSON message: %v", err)
 		return
@@ -429,6 +431,7 @@ func UpdateMessaging(client *mongo.Client, UUID []byte, name string, apptype str
 			function: updatedValue,
 		},
 	}
+	fmt.Println("update: ", update)
 
 	updateJSON, err := json.Marshal(update)
 	if err != nil {
@@ -450,7 +453,7 @@ func UpdateMessaging(client *mongo.Client, UUID []byte, name string, apptype str
 
 	logg.DeviceID = name
 	logg.Function = function
-	logg.Change = change
+	logg.Change = string(change)
 	logg.Time = time.Now()
 	_, err = Logging.InsertOne(context.Background(), logg)
 
@@ -474,7 +477,7 @@ func UpdateThermMessaging(client *mongo.Client, UUID []byte, name string, apptyp
 
 	var logg LoggingStruct
 	// Update the MongoDB collection using JSON
-	collection := client.Database("smartHomeDB").Collection(apptype)
+	collection := client.Database("smartHomeDB").Collection("HVAC")
 	Logging := client.Database("smartHomeDB").Collection("Logging")
 	filter := bson.M{"UUID": messageRequest.UUID}
 
@@ -491,7 +494,7 @@ func UpdateThermMessaging(client *mongo.Client, UUID []byte, name string, apptyp
 			function: updatedValue,
 		},
 	}
-	fmt.Println(update)
+	fmt.Println("update: ", update)
 
 	updateJSON, err := json.Marshal(update)
 	if err != nil {
@@ -511,9 +514,28 @@ func UpdateThermMessaging(client *mongo.Client, UUID []byte, name string, apptyp
 		return
 	}
 
+	//var existingDoc bson.M
+	//err = collection.FindOne(context.Background(), filter).Decode(&existingDoc)
+	//if err != nil {
+	//	if err == mongo.ErrNoDocuments {
+	//		// Document does not exist, you can insert a new one
+	//		_, err = collection.InsertOne(context.Background(), update)
+	//	} else {
+	//		fmt.Printf("Error finding document: %v", err)
+	//		return
+	//	}
+	//} else {
+	//	// Document exists, update it
+	//	_, err = collection.UpdateOne(context.Background(), filter, update)
+	//	if err != nil {
+	//		fmt.Printf("Error updating document: %v", err)
+	//		return
+	//	}
+	//}
+
 	logg.DeviceID = name
 	logg.Function = function
-	logg.Change = change
+	logg.Change = string(change)
 	logg.Time = time.Now()
 	_, err = Logging.InsertOne(context.Background(), logg)
 
@@ -548,7 +570,7 @@ func FetchLogging(client *mongo.Client, dbName string) ([]LoggingStruct, error) 
 	if err := cursor.Err(); err != nil {
 		return nil, err
 	}
-	fmt.Println("light from db dal: ", logs)
+	//fmt.Println("light from db dal: ", logs)
 	return logs, nil
 }
 

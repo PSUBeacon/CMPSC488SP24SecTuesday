@@ -30,6 +30,8 @@ var secret = []byte("secret")
 
 var disconnectedPiNums []int
 
+var r = gin.Default() // Configure CORS
+
 func UpdateMissingPi(PiNum []string) {
 	for i := 0; i < len(PiNum); i++ {
 		PiNumInt, _ := strconv.Atoi(PiNum[i])
@@ -49,9 +51,6 @@ func main() {
 		}
 	}()
 
-	r := gin.Default()
-
-	// Configure CORS
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
@@ -90,6 +89,7 @@ func main() {
 	//ADJUSTMENT:
 	// Combined route group for both admin and user dashboards
 	dashboardGroup := r.Group("/dashboard")
+
 	dashboardGroup.Use() // Apply authMiddleware to protect the route
 	{
 		dashboardGroup.GET("/", dashboardHandler)
@@ -98,8 +98,17 @@ func main() {
 		dashboardGroup.GET("/status", statusResp)
 	}
 
+	settingsGroup := r.Group("/settings")
+	settingsGroup.Use(authMiddleware())
+	{
+		settingsGroup.GET("/")
+		settingsGroup.GET("/GetUser", authMiddleware(), getUsers)
+		settingsGroup.GET("/me", me)
+		settingsGroup.GET("/status", statusResp)
+	}
+
 	hvacGroup := r.Group("/hvac")
-	hvacGroup.Use()
+	hvacGroup.Use(authMiddleware())
 	{
 		hvacGroup.GET("/", GetHVAC)
 		hvacGroup.POST("/updateHVAC", updateThermostat)
@@ -108,7 +117,7 @@ func main() {
 	}
 
 	networkingGroup := r.Group("/networking")
-	networkingGroup.Use()
+	networkingGroup.Use(authMiddleware())
 	{
 		networkingGroup.GET("/", me)
 		networkingGroup.GET("/GetNetLogs", GetNetLogs)
@@ -116,7 +125,7 @@ func main() {
 	}
 
 	securityGroup := r.Group("/security")
-	securityGroup.Use()
+	securityGroup.Use(authMiddleware())
 	{
 		securityGroup.GET("/", me)
 		securityGroup.GET("/GetSecurity", GetSecurity)
@@ -125,7 +134,7 @@ func main() {
 	}
 
 	appliancesGroup := r.Group("/appliances", dashboardHandler)
-	appliancesGroup.Use()
+	appliancesGroup.Use(authMiddleware())
 	{
 		appliancesGroup.GET("/", me)
 		appliancesGroup.GET("/me", me)
@@ -133,13 +142,18 @@ func main() {
 	}
 
 	energyGroup := r.Group("/energy")
-	appliancesGroup.Use()
+	appliancesGroup.Use(authMiddleware())
 	{
 		energyGroup.GET("/", me)
 		energyGroup.POST("/GetEnergy", getAppliancesData)
 		energyGroup.GET("/status", statusResp)
 	}
-	go r.Run(":8081")
+	go func() {
+		err := r.Run(":8081")
+		if err != nil {
+
+		}
+	}()
 	//if err != nil {
 	//	log.Fatal("Server startup error:", err)
 	//}
@@ -147,6 +161,54 @@ func main() {
 	//
 
 	select {}
+}
+
+func getUsers(c *gin.Context) {
+
+	//session := sessions.Default(c)
+	username, exists := c.Get("username")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Username not found in context"})
+		return
+	}
+
+	if username == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Username not found in session"})
+		return
+	}
+
+	// Convert username to string
+	usernameStr, ok := username.(string)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username type"})
+		return
+	}
+
+	// Fetch user by username from MongoDB
+	fetchedUser, err := dal.FetchUser(client, usernameStr)
+	if err != nil {
+		fmt.Printf("Error fetching user: %v\n", err)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username"})
+		return
+	}
+	fmt.Println("fetchedUser", fetchedUser)
+
+	// Create a struct to hold the user information
+	type userInfo struct {
+		Username  string `json:"username"`
+		FirstName string `json:"firstName"`
+		LastName  string `json:"lastName"`
+		Role      string `json:"role"`
+	}
+	var userData userInfo
+
+	userData.Username = fetchedUser.Username
+	userData.FirstName = fetchedUser.FirstName
+	userData.LastName = fetchedUser.LastName
+	userData.Role = fetchedUser.Role
+	fmt.Printf("userData: %+v\n", userData)
+
+	c.JSON(http.StatusOK, userData)
 }
 
 func updateIoT(c *gin.Context) {
@@ -232,7 +294,7 @@ func VerifySecurityCode(c *gin.Context) {
 
 	var req struct {
 		Code   string `json:"code"`
-		Status string `json:"status"`
+		Status []byte `json:"status"`
 	}
 	fmt.Println("Alarm Status: ", req.Status)
 	requestBody, _ := ioutil.ReadAll(c.Request.Body)
@@ -253,8 +315,8 @@ func VerifySecurityCode(c *gin.Context) {
 	if req.Code == securityKey {
 		c.JSON(http.StatusOK, gin.H{"message": "Security code verified"})
 		fmt.Println("Key is valid ", req.Code)
-		dal.UpdateMessaging(client, []byte("502857"), "Security", "SecuritySystem", "Status", req.Status)
-		dal.UpdateMessaging(client, []byte("502858"), "Security", "SecuritySystem", "Status", req.Status)
+		dal.UpdateMessaging(client, []byte("502857"), "Security", "SecuritySystem", "Status", string(req.Status))
+		dal.UpdateMessaging(client, []byte("502858"), "Security", "SecuritySystem", "Status", string(req.Status))
 	} else {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid security code"})
 	}
@@ -386,6 +448,9 @@ func loginHandler(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"}) // Use generic error message
 
 		return
+	} else {
+		session.Set("username", loginData.Username)
+		//session.Save()
 	}
 	//c.Set("smartHomeDB", smartHomeDB)
 
@@ -395,9 +460,7 @@ func loginHandler(c *gin.Context) {
 	// JWT token creation
 	claims := jwt.MapClaims{
 		"username": fetchedUser.Username,
-		"role":     fetchedUser.Role, // Use the actual role from the fetched user
-
-		"exp": time.Now().Add(time.Hour * 24).Unix(), // Token expiration time
+		"exp":      time.Now().Add(time.Hour * 24).Unix(), // Token expiration time
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(jwtKey)
@@ -406,15 +469,16 @@ func loginHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create the token"})
 		return
 	}
-	session.Set(userkey, loginData.Username)
-	if err := session.Save(); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save session"})
-		return
-	}
+	// Set the username in the session
+	//session.Set("username", loginData.Username)
+	session.Save()
+
+	//fmt.Println(session.Get("username"))
 	// Return the JWT token in the response
 	c.JSON(http.StatusOK, gin.H{"token": tokenString,
-		"firstname": fetchedUser.FirstName,
-		"lastname":  fetchedUser.LastName})
+		"username": fetchedUser.Username,
+		"password": fetchedUser.Password})
+	fmt.Println(session.Get("username"))
 
 }
 
@@ -496,47 +560,47 @@ func me(c *gin.Context) {
 // check jwt auth and set user role
 func authMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// Check for JWT token in the Authorization header
 		authHeader := c.GetHeader("Authorization")
-		fmt.Printf("Authorization header: %s\n", authHeader)
-		if authHeader == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization token not found"})
-			c.Abort()
-			return
-		}
+		if authHeader != "" {
+			// Extract the token from the Authorization header
+			parts := strings.Split(authHeader, " ")
+			if len(parts) == 2 && parts[0] == "Bearer" {
+				tokenString := parts[1]
 
-		// Extract the token from the Authorization header
-		parts := strings.Split(authHeader, " ")
-		if len(parts) != 2 || parts[0] != "Bearer" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid Authorization header format"})
-			c.Abort()
-			return
-		}
+				token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+					if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+						return nil, fmt.Errorf("Unexpected signing method")
+					}
+					return jwtKey, nil
+				})
 
-		tokenString := parts[1]
-
-		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, fmt.Errorf("Unexpected signing method")
+				if err == nil && token.Valid {
+					if claims, ok := token.Claims.(jwt.MapClaims); ok {
+						// Set the user claims in the request context
+						fmt.Printf("Authorized")
+						c.Set("user", claims)
+						c.Next()
+						return
+					}
+				}
 			}
-			return jwtKey, nil
-		})
+		}
 
-		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		session := sessions.Default(c)
+		username := session.Get("username")
+
+		fmt.Printf("Session: %+v\n", session)
+		fmt.Printf("Username: %+v\n", username)
+
+		if username == nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
 			c.Abort()
 			return
 		}
 
-		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			// Set the user claims in the request context
-			fmt.Printf("Authorized")
-			c.Set("user", claims)
-			c.Next()
-		} else {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-			c.Abort()
-			return
-		}
+		c.Set("username", username)
+		c.Next()
 	}
 }
 

@@ -4,17 +4,12 @@ on:
   push:
     branches:
       - main
+      - iot-back
       - tests
 
 jobs:
-  restore:
+  func_tests:
     runs-on: ubuntu-latest
-
-#    services:
-#      mongodb:
-#        image: mongo:4.4.14
-#        ports:
-#          - 27017:27017
 
     steps:
       - name: Checkout code
@@ -24,14 +19,13 @@ jobs:
         run: |
           docker run --name smarthomedb -d -p 27017:27017 -v ./db-schema:/backup mongo:4.4.14
           docker exec smarthomedb mongorestore /backup/
-          #docker run --network host -v ./db-schema:/backup mongo:4.4.14 mongorestore --host localhost --port 27017 /backup/
 
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
           go-version: '1.22'
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc-arm-linux-gnueabihf libc6-armhf-cross libc6-dev-armhf-cross

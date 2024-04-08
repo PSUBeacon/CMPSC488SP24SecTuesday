@@ -23,5 +23,5 @@ jobs:
       - name: Restore MongoDB backup
         run: |
           docker run --name smarthomedb -d -p 27017:27017 -v ./db-schema:/backup mongo:4.4.14
-          docker exec -it smarthomedb mongorestore /backup/
+          docker exec smarthomedb mongorestore /backup/
           #docker run --network host -v ./db-schema:/backup mongo:4.4.14 mongorestore --host localhost --port 27017 /backup/

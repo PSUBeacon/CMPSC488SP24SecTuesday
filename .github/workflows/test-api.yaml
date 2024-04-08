@@ -10,11 +10,11 @@ jobs:
   restore:
     runs-on: ubuntu-latest
 
-    services:
-      mongodb:
-        image: mongo:4.4.14
-        ports:
-          - 27017:27017
+#    services:
+#      mongodb:
+#        image: mongo:4.4.14
+#        ports:
+#          - 27017:27017
 
     steps:
       - name: Checkout code
@@ -22,6 +22,6 @@ jobs:
 
       - name: Restore MongoDB backup
         run: |
-          #docker run --name smarthomedb -d -p 27017:27017 -v ./db-schema:/backup mongo:4.4.14
-          #docker exec -it smarthomedb mongorestore /backup/
-          docker run --network host -v ./db-schema:/backup mongo:4.4.14 mongorestore --host localhost --port 27017 /backup/
+          docker run --name smarthomedb -d -p 27017:27017 -v ./db-schema:/backup mongo:4.4.14
+          docker exec -it smarthomedb mongorestore /backup/
+          #docker run --network host -v ./db-schema:/backup mongo:4.4.14 mongorestore --host localhost --port 27017 /backup/

@@ -51,7 +51,7 @@ jobs:
 
       - name: Run Binary
         run: | 
-          ./bam-api/api & 
+          ./api & 
           echo "API started"
 
       - name: Run Functional Tests

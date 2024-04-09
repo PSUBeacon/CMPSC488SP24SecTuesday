@@ -112,6 +112,7 @@ const HVAC = () => {
                     position: 'relative'
                 }}>
                     <h1 style={{color: 'white'}}>HVAC</h1>
+                    <div>
                     <div className="hvac-data-container">
                         {floorData.length > 0 && (
                             <div key={floorData[currentIndex].UUID}>
@@ -127,6 +128,7 @@ const HVAC = () => {
                     <div className={'navigation'}>
                         <button onClick={handlePrevious} className={'submitButton'}>Previous</button>
                         <button onClick={handleNext} className={'submitButton'}>Next</button>
+                    </div>
                     </div>
                 </main>
             </div>

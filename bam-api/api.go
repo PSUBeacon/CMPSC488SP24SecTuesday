@@ -4,6 +4,7 @@ import (
 	"CMPSC488SP24SecTuesday/dal"
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"github.com/JGLTechnologies/gin-rate-limit"
 	"github.com/gin-contrib/cors"
@@ -64,7 +65,7 @@ func main() {
 
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
+		AllowMethods:     []string{"GET", "POST", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
@@ -91,7 +92,8 @@ func main() {
 	r.POST("/login", loginHandler)
 	r.GET("/logout", logout)
 	r.POST("/signup", signupHandler)
-
+	r.DELETE("/users/:username", deleteUserHandler)
+	r.PUT("/users/:username/role", updateUserRoleHandler)
 	// Apply JWT middleware to protected routes
 	protectedRoutes := r.Group("/")
 	protectedRoutes.Use(authMiddleware())
@@ -500,6 +502,44 @@ func loginHandler(c *gin.Context) {
 
 }
 
+func deleteUserHandler(c *gin.Context) {
+	username := c.Param("username")
+
+	err := dal.DeleteUser(client, username)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
+}
+
+func updateUserRoleHandler(c *gin.Context) {
+	username := c.Param("username")
+	var roleUpdate struct {
+		Role string `json:"role"`
+	}
+	if err := c.BindJSON(&roleUpdate); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	err := dal.UpdateUserRole(client, username, roleUpdate.Role)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "User role updated successfully"})
+}
+
 func logout(c *gin.Context) {
 	session := sessions.Default(c)
 	user := session.Get(userkey)
@@ -556,6 +596,7 @@ func signupHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "User created succesfully"})
 
+	//getUsers(c)
 }
 
 func AuthRequired(c *gin.Context) {

@@ -328,6 +328,41 @@ func CreateUser(client *mongo.Client, user *User) error {
 	return nil
 }
 
+func DeleteUser(client *mongo.Client, username string) error {
+	collection := client.Database(dbName).Collection("Users")
+
+	filter := bson.M{"username": username}
+
+	result, err := collection.DeleteOne(context.Background(), filter)
+	if err != nil {
+		return err
+	}
+
+	if result.DeletedCount == 0 {
+		return mongo.ErrNoDocuments
+	}
+
+	return nil
+}
+
+func UpdateUserRole(client *mongo.Client, username, newRole string) error {
+	collection := client.Database(dbName).Collection("Users")
+
+	filter := bson.M{"username": username}
+	update := bson.M{"$set": bson.M{"role": newRole}}
+
+	result, err := collection.UpdateOne(context.Background(), filter, update)
+	if err != nil {
+		return err
+	}
+
+	if result.MatchedCount == 0 {
+		return mongo.ErrNoDocuments
+	}
+
+	return nil
+}
+
 func FetchLights(client *mongo.Client, dbName string, roomName string) ([]Lighting, error) {
 	collection := client.Database(dbName).Collection("Lighting")
 

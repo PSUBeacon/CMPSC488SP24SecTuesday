@@ -1,13 +1,7 @@
 /* HVAC.css */
 .hvacPage {
-    display: flex;
-    flex-direction: column;
-    height: 100vh; /* This makes the div take the full height of the viewport */
-    width: 100vw; /* This makes the div take the full width of the viewport */
-    background-color: #2e370e; /* Example background color */
-    color: #ffffff; /* Example text color */
-    margin: 0; /* Removes default margin */
-    padding: 0; /* Removes default padding */
+    transform: scale(1.5);
+    transform-origin: top center;
 }
 
 .hvac-data-container {
@@ -16,37 +10,6 @@
     align-items: center;
     min-width: 0;
     width: 100%;
-    height: 75%;
-}
-
-.data-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1rem;
-    padding: 1rem;
-    background-color: #1A3851;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 300px;
-}
-
-.data-icon {
-    margin-right: 1rem;
-    font-size: 24px;
-    color: #50BCC0;
-}
-
-.data-info {
-    color: #FFFFFF;
-}
-
-.data-info p:first-child {
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-}
-
-.data-info select {
-    z-index: 10; /* Adjust as necessary */
 }
 
 .navigation {
@@ -56,6 +19,7 @@
 
 .navigation button {
     margin: 5px;
+    min-width: 7rem;
 }
 
 .slider {

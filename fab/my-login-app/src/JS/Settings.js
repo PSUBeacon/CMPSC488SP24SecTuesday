@@ -3,7 +3,8 @@ import logoImage from '../img/logo.webp';
 import '../CSS/Settings.css'; // Adjust the path as necessary based on your file structure
 import {Link} from 'react-router-dom'; // Import Link component
 import accountIcon from '../img/account.png';
-import {useNavigate} from 'react-router-dom'; // Import useHistory for navigation
+import {useNavigate} from 'react-router-dom';
+import axios from "axios"; // Import useHistory for navigation
 
 const SettingsPage = () => {
     document.title = 'BEACON | Settings';
@@ -19,7 +20,7 @@ const SettingsPage = () => {
     const userFirstName = sessionStorage.getItem('FirstName');
     const userLastName = sessionStorage.getItem('LastName');
     const userAccountType = sessionStorage.getItem('Role');
-
+    const [isLoading, setIsLoading] = useState(false);
     const topNavStyle = {
         backgroundColor: '#081624',
         color: 'white',
@@ -40,72 +41,160 @@ const SettingsPage = () => {
     const [newUserFirstName, setNewUserFirstName] = useState('');
     const [newUserLastName, setNewUserLastName] = useState('');
     const [newUserRole, setNewUserRole] = useState('User');
-    const [newUserEmail, setNewUserEmail] = useState('');
+    const [newUserUsername, setNewUserUsername] = useState('');
     const [newUserPassword, setNewUserPassword] = useState('');
+    const [newuser, setNewuser] = useState([]);
     const [users, setUsers] = useState([]);
 
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const response = await fetch('http://localhost:8081/settings/GetUsers', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
 
-    const fetchUsers = async () => {
+                if (response.ok) {
+                    const data = await response.json();
+                    setUsers(data);
+                } else {
+                    setError('Failed to fetch users');
+                }
+            } catch (error) {
+                console.log('Fetch operation error:', error);
+            }
+        };
+
+        if (userAccountType === 'admin') {
+            setSelectedNav('Manage Users')
+            fetchUsers().then(r => console.log('Users fetched successfully:', r)).catch(e => console.error('Fetch users error:', e));
+        } else {
+            setSelectedNav('Account Info')
+        }
+    }, [token, userAccountType]);
+
+    // Handler to add a new user (this will need to be more complex in a real app)
+    const addUserHandler = async () => {
         try {
-            const response = await fetch('http://localhost:8081/settings/GetUsers', {
-                method: 'GET',
+            const serverUrl = 'http://localhost:8081/signup';
+            const response = await axios.post(serverUrl, {
+                firstName: newUserFirstName,
+                lastName: newUserLastName,
+                username: newUserUsername,
+                password: newUserPassword,
+            });
+
+            console.log('User added successfully:', response.data);
+            // setNewuser([{
+            //     firstName: newUserFirstName,
+            //     lastName: newUserLastName,
+            //     username: newUserUsername,
+            //     password: newUserPassword,
+            // }]);
+
+            setUsers(prevUsers => [...prevUsers, {
+                firstName: newUserFirstName,
+                lastName: newUserLastName,
+                username: newUserUsername,
+                password: newUserPassword,
+                role: newUserRole
+            }]);
+
+            setShowAddUserForm(false);
+            setNewUserFirstName('');
+            setNewUserLastName('');
+            setNewUserUsername('');
+            setNewUserPassword('');
+
+
+            navigate('/settings')
+
+        } catch (error) {
+            if (error.response && error.response.data && error.response.data.error) {
+                setError(error.response.data.error);
+            } else {
+                setError('Failed to add user. Username already exists in the system');
+            }
+            console.error('Add user error:', error.toJSON());
+        }
+    };
+
+    // const deleteUserHandler = async (username) => {
+    //     try {
+    //         setIsLoading(true);
+    //         const serverUrl = `http://localhost:8081/users/${username}`;
+    //         await axios.delete(serverUrl, {
+    //             headers: {
+    //                 'Authorization': `Bearer ${token}`,
+    //             },
+    //         });
+    //         removeUserHandler(username);
+    //     } catch (error) {
+    //         if (error.response && error.response.data && error.response.data.error) {
+    //             setError(error.response.data.error);
+    //         } else {
+    //             setError('Failed to delete user. Please try again later.');
+    //         }
+    //         console.error('Delete user error:', error);
+    //     } finally{
+    //         setIsLoading(false);
+    //     }
+    // };
+    // Handler to remove a user by id
+// Handler to remove a user by username
+    const removeUserHandler = async (username) => {
+        try {
+            setIsLoading(true);
+            const serverUrl = `http://localhost:8081/users/${username}`;
+            await axios.delete(serverUrl, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+            // Remove the user from the state without making another request
+            setUsers((prevUsers) => prevUsers.filter((user) => user.username !== username));
+        } catch (error) {
+            if (error.response && error.response.data && error.response.data.error) {
+                setError(error.response.data.error);
+            } else {
+                setError('Failed to delete user. Please try again later.');
+            }
+            console.error('Delete user error:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const changeUserRoleHandler = async (username, newRole) => {
+        try {
+            const serverUrl = `http://localhost:8081/users/${username}/role`;
+            await axios.put(serverUrl, { role: newRole }, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
             });
-
-            if (response.ok) {
-                const data = await response.json();
-                setUsers(data);
-            } else {
-                setError('Failed to fetch users');
-            }
+            setUsers((prevUsers) =>
+                prevUsers.map((user) =>
+                    user.username === username ? { ...user, role: newRole } : user
+                )
+            );
         } catch (error) {
-            console.log('Fetch operation error:', error);
+            if (error.response && error.response.data && error.response.data.error) {
+                setError(error.response.data.error);
+            } else {
+                setError('Failed to update user role. Please try again later.');
+            }
+            console.error('Change user role error:', error);
         }
-    };
-
-    useEffect(() => {
-        if (userAccountType === 'admin') {
-            fetchUsers();
-        }
-    }, [userAccountType]);
-
-    // Handler to add a new user (this will need to be more complex in a real app)
-    const addUserHandler = () => {
-        // Simple example: Add a default new user (you would have more complex logic in a real app)
-        const newUser = {id: users.length + 1, name: `New User ${users.length + 1}`, role: 'User'};
-        setUsers([...users, newUser]);
-    };
-
-    // Handler to remove a user by id
-    const removeUserHandler = (userId) => {
-        setUsers(users.filter(user => user.id !== userId));
-    };
-
-    // Handler to change a user's role
-    const changeUserRoleHandler = (userId, newRole) => {
-        setUsers(users.map(user => user.id === userId ? {...user, role: newRole} : user));
     };
 
     const addUserFormHandler = (event) => {
         event.preventDefault();
-        const newUser = {
-            id: users.length + 1,
-            name: `${newUserFirstName} ${newUserLastName}`,
-            role: newUserRole,
-            email: newUserEmail,
-            password: newUserPassword, // Ensure you hash the password in a real app!
-        };
-        setUsers([...users, newUser]);
-        setShowAddUserForm(false); // Hide the form after adding the user
-
-        // Reset form fields
-        setNewUserFirstName('');
-        setNewUserLastName('');
-        setNewUserEmail('');
-        setNewUserPassword('');
+        addUserHandler().then(r => console.log('User added successfully:', r)).catch(e => console.error('Add user error:', e));
     };
 
     function setUserInfo(param) {
@@ -119,6 +208,7 @@ const SettingsPage = () => {
             ...prevState,
             [name]: value
         }));
+        sessionStorage.setItem(name, value);
     };
 
     return (
@@ -215,10 +305,10 @@ const SettingsPage = () => {
                                         style={{margin: '5px'}}
                                     />
                                     <input
-                                        type="email"
-                                        placeholder="Email"
-                                        value={newUserEmail}
-                                        onChange={(e) => setNewUserEmail(e.target.value)}
+                                        type="text"
+                                        placeholder="Username"
+                                        value={newUserUsername}
+                                        onChange={(e) => setNewUserUsername(e.target.value)}
                                         required
                                         style={{margin: '5px'}}
                                     />
@@ -236,9 +326,8 @@ const SettingsPage = () => {
                                         required
                                         style={{margin: '5px'}}
                                     >
-                                        <option value="admin">Admin</option>
+                                        {/*<option value="admin">Admin</option>*/}
                                         <option value="user">User</option>
-                                        <option value="child">Child</option>
                                     </select>
                                     <button type="submit" style={{
                                         margin: '5px',
@@ -275,7 +364,7 @@ const SettingsPage = () => {
                                         <div style={{display: 'flex', alignItems: 'center'}}>
                                             <select
                                                 value={user.role}
-                                                onChange={(e) => changeUserRoleHandler(user.id, e.target.value)}
+                                                onChange={(e) => changeUserRoleHandler(user.username, e.target.value)}
                                                 style={{
                                                     margin: '0 10px',
                                                     padding: '5px',
@@ -288,15 +377,16 @@ const SettingsPage = () => {
                                             >
                                                 <option value="admin">admin</option>
                                                 <option value="user">user</option>
-                                                <option value="child">child</option>
                                             </select>
-                                            <button onClick={() => removeUserHandler(user.id)} style={{
+                                            <button onClick={() => removeUserHandler(user.username)} disabled={isLoading} style={{
                                                 backgroundColor: '#50BCC0',
                                                 color: 'black',
                                                 border: 'none',
                                                 padding: '5px 10px',
                                                 borderRadius: '5px',
-                                                zIndex: 3
+                                                zIndex: 3,
+                                                opacity: isLoading ? 0.5 : 1,
+                                                cursor: isLoading ? 'not-allowed' : 'pointer'
                                             }}>
                                                 Remove
                                             </button>

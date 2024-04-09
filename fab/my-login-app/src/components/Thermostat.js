@@ -30,7 +30,7 @@ const sendServerRequest = () => {
 };
 
 const ModeToggle = ({initialMode, onModeChange, initialStatus}) => {
-    [mode, setMode] = useState(initialStatus == 'false' ? 'off' : initialMode);
+    [mode, setMode] = useState(initialStatus === 'false' ? 'off' : initialMode);
 
     const handleModeChange = async (newMode) => {
         await setMode(newMode);
@@ -104,7 +104,7 @@ const NestThermostat = ({
                             thermostat
                         }) => {
     [temperature, setTemperature] = useState(thermostat.Temperature || 76);
-    [mode, setMode] = useState(thermostat.Mode);
+    [mode, setMode] = useState(thermostat.Status === 'false' ? 'off' : thermostat.Mode);
     [fanSpeed, setFanSpeed] = useState(thermostat.FanSpeed);
     [inituuid, setInituuid] = useState(thermostat.UUID);
 

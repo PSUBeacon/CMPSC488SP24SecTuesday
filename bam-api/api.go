@@ -288,6 +288,14 @@ func updateThermostat(c *gin.Context) {
 		return
 	}
 
+	if req.Function == "Mode" {
+		var req2 = req
+		req2.Function = "Status"
+		req2.Change = "true"
+
+		dal.UpdateThermMessaging(client, []byte(req2.UUID), req2.Name, req2.AppType, req2.Function, req2.Change)
+	}
+
 	//fmt.Println([]byte(req.UUID), req.Name, req.AppType, req.Function, req.Change)
 	//fmt.Printf("\n%T\n", req.Change)
 	dal.UpdateThermMessaging(client, []byte(req.UUID), req.Name, req.AppType, req.Function, req.Change)

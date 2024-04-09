@@ -2,6 +2,7 @@ package main
 
 import (
 	"CMPSC488SP24SecTuesday/dal"
+	"CMPSC488SP24SecTuesday/networktraffic"
 	"bytes"
 	"context"
 	"fmt"
@@ -121,6 +122,7 @@ func main() {
 	{
 		networkingGroup.GET("/", me)
 		networkingGroup.GET("/GetNetLogs", GetNetLogs)
+		networkingGroup.GET("/GetNetPcapLogs", GetNetPcapLogs)
 		networkingGroup.GET("/status", statusResp)
 	}
 
@@ -670,6 +672,17 @@ func dashboardHandler(c *gin.Context) {
 
 func GetNetLogs(c *gin.Context) {
 	logs, err := dal.FetchLogging(client, "smartHomeDB")
+	if err != nil {
+		fmt.Printf(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, logs)
+}
+
+func GetNetPcapLogs(c *gin.Context) {
+	logs, err :=  networktraffic.GetNetEvents() //.FetchLogging(client, "smartHomeDB")
 	if err != nil {
 		fmt.Printf(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

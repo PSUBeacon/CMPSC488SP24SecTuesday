@@ -1,4 +1,4 @@
-package main
+package networktraffic
 
 import (
 	"bufio"
@@ -46,6 +46,6 @@ func ConfigureController() {
 	}
 }
 
-func main() {
-	ConfigureController()
-}
+//func main() {
+//	ConfigureController()
+//}

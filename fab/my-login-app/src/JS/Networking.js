@@ -26,9 +26,41 @@ const Networking = () => {
     const [error, setError] = useState('');
     const [Logs, setLogs] = useState([]);
     const [currentView, setCurrentView] = useState('iotLogs'); // New state to track current view
+
     // Function to change view
     const changeView = (view) => {
         setCurrentView(view);
+
+        // Check if the new view is for networkLogs and fetch them
+        if (view === 'networkLogs') {
+            const token = sessionStorage.getItem('token');
+            const networkLogsUrl = "http://localhost:8081/networking/GetNetPcapLogs"; // Update this URL as needed
+
+            fetch(networkLogsUrl, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Assuming the API returns an array of network logs,
+                    // update the Logs state directly if it's meant for networkLogs,
+                    // or adjust as needed based on your state management.
+                    setLogs(data);
+                    console.log('Fetched Network logs:', data);
+                })
+                .catch(error => {
+                    console.error('Error fetching network logs:', error);
+                    setError('Could not fetch network logs');
+                });
+        }
     };
     const navigate = useNavigate(); // Instantiate useNavigate hook
     // Define your IoT Logs data similar to how you have solarPanel data
@@ -37,6 +69,8 @@ const Networking = () => {
     ];
     const token = sessionStorage.getItem('token');
     const url = "http://localhost:8081/networking/GetNetLogs";
+    const urlNet = "http://localhost:8081/networking/GetNetPcapLogs";
+
 
     // fetch(url, {
     //     method: 'GET',
@@ -137,6 +171,31 @@ const Networking = () => {
         </div>
     );
 
+
+    function NetworkLogsComponent({ logs }) {
+        return (
+            <table>
+                <thead>
+                <tr>
+                    <th>Port Sent From</th>
+                    <th>Port Sent To</th>
+                    <th>Timestamp</th>
+                </tr>
+                </thead>
+                <tbody>
+                {logs.map((log, index) => (
+                    <tr key={index}>
+                        <td>{log.PortSentFrom}</td>
+                        <td>{log.PortSentTo}</td>
+                        <td>{log.Timestamp}</td>
+                    </tr>
+                ))}
+                </tbody>
+            </table>
+        );
+    }
+
+
 // Define your Network Logs data
     const networkLogs = [
         {PortSentFrom: 'Port 80', PortSentTo: 'Port 20'},
@@ -218,7 +277,12 @@ const Networking = () => {
                             }}>
                                 {/* Conditionally render the table based on the current view */}
                                 {currentView === 'iotLogs' && iotLogsTable}
-                                {currentView === 'networkLogs' && networkLogsTable}
+                                {/*{currentView === 'networkLogs' && networkLogsTable}*/}
+                                {currentView === 'networkLogs' && <NetworkLogsComponent logs={Logs}/>}
+
+                                {/*{currentView === 'iotLogs' && <IotLogsComponent logs={Logs}/>}*/}
+
+
 
 
                                 {/* Camera View Buttons */}

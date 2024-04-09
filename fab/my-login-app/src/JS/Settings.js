@@ -5,58 +5,21 @@ import {Link} from 'react-router-dom'; // Import Link component
 import accountIcon from '../img/account.png';
 import {useNavigate} from 'react-router-dom'; // Import useHistory for navigation
 
-
 const SettingsPage = () => {
     document.title = 'BEACON | Settings';
     const [error, setError] = useState('');
-    const [selectedNav, setSelectedNav] = useState(); // State variable for selected navigation item
-    let userAccountType, userFirstName, userLastName; // Variables to store user info
-    const navigate = useNavigate(); // Hook to enable redirection
+    const [selectedNav, setSelectedNav] = useState();
+    const navigate = useNavigate();
     const handleSignOut = () => {
-        // Add your sign-out logic here if necessary, like clearing localStorage or cookies
         sessionStorage.removeItem('token');
-        // Redirect to the login page
-        window.location.href = '/'; // Replace '/login' with your actual login route
+        window.location.href = '/';
     };
 
+    const token = sessionStorage.getItem('token');
+    const userFirstName = sessionStorage.getItem('FirstName');
+    const userLastName = sessionStorage.getItem('LastName');
+    const userAccountType = sessionStorage.getItem('Role');
 
-    useEffect(() => {
-        const token = sessionStorage.getItem('token');
-        const url = 'http://localhost:8081/settings/GetUser';
-
-        if (!token) {
-            navigate('/'); // Redirect to login page if token is not present
-            return;
-        }
-
-        fetch(url, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            },
-        })
-            .then(response => response.json())
-            .then(response => {
-                if (response && response.data) {
-                    userFirstName = response.data.firstName;
-                    userLastName = response.data.lastName;
-                    userAccountType = response.data.role;
-                    sessionStorage.setItem('accountType', response.data.accountType);
-                    console.log(response);
-                } else {
-                    setError('Unexpected response from server');
-                }
-            })
-            .catch(error => {
-                console.log('Fetch operation error:', error)
-            });
-
-
-    }, [navigate]);
-
-
-    // Styles that change with the theme
     const topNavStyle = {
         backgroundColor: '#081624',
         color: 'white',
@@ -80,6 +43,34 @@ const SettingsPage = () => {
     const [newUserEmail, setNewUserEmail] = useState('');
     const [newUserPassword, setNewUserPassword] = useState('');
     const [users, setUsers] = useState([]);
+
+
+    const fetchUsers = async () => {
+        try {
+            const response = await fetch('http://localhost:8081/settings/GetUsers', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setUsers(data);
+            } else {
+                setError('Failed to fetch users');
+            }
+        } catch (error) {
+            console.log('Fetch operation error:', error);
+        }
+    };
+
+    useEffect(() => {
+        if (userAccountType === 'admin') {
+            fetchUsers();
+        }
+    }, [userAccountType]);
 
     // Handler to add a new user (this will need to be more complex in a real app)
     const addUserHandler = () => {
@@ -151,8 +142,8 @@ const SettingsPage = () => {
                                     Manage Users
                                 </li>
                             )}
-                            <li className="settings-nav-item" onClick={() => setSelectedNav('Account Settings')}>
-                                Account Settings
+                            <li className="settings-nav-item" onClick={() => setSelectedNav('Account Info')}>
+                                Account Info
                             </li>
                             <li className="settings-nav-item">
                                 <button onClick={handleSignOut} style={{
@@ -172,7 +163,6 @@ const SettingsPage = () => {
                 <div style={{
                     flex: '1',
                     padding: '1rem',
-                    backgroundImage: 'linear-gradient(to bottom, #0E2237, #081624)',
                     position: 'relative',
                     display: 'flex',
                     alignItems: 'center',
@@ -254,7 +244,7 @@ const SettingsPage = () => {
                                         margin: '5px',
                                         padding: '10px',
                                         backgroundColor: '#50BCC0',
-                                        color: 'white',
+                                        color: 'black',
                                         border: 'none',
                                         borderRadius: '5px'
                                     }}>
@@ -264,7 +254,7 @@ const SettingsPage = () => {
                             )}
                             <div style={{width: '100%', maxWidth: '400px', overflow: 'auto', zIndex: 2}}>
                                 {users.map(user => (
-                                    <div key={user.id} style={{
+                                    <div key={user.username} style={{
                                         margin: '10px',
                                         padding: '10px',
                                         backgroundColor: '#081624',
@@ -275,11 +265,11 @@ const SettingsPage = () => {
                                         zIndex: 2
                                     }}>
                                         <div style={{display: 'flex', alignItems: 'center'}}>
-                                            <span style={{
-                                                fontWeight: 'bold',
-                                                color: 'white',
-                                                marginRight: '10px'
-                                            }}>{user.name}</span>
+                        <span style={{
+                            fontWeight: 'bold',
+                            color: 'white',
+                            marginRight: '10px'
+                        }}>{user.firstName} {user.lastName}</span>
                                             <span style={{color: '#95A4B6'}}>({user.role})</span>
                                         </div>
                                         <div style={{display: 'flex', alignItems: 'center'}}>
@@ -291,18 +281,18 @@ const SettingsPage = () => {
                                                     padding: '5px',
                                                     borderRadius: '5px',
                                                     border: '1px solid #50BCC0',
-                                                    backgroundColor: 'transparent',
+                                                    backgroundColor: '#081624',
                                                     color: 'white',
                                                     zIndex: 3
                                                 }}
                                             >
-                                                <option value="Admin">admin</option>
-                                                <option value="User">User</option>
-                                                <option value="Child">Child</option>
+                                                <option value="admin">admin</option>
+                                                <option value="user">user</option>
+                                                <option value="child">child</option>
                                             </select>
                                             <button onClick={() => removeUserHandler(user.id)} style={{
                                                 backgroundColor: '#50BCC0',
-                                                color: 'white',
+                                                color: 'black',
                                                 border: 'none',
                                                 padding: '5px 10px',
                                                 borderRadius: '5px',
@@ -316,9 +306,9 @@ const SettingsPage = () => {
                             </div>
                         </div>
                     )}
-                    {selectedNav === 'Account Settings' && (
+                    {selectedNav === 'Account Info' && (
                         <div style={{width: '100%', textAlign: 'center', padding: '20px'}}>
-                            <h3 style={{marginBottom: '40px'}}>Account Settings</h3>
+                            <h3 style={{marginBottom: '40px'}}>Account Info</h3>
                             <div style={{margin: '10px'}}>
                                 <img
                                     src={accountIcon}

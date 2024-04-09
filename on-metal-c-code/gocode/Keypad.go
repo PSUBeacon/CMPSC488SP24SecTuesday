@@ -1,6 +1,7 @@
 package gocode
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/stianeikeland/go-rpio/v4"
@@ -125,6 +126,52 @@ func (k *Keypad) UpdateKeyState(key *Key, newState KeyState) {
 		}
 	} else {
 		key.StateChanged = false
+	}
+}
+
+const securityCode = "123456" // Exam
+
+// Variable to store the entered code sequence
+var enteredCode string
+
+func onKeyPress(char rune) {
+	// Append pressed key to the entered code sequence
+	enteredCode += string(char)
+
+	// Check if the entered code matches the security code
+	if enteredCode == securityCode {
+		// Trigger the appropriate action when the correct code is entered
+		fmt.Println("Security code entered correctly. Disarming alarm...")
+		// Call a function to disarm the alarm, for example
+	}
+}
+
+// Initialize the keypad and start listening for key presses
+func InitKeypad() {
+	// GPIO pin numbers for rows and columns
+	rowPins := []int{22, 23, 24, 25}
+	columnPins := []int{17, 18, 27}
+
+	// Define keys
+	keys := [][]Key{
+		{{'1', 0, IDLE, false}, {'2', 1, IDLE, false}, {'3', 2, IDLE, false}},
+		{{'4', 3, IDLE, false}, {'5', 4, IDLE, false}, {'6', 5, IDLE, false}},
+		{{'7', 6, IDLE, false}, {'8', 7, IDLE, false}, {'9', 8, IDLE, false}},
+		{{'*', 9, IDLE, false}, {'0', 10, IDLE, false}, {'#', 11, IDLE, false}},
+	}
+
+	// Create and initialize the keypad
+	keypad := NewKeypad(rowPins, columnPins, keys)
+	keypad.Begin()
+
+	// Set the event listener
+	keypad.AddEventListener(onKeyPress)
+
+	// Main loop
+	for {
+		// Scan keys periodically
+		keypad.GetKeys()
+		time.Sleep(100 * time.Millisecond)
 	}
 }
 

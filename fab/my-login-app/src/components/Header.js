@@ -11,8 +11,9 @@ const Header = ({accountType}) => {
     const [isNavVisible, setIsNavVisible] = useState(false);
     const [isAccountPopupVisible, setIsAccountPopupVisible] = useState(false);
     const navigate = useNavigate();
-    const fname = sessionStorage.getItem('lastname')
-    const lname = sessionStorage.getItem('firstname')
+    const fname = sessionStorage.getItem('LastName')
+    const lname = sessionStorage.getItem('FirstName')
+    const role = sessionStorage.getItem('Role')
 
     const [isOpen, setIsOpen] = useState(false);
 
@@ -29,6 +30,9 @@ const Header = ({accountType}) => {
     // Handles the user sign-out process
     const signOut = () => {
         sessionStorage.removeItem('token');
+        sessionStorage.removeItem('FirstName');
+        sessionStorage.removeItem('LastName');
+        sessionStorage.removeItem('Role');
         setIsAccountPopupVisible(false); // Close the account popup
         navigate('/'); // Navigate to home or sign-in page
     };
@@ -67,8 +71,13 @@ const Header = ({accountType}) => {
                                        onClick={() => setIsOpen(false)}>Security</a></li>
                                 <li><a className="nav-text" href="/lighting"
                                        onClick={() => setIsOpen(false)}>Lighting</a></li>
-                                <li><a className="nav-text" href="/networking"
-                                       onClick={() => setIsOpen(false)}>Networking</a></li>
+                                {role === 'admin' && (
+                                    <li>
+                                        <a className="nav-text" href="/networking" onClick={() => setIsOpen(false)}>
+                                            Networking
+                                        </a>
+                                    </li>
+                                )}
                                 <li><a className="nav-text" href="/hvac"
                                        onClick={() => setIsOpen(false)}>HVAC</a></li>
                                 <li><a className="nav-text" href="/appliances"

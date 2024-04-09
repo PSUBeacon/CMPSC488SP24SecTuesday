@@ -1,19 +1,11 @@
 import React, {useState, useEffect} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {Link} from 'react-router-dom'; // Import Link from react-router-dom for navigation
 import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure Bootstrap CSS is imported to use its grid system and components
-import logoImage from '../img/logo.webp';
-import houseImage from '../img/houseImage.jpg';
-import notificationIcon from '../img/notification.png'
-import settingsIcon from '../img/settings.png'
-import accountIcon from '../img/account.png'
-import menuIcon from '../img/menu.png'
 import placeholderImage from '../img/placeholderImage.jpg'; // Replace with the path to your placeholder image
 import placeholderImage2 from '../img/placeholderImage2.jpg'; // Replace with the path to your placeholder image
 import {Table} from 'react-bootstrap';
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
-import axios from "axios";
 
 // Define the Dashboard component using a functional component pattern
 const Networking = () => {
@@ -33,34 +25,11 @@ const Networking = () => {
     const navigate = useNavigate(); // Instantiate useNavigate hook
     // Define your IoT Logs data similar to how you have solarPanel data
     let iotLogs = [
-        // {DeviceID: 'Port 80', Function: 'Port 20', "Change": 'true', "Time": "0:000"}
+        // {DeviceID: '37675', Function: 'Temperature', "Change": '73', "Time": "00:00:000"}
     ];
+
     const token = sessionStorage.getItem('token');
     const url = "http://localhost:8081/networking/GetNetLogs";
-
-    // fetch(url, {
-    //     method: 'GET',
-    //     headers: {
-    //         'Authorization': `Bearer ${token}`,
-    //         'Content-Type': 'application/json',
-    //     },
-    // })
-    //     .then(response => {
-    //         if (!response.ok) {
-    //             throw new Error('Network response was not ok');
-    //         }
-    //         return response.json();
-    //     })
-    //     .then(data => {
-    //         // Store the fetched data into networkLogs
-    //         iotLogs.push(...data);
-    //         setLogs(data)
-    //         console.log('IOT logs:', iotLogs); // You can process or log the data here
-    //     })
-    //     .catch(error => {
-    //         // Handle errors
-    //         console.error('Error fetching logs:', error);
-    //     });
 
     useEffect(() => {
 
@@ -69,21 +38,6 @@ const Networking = () => {
                 navigate('/'); // Redirect to login page if token is not present
                 return;
             }
-
-            // axios.get(`http://localhost:8081/networking/GetNetLogs`, {
-            //     headers: {
-            //         'Authorization': `Bearer ${token}`,
-            //         'Content-Type': 'application/json',
-            //     },
-            // })
-            //     .then(response => {
-            //         setLogs(response.data); // Set the fetched lights
-            //         //console.log("data", response.data)
-            //     })
-            //     .catch(error => {
-            //         console.error('Error fetching logs:', error);
-            //         setError('Could not fetch logs');
-            //     });
 
             fetch(url, {
                 method: 'GET',
@@ -176,12 +130,11 @@ const Networking = () => {
     const cameraFeeds = {
         livingroom: placeholderImage, // Replace with the actual camera feed URL or image for the living room
         kitchen: placeholderImage2, // Replace with the actual camera feed URL or image for the kitchen
-        // Add more camera feeds as needed
     };
 
     // This is the JSX return statement where we layout our component's HTML structure
     return (
-        <div style={{display: 'flex', minHeight: '100vh', flexDirection: 'column', backgroundColor: '#081624'}}>
+        <div style={{display: 'flex', minHeight: '100vh', flexDirection: 'column'}}>
             <Header accountType={accountType}/>
             <div style={{display: 'flex', flex: '1'}}>
                 <Sidebar isNavVisible={isNavVisible}/>
@@ -190,8 +143,7 @@ const Networking = () => {
                     padding: '1rem',
                     display: 'flex',
                     flexDirection: 'column',
-                    alignItems: 'center',
-                    backgroundColor: '#0E2237'
+                    alignItems: 'center'
                 }}>
 
                     {/* Widgets Container */}
@@ -220,8 +172,6 @@ const Networking = () => {
                                 {currentView === 'iotLogs' && iotLogsTable}
                                 {currentView === 'networkLogs' && networkLogsTable}
 
-
-                                {/* Camera View Buttons */}
                                 <div style={{
                                     position: 'absolute',
                                     top: '10px',
@@ -241,7 +191,6 @@ const Networking = () => {
                                         backgroundColor: currentView === 'networkLogs' ? '#0294A5' : '#08192B'
                                     }}>Network Logs
                                     </button>
-                                    {/* Add more buttons for additional camera views */}
                                 </div>
                             </div>
                         </div>

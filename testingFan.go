@@ -7,40 +7,50 @@ import (
 	"periph.io/x/conn/v3/gpio"
 	"periph.io/x/conn/v3/gpio/gpioreg"
 	"periph.io/x/conn/v3/physic"
-	"periph.io/x/host/v3"
 )
 
-// Start starts the Fan.
-func Start(pin gpio.PinIO) {
-	// Generate a 33% duty cycle 10KHz signal.
-	if err := pin.PWM(gpio.DutyMax/3, 440*physic.Hertz); err != nil {
+// SetFanSpeed sets the fan speed to low, medium, or high.
+func SetFanSpeed(pin gpio.PinIO, speed string) {
+	var duty gpio.Duty
+	switch speed {
+	case "low":
+		duty = gpio.DutyMax / 4 // 25% duty cycle for low speed
+	case "medium":
+		duty = gpio.DutyMax / 2 // 50% duty cycle for medium speed
+	case "high":
+		duty = gpio.DutyMax * 3 / 4 // 75% duty cycle for high speed
+	default:
+		log.Fatalf("Invalid speed setting: %s", speed)
+	}
+
+	// Generate signal with specified duty cycle at 10KHz
+	if err := pin.PWM(duty, 440*physic.Hertz); err != nil {
 		log.Fatal(err)
 	}
 }
 
-// Stop stops the Fan.
-func Stop(pin gpio.PinIO) {
+// TurnFanOn starts the fan at a specified speed.
+func TurnFanOn(pin gpio.PinIO, speed string) {
+	SetFanSpeed(pin, speed)
+}
+
+// TurnFanOff stops the fan.
+func TurnFanOff(pin gpio.PinIO) {
 	if err := pin.Halt(); err != nil {
 		log.Fatal(err)
 	}
 }
 
 func main() {
-	// Make sure periph is initialized.
-	if _, err := host.Init(); err != nil {
-		log.Fatal(err)
-	}
-
-	// Use gpioreg GPIO pin registry to find a GPIO pin by name.
-	pin := gpioreg.ByName("GPIO7")
+	pin := gpioreg.ByName("GPIO0")
 	if pin == nil {
-		log.Fatalf("Failed to find GPIO4")
+		log.Fatalf("Failed to find GPIO0")
 	}
 
-	// Start the fan
-	Start(pin)
+	// Example: Turn the fan on at medium speed.
+	TurnFanOn(pin, "medium")
 
-	// Stop the fan after 10 seconds
+	// Example: Turn the fan off after 10 seconds.
 	time.Sleep(10 * time.Second)
-	Stop(pin)
+	TurnFanOff(pin)
 }

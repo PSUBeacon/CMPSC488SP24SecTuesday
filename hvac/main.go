@@ -78,7 +78,7 @@ func DisplayLCDHVAC() {
 	tempToSet = 74
 	fanStatus = "ON"
 
-	gocode.WriteLCD("Now:" + string(rune(intCurrTemp)) + "F Set:" + string(rune(tempToSet)) + "FMode:" + mode + " Fan:" + fanStatus)
+	gocode.WriteLCD("Now:" + fmt.Sprintf("%03d", intCurrTemp) + " Set:" + fmt.Sprintf("%02d", tempToSet) + "  Mode:" + mode + " Fan:" + fanStatus)
 }
 
 //func main() {

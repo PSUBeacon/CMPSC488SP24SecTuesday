@@ -2,37 +2,25 @@
 import '../CSS/HVAC.css'; // Import CSS file
 import React, {useState, useEffect} from 'react';
 import {useNavigate} from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure Bootstrap CSS is imported to use its grid system and components
+//import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure Bootstrap CSS is imported to use its grid system and components
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import NestThermostat from "../components/Thermostat";
 import axios from 'axios';
+import {faAlignCenter} from "@fortawesome/free-solid-svg-icons";
 
 const HVAC = () => {
     document.title = 'BEACON | HVAC';
 
-    // States for each device
-    const [deviceData, setDeviceData] = useState({
-        HVAC: {},
-        Dishwasher: {},
-        Fridge: {},
-        Lighting: {},
-        Microwave: {},
-        Oven: {},
-        SecuritySystem: {},
-        SolarPanel: {},
-        Toaster: {},
-    });
 
     const navigate = useNavigate(); // Instantiate useNavigate hook
     const [user, setUser] = useState(null);
     const [error, setError] = useState('');
     const [isNavVisible, setIsNavVisible] = useState(false);
     const [accountType, setAccountType] = useState('');
-    const [secondFloorHVACStatus, setSecondFloorHVACStatus] = useState(deviceData.HVAC.Status);
-    const [basementHVACStatus, setBasementHVACStatus] = useState(deviceData.HVAC.Status);
-
+    const [thermostats, setThermostats] = useState([]);
     const [floorData, setFloorData] = useState([]);
+    const [currentIndex, setCurrentIndex] = useState(0); // Track the current index to display
 
     useEffect(() => {
         const token = sessionStorage.getItem('token');
@@ -56,6 +44,23 @@ const HVAC = () => {
                 setError('Could not fetch floor');
             });
     }, [navigate]);
+
+    const handleNext = () => {
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % floorData.length);
+    };
+
+    const handlePrevious = () => {
+        setCurrentIndex((prevIndex) => {
+            const newIndex = prevIndex - 1;
+            return newIndex < 0 ? floorData.length - 1 : newIndex;
+        });
+    };
+
+    const handleThermostatChange = (updatedThermostat) => {
+        const newFloorData = [...floorData];
+        newFloorData[currentIndex] = updatedThermostat;
+        setFloorData(newFloorData);
+    };
 
     useEffect(() => {
         const token = sessionStorage.getItem('token');
@@ -90,6 +95,15 @@ const HVAC = () => {
 
     }, [navigate]);
 
+    const [updatedFloorData, setUpdatedFloorData] = useState(floorData);
+
+    // const handleThermostatChange = (index, updatedThermostat) => {
+    //     // Update the floorData with the updatedThermostat
+    //     const newFloorData = [...updatedFloorData];
+    //     newFloorData[index] = updatedThermostat;
+    //     setUpdatedFloorData(newFloorData);
+    // };
+
     return (
         <div style={{display: 'flex', minHeight: '100vh', flexDirection: 'column', backgroundColor: '#081624'}}>
             <Header accountType={accountType}/>
@@ -104,28 +118,22 @@ const HVAC = () => {
                     backgroundImage: 'linear-gradient(to bottom, #0E2237, #081624)',
                     position: 'relative'
                 }}>
-
-                    <h1 style={{color: 'white', marginBottom: '2rem'}}>HVAC</h1>
-                    <div className="hvac-data-container" style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'space-around',
-                        width: '100%'
-                    }}>
-                        {floorData.map((floor, index) => (
-                            <div key={index} style={{marginRight: index === 0 ? '2rem' : 0}}>
-                                <h4 style={{
-                                    textAlign: "center",
-                                    marginBottom: '20px',
-                                    color: 'White'
-                                }}>{floor.Location} {floor.UUID}</h4>
-                                <p></p>
-                                <NestThermostat initialTemperature={floor.Temperature}
-                                                initialFanSpeed={floor.FanSpeed} initialMode={floor.Mode}
-                                                initialHumidity={floor.Humidity} initialPU={floor.EnergyConsumption}
-                                                initialStatus={floor.Status} uuid={floor.UUID}/>
+                    <h1 style={{color: 'white'}}>HVAC</h1>
+                    <div className="hvac-data-container">
+                        {floorData.length > 0 && (
+                            <div key={floorData[currentIndex].UUID}>
+                                <p>{floorData[currentIndex].Location}</p>
+                                <NestThermostat
+                                    thermostat={floorData[currentIndex]}
+                                    index={currentIndex}
+                                    onThermostatChange={handleThermostatChange}
+                                />
                             </div>
-                        ))}
+                        )}
+                    </div>
+                    <div>
+                        <button onClick={handlePrevious} className={'submitButton'}>Previous</button>
+                        <button onClick={handleNext} className={'submitButton'}>Next</button>
                     </div>
                 </main>
             </div>

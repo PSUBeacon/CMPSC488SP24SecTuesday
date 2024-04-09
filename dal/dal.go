@@ -254,7 +254,33 @@ func FetchCollections(client *mongo.Client, dbName string) (*SmartHomeDB, error)
 	return smartHomeDB, nil
 }
 
-///////////////////////////////////////////////////////////
+func FetchAllUsers(client *mongo.Client) ([]User, error) {
+	collection := client.Database(dbName).Collection("Users")
+
+	// Finding multiple documents returns a cursor
+	cursor, err := collection.Find(context.TODO(), bson.M{})
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(context.TODO())
+
+	var users []User
+	for cursor.Next(context.TODO()) {
+		var user User
+		err := cursor.Decode(&user)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, user)
+	}
+
+	if err := cursor.Err(); err != nil {
+		return nil, err
+	}
+
+	fmt.Printf("Retrieved %d users from the database\n", len(users))
+	return users, nil
+}
 
 func FetchUser(client *mongo.Client, userName string) (User, error) {
 
@@ -410,6 +436,7 @@ func UpdateMessaging(client *mongo.Client, UUID []byte, name string, apptype str
 		fmt.Printf("Error marshaling JSON message: %v", err)
 		return
 	}
+
 	messaging.BroadCastMessage(message)
 
 	var logg LoggingStruct

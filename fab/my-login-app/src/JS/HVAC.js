@@ -97,13 +97,6 @@ const HVAC = () => {
 
     const [updatedFloorData, setUpdatedFloorData] = useState(floorData);
 
-    // const handleThermostatChange = (index, updatedThermostat) => {
-    //     // Update the floorData with the updatedThermostat
-    //     const newFloorData = [...updatedFloorData];
-    //     newFloorData[index] = updatedThermostat;
-    //     setUpdatedFloorData(newFloorData);
-    // };
-
     return (
         <div style={{display: 'flex', minHeight: '100vh', flexDirection: 'column', backgroundColor: '#081624'}}>
             <Header accountType={accountType}/>
@@ -131,7 +124,7 @@ const HVAC = () => {
                             </div>
                         )}
                     </div>
-                    <div>
+                    <div className={'navigation'}>
                         <button onClick={handlePrevious} className={'submitButton'}>Previous</button>
                         <button onClick={handleNext} className={'submitButton'}>Next</button>
                     </div>

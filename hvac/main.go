@@ -6,11 +6,18 @@ import (
 )
 
 const temperaturePin = 4
-const fanPin = uint8(18)
+const fanPin = 12
 
 var mode string
 var tempToSet int
+var fanSpeed int
 var fanStatus string
+
+const (
+	LowSpeed    = 20
+	MediumSpeed = 50
+	HighSpeed   = 90
+)
 
 // SetTemperature sets the desired temperature for the HVAC system.
 func UpdateTemperature(newTemperature int) {
@@ -21,22 +28,22 @@ func UpdateTemperature(newTemperature int) {
 	}
 	intCurrTemp := int(currentTemp)
 	if newTemperature == intCurrTemp {
-		gocode.FanStatus(fanPin, false)
+		gocode.TurnOffFan(fanPin)
 		fmt.Printf("%s Temperature is set to %d°C\n", newTemperature)
 	}
 	if mode == "Cool" && newTemperature < intCurrTemp {
-		gocode.FanStatus(fanPin, true)
-		UpdateTemperature(newTemperature)
+		gocode.SetFanSpeed(fanPin, fanSpeed)
+		//UpdateTemperature(newTemperature)
 	}
 	if mode == "Cool" && newTemperature > intCurrTemp {
-		gocode.FanStatus(fanPin, false)
+		gocode.TurnOffFan(fanPin)
 	}
 	if mode == "Heat" && newTemperature > intCurrTemp {
-		gocode.FanStatus(fanPin, true)
-		UpdateTemperature(newTemperature)
+		gocode.SetFanSpeed(fanPin, fanSpeed)
+		//UpdateTemperature(newTemperature)
 	}
 	if mode == "Heat" && newTemperature < intCurrTemp {
-		gocode.FanStatus(fanPin, false)
+		gocode.TurnOffFan(fanPin)
 	}
 
 }
@@ -50,11 +57,11 @@ func UpdateFanSpeed(speed int) {
 // SetStatus sets the status (e.g., "Cool", "Heat", "Fan", "Off") for the HVAC system.
 func UpdateStatus(status bool) {
 	if status == true {
-		gocode.FanStatus(fanPin, true)
+		gocode.SetFanSpeed(fanPin, fanSpeed)
 		fmt.Printf("%s status is set to %s\n", status)
 	}
 	if status == false {
-		gocode.FanStatus(fanPin, false)
+		gocode.TurnOffFan(fanPin)
 		fmt.Printf("%s status is set to %s\n", status)
 	}
 }

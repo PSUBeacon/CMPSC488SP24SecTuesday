@@ -119,11 +119,13 @@ const NestThermostat = ({
     );
 
     const handleInputChange = useCallback(
-        (event) => {
+        async (event) => {
             const inputTemp = parseInt(event.target.value, 10);
             if (!isNaN(inputTemp) && inputTemp >= minTemp && inputTemp <= maxTemp) {
                 setTemperature(inputTemp);
             }
+            await handleTemperatureChange(Math.max(temperature - 1, minTemp));
+            await sendServerRequest();
         },
         [setTemperature, minTemp, maxTemp]
     );
@@ -190,6 +192,34 @@ const NestThermostat = ({
                 <button onClick={handleIncrement} className="temperature-button">
                     +
                 </button>
+
+                {/*<input*/}
+                {/*    type="range"*/}
+                {/*    id="dimmer"*/}
+                {/*    name="dimmer"*/}
+                {/*    min="60"*/}
+                {/*    max="90"*/}
+                {/*    value={temperature}*/}
+                {/*    onChange={(e) => {*/}
+                {/*        const newValue = (e.target.value);*/}
+                {/*        setTemperature(newValue);*/}
+                {/*    }}*/}
+                {/*    onMouseUp={(e) => {*/}
+
+                {/*        handleInputChange(e);*/}
+
+                {/*    }}*/}
+                {/*    style={{*/}
+                {/*        WebkitAppearance: 'none',*/}
+                {/*        width: '100%',*/}
+                {/*        height: '15px',*/}
+                {/*        background: '#d3d3d3',*/}
+                {/*        outline: 'none',*/}
+                {/*        opacity: '0.7',*/}
+                {/*        transition: 'opacity .2s',*/}
+                {/*        borderRadius: '5px',*/}
+                {/*    }}*/}
+                {/*/>*/}
                 <div className="humidity-display">Humidity: {thermostat.Humidity}%</div>
                 <div className="humidity-display">Power Usage: {thermostat.EnergyConsumpstion}kW</div>
             </div>

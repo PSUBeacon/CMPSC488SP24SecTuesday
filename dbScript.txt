@@ -79,7 +79,7 @@ db.HVAC.insertMany([
   },
   {
     UUID: '050337',
-    Location: 'Basement',
+    Location: '1st Floor',
     Temperature: 65,
     Humidity: 50,
     FanSpeed: 1,
@@ -103,6 +103,14 @@ db.Lighting.insertMany([
   {
     UUID: '417294',
     Location: 'Kitchen',
+    Brightness: 75,
+    Status: "true",
+    EnergyConsumption: 4,
+    LastChanged: new ISODate('2024-02-23T17:39:02.938Z')
+  },
+  {
+    UUID: '417295',
+    Location: 'Living Room',
     Brightness: 75,
     Status: "true",
     EnergyConsumption: 4,

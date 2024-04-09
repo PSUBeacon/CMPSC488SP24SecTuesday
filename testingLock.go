@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	servoPinNumber   = 4
+	servoPinNumber   = 23
 	pulseFrequency   = 20 * time.Millisecond
 	minPulseWidth    = 700 * time.Microsecond
 	maxPulseWidth    = 1500 * time.Microsecond

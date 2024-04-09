@@ -529,13 +529,13 @@ func UpdateThermMessaging(client *mongo.Client, UUID []byte, name string, apptyp
 	messageRequest.AppType = apptype
 	messageRequest.Function = function
 	messageRequest.Change = change
-	//message, err := json.Marshal(messageRequest)
-	////fmt.Println("message is:", message)
-	//if err != nil {
-	//	fmt.Printf("Error marshaling JSON message: %v", err)
-	//	return
-	//}
-	//messaging.BroadCastMessage(message)
+	message, err := json.Marshal(messageRequest)
+	//fmt.Println("message is:", message)
+	if err != nil {
+		fmt.Printf("Error marshaling JSON message: %v", err)
+		return
+	}
+	messaging.BroadCastMessage(message)
 
 	var logg LoggingStruct
 	// Update the MongoDB collection using JSON

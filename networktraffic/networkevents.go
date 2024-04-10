@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/pcap"
-	"go.bug.st/serial"
+	// "go.bug.st/serial" // reimport with zigbe device available
 	"log"
 	"time"
 )
@@ -138,37 +138,38 @@ func GetNetEvents() ([]byte, error) {
 
 	print("Checking zigbee network traffic ...")
 
-	// Open the XBee module for communication
-	port, err := serial.Open("/dev/ttyUSB0", &serial.Mode{BaudRate: 9600})
-	if err != nil {
-		log.Fatal("Error opening XBee module:", err)
-	}
-
-	// Get the current time
-	startTime := time.Now()
-
-	for {
-
-		// Read data from the serial port
-		buf := make([]byte, 4096) // Adjust buffer size as needed
-		n, err := port.Read(buf)
-		if err != nil {
-			log.Println("Error reading from serial port:", err)
-			continue
-		}
-
-		// Process the received data (Zigbee frames)
-		fmt.Println("\nZigbee PAN and MAC on the network:")
-		ProcessZigbeeFrames(buf[:n])
-
-		// Check if 30 seconds have passed
-		if time.Since(startTime) >= 3*time.Second {
-			break
-		}
-
-		// Optionally, you can add a small delay to reduce CPU usage
-		time.Sleep(100 * time.Millisecond)
-	}
+	//// Open the XBee module for communication
+	//port, err := serial.Open("/dev/ttyUSB0", &serial.Mode{BaudRate: 9600})
+	//if err != nil {
+	//	log.Println("Error opening XBee module:", err)
+	//
+	//}
+	//
+	//// Get the current time
+	//startTime := time.Now()
+	//
+	//for {
+	//
+	//	// Read data from the serial port
+	//	buf := make([]byte, 4096) // Adjust buffer size as needed
+	//	n, err := port.Read(buf)
+	//	if err != nil {
+	//		log.Println("Error reading from serial port:", err)
+	//		continue
+	//	}
+	//
+	//	// Process the received data (Zigbee frames)
+	//	fmt.Println("\nZigbee PAN and MAC on the network:")
+	//	ProcessZigbeeFrames(buf[:n])
+	//
+	//	// Check if 30 seconds have passed
+	//	if time.Since(startTime) >= 3*time.Second {
+	//		break
+	//	}
+	//
+	//	// Optionally, you can add a small delay to reduce CPU usage
+	//	time.Sleep(100 * time.Millisecond)
+	//} // temporary commented out since zigbee network is not available on laptop
 
 	return jsonNetworkData, err
 

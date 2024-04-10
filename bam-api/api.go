@@ -682,14 +682,14 @@ func GetNetLogs(c *gin.Context) {
 }
 
 func GetNetPcapLogs(c *gin.Context) {
-	logs, err :=  networktraffic.GetNetEvents() //.FetchLogging(client, "smartHomeDB")
+	logs, err := networktraffic.GetNetEvents() // Fetch the logs
 	if err != nil {
-		fmt.Printf(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, logs)
+	// Since logs is already a JSON []byte, write it directly to the response body
+	c.Data(http.StatusOK, "application/json", logs)
 }
 
 func GetSecurity(c *gin.Context) {

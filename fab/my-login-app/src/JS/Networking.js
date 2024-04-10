@@ -1,155 +1,75 @@
-import React, {useState, useEffect} from 'react';
-import {useNavigate} from 'react-router-dom';
-import {Link} from 'react-router-dom'; // Import Link from react-router-dom for navigation
-import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure Bootstrap CSS is imported to use its grid system and components
-import logoImage from '../img/logo.webp';
-import houseImage from '../img/houseImage.jpg';
-import notificationIcon from '../img/notification.png'
-import settingsIcon from '../img/settings.png'
-import accountIcon from '../img/account.png'
-import menuIcon from '../img/menu.png'
-import placeholderImage from '../img/placeholderImage.jpg'; // Replace with the path to your placeholder image
-import placeholderImage2 from '../img/placeholderImage2.jpg'; // Replace with the path to your placeholder image
-import {Table} from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Table } from 'react-bootstrap';
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
-import axios from "axios";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-// Define the Dashboard component using a functional component pattern
+
 const Networking = () => {
-    document.title = 'BEACON | Logs';
-    const [isAccountPopupVisible, setIsAccountPopupVisible] = useState(false);
+    const navigate = useNavigate();
     const [isNavVisible, setIsNavVisible] = useState(false);
-    const [dashboardMessage, setDashboardMessage] = useState('');
-    const [accountType, setAccountType] = useState('')
-    const [user, setUser] = useState(null);
-    const [error, setError] = useState('');
+    const [accountType, setAccountType] = useState('');
     const [Logs, setLogs] = useState([]);
-    const [currentView, setCurrentView] = useState('iotLogs'); // New state to track current view
+    const [currentView, setCurrentView] = useState('iotLogs');
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
 
-    // Function to change view
-    const changeView = (view) => {
-        setCurrentView(view);
-
-        // Check if the new view is for networkLogs and fetch them
-        if (view === 'networkLogs') {
-            const token = sessionStorage.getItem('token');
-            const networkLogsUrl = "http://localhost:8081/networking/GetNetPcapLogs"; // Update this URL as needed
-
-            fetch(networkLogsUrl, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Assuming the API returns an array of network logs,
-                    // update the Logs state directly if it's meant for networkLogs,
-                    // or adjust as needed based on your state management.
-                    setLogs(data);
-                    console.log('Fetched Network logs:', data);
-                })
-                .catch(error => {
-                    console.error('Error fetching network logs:', error);
-                    setError('Could not fetch network logs');
-                });
-        }
-    };
-    const navigate = useNavigate(); // Instantiate useNavigate hook
-    // Define your IoT Logs data similar to how you have solarPanel data
-    let iotLogs = [
-        // {DeviceID: 'Port 80', Function: 'Port 20', "Change": 'true', "Time": "0:000"}
-    ];
-    const token = sessionStorage.getItem('token');
-    const url = "http://localhost:8081/networking/GetNetLogs";
-    const urlNet = "http://localhost:8081/networking/GetNetPcapLogs";
-
-
-    // fetch(url, {
-    //     method: 'GET',
-    //     headers: {
-    //         'Authorization': `Bearer ${token}`,
-    //         'Content-Type': 'application/json',
-    //     },
-    // })
-    //     .then(response => {
-    //         if (!response.ok) {
-    //             throw new Error('Network response was not ok');
-    //         }
-    //         return response.json();
-    //     })
-    //     .then(data => {
-    //         // Store the fetched data into networkLogs
-    //         iotLogs.push(...data);
-    //         setLogs(data)
-    //         console.log('IOT logs:', iotLogs); // You can process or log the data here
-    //     })
-    //     .catch(error => {
-    //         // Handle errors
-    //         console.error('Error fetching logs:', error);
-    //     });
+    document.title = 'BEACON | Logs';
 
     useEffect(() => {
+        const token = sessionStorage.getItem('token');
+        if (!token) {
+            navigate('/');
+            return;
+        }
+        fetchLogs();
+    }, [currentView]); // Fetch logs also when currentView changes
 
-            const token = sessionStorage.getItem('token');
-            if (!token) {
-                navigate('/'); // Redirect to login page if token is not present
-                return;
-            }
+    const fetchLogs = () => {
+        setIsLoading(true);
+        setError('');
+        const token = sessionStorage.getItem('token');
+        const url = currentView === 'iotLogs' ? "http://localhost:8081/networking/GetNetLogs" : "http://localhost:8081/networking/GetNetPcapLogs";
 
-            // axios.get(`http://localhost:8081/networking/GetNetLogs`, {
-            //     headers: {
-            //         'Authorization': `Bearer ${token}`,
-            //         'Content-Type': 'application/json',
-            //     },
-            // })
-            //     .then(response => {
-            //         setLogs(response.data); // Set the fetched lights
-            //         //console.log("data", response.data)
-            //     })
-            //     .catch(error => {
-            //         console.error('Error fetching logs:', error);
-            //         setError('Could not fetch logs');
-            //     });
-
-            fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(response => {
+                console.log(response)
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
             })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Store the fetched data into networkLogs
-                    iotLogs.push(...data);
-                    setLogs(data)
-                    console.log('IOT logs:', iotLogs);// You can process or log the data here
-                })
-                .catch(error => {
-                    // Handle errors
-                    console.error('Error fetching logs:', error);
-                });
-        },
-        []
-    );
-    const iotLogsTable = (
+            .then(data => {
+                console.log(data)
+                if (Array.isArray(data)) {
+                    setLogs(data);
+                } else {
+                    throw new Error('Data format is incorrect');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                setError('Failed to load data');
+            })
+            .finally(() => setIsLoading(false));
+    };
+
+    const changeView = (view) => {
+        setCurrentView(view);
+    };
+
+    const renderLogsTable = () => (
         <div>
             <h2 style={{color: '#173350'}}>IOT Logs</h2>
-            <Table striped bordered hover variant="dark" style={{marginTop: '20px', backgroundColor: "#173350"}}>
-                <thead>
+            <Table striped bordered hover variant="dark">
+            <thead>
                 <tr>
                     <th>DeviceID</th>
                     <th>Function</th>
@@ -171,56 +91,31 @@ const Networking = () => {
         </div>
     );
 
-
-    function NetworkLogsComponent({ logs }) {
-        return (
-            <table>
-                <thead>
-                <tr>
-                    <th>Port Sent From</th>
-                    <th>Port Sent To</th>
-                    <th>Timestamp</th>
-                </tr>
-                </thead>
-                <tbody>
-                {logs.map((log, index) => (
-                    <tr key={index}>
-                        <td>{log.PortSentFrom}</td>
-                        <td>{log.PortSentTo}</td>
-                        <td>{log.Timestamp}</td>
-                    </tr>
-                ))}
-                </tbody>
-            </table>
-        );
-    }
-
-
-// Define your Network Logs data
-    const networkLogs = [
-        {PortSentFrom: 'Port 80', PortSentTo: 'Port 20'},
-        {PortSentFrom: 'Port 80', PortSentTo: 'Port 20'},
-        {PortSentFrom: 'Port 80', PortSentTo: 'Port 20'},
-        {PortSentFrom: 'Port 80', PortSentTo: 'Port 20'},
-        {PortSentFrom: 'Port 80', PortSentTo: 'Port 20'},
-        // Add more network log entries as needed
-    ];
-
-    const networkLogsTable = (
+    const renderPcapLogsTable = () => (
         <div>
             <h2 style={{color: '#173350'}}>Network Logs</h2>
-            <Table striped bordered hover variant="dark" style={{marginTop: '20px', backgroundColor: "#173350"}}>
+            <Table striped bordered hover variant="dark">
                 <thead>
                 <tr>
-                    <th>Port Sent From</th>
-                    <th>Port Sent To</th>
+                    <th>Network Type</th>
+                    <th>Source MAC</th>
+                    <th>Destination MAC</th>
+                    <th>Source IP</th>
+                    <th>Destination IP</th>
+                    <th>Source Port</th>
+                    <th>Destination Port</th>
                 </tr>
                 </thead>
                 <tbody>
-                {networkLogs.map((log, index) => (
+                {Logs.map((log, index) => (
                     <tr key={index}>
-                        <td>{log.PortSentFrom}</td>
-                        <td>{log.PortSentTo}</td>
+                        <td>{log.network_type}</td>
+                        <td>{log.source_mac}</td>
+                        <td>{log.destination_mac}</td>
+                        <td>{log.source_ip}</td>
+                        <td>{log.destination_ip}</td>
+                        <td>{log.source_port}</td>
+                        <td>{log.destination_port}</td>
                     </tr>
                 ))}
                 </tbody>
@@ -228,92 +123,30 @@ const Networking = () => {
         </div>
     );
 
-
-    const [cameraView, setCameraView] = useState('livingroom'); // Default camera view
-
-    // Object that holds the URLs for your camera feeds
-    const cameraFeeds = {
-        livingroom: placeholderImage, // Replace with the actual camera feed URL or image for the living room
-        kitchen: placeholderImage2, // Replace with the actual camera feed URL or image for the kitchen
-        // Add more camera feeds as needed
-    };
-
-    // This is the JSX return statement where we layout our component's HTML structure
     return (
-        <div style={{display: 'flex', minHeight: '100vh', flexDirection: 'column', backgroundColor: '#081624'}}>
-            <Header accountType={accountType}/>
-            <div style={{display: 'flex', flex: '1'}}>
-                <Sidebar isNavVisible={isNavVisible}/>
-                <main style={{
-                    flex: '1',
-                    padding: '1rem',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    backgroundColor: '#0E2237'
-                }}>
+        <div style={{display: 'flex', minHeight: '100vh', flexDirection: 'column', backgroundColor: '#081624' }}>
+            <Header accountType={accountType} />
+            <div style={{ display: 'flex', flex: '1' }}>
+                <Sidebar isNavVisible={isNavVisible} />
+                <main style={{ flex: '1', padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: '#0E2237' }}>
+                    <div style={{ width: '100%', maxWidth: '1700px', display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: '20px', marginBottom: '20px' }}>
+                        {/*<div className="camera-widget" style={{ maxWidth: '80%', backgroundColor: '#173350', borderRadius: '10px', overflow: 'hidden', flexBasis: '100%', padding: '12px', marginTop: "70px" }}>*/}
+                            <div className="camera-widget" style={{ position: 'relative', maxWidth: '80%', backgroundColor: '#173350', borderRadius: '10px', overflow: 'hidden', flexBasis: '100%', padding: '12px', marginTop: "70px" }}>
 
-                    {/* Widgets Container */}
-                    <div style={{width: '100%', maxWidth: '1700px'}}>
-                        {/* Widgets Row */}
-                        <div style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            flexWrap: 'wrap',
-                            justifyContent: 'center',
-                            gap: '20px',
-                            marginBottom: '20px'
-                        }}>
-                            {/* Camera Widget */}
-                            <div className="camera-widget" style={{
-                                position: 'relative',
-                                maxWidth: '60%',
-                                backgroundColor: '#173350',
-                                borderRadius: '10px',
-                                overflow: 'hidden',
-                                flexBasis: '100%',
-                                padding: '12px',
-                                marginTop: "70px"
-                            }}>
-                                {/* Conditionally render the table based on the current view */}
-                                {currentView === 'iotLogs' && iotLogsTable}
-                                {/*{currentView === 'networkLogs' && networkLogsTable}*/}
-                                {currentView === 'networkLogs' && <NetworkLogsComponent logs={Logs}/>}
-
-                                {/*{currentView === 'iotLogs' && <IotLogsComponent logs={Logs}/>}*/}
-
-
-
-
-                                {/* Camera View Buttons */}
-                                <div style={{
-                                    position: 'absolute',
-                                    top: '10px',
-                                    left: '10px',
-                                    display: 'flex',
-                                    gap: '5px'
-                                }}>
-                                    <button onClick={() => changeView('iotLogs')} style={{
-                                        padding: '5px',
-                                        color: 'white',
-                                        backgroundColor: currentView === 'iotLogs' ? '#0294A5' : '#08192B'
-                                    }}>IOT Logs
-                                    </button>
-                                    <button onClick={() => changeView('networkLogs')} style={{
-                                        padding: '5px',
-                                        color: 'white',
-                                        backgroundColor: currentView === 'networkLogs' ? '#0294A5' : '#08192B'
-                                    }}>Network Logs
-                                    </button>
-                                    {/* Add more buttons for additional camera views */}
-                                </div>
+                            {isLoading && <div>Loading...</div>}
+                            {!isLoading && error && <div>Error: {error}</div>}
+                            {!isLoading && !error && currentView === 'iotLogs' && renderLogsTable()}
+                            {!isLoading && !error && currentView === 'networkLogs' && renderPcapLogsTable()}
+                            <div style={{ position: 'absolute', top: '10px', left: '10px', display: 'flex', gap: '5px' }}>
+                                <button onClick={() => changeView('iotLogs')} style={{ padding: '5px', color: 'white', backgroundColor: currentView === 'iotLogs' ? '#0294A5' : '#08192B' }}>IOT Logs</button>
+                                <button onClick={() => changeView('networkLogs')} style={{ padding: '5px', color: 'white', backgroundColor: currentView === 'networkLogs' ? '#0294A5' : '#08192B' }}>Network Logs</button>
                             </div>
                         </div>
                     </div>
                 </main>
-
             </div>
         </div>
     );
 };
+
 export default Networking;

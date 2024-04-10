@@ -391,7 +391,7 @@ func main() {
 	if piNum == 13 {
 		go gocode.InitKeypad()
 	}
-	if piNum == 25 {
+	if piNum == 16 {
 		go hvac.DisplayLCDHVAC("", 0, "")
 		//go hvac.SendTempToFE()
 	}

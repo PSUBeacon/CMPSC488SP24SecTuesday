@@ -13,12 +13,13 @@ const sendServerRequest = () => {
         AppType: "HVAC",
         Function: func,
         Change: func === "Mode" ? mode :
-            func === "Temperature" ? JSON.stringify(temperature) :
+            func === "Temperature" ? temperature :
                 func === "FanSpeed" ? JSON.stringify(fanSpeed) :
                     mode === "off" ? "false" : "true",
     };
 
     try {
+        console.log(requestBody)
         const response = axios.post('http://localhost:8081/hvac/updateHVAC', requestBody, {
             headers: {
                 'Content-Type': 'application/json',
@@ -78,20 +79,20 @@ const FanSpeedToggle = ({initialFanSpeed, onFanSpeedChange}) => {
         <div className="fan-speed-toggle">
             <span className="mode-label"></span>
             <button
-                className={`fan-speed-button ${fanSpeed === 1 ? 'active' : ''}`}
-                onClick={() => handleFanSpeedChange(1)}
+                className={`fan-speed-button ${fanSpeed === 30 ? 'active' : ''}`}
+                onClick={() => handleFanSpeedChange(30)}
             >
                 Low
             </button>
             <button
-                className={`fan-speed-button ${fanSpeed === 2 ? 'active' : ''}`}
-                onClick={() => handleFanSpeedChange(2)}
+                className={`fan-speed-button ${fanSpeed === 50 ? 'active' : ''}`}
+                onClick={() => handleFanSpeedChange(50)}
             >
                 Medium
             </button>
             <button
-                className={`fan-speed-button ${fanSpeed === 3 ? 'active' : ''}`}
-                onClick={() => handleFanSpeedChange(3)}
+                className={`fan-speed-button ${fanSpeed === 90 ? 'active' : ''}`}
+                onClick={() => handleFanSpeedChange(90)}
             >
                 High
             </button>
@@ -107,16 +108,18 @@ const NestThermostat = ({
     [mode, setMode] = useState(thermostat.Status === 'false' ? 'off' : thermostat.Mode);
     [fanSpeed, setFanSpeed] = useState(thermostat.FanSpeed);
     [inituuid, setInituuid] = useState(thermostat.UUID);
+    const [dimmerValue, setDimmerValue] = useState(thermostat.Temperature);
 
     const minTemp = 60;
     const maxTemp = 90;
 
-    const handleTemperatureChange = useCallback(
-        (newTemp) => {
-            setTemperature(newTemp);
-        },
-        [setTemperature]
-    );
+    const handleTemperatureChange =
+        async (newTemp) => {
+            func = "Temperature";
+            await setTemperature(newTemp);
+            console.log(func + ": " + temperature)
+            await sendServerRequest()
+        };
 
     const handleInputChange = useCallback(
         async (event) => {
@@ -125,7 +128,7 @@ const NestThermostat = ({
                 setTemperature(inputTemp);
             }
             await handleTemperatureChange(Math.max(temperature - 1, minTemp));
-            await sendServerRequest();
+
         },
         [setTemperature, minTemp, maxTemp]
     );
@@ -177,49 +180,56 @@ const NestThermostat = ({
             </svg>
 
             <div className="temperature-controls">
-                <button onClick={handleDecrement} className="temperature-button">
-                    -
-                </button>
-                <input
-                    type="number"
-                    value={temperature}
-                    min={minTemp}
-                    max={maxTemp}
-                    onChange={handleInputChange}
-                    className="temperature-input"
-                    style={{display: 'none'}}
-                />
-                <button onClick={handleIncrement} className="temperature-button">
-                    +
-                </button>
-
+                {/*<button onClick={handleDecrement} className="temperature-button">*/}
+                {/*    -*/}
+                {/*</button>*/}
                 {/*<input*/}
-                {/*    type="range"*/}
-                {/*    id="dimmer"*/}
-                {/*    name="dimmer"*/}
-                {/*    min="60"*/}
-                {/*    max="90"*/}
+                {/*    type="number"*/}
                 {/*    value={temperature}*/}
-                {/*    onChange={(e) => {*/}
-                {/*        const newValue = (e.target.value);*/}
-                {/*        setTemperature(newValue);*/}
-                {/*    }}*/}
-                {/*    onMouseUp={(e) => {*/}
-
-                {/*        handleInputChange(e);*/}
-
-                {/*    }}*/}
-                {/*    style={{*/}
-                {/*        WebkitAppearance: 'none',*/}
-                {/*        width: '100%',*/}
-                {/*        height: '15px',*/}
-                {/*        background: '#d3d3d3',*/}
-                {/*        outline: 'none',*/}
-                {/*        opacity: '0.7',*/}
-                {/*        transition: 'opacity .2s',*/}
-                {/*        borderRadius: '5px',*/}
-                {/*    }}*/}
+                {/*    min={minTemp}*/}
+                {/*    max={maxTemp}*/}
+                {/*    onChange={handleInputChange}*/}
+                {/*    className="temperature-input"*/}
+                {/*    style={{display: 'none'}}*/}
                 {/*/>*/}
+                {/*<button onClick={handleIncrement} className="temperature-button">*/}
+                {/*    +*/}
+                {/*</button>*/}
+
+                <input
+                    type="range"
+                    id="dimmer"
+                    name="dimmer"
+                    min="60"
+                    max="90"
+                    value={temperature}
+                    onChange={(e) => {
+                        const newValue = (e.target.value);
+                        setTemperature(newValue)
+                    }}
+                    onMouseUp={(e) => {
+
+                        // handleInputChange(e);
+                        handleTemperatureChange(temperature);
+                        console.log(temperature)
+
+                    }}
+                    style={{
+                        WebkitAppearance: 'none',
+                        width: '100%',
+                        height: '15px',
+                        background: 'White',
+                        outline: 'none',
+                        opacity: '1',
+                        transition: 'opacity .2s',
+                        borderRadius: '5px',
+                    }}
+                />
+                <label htmlFor="dimmer"
+                       style={{
+                           color: '#fff',
+                           marginTop: '5px'
+                       }}>{temperature}</label>
                 <div className="humidity-display">Humidity: {thermostat.Humidity}%</div>
                 <div className="humidity-display">Power Usage: {thermostat.EnergyConsumpstion}kW</div>
             </div>

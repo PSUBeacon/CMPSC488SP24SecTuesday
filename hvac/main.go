@@ -13,12 +13,6 @@ var tempToSet int
 var fanSpeed int
 var fanStatus string
 
-const (
-	LowSpeed    = 20
-	MediumSpeed = 50
-	HighSpeed   = 90
-)
-
 // SetTemperature sets the desired temperature for the HVAC system.
 func UpdateTemperature(newTemperature int) {
 	currentTemp, err := gocode.ReadTemperature(temperaturePin, 22)
@@ -85,7 +79,7 @@ func DisplayLCDHVAC() {
 	tempToSet = 74
 	fanStatus = "ON"
 
-	gocode.WriteLCD("Now:" + fmt.Sprintf("%02d", intCurrTemp) + " Set:" + fmt.Sprintf("%02d", tempToSet) + "  Mode:" + mode + " Fan:" + fanStatus)
+	gocode.WriteLCD("Now:" + fmt.Sprintf("%02d", intCurrTemp) + "F Set:" + fmt.Sprintf("%02d", tempToSet) + "F Mode:" + mode + " Fan:" + fanStatus)
 }
 
 //func main() {

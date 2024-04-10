@@ -2,9 +2,11 @@ package gocode
 
 import (
 	"fmt"
-	"time"
-
+	"github.com/joho/godotenv"
 	"github.com/stianeikeland/go-rpio/v4"
+	"log"
+	"os"
+	"time"
 )
 
 // KeyState represents the state of a key.
@@ -129,20 +131,33 @@ func (k *Keypad) UpdateKeyState(key *Key, newState KeyState) {
 	}
 }
 
-const securityCode = "123456" // Exam
+//const securityCode = "123456" // Exam
 
-// Variable to store the entered code sequence
 var enteredCode string
 
 func onKeyPress(char rune) {
-	// Append pressed key to the entered code sequence
-	enteredCode += string(char)
+	if len(enteredCode) < 6 {
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatalf("Error loading .env file: %v", err)
+		}
+		securityCode := os.Getenv("SECURITY_KEY")
 
-	// Check if the entered code matches the security code
-	if enteredCode == securityCode {
-		// Trigger the appropriate action when the correct code is entered
-		fmt.Println("Security code entered correctly. Disarming alarm...")
-		// Call a function to disarm the alarm, for example
+		// Append pressed key to the entered code sequence
+		enteredCode += string(char)
+
+		WriteLCD("Code: " + enteredCode)
+
+		// Check if the entered code matches the security code
+		if enteredCode == securityCode {
+			// Trigger the appropriate action when the correct code is entered
+			fmt.Println("Security code entered correctly. Disarming alarm...")
+			// Call a function to disarm the alarm, for example
+		}
+	}
+	if len(enteredCode) == 6 {
+		ClearLCD()
+		WriteLCD("Code: ")
 	}
 }
 

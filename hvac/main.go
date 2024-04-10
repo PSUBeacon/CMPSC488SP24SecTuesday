@@ -1,15 +1,18 @@
 package hvac
 
 import (
+	messaging "CMPSC488SP24SecTuesday/AES-BlockChain-Communication"
 	"CMPSC488SP24SecTuesday/on-metal-c-code/gocode"
 	"fmt"
+	"strconv"
+	"time"
 )
 
 const temperaturePin = 4
 const fanPin = 12
 
 var mode string
-var tempToSet int
+var tempToSet int = 0
 var fanSpeed int = 50
 var fanStatus string
 
@@ -64,7 +67,35 @@ func UpdateMode(mode string) {
 	fmt.Printf("%s mode is set to %s\n", mode)
 }
 
-func DisplayLCDHVAC() {
+type DefaultHVAC struct {
+	Mode      string
+	TempToSet int
+	FanSpeed  int
+	FanStatus string
+}
+
+func SendTempToFE() {
+	ticker := time.NewTicker(1 * time.Minute)
+	defer ticker.Stop()
+
+	for range ticker.C {
+		currentTemp, err := gocode.ReadTemperature(temperaturePin, 22)
+		if err != nil {
+			fmt.Println("Error reading temperature:", err)
+			continue
+		}
+
+		// Convert the float value to a string
+		tempStr := strconv.FormatFloat(currentTemp, 'f', -1, 64)
+
+		// Convert the string to bytes
+		tempBytes := []byte(tempStr)
+
+		messaging.BroadCastMessage(tempBytes)
+	}
+}
+
+func DisplayLCDHVAC(mode string, tempToSet int, fanStatus string) {
 	//currentTemp, err := gocode.ReadTemperature(temperaturePin, 22)
 	//if err != nil {
 	//	return
@@ -74,12 +105,27 @@ func DisplayLCDHVAC() {
 	//}
 	//intCurrTemp := int(currentTemp)
 	// Hardcode current temp, Mode, Temperature to set, Status
+	defaults := DefaultHVAC{
+		Mode:      "Heat",
+		TempToSet: 74,
+		FanSpeed:  50,
+		FanStatus: "OFF",
+	}
+
+	if mode == "" {
+		defaults.Mode = mode
+	}
+	if tempToSet == 0 {
+		defaults.TempToSet = tempToSet
+	}
+	if fanStatus == "" {
+		defaults.FanStatus = fanStatus
+	}
+
 	intCurrTemp := 76
-	mode = "Heat"
-	tempToSet = 74
-	fanStatus = "ON"
 
 	gocode.WriteLCD("Now:" + fmt.Sprintf("%02d", intCurrTemp) + "F Set:" + fmt.Sprintf("%02d", tempToSet) + "F Mode:" + mode + " Fan:" + fanStatus)
+
 }
 
 //func main() {

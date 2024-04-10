@@ -21,7 +21,6 @@ config.json
 fab-2
 
 # dependencies
-*node_modules
 /.pnp
 .pnp.js
 

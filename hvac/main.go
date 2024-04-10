@@ -12,17 +12,18 @@ const temperaturePin = 4
 const fanPin = 12
 
 var mode string
-var tempToSet int = 0
+var tempToSet = 0
 var fanSpeed int = 50
 var fanStatus string
 
 // SetTemperature sets the desired temperature for the HVAC system.
 func UpdateTemperature(newTemperature int) {
-	currentTemp, err := gocode.ReadTemperature(temperaturePin, 22)
-	if err != nil {
-		fmt.Println("Error reading Temperature:", err)
-		return
-	}
+	//currentTemp, err := gocode.ReadTemperature(temperaturePin, 22)
+	//if err != nil {
+	//	fmt.Println("Error reading Temperature:", err)
+	//	return
+	//}
+	currentTemp := 76
 	intCurrTemp := int(currentTemp)
 	if newTemperature == intCurrTemp {
 		gocode.TurnOffFan(fanPin)

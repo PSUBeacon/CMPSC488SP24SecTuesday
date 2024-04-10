@@ -7,26 +7,30 @@
     {
       "Pinum": 13,
       "UUID": "417294"
+    },
+    {
+      "Pinum": 13,
+      "UUID": "417295"
     }
   ],
   "hvac": [
     {
       "Pinum": 25,
-      "UUID": "mnop3456"
+      "UUID": "050336"
     },
     {
       "Pinum": 25,
-      "UUID": "qrst7890"
+      "UUID": "050337"
     }
   ],
   "security": [
     {
       "Pinum": 13,
-      "UUID": "uvwx1234"
+      "UUID": "502857"
     },
     {
       "Pinum": 13,
-      "UUID": "yzab5678"
+      "UUID": "502858"
     }
   ],
   "appliances": [
@@ -38,11 +42,11 @@
   "energy": [
     {
       "Pinum": 16,
-      "UUID": "ghij3456"
+      "UUID": "636712"
     },
     {
       "Pinum": 16,
-      "UUID": "klmn7890"
+      "UUID": "636713"
     }
   ]
 }

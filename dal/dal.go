@@ -600,7 +600,7 @@ func UpdateThermMessaging(client *mongo.Client, UUID []byte, name string, apptyp
 	logg.Change = string(change)
 	logg.Time = time.Now()
 	_, err = Logging.InsertOne(context.Background(), logg)
-
+	time.Sleep(2 * time.Second)
 	return
 }
 

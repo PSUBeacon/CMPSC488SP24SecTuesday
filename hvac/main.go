@@ -10,7 +10,7 @@ const fanPin = 12
 
 var mode string
 var tempToSet int
-var fanSpeed int
+var fanSpeed int = 50
 var fanStatus string
 
 // SetTemperature sets the desired temperature for the HVAC system.

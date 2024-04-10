@@ -294,6 +294,7 @@ func updateThermostat(c *gin.Context) {
 		req2.Change = "true"
 
 		dal.UpdateThermMessaging(client, []byte(req2.UUID), req2.Name, req2.AppType, req2.Function, req2.Change)
+		time.Sleep(6 * time.Second)
 	}
 
 	//fmt.Println([]byte(req.UUID), req.Name, req.AppType, req.Function, req.Change)

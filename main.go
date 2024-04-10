@@ -285,7 +285,7 @@ func handleFunctionality() {
 					if messageData.Change == "true" {
 						hvac.UpdateStatus(true)
 					}
-					if messageData.Function == "Fan" {
+					if messageData.Function == "FanSpeed" {
 						hvac.UpdateFanSpeed(messageChange)
 					}
 					if messageData.Function == "Temperature" {

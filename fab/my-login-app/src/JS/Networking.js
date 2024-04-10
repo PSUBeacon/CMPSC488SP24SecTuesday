@@ -5,7 +5,6 @@ import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-
 const Networking = () => {
     const navigate = useNavigate();
     const [isNavVisible, setIsNavVisible] = useState(false);
@@ -16,7 +15,7 @@ const Networking = () => {
     const [error, setError] = useState('');
 
     document.title = 'BEACON | Logs';
-
+  
     useEffect(() => {
         const token = sessionStorage.getItem('token');
         if (!token) {
@@ -66,6 +65,7 @@ const Networking = () => {
     };
 
     const renderLogsTable = () => (
+
         <div>
             <h2 style={{color: '#173350'}}>IOT Logs</h2>
             <Table striped bordered hover variant="dark">

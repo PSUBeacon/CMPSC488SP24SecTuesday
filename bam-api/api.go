@@ -5,7 +5,9 @@ import (
 	"CMPSC488SP24SecTuesday/networktraffic"
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
+	"github.com/JGLTechnologies/gin-rate-limit"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
@@ -31,6 +33,8 @@ var secret = []byte("secret")
 
 var disconnectedPiNums []int
 
+var username = ""
+
 var r = gin.Default() // Configure CORS
 
 func UpdateMissingPi(PiNum []string) {
@@ -38,6 +42,14 @@ func UpdateMissingPi(PiNum []string) {
 		PiNumInt, _ := strconv.Atoi(PiNum[i])
 		disconnectedPiNums = append(disconnectedPiNums, PiNumInt)
 	}
+}
+
+func keyFunc(c *gin.Context) string {
+	return c.ClientIP()
+}
+
+func errorHandler(c *gin.Context, info ratelimit.Info) {
+	c.String(429, "Too many requests. Try again in "+time.Until(info.ResetTime).String())
 }
 
 func main() {
@@ -54,10 +66,11 @@ func main() {
 
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
+		AllowMethods:     []string{"GET", "POST", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
+
 		AllowOriginFunc: func(origin string) bool {
 			return origin == "*"
 		},
@@ -66,12 +79,22 @@ func main() {
 
 	r.Use(sessions.Sessions("mysession", cookie.NewStore(secret)))
 
+	store := ratelimit.InMemoryStore(&ratelimit.InMemoryOptions{
+		Rate:  time.Second,
+		Limit: 3,
+	})
+	mw := ratelimit.RateLimiter(store, &ratelimit.Options{
+		ErrorHandler: errorHandler,
+		KeyFunc:      keyFunc,
+	})
+
 	// unprotected endpoints no auth needed
 	r.GET("/status", statusResp)
 	r.POST("/login", loginHandler)
 	r.GET("/logout", logout)
 	r.POST("/signup", signupHandler)
-
+	r.DELETE("/users/:username", deleteUserHandler)
+	r.PUT("/users/:username/role", updateUserRoleHandler)
 	// Apply JWT middleware to protected routes
 	protectedRoutes := r.Group("/")
 	protectedRoutes.Use(authMiddleware())
@@ -100,25 +123,25 @@ func main() {
 	}
 
 	settingsGroup := r.Group("/settings")
-	settingsGroup.Use(authMiddleware())
+	settingsGroup.Use()
 	{
 		settingsGroup.GET("/")
-		settingsGroup.GET("/GetUser", authMiddleware(), getUsers)
+		settingsGroup.GET("/GetUsers", getUsers)
 		settingsGroup.GET("/me", me)
 		settingsGroup.GET("/status", statusResp)
 	}
 
 	hvacGroup := r.Group("/hvac")
-	hvacGroup.Use(authMiddleware())
+	hvacGroup.Use()
 	{
 		hvacGroup.GET("/", GetHVAC)
-		hvacGroup.POST("/updateHVAC", updateThermostat)
+		hvacGroup.POST("/updateHVAC", mw, updateThermostat)
 		hvacGroup.GET("/GetHVAC", GetHVAC)
 		hvacGroup.GET("/status", statusResp)
 	}
 
 	networkingGroup := r.Group("/networking")
-	networkingGroup.Use(authMiddleware())
+	networkingGroup.Use()
 	{
 		networkingGroup.GET("/", me)
 		networkingGroup.GET("/GetNetLogs", GetNetLogs)
@@ -127,7 +150,7 @@ func main() {
 	}
 
 	securityGroup := r.Group("/security")
-	securityGroup.Use(authMiddleware())
+	securityGroup.Use()
 	{
 		securityGroup.GET("/", me)
 		securityGroup.GET("/GetSecurity", GetSecurity)
@@ -136,7 +159,7 @@ func main() {
 	}
 
 	appliancesGroup := r.Group("/appliances", dashboardHandler)
-	appliancesGroup.Use(authMiddleware())
+	appliancesGroup.Use()
 	{
 		appliancesGroup.GET("/", me)
 		appliancesGroup.GET("/me", me)
@@ -144,12 +167,13 @@ func main() {
 	}
 
 	energyGroup := r.Group("/energy")
-	appliancesGroup.Use(authMiddleware())
+	appliancesGroup.Use()
 	{
 		energyGroup.GET("/", me)
 		energyGroup.POST("/GetEnergy", getAppliancesData)
 		energyGroup.GET("/status", statusResp)
 	}
+
 	go func() {
 		err := r.Run(":8081")
 		if err != nil {
@@ -166,34 +190,13 @@ func main() {
 }
 
 func getUsers(c *gin.Context) {
-
-	//session := sessions.Default(c)
-	username, exists := c.Get("username")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Username not found in context"})
-		return
-	}
-
-	if username == nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Username not found in session"})
-		return
-	}
-
-	// Convert username to string
-	usernameStr, ok := username.(string)
-	if !ok {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username type"})
-		return
-	}
-
-	// Fetch user by username from MongoDB
-	fetchedUser, err := dal.FetchUser(client, usernameStr)
+	// Fetch all users from MongoDB
+	fetchedUsers, err := dal.FetchAllUsers(client)
 	if err != nil {
-		fmt.Printf("Error fetching user: %v\n", err)
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username"})
+		fmt.Printf("Error fetching users: %v\n", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch users"})
 		return
 	}
-	fmt.Println("fetchedUser", fetchedUser)
 
 	// Create a struct to hold the user information
 	type userInfo struct {
@@ -202,15 +205,20 @@ func getUsers(c *gin.Context) {
 		LastName  string `json:"lastName"`
 		Role      string `json:"role"`
 	}
-	var userData userInfo
 
-	userData.Username = fetchedUser.Username
-	userData.FirstName = fetchedUser.FirstName
-	userData.LastName = fetchedUser.LastName
-	userData.Role = fetchedUser.Role
-	fmt.Printf("userData: %+v\n", userData)
+	var usersData []userInfo
 
-	c.JSON(http.StatusOK, userData)
+	for _, user := range fetchedUsers {
+		userData := userInfo{
+			Username:  user.Username,
+			FirstName: user.FirstName,
+			LastName:  user.LastName,
+			Role:      user.Role,
+		}
+		usersData = append(usersData, userData)
+	}
+
+	c.JSON(http.StatusOK, usersData)
 }
 
 func updateIoT(c *gin.Context) {
@@ -280,6 +288,15 @@ func updateThermostat(c *gin.Context) {
 		fmt.Printf("Error binding JSON: %v\n", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+	}
+
+	if req.Function == "Mode" {
+		var req2 = req
+		req2.Function = "Status"
+		req2.Change = "true"
+
+		dal.UpdateThermMessaging(client, []byte(req2.UUID), req2.Name, req2.AppType, req2.Function, req2.Change)
+		time.Sleep(1 * time.Second)
 	}
 
 	//fmt.Println([]byte(req.UUID), req.Name, req.AppType, req.Function, req.Change)
@@ -423,8 +440,11 @@ var jwtKey = []byte(getJwtKey())
 func loginHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	var loginData struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
+		Username  string `json:"username"`
+		Password  string `json:"password"`
+		Firstname string `json:"firstname"`
+		Lastname  string `json:"lastname"`
+		Role      string `json:"role"`
 	}
 
 	if err := c.BindJSON(&loginData); err != nil {
@@ -452,6 +472,7 @@ func loginHandler(c *gin.Context) {
 		return
 	} else {
 		session.Set("username", loginData.Username)
+		username = loginData.Username
 		//session.Save()
 	}
 	//c.Set("smartHomeDB", smartHomeDB)
@@ -461,8 +482,11 @@ func loginHandler(c *gin.Context) {
 
 	// JWT token creation
 	claims := jwt.MapClaims{
-		"username": fetchedUser.Username,
-		"exp":      time.Now().Add(time.Hour * 24).Unix(), // Token expiration time
+		"username":  fetchedUser.Username,
+		"firstname": fetchedUser.FirstName,
+		"lastname":  fetchedUser.LastName,
+		"role":      fetchedUser.Role,
+		"exp":       time.Now().Add(time.Hour * 24).Unix(), // Token expiration time
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(jwtKey)
@@ -478,10 +502,53 @@ func loginHandler(c *gin.Context) {
 	//fmt.Println(session.Get("username"))
 	// Return the JWT token in the response
 	c.JSON(http.StatusOK, gin.H{"token": tokenString,
-		"username": fetchedUser.Username,
-		"password": fetchedUser.Password})
+		"username":  fetchedUser.Username,
+		"password":  fetchedUser.Password,
+		"firstname": fetchedUser.FirstName,
+		"lastname":  fetchedUser.LastName,
+		"role":      fetchedUser.Role,
+	})
+
 	fmt.Println(session.Get("username"))
 
+}
+
+func deleteUserHandler(c *gin.Context) {
+	username := c.Param("username")
+
+	err := dal.DeleteUser(client, username)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
+}
+
+func updateUserRoleHandler(c *gin.Context) {
+	username := c.Param("username")
+	var roleUpdate struct {
+		Role string `json:"role"`
+	}
+	if err := c.BindJSON(&roleUpdate); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	err := dal.UpdateUserRole(client, username, roleUpdate.Role)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "User role updated successfully"})
 }
 
 func logout(c *gin.Context) {
@@ -497,6 +564,7 @@ func logout(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Successfully logged out"})
+	username = ""
 }
 
 func signupHandler(c *gin.Context) {
@@ -539,6 +607,7 @@ func signupHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "User created succesfully"})
 
+	//getUsers(c)
 }
 
 func AuthRequired(c *gin.Context) {

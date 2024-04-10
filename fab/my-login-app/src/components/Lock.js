@@ -24,7 +24,8 @@ const AnimatedIcon = styled.div`
 const PadlockAnimation = ({isLocked, handleToggleLock}) => {
     return (
         <AnimatedIcon isLocked={isLocked} onClick={handleToggleLock}>
-            {isLocked ? <FaLock style={{color: '#F70048'}}/> : <FaLockOpen style={{color: '#41E969'}}/>}
+            {isLocked ? <FaLock style={{color: '#F70048', cursor: "pointer"}}/> :
+                <FaLockOpen style={{color: '#41E969', cursor: "pointer"}}/>}
         </AnimatedIcon>
     );
 };

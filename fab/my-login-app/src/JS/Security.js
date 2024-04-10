@@ -112,7 +112,7 @@ const Security = () => {
     };
 
     return (
-        <div style={{display: 'flex', minHeight: '100vh', flexDirection: 'column', backgroundColor: '#081624'}}>
+        <div style={{display: 'flex', minHeight: '100vh', flexDirection: 'column'}}>
             <Header accountType={accountType}/>
             <div style={{display: 'flex', flex: '1'}}>
                 <Sidebar isNavVisible={isNavVisible}/>
@@ -122,7 +122,6 @@ const Security = () => {
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    backgroundColor: '#0E2237',
                     width: '100%'
                 }}>
                     <div style={{

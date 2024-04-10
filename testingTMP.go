@@ -15,14 +15,12 @@ func main() {
 	}
 	defer rpio.Close()
 
-	pin := rpio.Pin(4)
-	pin.PullUp()
-	pin.Input()
+	pin := 4
 	time.Sleep(2 * time.Second) // Allow sensor to stabilize
 
 	sensorType := dht.DHT11
 
-	temperature, humidity, _, err := sensor.ReadDHTxxWithRetry(sensorType, pin, rpio.PullUp, 10)
+	temperature, humidity, _, err := dht.ReadDHTxxWithRetry(sensorType, pin, true, 10)
 	if err != nil {
 		log.Fatalf("Failed to read DHT11: %s", err)
 	}

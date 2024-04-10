@@ -293,7 +293,7 @@ func handleFunctionality() {
 
 					}
 					if messageData.Function == "Temperature" {
-						hvac.UpdateTemperature(messageChange)
+						//	hvac.UpdateTemperature(messageChange)
 						hvac.DisplayLCDHVAC("", messageChange, "")
 					}
 					if messageData.Function == "Mode" {
@@ -393,7 +393,7 @@ func main() {
 	}
 	if piNum == 25 {
 		go hvac.DisplayLCDHVAC("", 0, "")
-		go hvac.SendTempToFE()
+		//go hvac.SendTempToFE()
 	}
 	BlockReceiver()
 }

@@ -114,13 +114,13 @@ func DisplayLCDHVAC(mode string, tempToSet int, fanStatus string) {
 	}
 
 	if mode == "" {
-		defaults.Mode = mode
+		mode = defaults.Mode
 	}
 	if tempToSet == 0 {
-		defaults.TempToSet = tempToSet
+		tempToSet = defaults.TempToSet
 	}
 	if fanStatus == "" {
-		defaults.FanStatus = fanStatus
+		fanStatus = defaults.FanStatus
 	}
 
 	intCurrTemp := 76

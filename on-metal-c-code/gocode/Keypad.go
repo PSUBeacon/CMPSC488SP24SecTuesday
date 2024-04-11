@@ -1,6 +1,7 @@
 package gocode
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/joho/godotenv"
 	"github.com/stianeikeland/go-rpio/v4"
@@ -135,6 +136,11 @@ func (k *Keypad) UpdateKeyState(key *Key, newState KeyState) {
 
 var enteredCode string
 
+type System struct {
+	UUID   string `json:"UUID"`
+	Status string `json:"Status"`
+}
+
 func onKeyPress(char rune) {
 
 	err := godotenv.Load()
@@ -148,12 +154,44 @@ func onKeyPress(char rune) {
 
 		WriteLCD("Code: " + enteredCode)
 
-		// Check if the entered code matches the security code
-		//if enteredCode == securityCode {
-		//	// Trigger the appropriate action when the correct code is entered
-		//	fmt.Println("Security code entered correctly. Disarming alarm...")
-		//	// Call a function to disarm the alarm, for example
-		//}
+		//Check if the entered code matches the security code
+		if enteredCode == securityCode {
+			// Trigger the appropriate action when the correct code is entered
+			jsonSecurityData, err := os.ReadFile("security/Keys.json")
+			if err != nil {
+				fmt.Println("Error reading key data:", err)
+				return
+			}
+			//fmt.Println("Thermostat data, ", jsonThermData)
+			// Unmarshal the JSON data into a Thermostat struct
+			var securitySystem System
+			if err := json.Unmarshal(jsonSecurityData, &securitySystem); err != nil {
+				fmt.Println("Error unmarshalling thermostat data:", err)
+				return
+			}
+
+			if securitySystem.Status == "armed" {
+				fmt.Println("Security code entered correctly. disarming alarm...")
+				securitySystem.Status = "disarmed"
+				WriteLCD(securitySystem.Status)
+
+			}
+			if securitySystem.Status == "disarmed" {
+				fmt.Println("Security code entered correctly. arming alarm...")
+				securitySystem.Status = "armed"
+				WriteLCD(securitySystem.Status)
+			}
+			securityJSON, err := json.MarshalIndent(securitySystem, "", "	")
+			if err != nil {
+				fmt.Println("Error marshalling security data:", err)
+				return
+			}
+
+			err = os.WriteFile("security/Keys.json", securityJSON, 0644)
+			if err != nil {
+				panic(err)
+			}
+		}
 	}
 	if len(enteredCode) == 6 {
 		if enteredCode == securityCode {

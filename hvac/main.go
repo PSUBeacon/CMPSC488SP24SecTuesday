@@ -58,10 +58,12 @@ func UpdateStatus(status bool) {
 	if status == true {
 		//gocode.SetFanSpeed(fanPin, fanSpeed)
 		go UpdateTemperature(tempToSet)
+		DisplayLCDHVAC("", 0, "ON")
 		fmt.Printf("%s status is set to %s\n", status)
 	}
 	if status == false {
 		//gocode.TurnOffFan(fanPin)
+		DisplayLCDHVAC("", 0, "OFF")
 		fmt.Printf("%s status is set to %s\n", status)
 	}
 }

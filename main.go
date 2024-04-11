@@ -289,19 +289,19 @@ func handleFunctionality() {
 								hvac.DisplayLCDHVAC("", 0, "ON")
 							}
 						}
-						if messageData.Function == "FanSpeed" {
-							hvac.UpdateFanSpeed(messageChange)
-							hvac.DisplayLCDHVAC("", 0, "ON")
+					}
+					if messageData.Function == "FanSpeed" {
+						hvac.UpdateFanSpeed(messageChange)
+						hvac.DisplayLCDHVAC("", 0, "ON")
 
-						}
-						if messageData.Function == "Temperature" {
-							hvac.UpdateTemperature(messageChange)
-							hvac.DisplayLCDHVAC("", messageChange, "")
-						}
-						if messageData.Function == "Mode" {
-							hvac.UpdateMode(messageData.Change)
-							hvac.DisplayLCDHVAC(messageData.Change, 0, "")
-						}
+					}
+					if messageData.Function == "Temperature" {
+						hvac.UpdateTemperature(messageChange)
+						hvac.DisplayLCDHVAC("", messageChange, "")
+					}
+					if messageData.Function == "Mode" {
+						hvac.UpdateMode(messageData.Change)
+						hvac.DisplayLCDHVAC(messageData.Change, 0, "")
 					}
 				}
 			}

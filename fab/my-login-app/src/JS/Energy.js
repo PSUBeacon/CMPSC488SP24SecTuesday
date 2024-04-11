@@ -27,41 +27,47 @@ const Energy = () => {
     const navigate = useNavigate(); // Instantiate useNavigate hook
     const [user, setUser] = useState(null);
     const [error, setError] = useState('');
+    const [status, setStatus] = useState('');
+    // const [requestBody, setRequestBody] = useState({});
+    const [category, setCategory] = useState({});
 
     const CollectionMapping = {
-        dishwasher: 'Appliances',
-        toaster: 'Appliances',
-        oven: 'Appliances',
-        fridge: 'Appliances',
-        microwave: 'Appliances',
-        hvac: 'HVAC',
-        solarpanel: 'Energy',
-        securitysystem: 'Security',
+        dishwasher: "Appliances",
+        toaster: "Appliances",
+        oven: "Appliances",
+        fridge: "Appliances",
+        microwave: "Appliances",
+        hvac: "HVAC",
+        solarpanel: "Energy",
+        securitysystem: "Security",
     };
 
     const handleGoToAppliances = () => {
         navigate('/appliances'); // Adjust the route as necessary
     };
 
-    const handleEnergyStatusChange = async (uuid, key, status) => {
+    const handleEnergyStatusChange = async (uuid, key, gotstatus) => {
         const token = sessionStorage.getItem('token');
+        await setStatus(gotstatus)
         if (!token) {
             navigate('/');
             return;
         }
 
-        const category = CollectionMapping[key.toLowerCase()] || key;
+        await setCategory(CollectionMapping[key.toLowerCase()] || key);
 
         const requestBody = {
             uuid: uuid,
             name: category,
             apptype: key,
             function: "Status",
-            change: status,
+            change: gotstatus,
         };
 
+        console.log(requestBody);
+
         try {
-            const response = await fetch('http://localhost:8081/energy', {
+            const response = await fetch('http://localhost:8081/energy/updateEnergy', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -75,6 +81,8 @@ const Energy = () => {
         } catch (error) {
             console.error('Failed to update energy status:', error);
         }
+
+        navigate('/energy')
     };
 
     const [data, setData] = useState({});
@@ -138,7 +146,7 @@ const Energy = () => {
                                     <tr key={index}>
                                         <td style={{width: '25%'}}>{key} - {appliance.Location}</td>
                                         {/* NEED TO USE DEVICE NAME-LABEL */}
-                                        <td style={{width: '25%'}}>{appliance.Status ? "On" : "Off"}</td>
+                                        <td style={{width: '25%'}}>{appliance.Status == "true" ? "On" : "Off"}</td>
                                         <td style={{width: '25%'}}>{appliance.EnergyConsumption}</td>
                                         <td style={{width: '25%'}}>
                                             {/* Implement actual toggle functionality as needed */}

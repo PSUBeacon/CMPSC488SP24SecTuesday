@@ -341,9 +341,11 @@ func handleFunctionality() {
 					if messageData.Function == "Status" {
 						if messageData.Change == "false" {
 							appliances.UpdateStatus(messageData.AppType, false)
+							fmt.Println("got here")
 						}
 						if messageData.Change == "true" {
 							appliances.UpdateStatus(messageData.AppType, true)
+							fmt.Println("got here")
 						}
 					}
 					if messageData.Function == "Temperature" {

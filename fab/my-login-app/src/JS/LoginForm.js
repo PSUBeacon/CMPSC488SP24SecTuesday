@@ -14,7 +14,7 @@ const LoginForm = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        const serverUrl = 'http://localhost:3000/login';
+        const serverUrl = 'http://localhost:8081/login';
 
         try {
             const response = await axios.post(serverUrl, {

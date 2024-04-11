@@ -107,7 +107,7 @@ func main() {
 
 	protectedRoutes.POST("/appliances", getAppliancesData)
 
-	protectedRoutes.POST("/energy", updateIoT)
+	//protectedRoutes.POST("/energy", updateIoT)
 
 	//ADJUSTMENT:
 	// Combined route group for both admin and user dashboards
@@ -167,6 +167,7 @@ func main() {
 	appliancesGroup.Use()
 	{
 		energyGroup.GET("/", me)
+		energyGroup.POST("/updateEnergy", updateIoT)
 		energyGroup.POST("/GetEnergy", getAppliancesData)
 		energyGroup.GET("/status", statusResp)
 	}
@@ -256,6 +257,14 @@ func updateIoT(c *gin.Context) {
 	//	dal.UpdateMessaging(client, []byte(req.UUID), req.Name, req.AppType, req.Function, req.Change)
 	//	c.JSON(http.StatusOK, gin.H{"message": "IOT updated successfully"})
 	//}
+
+	if req.Change == "true" {
+		req.Change = "false"
+	} else {
+		req.Change = "true"
+	}
+
+	fmt.Println(req)
 	dal.UpdateMessaging(client, []byte(req.UUID), req.Name, req.AppType, req.Function, req.Change)
 
 }

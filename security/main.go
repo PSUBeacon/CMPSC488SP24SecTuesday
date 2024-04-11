@@ -34,6 +34,12 @@ func DetectMotion() {
 	}
 }
 
+// get keypad input
+func GetKeypadInput() {
+	gocode.InitKeypad()
+
+}
+
 func UpdateAlarmStatus(armed bool) {
 	if armed {
 		fmt.Println("Alarm armed.")

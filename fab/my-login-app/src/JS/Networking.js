@@ -29,7 +29,7 @@ const Networking = () => {
     ];
 
     const token = sessionStorage.getItem('token');
-    const url = "http://192.168.8.117:8081/networking/GetNetLogs";
+    const url = "http://localhost:8081/networking/GetNetLogs";
 
     useEffect(() => {
 

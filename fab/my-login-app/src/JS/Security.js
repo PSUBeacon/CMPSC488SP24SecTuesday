@@ -43,7 +43,7 @@ const Security = () => {
 
     useEffect(() => {
         const token = sessionStorage.getItem('token');
-        const url = 'http://192.168.8.117:8081/security';
+        const url = 'http://localhost:8081/security';
 
         if (!token) {
             navigate('/'); // Redirect to login page if token is not present
@@ -81,7 +81,7 @@ const Security = () => {
             return;
         }
 
-        const serverUrl = 'http://192.168.8.117:8081/security';
+        const serverUrl = 'http://localhost:8081/security';
         const requestBody = {
             uuid: uuid,
             name: "Security",

@@ -49,7 +49,7 @@ const SettingsPage = () => {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const response = await fetch('http://192.168.8.117:8081/settings/GetUsers', {
+                const response = await fetch('http://localhost:8081/settings/GetUsers', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -79,7 +79,7 @@ const SettingsPage = () => {
     // Handler to add a new user (this will need to be more complex in a real app)
     const addUserHandler = async () => {
         try {
-            const serverUrl = 'http://192.168.8.117:8081/signup';
+            const serverUrl = 'http://localhost:8081/signup';
             const response = await axios.post(serverUrl, {
                 firstName: newUserFirstName,
                 lastName: newUserLastName,
@@ -125,7 +125,7 @@ const SettingsPage = () => {
     // const deleteUserHandler = async (username) => {
     //     try {
     //         setIsLoading(true);
-    //         const serverUrl = `http://192.168.8.117:8081/users/${username}`;
+    //         const serverUrl = `http://localhost:8081/users/${username}`;
     //         await axios.delete(serverUrl, {
     //             headers: {
     //                 'Authorization': `Bearer ${token}`,
@@ -148,7 +148,7 @@ const SettingsPage = () => {
     const removeUserHandler = async (username) => {
         try {
             setIsLoading(true);
-            const serverUrl = `http://192.168.8.117:8081/users/${username}`;
+            const serverUrl = `http://localhost:8081/users/${username}`;
             await axios.delete(serverUrl, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -170,7 +170,7 @@ const SettingsPage = () => {
 
     const changeUserRoleHandler = async (username, newRole) => {
         try {
-            const serverUrl = `http://192.168.8.117:8081/users/${username}/role`;
+            const serverUrl = `http://localhost:8081/users/${username}/role`;
             await axios.post(serverUrl, { role: newRole }, {
                 headers: {
                     'Authorization': `Bearer ${token}`,

@@ -155,7 +155,7 @@ func send(message []byte, statusCheck string) string {
 
 	//fmt.Println(statusCheck)
 
-	port, err := serial.Open("/dev/ttyUSB0", mode)
+	port, err := serial.Open("DN01EZI5", mode)
 	if statusCheck == "check" || statusCheck == "send" {
 		if err != nil {
 			// Check if the error message indicates that the port is busy

@@ -21,16 +21,18 @@ const LoginForm = () => {
                 username,
                 password,
             });
+            console.log(response.data)
             const jwtToken = response.data.token; // Assuming the token is returned in a field named 'token'
             const fname = response.data.firstname;
             const lname = response.data.lastname;
             const role = response.data.role;
+
             console.log('JWT Token:', jwtToken);
 
             sessionStorage.setItem('token', jwtToken);
             sessionStorage.setItem('FirstName', fname);
             sessionStorage.setItem('LastName', lname);
-            sessionStorage.setItem('Role', role);
+            sessionStorage.setItem('accountType', role);
 
             // Redirect user to the dashboard page
             navigate('/dashboard'); // Use navigate to redirect

@@ -93,7 +93,7 @@ func main() {
 	r.GET("/logout", logout)
 	r.POST("/signup", signupHandler)
 	r.DELETE("/users/:username", deleteUserHandler)
-	r.PUT("/users/:username/role", updateUserRoleHandler)
+	r.POST("/users/:username/role", updateUserRoleHandler)
 	// Apply JWT middleware to protected routes
 	protectedRoutes := r.Group("/")
 	protectedRoutes.Use(authMiddleware())
@@ -112,10 +112,9 @@ func main() {
 	//ADJUSTMENT:
 	// Combined route group for both admin and user dashboards
 	dashboardGroup := r.Group("/dashboard")
-
-	dashboardGroup.Use() // Apply authMiddleware to protect the route
+	dashboardGroup.Use()
 	{
-		dashboardGroup.GET("/", dashboardHandler)
+		dashboardGroup.GET("/")
 		dashboardGroup.GET("/GetDashboard", getDashboardItems)
 		dashboardGroup.GET("/me", me)
 		dashboardGroup.GET("/status", statusResp)
@@ -156,7 +155,7 @@ func main() {
 		securityGroup.GET("/status", statusResp)
 	}
 
-	appliancesGroup := r.Group("/appliances", dashboardHandler)
+	appliancesGroup := r.Group("/appliances")
 	appliancesGroup.Use()
 	{
 		appliancesGroup.GET("/", me)
@@ -383,7 +382,8 @@ func getAppliancesData(c *gin.Context) {
 
 func getDashboardItems(c *gin.Context) {
 	// Fetch the user's account type from the session
-	accountType := c.GetString("accountType")
+	accountType, _ := c.Get("accountType")
+	fmt.Println(accountType)
 	if accountType == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
@@ -470,6 +470,7 @@ func loginHandler(c *gin.Context) {
 		return
 	} else {
 		session.Set("username", loginData.Username)
+		session.Set("accountType", fetchedUser.Role)
 		username = loginData.Username
 		//session.Save()
 	}

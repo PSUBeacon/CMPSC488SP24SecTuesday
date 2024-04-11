@@ -11,10 +11,13 @@ import kitchenFootage from '../img/kitchenFootage.gif';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import PadlockAnimation from "../components/Lock";
+import data from "bootstrap/js/src/dom/data";
+
 
 const Dashboard = () => {
     document.title = 'BEACON | Dashboard';
 
+    const [deviceData, setDeviceData] = useState({});
     const [cameraView, setCameraView] = useState('livingroom'); // Default camera view
     const navigate = useNavigate(); // Instantiate useNavigate hook
     const [isNavVisible, setIsNavVisible] = useState(false);
@@ -26,23 +29,10 @@ const Dashboard = () => {
         '502857': 'locked',
         '502858': 'locked',
     });
-    // States for each device
-    const [deviceData, setDeviceData] = useState({
-        HVAC: {},
-        Dishwasher: {},
-        Fridge: {},
-        Lighting: {},
-        Microwave: {},
-        Oven: {},
-        SecuritySystem: {},
-        SolarPanel: {},
-        Toaster: {},
-    });
-
 
     useEffect(() => {
         const token = sessionStorage.getItem('token');
-        const url = 'http://localhost:8081/dashboard';
+        const url = 'http://localhost:8081/dashboard/GetDashboard';
 
         if (!token) {
             navigate('/'); // Redirect to login page if token is not present
@@ -57,20 +47,36 @@ const Dashboard = () => {
             },
         })
             .then(response => response.json())
-            .then(response => {
-                if (response && response.data) {
-                    setUser(response.data.user);
-                    setAccountType(response.data.accountType);
-                    sessionStorage.setItem('accountType', response.data.accountType);
+            .then(responseData => {
+                console.log(responseData); // Step 1: Log responseData
+
+                if (responseData && responseData.data) {
+                    setUser(responseData.data.user);
+
+                    // Construct newDeviceData object
+                    const newDeviceData = {
+                        HVAC: responseData.data.hvac,
+                        Dishwasher: responseData.data.appliances.Dishwasher,
+                        Fridge: responseData.data.appliances.Fridge,
+                        Microwave: responseData.data.appliances.Microwave,
+                        Oven: responseData.data.appliances.Oven,
+                        Toaster: responseData.data.appliances.Toaster,
+                    };
+
+                    setDeviceData(newDeviceData);
                 } else {
                     setError('Unexpected response from server');
                 }
             })
             .catch(error => {
-                console.log('Fetch operation error:', error)
+                console.log('Fetch operation error:', error);
             });
     }, [navigate]);
 
+
+    useEffect(() => {
+        console.log(deviceData);
+    }, [deviceData]);
 
     // Object that holds the URLs for your camera feeds
     const cameraFeeds = {
@@ -125,15 +131,44 @@ const Dashboard = () => {
             backDoor: 'Locked',
         });
 
-        const handleToggleLock = (door) => {
-            setLocksStatus(prevStatus => ({
-                ...prevStatus,
-                [door]: prevStatus[door] === 'Locked' ? 'Unlocked' : 'Locked',
-            }));
-        };
+        const handleToggleLock = (uuid) => {
+            const isLocking = lockStates[uuid] === 'locked' ? 'unlocked' : 'locked';
 
-        // State to track the light status
-        const [lightStatus, setLightStatus] = useState('Off');
+            const token = sessionStorage.getItem('token');
+            if (!token) {
+                console.error("Authorization token not found.");
+                return;
+            }
+
+            const serverUrl = 'http://localhost:8081/security';
+            const requestBody = {
+                uuid: uuid,
+                name: "Security",
+                apptype: "Security",
+                function: "LockStatus",
+                change: isLocking,
+            };
+
+            fetch(serverUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody),
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log(`Lock ${uuid} has been ${isLocking === 'locked' ? 'locked' : 'unlocked'} successfully.`);
+                        setLockStates(prevStates => ({...prevStates, [uuid]: isLocking}));
+                    } else {
+                        throw new Error(`Failed to toggle the lock ${uuid} to ${isLocking === 'locked' ? 'locked' : 'unlocked'} with status: ${response.status}`);
+                    }
+                })
+                .catch(error => {
+                    console.error(`There was an error toggling the lock ${uuid} to ${isLocking === 'locked' ? 'locked' : 'unlocked'}:`, error);
+                });
+        };
 
         const handleToggleLight = () => {
             const isTurningOn = lightStatus === 'Off';
@@ -171,6 +206,9 @@ const Dashboard = () => {
                     console.error('Error updating light status:', error);
                 });
         };
+        // State to track the light status
+        const [lightStatus, setLightStatus] = useState('Off');
+
 
         return (
             <div>
@@ -191,8 +229,8 @@ const Dashboard = () => {
                         <img className="lockImage" src={doorLockIcon} alt="Lock Icon"
                              style={{width: '100px', height: 'auto'}}/>
                         <PadlockAnimation
-                            isLocked={lockStates['502858'] === 'locked'}
-                            handleToggleLock={() => handleToggleLock('502858')}/>
+                            isLocked={lockStates['502857'] === 'locked'}
+                            handleToggleLock={() => handleToggleLock('502857')}/>
                     </div>
 
                     {/* Back Door Lock */}
@@ -262,6 +300,9 @@ const Dashboard = () => {
 
     // Appliances Widget JSX
     const AppliancesWidget = () => {
+
+        // iterate through each key and value of the deviceData object
+
         return (
             <div>
                 <div className="widget" style={{
@@ -275,17 +316,26 @@ const Dashboard = () => {
                     display: 'flex',
                     justifyContent: 'space-around'
                 }}>
-                    {/* Iterate over the deviceData object */}
+
                     {Object.entries(deviceData).map(([deviceName, deviceInfo]) => (
-                        // Only render the device if its status is available and not an empty string
-                        deviceInfo.Status && deviceInfo.Status !== '' && (
-                            <div key={deviceName} style={{textAlign: 'center'}}>
-                                <span style={{color: "#95A4B6", margin: '6px'}}>{deviceName}</span>
-                                <p>{deviceInfo.Status}</p>
-                                {console.log(deviceInfo.Status)}
-                            </div>
-                        )
-                    ))}
+                        Object.entries(deviceInfo).map(([key, value]) => (
+                            // deviceInfo.Status && deviceInfo.Status !== '' && (
+                                <div key={key} style={{textAlign: 'center'}}>
+                                    <span style={{color: "#95A4B6", margin: '6px'}}>{deviceName}</span>
+                                    <p>{value.Status === 'true' ? "On" : "Off"}</p>
+                                    <p>{value.Location}</p>
+                                    {/* Additional rendering based on deviceInfo */}
+                                    {/*{deviceInfo.SomeOtherProperty && (*/}
+                                    {/*    <p>Additional Info: {deviceInfo.SomeOtherProperty}</p>*/}
+                                    {/*)}*/}
+                                    {/* Print the value for deviceName */}
+                                </div>
+                            )
+                            // )
+                    )))}
+
+
+
                 </div>
             </div>
         );
@@ -413,50 +463,6 @@ const Dashboard = () => {
                             justifyContent: 'center',
                             gap: '20px'
                         }}>
-                            {/* Status by Units Widget */}
-                            <div className="widget" style={{
-                                flex: '1',
-                                minWidth: '290px',
-                                backgroundColor: '#173350',
-                                padding: '20px',
-                                borderRadius: '1px',
-                                margin: '10px',
-                                boxSizing: 'border-box'
-                            }}>
-                                <h3 style={{marginBottom: '20px', color: "#95A4B6"}}>Status by Units</h3>
-                                {/* Content of the status by units widget */}
-                                <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around'}}>
-                                    <div style={{textAlign: "center", margin: '6px'}}>
-                                        <p style={{color: "#95A4B6"}}>Power</p>
-                                        {deviceData.solarPanel && deviceData.solarPanel[0] && deviceData.solarPanel[0].EnergyGeneratedToday && (
-                                            <p style={{fontSize: '22px'}}>{deviceData.solarPanel[0].EnergyGeneratedToday}kw</p>
-                                        )}
-                                    </div>
-                                    <div style={{textAlign: "center", margin: '6px'}}>
-                                        <p style={{color: "#95A4B6"}}>Temperature</p>
-                                        {deviceData.hvac && deviceData.hvac[0] && deviceData.hvac[0].Temperature && (
-                                            <p style={{fontSize: '22px'}}>{deviceData.hvac[0].Temperature}</p>
-                                        )}
-                                    </div>
-                                    <div style={{textAlign: "center", margin: '6px'}}>
-                                        <p style={{color: "#95A4B6"}}> Humidity</p>
-                                        {deviceData.hvac && deviceData.hvac[0] && deviceData.hvac[0].Humidity && (
-                                            <p style={{fontSize: '22px'}}>{deviceData.hvac[0].Humidity}</p>
-                                        )}
-                                    </div>
-                                    <div style={{textAlign: "center", margin: '6px'}}>
-                                        <p style={{color: "#95A4B6"}}>Security</p>
-                                        {deviceData.securitySystem && deviceData.securitySystem[0] && deviceData.securitySystem[0].Status && (
-                                            <p style={{
-                                                color: 'green',
-                                                fontWeight: 'bold',
-                                                fontSize: '22px'
-                                            }}>{deviceData.securitySystem[0].Status}</p>
-                                        )}
-                                    </div>
-                                </div>
-
-                            </div>
 
                             {/* Scheduled Activity Widget */}
                             <div className="widget" style={{
@@ -479,8 +485,8 @@ const Dashboard = () => {
                                     borderRadius: '10px',
                                     margin: '0px'
                                 }}>
-                                    <div>
-                                        <h3 style={{color: "#95A4B6"}}>Active Appliances</h3>
+                                    <div class = "align-items-center">
+                                        <h3 class = "text-center" style={{color: "#95A4B6", textAlign: "center"}}>Active Appliances</h3>
                                     </div>
                                     <div>
                                         <button onClick={() => navigate('/appliances')} style={{

@@ -13,7 +13,7 @@ const Header = ({accountType}) => {
     const navigate = useNavigate();
     const fname = sessionStorage.getItem('LastName')
     const lname = sessionStorage.getItem('FirstName')
-    const role = sessionStorage.getItem('Role')
+    const role = sessionStorage.getItem('accountType')
 
     const [isOpen, setIsOpen] = useState(false);
 

@@ -6,7 +6,7 @@ import '../CSS/SideBar.css';
 
 const Sidebar = ({isNavVisible}) => {
     const location = useLocation();
-    const role = sessionStorage.getItem('Role')
+    const role = sessionStorage.getItem('accountType')
 
     // Helper function to determine if the path matches
     const isPathActive = (path) => {

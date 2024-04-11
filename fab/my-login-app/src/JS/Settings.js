@@ -19,7 +19,7 @@ const SettingsPage = () => {
     const token = sessionStorage.getItem('token');
     const userFirstName = sessionStorage.getItem('FirstName');
     const userLastName = sessionStorage.getItem('LastName');
-    const userAccountType = sessionStorage.getItem('Role');
+    const userAccountType = sessionStorage.getItem('accountType');
     const [isLoading, setIsLoading] = useState(false);
     const topNavStyle = {
         backgroundColor: '#081624',
@@ -171,7 +171,7 @@ const SettingsPage = () => {
     const changeUserRoleHandler = async (username, newRole) => {
         try {
             const serverUrl = `http://localhost:8081/users/${username}/role`;
-            await axios.put(serverUrl, { role: newRole }, {
+            await axios.post(serverUrl, { role: newRole }, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',

@@ -79,6 +79,7 @@ func UpdateTemperature(newTemperature int, uuid string) {
 		thermostat[index].FanStatus = "OFF"
 	}
 
+	DisplayLCDHVAC(thermostat[index].Mode, thermostat[index].SetTemp, thermostat[index].FanStatus)
 	thermostatJSON, err := json.MarshalIndent(thermostat, "", "	")
 	if err != nil {
 		fmt.Println("Error marshalling thermostat data:", err)

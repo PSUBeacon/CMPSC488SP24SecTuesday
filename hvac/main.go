@@ -56,11 +56,12 @@ func UpdateFanSpeed(speed int) {
 // SetStatus sets the status (e.g., "Cool", "Heat", "Fan", "Off") for the HVAC system.
 func UpdateStatus(status bool) {
 	if status == true {
-		gocode.SetFanSpeed(fanPin, fanSpeed)
+		//gocode.SetFanSpeed(fanPin, fanSpeed)
+		go UpdateTemperature(tempToSet)
 		fmt.Printf("%s status is set to %s\n", status)
 	}
 	if status == false {
-		gocode.TurnOffFan(fanPin)
+		//gocode.TurnOffFan(fanPin)
 		fmt.Printf("%s status is set to %s\n", status)
 	}
 }

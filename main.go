@@ -375,7 +375,7 @@ func handleFunctionality() {
 			for _, Pi := range group {
 				if Pi.UUID == messageData.UUID {
 					if messageData.Function == "Status" {
-						//energy.UpdateAlarmStatus(messageData.StatusChange)
+						//energy.,UpdateAlarmStatus(messageData.StatusChange)
 					}
 				}
 			}
@@ -401,6 +401,7 @@ func main() {
 	}
 	if piNum == 22 {
 		security.DisplayLCDSecurity("", "")
+		go gocode.InitKeypad()
 	}
 	BlockReceiver()
 }

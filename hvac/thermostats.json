@@ -2,7 +2,7 @@
   {
     "UUID": "Thermostat 1",
     "currentTemp": 72,
-    "mode": "cooling",
+    "mode": "Cool",
     "fanStatus": "on",
     "fanSpeed": 30,
     "setTemp": 68
@@ -10,7 +10,7 @@
   {
     "UUID": "Thermostat 2",
     "currentTemp": 75,
-    "mode": "heating",
+    "mode": "Heat",
     "fanStatus": "off",
     "fanSpeed": 50,
     "setTemp": 70

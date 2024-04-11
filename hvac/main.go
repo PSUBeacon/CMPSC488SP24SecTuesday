@@ -85,10 +85,9 @@ func UpdateTemperature(newTemperature int, uuid string) {
 		return
 	}
 
-	if err := os.WriteFile("thermostat.json", thermostatJSON, 0644); err != nil {
-		fmt.Println("Error writing thermostat data:", err)
-		return
-
+	err = os.WriteFile("hvac/thermostats.json", thermostatJSON, 0644)
+	if err != nil {
+		panic(err)
 	}
 
 }
@@ -126,10 +125,9 @@ func UpdateFanSpeed(speed int, uuid string) {
 		return
 	}
 
-	if err := os.WriteFile("thermostat.json", thermostatJSON, 0644); err != nil {
-		fmt.Println("Error writing thermostat data:", err)
-		return
-
+	err = os.WriteFile("hvac/thermostats.json", thermostatJSON, 0644)
+	if err != nil {
+		panic(err)
 	}
 }
 
@@ -174,9 +172,9 @@ func UpdateStatus(status bool, uuid string) {
 		return
 	}
 
-	if err := os.WriteFile("thermostat.json", thermostatJSON, 0644); err != nil {
-		fmt.Println("Error writing thermostat data:", err)
-		return
+	err = os.WriteFile("hvac/thermostats.json", thermostatJSON, 0644)
+	if err != nil {
+		panic(err)
 	}
 	fmt.Println("Thermostat data updated successfully")
 
@@ -216,9 +214,9 @@ func UpdateMode(mode string, uuid string) {
 		return
 	}
 
-	if err := os.WriteFile("thermostat.json", thermostatJSON, 0644); err != nil {
-		fmt.Println("Error writing thermostat data:", err)
-		return
+	err = os.WriteFile("hvac/thermostats.json", thermostatJSON, 0644)
+	if err != nil {
+		panic(err)
 	}
 	fmt.Println("Thermostat data updated successfully")
 }

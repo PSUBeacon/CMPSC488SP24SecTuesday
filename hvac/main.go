@@ -4,6 +4,7 @@ import (
 	messaging "CMPSC488SP24SecTuesday/AES-BlockChain-Communication"
 	"CMPSC488SP24SecTuesday/on-metal-c-code/gocode"
 	"fmt"
+	"os"
 	"strconv"
 	"time"
 )
@@ -11,14 +12,19 @@ import (
 const temperaturePin = 4
 const fanPin = 12
 
-var mode string
-var tempToSet = 0
-var fanSpeed int = 50
-var fanStatus string
-var intCurrTemp int
+type Thermostat struct {
+	UUID        string `json:"UUID"`
+	CurrentTemp int    `json:"currentTemp"`
+	Mode        string `json:"mode"`
+	FanStatus   string `json:"fanStatus"`
+	FanSpeed    string `json:"fanSpeed"`
+	SetTemp     int    `json:"setTemp"`
+}
 
 // SetTemperature sets the desired temperature for the HVAC system.
 func UpdateTemperature(newTemperature int) {
+	jsonThermData, err := os.ReadFile("thermostat.json")
+
 	currentTemp, err := gocode.ReadTemperature(temperaturePin, 22)
 	if err != nil {
 		fmt.Println("Error reading Temperature:", err)
@@ -30,18 +36,18 @@ func UpdateTemperature(newTemperature int) {
 		gocode.TurnOffFan(fanPin)
 		fmt.Printf("%s Temperature is set to %d°C\n", newTemperature)
 	}
-	if mode == "Cool" && newTemperature < intCurrTemp {
-		gocode.SetFanSpeed(fanPin, fanSpeed)
+	if thermostat.mode == "Cool" && newTemperature < intCurrTemp {
+		gocode.SetFanSpeed(fanPin, thermostat.fanSpeed)
 		//UpdateTemperature(newTemperature)
 	}
-	if mode == "Cool" && newTemperature > intCurrTemp {
+	if thermostat.mode == "Cool" && newTemperature > intCurrTemp {
 		gocode.TurnOffFan(fanPin)
 	}
-	if mode == "Heat" && newTemperature > intCurrTemp {
-		gocode.SetFanSpeed(fanPin, fanSpeed)
+	if thermostat.mode == "Heat" && newTemperature > intCurrTemp {
+		gocode.SetFanSpeed(fanPin, thermostat.fanSpeed)
 		//UpdateTemperature(newTemperature)
 	}
-	if mode == "Heat" && newTemperature < intCurrTemp {
+	if thermostat.mode == "Heat" && newTemperature < intCurrTemp {
 		gocode.TurnOffFan(fanPin)
 	}
 

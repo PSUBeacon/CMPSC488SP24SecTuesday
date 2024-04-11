@@ -187,23 +187,23 @@ func InitKeypad() rune {
 	keypad.Begin()
 
 	// Set the event listener
-	//keypad.AddEventListener(onKeyPress)
+	keypad.AddEventListener(onKeyPress)
 
-	// Main loop
-	//for {
-	//	// Scan keys periodically
-	//	keypad.GetKeys()
-	//	time.Sleep(100 * time.Millisecond)
-	//}
-
+	//	Main loop
 	for {
 		// Scan keys periodically
-		key := keypad.GetKey()
+		keypad.GetKeys()
 		time.Sleep(100 * time.Millisecond)
-		if key != ' ' {
-			return key // Return the pressed key
-		}
 	}
+
+	//for {
+	//	// Scan keys periodically
+	//	key := keypad.GetKey()
+	//	time.Sleep(100 * time.Millisecond)
+	//	if key != ' ' {
+	//		return key // Return the pressed key
+	//	}
+	//}
 }
 
 //func main() {

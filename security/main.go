@@ -76,14 +76,5 @@ func DisplayLCDSecurity(status string, motionStatus string) {
 		motionStatus = defaults.MotionStatus
 	}
 
-	gocode.WriteLCD("Status: " + status + " Motion: " + motionStatus)
-}
-
-func main() {
-	go HandleMotionDetection()
-
-	time.Sleep(10 * time.Second)
-	DisplayLCDSecurity("Armed", "Motion detected")
-
-	select {}
+	go gocode.WriteLCD("Status: " + status + " Motion: " + motionStatus)
 }

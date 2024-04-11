@@ -313,9 +313,11 @@ func handleFunctionality() {
 					if messageData.Function == "Status" {
 						if messageData.Change == "false" {
 							security.UpdateAlarmStatus(false)
+							security.DisplayLCDSecurity("Disarmed", "OFF")
 						}
 						if messageData.Change == "true" {
 							security.UpdateAlarmStatus(true)
+							security.DisplayLCDSecurity("Armed", "ON")
 						}
 					}
 					if messageData.Function == "LockStatus" {
@@ -394,6 +396,9 @@ func main() {
 	if piNum == 16 {
 		go hvac.DisplayLCDHVAC("", 0, "")
 		//go hvac.SendTempToFE()
+	}
+	if piNum == 22 {
+		go security.DisplayLCDSecurity("", "")
 	}
 	BlockReceiver()
 }

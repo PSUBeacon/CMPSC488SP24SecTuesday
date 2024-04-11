@@ -20,7 +20,7 @@ const Appliances = () => {
 
 
     // URL of the API you want to fetch from
-    const apiUrl = 'https://localhost:8081/appliances'
+    const apiUrl = 'https://192.168.8.117:8081/appliances'
 
     // Use fetch to get the data from the API
     async function logAppliances() {
@@ -34,7 +34,7 @@ const Appliances = () => {
     // Protect Endpoint
     useEffect(() => {
         const token = sessionStorage.getItem('token');
-        const url = 'http://localhost:8081/appliances';
+        const url = 'http://192.168.8.117:8081/appliances';
 
         if (!token) {
             navigate('/'); // Redirect to login page if token is not present

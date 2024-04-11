@@ -29,7 +29,7 @@ const HVAC = () => {
             return;
         }
 
-        axios.get(`http://localhost:8081/hvac/GetHVAC`, {
+        axios.get(`http://192.168.8.117:8081/hvac/GetHVAC`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
@@ -64,7 +64,7 @@ const HVAC = () => {
 
     useEffect(() => {
         const token = sessionStorage.getItem('token');
-        const url = 'http://localhost:8081/hvac/';
+        const url = 'http://192.168.8.117:8081/hvac/';
 
         if (!token) {
             navigate('/'); // Redirect to login page if token is not present

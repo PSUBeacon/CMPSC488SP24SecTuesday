@@ -1,0 +1,16 @@
+[
+  {
+    "thermostatId": "Thermostat 1",
+    "currentTemp": 72,
+    "mode": "cooling",
+    "fanStatus": "on",
+    "setTemp": 68
+  },
+  {
+    "thermostatId": "Thermostat 2",
+    "currentTemp": 75,
+    "mode": "heating",
+    "fanStatus": "off",
+    "setTemp": 70
+  }
+]

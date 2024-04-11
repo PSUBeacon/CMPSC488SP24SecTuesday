@@ -283,11 +283,11 @@ func handleFunctionality() {
 					if messageData.Function == "Status" {
 						if messageData.Change == "false" {
 							hvac.UpdateStatus(false)
-							hvac.DisplayLCDHVAC("", 0, "OFF")
+							//hvac.DisplayLCDHVAC("", 0, "OFF")
 						}
 						if messageData.Change == "true" {
 							hvac.UpdateStatus(true)
-							hvac.DisplayLCDHVAC("", 0, "ON")
+							//hvac.DisplayLCDHVAC("", 0, "ON")
 						}
 					}
 					if messageData.Function == "FanSpeed" {
@@ -396,7 +396,7 @@ func main() {
 		go gocode.InitKeypad()
 	}
 	if piNum == 16 {
-		go hvac.DisplayLCDHVAC("", 0, "")
+		hvac.DisplayLCDHVAC("", 0, "")
 		//go hvac.SendTempToFE()
 	}
 	if piNum == 22 {

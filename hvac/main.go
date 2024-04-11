@@ -116,9 +116,9 @@ func UpdateFanSpeed(speed int, uuid string) {
 	}
 	thermostat[index].FanStatus = "ON"
 
+	DisplayLCDHVAC(thermostat[index].Mode, thermostat[index].SetTemp, thermostat[index].FanStatus)
 	gocode.SetFanSpeed(fanPin, speed)
 	fmt.Printf("%s fan speed is set to %s%%\n", speed)
-	DisplayLCDHVAC(thermostat[index].Mode, thermostat[index].SetTemp, thermostat[index].FanStatus)
 
 	thermostatJSON, err := json.MarshalIndent(thermostat, "", "	")
 	if err != nil {

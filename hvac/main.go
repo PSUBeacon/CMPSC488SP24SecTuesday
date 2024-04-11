@@ -24,7 +24,7 @@ type Thermostat struct {
 
 // SetTemperature sets the desired temperature for the HVAC system.
 func UpdateTemperature(newTemperature int) {
-	jsonThermData, err := os.ReadFile("thermostat.json")
+	jsonThermData, err := os.ReadFile("hvac/thermostat.json")
 	if err != nil {
 		fmt.Println("Error reading thermostat data:", err)
 		return

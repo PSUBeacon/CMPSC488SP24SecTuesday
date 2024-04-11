@@ -340,10 +340,10 @@ func handleFunctionality() {
 				if Pi.UUID == messageData.UUID {
 					if messageData.Function == "Status" {
 						if messageData.Change == "false" {
-							appliances.UpdateStatus(false)
+							appliances.UpdateStatus(messageData.Name, false)
 						}
 						if messageData.Change == "true" {
-							appliances.UpdateStatus(true)
+							appliances.UpdateStatus(messageData.Name, true)
 						}
 					}
 					if messageData.Function == "Temperature" {
@@ -357,10 +357,10 @@ func handleFunctionality() {
 					}
 					if messageData.Function == "EnergySaveMode" {
 						if messageData.Change == "false" {
-							appliances.UpdateStatus(false)
+							appliances.UpdateStatus(messageData.Name, false)
 						}
 						if messageData.Change == "true" {
-							appliances.UpdateStatus(true)
+							appliances.UpdateStatus(messageData.Name, true)
 						}
 					}
 					if messageData.Function == "WashTime" {

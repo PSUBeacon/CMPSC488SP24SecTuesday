@@ -177,6 +177,16 @@ func onKeyPress(char rune) {
 				securitySystem.SensorStatus = "OFF"
 				WriteLCD("Stat:" + securitySystem.Status + " Motion:" + securitySystem.SensorStatus)
 				enteredCode = ""
+				securityJSON, err := json.MarshalIndent(securitySystem, "", "	")
+				if err != nil {
+					fmt.Println("Error marshalling security data:", err)
+					return
+				}
+
+				err = os.WriteFile("security/Keys.json", securityJSON, 0644)
+				if err != nil {
+					panic(err)
+				}
 
 			}
 			if securitySystem.Status == "disarmed" {
@@ -185,29 +195,28 @@ func onKeyPress(char rune) {
 				securitySystem.SensorStatus = "ON"
 				WriteLCD("Stat:" + securitySystem.Status + " Motion:" + securitySystem.SensorStatus)
 				enteredCode = ""
-			}
-			securityJSON, err := json.MarshalIndent(securitySystem, "", "	")
-			if err != nil {
-				fmt.Println("Error marshalling security data:", err)
-				return
-			}
+				securityJSON, err := json.MarshalIndent(securitySystem, "", "	")
+				if err != nil {
+					fmt.Println("Error marshalling security data:", err)
+					return
+				}
 
-			err = os.WriteFile("security/Keys.json", securityJSON, 0644)
-			if err != nil {
-				panic(err)
+				err = os.WriteFile("security/Keys.json", securityJSON, 0644)
+				if err != nil {
+					panic(err)
+				}
+			}
+		}
+		if len(enteredCode) == 6 {
+			if enteredCode == securityCode {
+				// Trigger the appropriate action when the correct code is entered
+				fmt.Println("Security code entered incorrectly")
+				// Call a function to disarm the alarm, for example
+				WriteLCD("Code: ")
+				enteredCode = ""
 			}
 		}
 	}
-	if len(enteredCode) == 6 {
-		if enteredCode == securityCode {
-			// Trigger the appropriate action when the correct code is entered
-			fmt.Println("Security code entered correctly. Disarming alarm...")
-			// Call a function to disarm the alarm, for example
-			WriteLCD("Code: ")
-			enteredCode = ""
-		}
-	}
-
 }
 
 // Initialize the keypad and start listening for key presses

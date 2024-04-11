@@ -180,6 +180,8 @@ func UpdateStatus(status bool, uuid string) {
 	fmt.Println("Thermostat data updated successfully")
 
 	fmt.Printf("%s status is set to %s\n", status)
+	go gocode.DrawH(9, 4, 10)
+
 }
 
 func UpdateMode(mode string, uuid string) {

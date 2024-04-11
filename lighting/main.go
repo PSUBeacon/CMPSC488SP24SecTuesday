@@ -3,6 +3,7 @@ package lighting
 import (
 	"CMPSC488SP24SecTuesday/on-metal-c-code/gocode"
 	"fmt"
+	"time"
 )
 
 const (
@@ -22,14 +23,14 @@ func UpdateStatus(newStatus bool) {
 
 // SetBrightness sets the brightness of the lighting.
 func SetBrightness(brightness int) {
-	//if brightness < 0 {
-	//	brightness = 0
-	//} else if brightness > 100 {
-	//	brightness = 100
-	//}
-	//gocode.DrawLightbulb(9, 4, 10)
-	//time.Sleep(3 * time.Second)
-	//gocode.ClearMatrix(9, 4, 10)
+	if brightness < 0 {
+		brightness = 0
+	} else if brightness > 100 {
+		brightness = 100
+	}
+	gocode.DrawLightbulb(9, 4, 10, brightness)
+	time.Sleep(3 * time.Second)
+	gocode.ClearMatrix(9, 4, 10)
 	GlobBrightness = brightness
 	gocode.SetIntensity(9, 4, 10, brightness)
 	fmt.Printf("%s brightness is set to %s\n", brightness)

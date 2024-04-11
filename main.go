@@ -401,7 +401,7 @@ func main() {
 	}
 	if piNum == 22 {
 		security.DisplayLCDSecurity("", "")
-		security.GetKeypadInput()
+		go gocode.InitKeypad()
 	}
 	BlockReceiver()
 }

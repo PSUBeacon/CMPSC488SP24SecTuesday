@@ -19,7 +19,7 @@ var intCurrTemp int
 
 // SetTemperature sets the desired temperature for the HVAC system.
 func UpdateTemperature(newTemperature int) {
-	currentTemp, err := gocode.ReadTemperature(temperaturePin, 11)
+	currentTemp, err := gocode.ReadTemperature(temperaturePin, 22)
 	if err != nil {
 		fmt.Println("Error reading Temperature:", err)
 		return

@@ -3,7 +3,9 @@ package hvac
 import (
 	messaging "CMPSC488SP24SecTuesday/AES-BlockChain-Communication"
 	"CMPSC488SP24SecTuesday/on-metal-c-code/gocode"
+	"encoding/json"
 	"fmt"
+	"os"
 	"strconv"
 	"time"
 )
@@ -11,36 +13,66 @@ import (
 const temperaturePin = 4
 const fanPin = 12
 
-var mode string
-var tempToSet = 0
-var fanSpeed int = 50
-var fanStatus string
+type Thermostat struct {
+	UUID        string `json:"UUID"`
+	CurrentTemp int    `json:"currentTemp"`
+	Mode        string `json:"mode"`
+	FanStatus   string `json:"fanStatus"`
+	FanSpeed    int    `json:"fanSpeed"`
+	SetTemp     int    `json:"setTemp"`
+}
 
 // SetTemperature sets the desired temperature for the HVAC system.
 func UpdateTemperature(newTemperature int) {
+	jsonThermData, err := os.ReadFile("thermostat.json")
+	if err != nil {
+		fmt.Println("Error reading thermostat data:", err)
+		return
+	}
+	// Unmarshal the JSON data into a Thermostat struct
+	var thermostat Thermostat
+	if err := json.Unmarshal(jsonThermData, &thermostat); err != nil {
+		fmt.Println("Error unmarshalling thermostat data:", err)
+		return
+	}
+
+	thermostat.SetTemp = newTemperature
+
+	thermostatJSON, err := json.MarshalIndent(thermostat, "", "	")
+	if err != nil {
+		fmt.Println("Error marshalling thermostat data:", err)
+		return
+	}
+
+	if err := os.WriteFile("thermostat.json", thermostatJSON, 0644); err != nil {
+		fmt.Println("Error writing thermostat data:", err)
+		return
+
+	}
+
 	currentTemp, err := gocode.ReadTemperature(temperaturePin, 22)
 	if err != nil {
 		fmt.Println("Error reading Temperature:", err)
 		return
 	}
-	currentTemp = 76
+	// currentTemp = 76
 	intCurrTemp := int(currentTemp)
 	if newTemperature == intCurrTemp {
 		gocode.TurnOffFan(fanPin)
 		fmt.Printf("%s Temperature is set to %d°C\n", newTemperature)
 	}
-	if mode == "Cool" && newTemperature < intCurrTemp {
-		gocode.SetFanSpeed(fanPin, fanSpeed)
+	if thermostat.Mode == "Cool" && newTemperature < intCurrTemp {
+		gocode.SetFanSpeed(fanPin, thermostat.FanSpeed)
 		//UpdateTemperature(newTemperature)
 	}
-	if mode == "Cool" && newTemperature > intCurrTemp {
+	if thermostat.Mode == "Cool" && newTemperature > intCurrTemp {
 		gocode.TurnOffFan(fanPin)
 	}
-	if mode == "Heat" && newTemperature > intCurrTemp {
-		gocode.SetFanSpeed(fanPin, fanSpeed)
+	if thermostat.Mode == "Heat" && newTemperature > intCurrTemp {
+		gocode.SetFanSpeed(fanPin, thermostat.FanSpeed)
 		//UpdateTemperature(newTemperature)
 	}
-	if mode == "Heat" && newTemperature < intCurrTemp {
+	if thermostat.Mode == "Heat" && newTemperature < intCurrTemp {
 		gocode.TurnOffFan(fanPin)
 	}
 
@@ -52,14 +84,36 @@ func UpdateFanSpeed(speed int) {
 	fmt.Printf("%s fan speed is set to %s%%\n", speed)
 }
 
-// SetStatus sets the status (e.g., "Cool", "Heat", "Fan", "Off") for the HVAC system.
+// SetStatus sets the status (e.g., "CoUpdateStatusol", "Heat", "Fan", "Off") for the HVAC system.
 func UpdateStatus(status bool) {
 	if status == true {
-		gocode.SetFanSpeed(fanPin, fanSpeed)
+		//gocode.SetFanSpeed(fanPin, fanSpeed)
+		//go UpdateTemperature(tempToSet)
+		jsonThermData, err := os.ReadFile("thermostat.json")
+		var thermostat Thermostat
+		if err := json.Unmarshal(jsonThermData, &thermostat); err != nil {
+			fmt.Println("Error unmarshalling thermostat data:", err)
+			return
+		}
+		thermostat.FanStatus = "on"
+		thermostatJSON, err := json.MarshalIndent(thermostat, "", "	")
+		if err != nil {
+			fmt.Println("Error marshalling thermostat data:", err)
+			return
+		}
+
+		if err := os.WriteFile("thermostat.json", thermostatJSON, 0644); err != nil {
+			fmt.Println("Error writing thermostat data:", err)
+			return
+		}
+		fmt.Println("Thermostat data updated successfully")
+
+		DisplayLCDHVAC("", 0, "ON")
 		fmt.Printf("%s status is set to %s\n", status)
 	}
 	if status == false {
-		gocode.TurnOffFan(fanPin)
+		//gocode.TurnOffFan(fanPin)
+		DisplayLCDHVAC("", 0, "OFF")
 		fmt.Printf("%s status is set to %s\n", status)
 	}
 }
@@ -123,7 +177,13 @@ func DisplayLCDHVAC(mode string, tempToSet int, fanStatus string) {
 		fanStatus = defaults.FanStatus
 	}
 
-	intCurrTemp := 76
+	var intCurrTemp int
+	rawCurrTemp, err := gocode.ReadTemperature(temperaturePin, 22)
+	if err != nil {
+		intCurrTemp = 0
+	}
+
+	intCurrTemp = int(rawCurrTemp)
 
 	// gocode.WriteLCD("Now:" + fmt.Sprintf("%02d", intCurrTemp) + " Set:" + fmt.Sprintf("%02d", tempToSet) + "   Mode:" + mode + " Fan:" + fanStatus)
 	gocode.WriteLCD("Now:" + fmt.Sprintf("%02d", intCurrTemp) + " Mode:" + mode + "Set:" + fmt.Sprintf("%02d", tempToSet) + " Fan:" + fanStatus)

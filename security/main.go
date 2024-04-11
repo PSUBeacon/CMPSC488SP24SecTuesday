@@ -3,54 +3,78 @@ package security
 import (
 	"CMPSC488SP24SecTuesday/on-metal-c-code/gocode"
 	"fmt"
+	"time"
 )
 
-var pirPin uint8 = 11
-var keypadRowPin []int
-var keypadColPin []int
-var buzzerPin uint8 = 4
+const (
+	pirPin    = 11
+	buzzerPin = 4
+)
 
-// MotionSensor represents a motion sensor component.
+var (
+	motion       bool
+	keypadRowPin []int
+	keypadColPin []int
+)
 
-// DetectMotion simulates detecting motion.
+type DefaultSecurity struct {
+	Status       string
+	MotionStatus string
+}
+
 func DetectMotion() {
 	motion, err := gocode.CheckForMotion(pirPin)
 	if err != nil {
+		fmt.Println("Error detecting motion:", err)
 		return
 	}
-	if motion == true {
-		// If motion detected, turn buzzer on
+	if motion {
 		gocode.BuzzerStatus(buzzerPin, true)
-		fmt.Printf("%s detected motion!\n")
+		fmt.Println("Motion detected!")
 	}
-
 }
 
-// Arm sets the alarm to the armed state.
-func UpdateAlarmStatus(status bool) {
-	if status == true {
-		// Detect motion only when alarm is armed
-		fmt.Printf("%s Alarm status is set to: \n", status)
+func UpdateAlarmStatus(armed bool) {
+	if armed {
+		fmt.Println("Alarm armed.")
 		DetectMotion()
 	} else {
-		// A way to turn the buzzer off
 		gocode.BuzzerStatus(buzzerPin, false)
+		fmt.Println("Alarm disarmed.")
+	}
+}
+
+func LockOrUnlock(lock bool) {
+	fmt.Println("Door is locked:", lock)
+	// Add logic to control door lock here
+}
+
+func HandleMotionDetection() {
+	ticker := time.NewTicker(5 * time.Second)
+	defer ticker.Stop()
+
+	for range ticker.C {
+		motion = !motion
+		if motion {
+			UpdateAlarmStatus(true)
+		} else {
+			UpdateAlarmStatus(false)
+		}
+	}
+}
+
+func DisplayLCDSecurity(status string, motionStatus string) {
+	defaults := DefaultSecurity{
+		Status:       "Armed",
+		MotionStatus: "Motion detected",
 	}
 
-}
+	if status == "" {
+		status = defaults.Status
+	}
+	if motionStatus == "" {
+		motionStatus = defaults.MotionStatus
+	}
 
-// Creates a lock or unlock feature
-func LockOrUnlock(lock bool) {
-	fmt.Println("Door is ", lock)
-	gocode.TurnServo()
-}
-
-// creates Padlock
-func NewPadlock(name string, pin string) {
-
-}
-
-// Padlock verify
-func Verify(pin string) {
-
+	go gocode.WriteLCD("Status: " + status + " Motion: " + motionStatus)
 }

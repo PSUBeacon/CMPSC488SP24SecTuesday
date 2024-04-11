@@ -162,7 +162,7 @@ func onKeyPress(char rune) {
 }
 
 // Initialize the keypad and start listening for key presses
-func InitKeypad() {
+func InitKeypad() rune {
 	// GPIO pin numbers for rows and columns
 	rowPins := []int{22, 23, 24, 25}
 	columnPins := []int{17, 18, 27}
@@ -180,13 +180,22 @@ func InitKeypad() {
 	keypad.Begin()
 
 	// Set the event listener
-	keypad.AddEventListener(onKeyPress)
+	//keypad.AddEventListener(onKeyPress)
 
 	// Main loop
+	//for {
+	//	// Scan keys periodically
+	//	keypad.GetKeys()
+	//	time.Sleep(100 * time.Millisecond)
+	//}
+
 	for {
 		// Scan keys periodically
-		keypad.GetKeys()
+		key := keypad.GetKey()
 		time.Sleep(100 * time.Millisecond)
+		if key != ' ' {
+			return key // Return the pressed key
+		}
 	}
 }
 

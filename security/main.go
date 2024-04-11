@@ -81,6 +81,7 @@ func DisplayLCDSecurity(status string, motionStatus string) {
 	if motionStatus == "" {
 		motionStatus = defaults.MotionStatus
 	}
+	key := gocode.InitKeypad()
 
-	gocode.WriteLCD("Stat:" + status + " Motion:" + motionStatus)
+	gocode.WriteLCD("Stat:" + status + " Motion:" + motionStatus + "Key: " + string(key))
 }

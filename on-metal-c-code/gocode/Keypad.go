@@ -187,6 +187,7 @@ func onKeyPress(char rune) {
 				if err != nil {
 					panic(err)
 				}
+				return
 
 			}
 			if securitySystem.Status == "disarmed" {
@@ -205,6 +206,7 @@ func onKeyPress(char rune) {
 				if err != nil {
 					panic(err)
 				}
+				return
 			}
 		}
 		if len(enteredCode) == 6 {

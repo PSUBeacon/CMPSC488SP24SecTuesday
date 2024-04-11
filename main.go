@@ -282,10 +282,10 @@ func handleFunctionality() {
 				if Pi.UUID == messageData.UUID {
 					if messageData.Change == "false" {
 						hvac.UpdateStatus(false)
-						hvac.DisplayLCDHVAC("", 0, messageData.Change)
+						hvac.DisplayLCDHVAC("", 0, "OFF")
 						if messageData.Change == "true" {
 							hvac.UpdateStatus(true)
-							hvac.DisplayLCDHVAC("", 0, messageData.Change)
+							hvac.DisplayLCDHVAC("", 0, "ON")
 						}
 						if messageData.Function == "FanSpeed" {
 							hvac.UpdateFanSpeed(messageChange)
@@ -313,9 +313,11 @@ func handleFunctionality() {
 					if messageData.Function == "Status" {
 						if messageData.Change == "false" {
 							security.UpdateAlarmStatus(false)
+							security.DisplayLCDSecurity("Disarmed", "OFF")
 						}
 						if messageData.Change == "true" {
 							security.UpdateAlarmStatus(true)
+							security.DisplayLCDSecurity("Armed", "ON")
 						}
 					}
 					if messageData.Function == "LockStatus" {
@@ -394,6 +396,9 @@ func main() {
 	if piNum == 16 {
 		go hvac.DisplayLCDHVAC("", 0, "")
 		//go hvac.SendTempToFE()
+	}
+	if piNum == 22 {
+		go security.DisplayLCDSecurity("", "")
 	}
 	BlockReceiver()
 }

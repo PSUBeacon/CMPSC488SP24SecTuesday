@@ -282,26 +282,26 @@ func handleFunctionality() {
 				if Pi.UUID == messageData.UUID {
 					if messageData.Function == "Status" {
 						if messageData.Change == "false" {
-							hvac.UpdateStatus(false)
+							hvac.UpdateStatus(false, messageData.UUID)
 							//hvac.DisplayLCDHVAC("", 0, "OFF")
 						}
 						if messageData.Change == "true" {
-							hvac.UpdateStatus(true)
+							hvac.UpdateStatus(true, messageData.UUID)
 							//hvac.DisplayLCDHVAC("", 0, "ON")
 						}
 					}
 					if messageData.Function == "FanSpeed" {
-						hvac.UpdateFanSpeed(messageChange)
-						hvac.DisplayLCDHVAC("", 0, "ON")
+						hvac.UpdateFanSpeed(messageChange, messageData.UUID)
+						//hvac.DisplayLCDHVAC("", 0, "ON")
 
 					}
 					if messageData.Function == "Temperature" {
-						hvac.UpdateTemperature(messageChange)
-						hvac.DisplayLCDHVAC("", messageChange, "")
+						hvac.UpdateTemperature(messageChange, messageData.UUID)
+						//hvac.DisplayLCDHVAC("", messageChange, "")
 					}
 					if messageData.Function == "Mode" {
-						hvac.UpdateMode(messageData.Change)
-						hvac.DisplayLCDHVAC(messageData.Change, 0, "")
+						hvac.UpdateMode(messageData.Change, messageData.UUID)
+						//hvac.DisplayLCDHVAC(messageData.Change, 0, "")
 					}
 				}
 			}
@@ -396,7 +396,7 @@ func main() {
 		go gocode.InitKeypad()
 	}
 	if piNum == 16 {
-		hvac.DisplayLCDHVAC("", 0, "")
+		//hvac.DisplayLCDHVAC("", 0, "")
 		//go hvac.SendTempToFE()
 	}
 	if piNum == 22 {

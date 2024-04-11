@@ -62,7 +62,7 @@ func BlockReceiver() []string {
 	mode := &serial.Mode{
 		BaudRate: 9600,
 	}
-	port, err := serial.Open("COM4", mode)
+	port, err := serial.Open("/dev/ttyUSB0", mode)
 	if err != nil {
 		log.Fatal("Error opening XBee module:", err)
 	}

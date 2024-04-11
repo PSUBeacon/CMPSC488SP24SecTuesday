@@ -38,6 +38,18 @@ func UpdateTemperature(newTemperature int) {
 
 	thermostat.SetTemp = newTemperature
 
+	thermostatJSON, err := json.MarshalIndent(thermostat, "", "	")
+	if err != nil {
+		fmt.Println("Error marshalling thermostat data:", err)
+		return
+	}
+
+	if err := os.WriteFile("thermostat.json", thermostatJSON, 0644); err != nil {
+		fmt.Println("Error writing thermostat data:", err)
+		return
+
+	}
+
 	currentTemp, err := gocode.ReadTemperature(temperaturePin, 22)
 	if err != nil {
 		fmt.Println("Error reading Temperature:", err)
@@ -165,6 +177,7 @@ func DisplayLCDHVAC(mode string, tempToSet int, fanStatus string) {
 		fanStatus = defaults.FanStatus
 	}
 
+	var intCurrTemp int
 	rawCurrTemp, err := gocode.ReadTemperature(temperaturePin, 22)
 	if err != nil {
 		intCurrTemp = 0

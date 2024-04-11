@@ -46,7 +46,8 @@ func UpdateTemperature(newTemperature int, uuid string) {
 
 	thermostat[index].SetTemp = newTemperature
 
-	currentTemp, err := gocode.ReadTemperature(temperaturePin, 22)
+	//currentTemp, err := gocode.ReadTemperature(temperaturePin, 22)
+	currentTemp := thermostat[index].CurrentTemp
 	if err != nil {
 		fmt.Println("Error reading Temperature:", err)
 		return

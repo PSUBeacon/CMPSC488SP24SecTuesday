@@ -33,7 +33,7 @@ func main() {
 	defer rpio.Close()
 
 	// Create a new PIR sensor instance connected to GPIO pin 17
-	pirSensor := NewPIR(17)
+	pirSensor := NewPIR(11)
 
 	// Set the sensor pin to input mode
 	pirSensor.signalPin.Input()

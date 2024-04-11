@@ -155,15 +155,15 @@ func send(message []byte, statusCheck string) string {
 
 	//fmt.Println(statusCheck)
 
-	port, err := serial.Open("COM4", mode)
+	port, err := serial.Open("COM5", mode)
 	if statusCheck == "check" || statusCheck == "send" {
 		if err != nil {
 			// Check if the error message indicates that the port is busy
 			if strings.Contains(err.Error(), "Serial port busy") {
-				fmt.Printf("Port %s is busy. Specific handling for busy port.\n", "COM4")
+				fmt.Printf("Port %s is busy. Specific handling for busy port.\n", "COM5")
 
 			} else {
-				fmt.Printf("Failed to check port %s: %v\n", "COM4", err)
+				fmt.Printf("Failed to check port %s: %v\n", "COM5", err)
 			}
 			canSend = false
 

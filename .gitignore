@@ -19,6 +19,7 @@ crypto/.env
 .vscode/
 config.json
 fab-2
+*node_modules
 
 # dependencies
 /.pnp

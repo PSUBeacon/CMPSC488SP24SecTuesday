@@ -282,18 +282,18 @@ func handleFunctionality() {
 				if Pi.UUID == messageData.UUID {
 					if messageData.Change == "false" {
 						hvac.UpdateStatus(false)
-						hvac.DisplayLCDHVAC("", 0, messageData.Change)
-					}
+						hvac.DisplayLCDHVAC("", 0, messageData.Chang
 					if messageData.Change == "true" {
 						hvac.UpdateStatus(true)
 						hvac.DisplayLCDHVAC("", 0, messageData.Change)
 					}
 					if messageData.Function == "FanSpeed" {
 						hvac.UpdateFanSpeed(messageChange)
+						hvac.DisplayLCDHVAC("", 0, "ON")
 
 					}
 					if messageData.Function == "Temperature" {
-						//	hvac.UpdateTemperature(messageChange)
+						hvac.UpdateTemperature(messageChange)
 						hvac.DisplayLCDHVAC("", messageChange, "")
 					}
 					if messageData.Function == "Mode" {

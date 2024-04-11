@@ -400,7 +400,7 @@ func main() {
 		//go hvac.SendTempToFE()
 	}
 	if piNum == 22 {
-		go security.DisplayLCDSecurity("", "")
+		security.DisplayLCDSecurity("", "")
 	}
 	BlockReceiver()
 }

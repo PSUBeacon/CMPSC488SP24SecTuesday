@@ -76,5 +76,5 @@ func DisplayLCDSecurity(status string, motionStatus string) {
 		motionStatus = defaults.MotionStatus
 	}
 
-	go gocode.WriteLCD("Status: " + status + " Motion: " + motionStatus)
+	gocode.WriteLCD("Status: " + status + " Motion: " + motionStatus)
 }

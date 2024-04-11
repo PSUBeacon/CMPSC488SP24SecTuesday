@@ -174,12 +174,16 @@ func onKeyPress(char rune) {
 				fmt.Println("Security code entered correctly. disarming alarm...")
 				securitySystem.Status = "disarmed"
 				WriteLCD(securitySystem.Status)
+				time.Sleep(2 * time.Second)
+				WriteLCD("Code: ")
 
 			}
 			if securitySystem.Status == "disarmed" {
 				fmt.Println("Security code entered correctly. arming alarm...")
 				securitySystem.Status = "armed"
 				WriteLCD(securitySystem.Status)
+				time.Sleep(2 * time.Second)
+				WriteLCD("Code: ")
 			}
 			securityJSON, err := json.MarshalIndent(securitySystem, "", "	")
 			if err != nil {
@@ -198,9 +202,9 @@ func onKeyPress(char rune) {
 			// Trigger the appropriate action when the correct code is entered
 			fmt.Println("Security code entered correctly. Disarming alarm...")
 			// Call a function to disarm the alarm, for example
+			WriteLCD("Code: ")
 		}
 	}
-	WriteLCD("Code: ")
 
 }
 

@@ -40,7 +40,7 @@ func UpdateTemperature(newTemperature int, uuid string) {
 	if uuid == "050336" {
 		index = 1
 	}
-	if uuid != "050336" {
+	if uuid != "050337" {
 		index = 0
 	}
 
@@ -111,7 +111,7 @@ func UpdateFanSpeed(speed int, uuid string) {
 	if uuid == "050336" {
 		index = 1
 	}
-	if uuid != "050336" {
+	if uuid != "050337" {
 		index = 0
 	}
 	thermostat[index].FanStatus = "ON"
@@ -152,7 +152,7 @@ func UpdateStatus(status bool, uuid string) {
 	if uuid == "050336" {
 		index = 1
 	}
-	if uuid != "050336" {
+	if uuid != "050337" {
 		index = 0
 	}
 
@@ -201,7 +201,7 @@ func UpdateMode(mode string, uuid string) {
 	if uuid == "050336" {
 		index = 1
 	}
-	if uuid != "050336" {
+	if uuid != "050337" {
 		index = 0
 	}
 	thermostat[index].Mode = mode

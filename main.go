@@ -284,10 +284,10 @@ func handleFunctionality() {
 						if messageData.Change == "false" {
 							hvac.UpdateStatus(false)
 							hvac.DisplayLCDHVAC("", 0, "OFF")
-							if messageData.Change == "true" {
-								hvac.UpdateStatus(true)
-								hvac.DisplayLCDHVAC("", 0, "ON")
-							}
+						}
+						if messageData.Change == "true" {
+							hvac.UpdateStatus(true)
+							hvac.DisplayLCDHVAC("", 0, "ON")
 						}
 					}
 					if messageData.Function == "FanSpeed" {

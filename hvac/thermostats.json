@@ -1,16 +1,19 @@
 [
   {
-    "thermostatId": "Thermostat 1",
+    "UUID": "Thermostat 1",
     "currentTemp": 72,
     "mode": "cooling",
     "fanStatus": "on",
+    "fanSpeed": 30,
     "setTemp": 68
   },
   {
-    "thermostatId": "Thermostat 2",
+    "UUID": "Thermostat 2",
     "currentTemp": 75,
     "mode": "heating",
     "fanStatus": "off",
+    "fanSpeed": 50,
     "setTemp": 70
   }
 ]
+

@@ -200,6 +200,8 @@ func onKeyPress(char rune) {
 			// Call a function to disarm the alarm, for example
 		}
 	}
+	WriteLCD("Code: ")
+
 }
 
 // Initialize the keypad and start listening for key presses

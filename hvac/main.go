@@ -23,7 +23,7 @@ func UpdateTemperature(newTemperature int) {
 		fmt.Println("Error reading Temperature:", err)
 		return
 	}
-	currentTemp = 76
+	// currentTemp = 76
 	intCurrTemp := int(currentTemp)
 	if newTemperature == intCurrTemp {
 		gocode.TurnOffFan(fanPin)
@@ -123,7 +123,10 @@ func DisplayLCDHVAC(mode string, tempToSet int, fanStatus string) {
 		fanStatus = defaults.FanStatus
 	}
 
-	intCurrTemp := 76
+	intCurrTemp, err := gocode.ReadTemperature(temperaturePin, 22)
+	if err != nil {
+		intCurrTemp = 0
+	}
 
 	// gocode.WriteLCD("Now:" + fmt.Sprintf("%02d", intCurrTemp) + " Set:" + fmt.Sprintf("%02d", tempToSet) + "   Mode:" + mode + " Fan:" + fanStatus)
 	gocode.WriteLCD("Now:" + fmt.Sprintf("%02d", intCurrTemp) + " Mode:" + mode + "Set:" + fmt.Sprintf("%02d", tempToSet) + " Fan:" + fanStatus)

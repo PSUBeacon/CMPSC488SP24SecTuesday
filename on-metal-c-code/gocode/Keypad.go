@@ -166,7 +166,7 @@ func onKeyPress(char rune) {
 			// Unmarshal the JSON data into a Thermostat struct
 			var securitySystem System
 			if err := json.Unmarshal(jsonSecurityData, &securitySystem); err != nil {
-				fmt.Println("Error unmarshalling thermostat data:", err)
+				fmt.Println("Error unmarshalling security data:", err)
 				return
 			}
 

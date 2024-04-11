@@ -66,7 +66,7 @@ func HandleMotionDetection() {
 	}
 }
 
-// DisplayLCDSecurity displays security system information on an LCD.
+// DisplayLCDSecurity displays security system information on an LCD
 func DisplayLCDSecurity(status string, motionStatus string) {
 	// Update LCD display with security system information
 	gocode.WriteLCD("Status: " + status + " Motion: " + motionStatus)

@@ -136,28 +136,31 @@ func (k *Keypad) UpdateKeyState(key *Key, newState KeyState) {
 var enteredCode string
 
 func onKeyPress(char rune) {
-	if len(enteredCode) < 6 {
-		err := godotenv.Load()
-		if err != nil {
-			log.Fatalf("Error loading .env file: %v", err)
-		}
-		securityCode := os.Getenv("SECURITY_KEY")
 
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
+	securityCode := os.Getenv("SECURITY_KEY")
+	if len(enteredCode) < 6 {
 		// Append pressed key to the entered code sequence
 		enteredCode += string(char)
 
 		WriteLCD("Code: " + enteredCode)
 
 		// Check if the entered code matches the security code
+		//if enteredCode == securityCode {
+		//	// Trigger the appropriate action when the correct code is entered
+		//	fmt.Println("Security code entered correctly. Disarming alarm...")
+		//	// Call a function to disarm the alarm, for example
+		//}
+	}
+	if len(enteredCode) == 6 {
 		if enteredCode == securityCode {
 			// Trigger the appropriate action when the correct code is entered
 			fmt.Println("Security code entered correctly. Disarming alarm...")
 			// Call a function to disarm the alarm, for example
 		}
-	}
-	if len(enteredCode) == 6 {
-		ClearLCD()
-		WriteLCD("Code: ")
 	}
 }
 

@@ -264,9 +264,6 @@ func main() {
 	initializeMatrix(dinPin, csPin, clkPin)
 	time.Sleep(3 * time.Second)
 
-	// Set the intensity of the LED matrix
-	SetIntensity(dinPin, csPin, clkPin, 15)
-	time.Sleep(3 * time.Second)
 	// Display a pattern on the matrix
 
 	// You can replace this with any pattern or function you want to display

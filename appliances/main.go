@@ -1,11 +1,21 @@
 package appliances
 
 import (
+	"CMPSC488SP24SecTuesday/on-metal-c-code/gocode"
 	"fmt"
 )
 
 // TurnOn turns the appliance on.
-func UpdateStatus(status bool) {
+func UpdateStatus(appliance string, status bool) {
+	outStatus := ""
+	if status == true {
+		outStatus = "ON"
+	}
+	if status == false {
+		outStatus = "OFF"
+	}
+	toLCD := appliance + ":" + outStatus
+	gocode.WriteLCD(toLCD)
 	fmt.Printf("%s Status is now set to: \n", status)
 }
 

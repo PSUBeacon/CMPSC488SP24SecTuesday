@@ -20,7 +20,7 @@ const sendServerRequest = () => {
 
     try {
         console.log(requestBody)
-        const response = axios.post('http://localhost:8081/hvac/updateHVAC', requestBody, {
+        const response = axios.post('http://192.168.8.117:8081/hvac/updateHVAC', requestBody, {
             headers: {
                 'Content-Type': 'application/json',
             },

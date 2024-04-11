@@ -18,7 +18,7 @@ const SignUp = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        const serverUrl = 'http://localhost:8081/signup'; // Adjust URL as needed
+        const serverUrl = 'http://192.168.8.117:8081/signup'; // Adjust URL as needed
 
         try {
             const response = await axios.post(serverUrl, {

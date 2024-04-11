@@ -1,4 +1,4 @@
-package main
+package security
 
 import (
 	"CMPSC488SP24SecTuesday/on-metal-c-code/gocode"

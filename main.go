@@ -280,12 +280,14 @@ func handleFunctionality() {
 		for _, group := range [][]dal.Pi{UUIDsData.Hvac} {
 			for _, Pi := range group {
 				if Pi.UUID == messageData.UUID {
-					if messageData.Change == "false" {
-						hvac.UpdateStatus(false)
-						hvac.DisplayLCDHVAC("", 0, "OFF")
-						if messageData.Change == "true" {
-							hvac.UpdateStatus(true)
-							hvac.DisplayLCDHVAC("", 0, "ON")
+					if messageData.Function == "Status" {
+						if messageData.Change == "false" {
+							hvac.UpdateStatus(false)
+							hvac.DisplayLCDHVAC("", 0, "OFF")
+							if messageData.Change == "true" {
+								hvac.UpdateStatus(true)
+								hvac.DisplayLCDHVAC("", 0, "ON")
+							}
 						}
 						if messageData.Function == "FanSpeed" {
 							hvac.UpdateFanSpeed(messageChange)

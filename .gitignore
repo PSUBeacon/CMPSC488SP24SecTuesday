@@ -17,7 +17,7 @@ vendor/
 crypto/.env
 .vs/
 .vscode/
-config.json
+
 fab-2
 *node_modules
 .env

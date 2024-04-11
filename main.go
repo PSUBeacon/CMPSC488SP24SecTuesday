@@ -375,7 +375,7 @@ func handleFunctionality() {
 			for _, Pi := range group {
 				if Pi.UUID == messageData.UUID {
 					if messageData.Function == "Status" {
-						//energy.UpdateAlarmStatus(messageData.StatusChange)
+						//energy.,UpdateAlarmStatus(messageData.StatusChange)
 					}
 				}
 			}

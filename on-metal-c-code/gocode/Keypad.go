@@ -210,7 +210,7 @@ func onKeyPress(char rune) {
 			}
 		}
 		if len(enteredCode) == 6 {
-			if enteredCode != securityCode {
+			if enteredCode == securityCode {
 				// Trigger the appropriate action when the correct code is entered
 				fmt.Println("Security code entered incorrectly")
 				// Call a function to disarm the alarm, for example

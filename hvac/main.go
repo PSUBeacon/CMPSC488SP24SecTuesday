@@ -100,7 +100,7 @@ func UpdateFanSpeed(speed int, uuid string) {
 		fmt.Println("Error reading thermostat data:", err)
 		return
 	}
-	fmt.Println("Thermostat data, ", jsonThermData)
+	//fmt.Println("Thermostat data, ", jsonThermData)
 	// Unmarshal the JSON data into a Thermostat struct
 	var thermostat []Thermostat
 	if err := json.Unmarshal(jsonThermData, &thermostat); err != nil {
@@ -140,7 +140,7 @@ func UpdateStatus(status bool, uuid string) {
 		fmt.Println("Error reading thermostat data:", err)
 		return
 	}
-	fmt.Println("Thermostat data, ", jsonThermData)
+	//fmt.Println("Thermostat data, ", jsonThermData)
 	// Unmarshal the JSON data into a Thermostat struct
 	var thermostat []Thermostat
 	if err := json.Unmarshal(jsonThermData, &thermostat); err != nil {
@@ -189,7 +189,7 @@ func UpdateMode(mode string, uuid string) {
 		fmt.Println("Error reading thermostat data:", err)
 		return
 	}
-	fmt.Println("Thermostat data, ", jsonThermData)
+	//fmt.Println("Thermostat data, ", jsonThermData)
 	// Unmarshal the JSON data into a Thermostat struct
 	var thermostat []Thermostat
 	if err := json.Unmarshal(jsonThermData, &thermostat); err != nil {

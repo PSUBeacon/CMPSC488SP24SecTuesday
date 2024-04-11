@@ -1,4 +1,5 @@
 {
   "UUID": "Thermostat 1",
-  "Status": "armed"
+  "Status": "armed",
+  "SensorStatus": "ON"
 }

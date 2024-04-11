@@ -137,8 +137,9 @@ func (k *Keypad) UpdateKeyState(key *Key, newState KeyState) {
 var enteredCode string
 
 type System struct {
-	UUID   string `json:"UUID"`
-	Status string `json:"Status"`
+	UUID         string `json:"UUID"`
+	Status       string `json:"Status"`
+	SensorStatus string `json:"SensorStatus"`
 }
 
 func onKeyPress(char rune) {
@@ -173,14 +174,16 @@ func onKeyPress(char rune) {
 			if securitySystem.Status == "armed" {
 				fmt.Println("Security code entered correctly. disarming alarm...")
 				securitySystem.Status = "disarmed"
-				WriteLCD(securitySystem.Status)
+				securitySystem.SensorStatus = "OFF"
+				WriteLCD("Stat:" + securitySystem.Status + " Motion:" + securitySystem.SensorStatus)
 				enteredCode = ""
 
 			}
 			if securitySystem.Status == "disarmed" {
 				fmt.Println("Security code entered correctly. arming alarm...")
 				securitySystem.Status = "armed"
-				WriteLCD(securitySystem.Status)
+				securitySystem.SensorStatus = "ON"
+				WriteLCD("Stat:" + securitySystem.Status + " Motion:" + securitySystem.SensorStatus)
 				enteredCode = ""
 			}
 			securityJSON, err := json.MarshalIndent(securitySystem, "", "	")

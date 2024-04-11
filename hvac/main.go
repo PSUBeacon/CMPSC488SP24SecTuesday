@@ -23,7 +23,7 @@ func UpdateTemperature(newTemperature int) {
 		fmt.Println("Error reading Temperature:", err)
 		return
 	}
-	currentTemp = 76
+	// currentTemp = 76
 	intCurrTemp := int(currentTemp)
 	if newTemperature == intCurrTemp {
 		gocode.TurnOffFan(fanPin)

@@ -61,7 +61,7 @@ const Energy = () => {
         };
 
         try {
-            const response = await fetch('http://192.168.8.117:8081/energy', {
+            const response = await fetch('http://localhost:8081/energy', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -87,7 +87,7 @@ const Energy = () => {
         }
         const fetchData = async () => {
             try {
-                const response = await fetch('http://192.168.8.117:8081/energy/GetEnergy', {
+                const response = await fetch('http://localhost:8081/energy/GetEnergy', {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,

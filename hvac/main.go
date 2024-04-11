@@ -29,6 +29,7 @@ func UpdateTemperature(newTemperature int) {
 		fmt.Println("Error reading thermostat data:", err)
 		return
 	}
+	fmt.Println("Thermostat data, ", jsonThermData)
 	// Unmarshal the JSON data into a Thermostat struct
 	var thermostat Thermostat
 	if err := json.Unmarshal(jsonThermData, &thermostat); err != nil {

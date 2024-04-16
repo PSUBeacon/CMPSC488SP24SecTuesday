@@ -2,6 +2,7 @@ package main
 
 import (
 	"CMPSC488SP24SecTuesday/dal"
+	"CMPSC488SP24SecTuesday/networktraffic"
 	"bytes"
 	"context"
 	"errors"
@@ -143,6 +144,7 @@ func main() {
 	{
 		networkingGroup.GET("/", me)
 		networkingGroup.GET("/GetNetLogs", GetNetLogs)
+		networkingGroup.GET("/GetNetPcapLogs", GetNetPcapLogs)
 		networkingGroup.GET("/status", statusResp)
 	}
 
@@ -756,6 +758,17 @@ func GetNetLogs(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, logs)
+}
+
+func GetNetPcapLogs(c *gin.Context) {
+	logs, err := networktraffic.GetNetEvents() // Fetch the logs
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Since logs is already a JSON []byte, write it directly to the response body
+	c.Data(http.StatusOK, "application/json", logs)
 }
 
 func GetSecurity(c *gin.Context) {

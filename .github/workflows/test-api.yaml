@@ -36,7 +36,7 @@ jobs:
 
       - name: Build for Tests
         run: |
-          apt install -y libpcap-dev
+          sudo apt install -y libpcap-dev
           file_name=("api.go")
           folder=("bam-api")
           len=${#folder[@]}

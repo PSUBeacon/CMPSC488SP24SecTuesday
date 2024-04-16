@@ -2,6 +2,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    /*transform: scale(1.5); !* 25% bigger *!*/
+    transform-origin: top center;
+    min-width: 0;
 }
 
 .thermostat-dial {

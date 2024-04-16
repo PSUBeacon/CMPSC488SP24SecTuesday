@@ -2,53 +2,51 @@ package gocode
 
 import (
 	"fmt"
+	"os"
+	"time"
+
 	"github.com/stianeikeland/go-rpio/v4"
 )
 
-func FanStatus(fanPin uint8, status bool) {
+const (
+	LowSpeed    = 30
+	MediumSpeed = 50
+	HighSpeed   = 90
+)
+
+// SetFanSpeed controls the fan speed using software PWM
+func SetFanSpeed(pin rpio.Pin, speed int) {
 	if err := rpio.Open(); err != nil {
 		fmt.Println("Unable to open GPIO:", err)
-		return
+		os.Exit(1)
 	}
 	defer rpio.Close()
-	fmt.Printf("%s status.\n", status)
-	fmt.Printf("on pin %s", fanPin)
-	if status == true {
-		pin := rpio.Pin(fanPin)
-		pin.Mode(rpio.Output)
-		pin.Write(rpio.High)
-		fmt.Printf("on pin %d is switched on.\n", pin)
+
+	pin.Output()
+
+	if speed == 0 {
+		TurnOffFan(pin)
+		return
 	}
-	if status == false {
-		pin := rpio.Pin(fanPin)
-		pin.Output()
+
+	onTime := time.Duration(speed) * time.Millisecond
+	offTime := 100*time.Millisecond - onTime
+	for i := 0; i < 200; i++ { // Run PWM for a short period
+		pin.High()
+		time.Sleep(onTime)
 		pin.Low()
-		fmt.Printf("Fan on pin %d is switched off.\n", pin)
+		time.Sleep(offTime)
 	}
 }
 
-func SetFanSpeed(fanPin uint8, speed int) {
+// TurnOffFan turns off the fan
+func TurnOffFan(pin rpio.Pin) {
 	if err := rpio.Open(); err != nil {
 		fmt.Println("Unable to open GPIO:", err)
-		return
+		os.Exit(1)
 	}
 	defer rpio.Close()
-	pin := rpio.Pin(fanPin)
-	pin.Mode(rpio.Pwm)
-	pin.Freq(64000)
-	pin.DutyCycle(uint32(speed), 100)
-}
 
-// Set the intensity (brightness) of the LED matrix
-func setSpeed(intensity byte) {
-	dinPin := rpio.Pin(dinPinNumber)
-	csPin := rpio.Pin(csPinNumber)
-	clkPin := rpio.Pin(clkPinNumber)
-
-	initializeMatrix(dinPin, csPin, clkPin)
-
-	if intensity > 0x0F {
-		intensity = 0x0F // Maximum intensity value is 0x0F
-	}
-	sendData(csPin, dinPin, clkPin, 0x0A, intensity)
+	pin.Output()
+	pin.Low()
 }

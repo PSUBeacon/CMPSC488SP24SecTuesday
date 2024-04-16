@@ -86,8 +86,8 @@ const Dashboard = () => {
             <div className="camera-widget" style={{
                 position: 'relative',
                 maxWidth: '100%',
-                backgroundColor: '#12232E',
                 borderRadius: '10px',
+                backgroundColor: '#12232E',
                 overflow: 'hidden'
             }}>
                 {/* Live Feed Video */}
@@ -267,9 +267,9 @@ const Dashboard = () => {
                 <div className="widget" style={{
                     flex: '1',
                     minWidth: '200px',
-                    backgroundColor: '#173350',
                     padding: '0px',
                     borderRadius: '1px',
+                    backgroundColor: '#173350',
                     margin: '10px',
                     boxSizing: 'border-box',
                     display: 'flex',
@@ -305,7 +305,7 @@ const Dashboard = () => {
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    backgroundColor: '#0E2237'
+                    backgroundColor: '#173350',
                 }}>
 
                     {/* Widgets Container */}
@@ -323,9 +323,9 @@ const Dashboard = () => {
                             <div className="camera-widget" style={{
                                 position: 'relative',
                                 maxWidth: '60%',
-                                backgroundColor: '#173350',
                                 borderRadius: '1px',
                                 overflow: 'hidden',
+                                backgroundColor: '#173350',
                                 flexBasis: '100%',
                                 padding: '12px'
                             }}>
@@ -365,8 +365,8 @@ const Dashboard = () => {
                             {/* Locks Widget */}
                             <div className="widget" style={{
                                 flex: '1',
-                                backgroundColor: '#173350',
                                 padding: '20px',
+                                backgroundColor: '#173350',
                                 borderRadius: '1px',
                                 margin: '10px',
                                 boxSizing: 'border-box'
@@ -405,7 +405,6 @@ const Dashboard = () => {
                                 <LocksWidget/>
                             </div>
                         </div>
-
                         {/* Another Row for More Widgets */}
                         <div style={{
                             display: 'flex',
@@ -505,7 +504,6 @@ const Dashboard = () => {
                         </div>
                     </div>
                 </main>
-
             </div>
         </div>
     );

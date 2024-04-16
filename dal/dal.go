@@ -11,7 +11,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"log"
 	"strconv"
 	"time"
 )
@@ -254,7 +253,33 @@ func FetchCollections(client *mongo.Client, dbName string) (*SmartHomeDB, error)
 	return smartHomeDB, nil
 }
 
-///////////////////////////////////////////////////////////
+func FetchAllUsers(client *mongo.Client) ([]User, error) {
+	collection := client.Database(dbName).Collection("Users")
+
+	// Finding multiple documents returns a cursor
+	cursor, err := collection.Find(context.TODO(), bson.M{})
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(context.TODO())
+
+	var users []User
+	for cursor.Next(context.TODO()) {
+		var user User
+		err := cursor.Decode(&user)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, user)
+	}
+
+	if err := cursor.Err(); err != nil {
+		return nil, err
+	}
+
+	fmt.Printf("Retrieved %d users from the database\n", len(users))
+	return users, nil
+}
 
 func FetchUser(client *mongo.Client, userName string) (User, error) {
 
@@ -297,6 +322,41 @@ func CreateUser(client *mongo.Client, user *User) error {
 	_, err = collection.InsertOne(context.TODO(), user)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func DeleteUser(client *mongo.Client, username string) error {
+	collection := client.Database(dbName).Collection("Users")
+
+	filter := bson.M{"username": username}
+
+	result, err := collection.DeleteOne(context.Background(), filter)
+	if err != nil {
+		return err
+	}
+
+	if result.DeletedCount == 0 {
+		return mongo.ErrNoDocuments
+	}
+
+	return nil
+}
+
+func UpdateUserRole(client *mongo.Client, username, newRole string) error {
+	collection := client.Database(dbName).Collection("Users")
+
+	filter := bson.M{"username": username}
+	update := bson.M{"$set": bson.M{"role": newRole}}
+
+	result, err := collection.UpdateOne(context.Background(), filter, update)
+	if err != nil {
+		return err
+	}
+
+	if result.MatchedCount == 0 {
+		return mongo.ErrNoDocuments
 	}
 
 	return nil
@@ -410,6 +470,7 @@ func UpdateMessaging(client *mongo.Client, UUID []byte, name string, apptype str
 		fmt.Printf("Error marshaling JSON message: %v", err)
 		return
 	}
+
 	messaging.BroadCastMessage(message)
 
 	var logg LoggingStruct
@@ -538,7 +599,7 @@ func UpdateThermMessaging(client *mongo.Client, UUID []byte, name string, apptyp
 	logg.Change = string(change)
 	logg.Time = time.Now()
 	_, err = Logging.InsertOne(context.Background(), logg)
-
+	//time.Sleep(2 * time.Second)
 	return
 }
 
@@ -572,59 +633,4 @@ func FetchLogging(client *mongo.Client, dbName string) ([]LoggingStruct, error) 
 	}
 	//fmt.Println("light from db dal: ", logs)
 	return logs, nil
-}
-
-//func PrintSmartHomeDBContents(smartHomeDB *SmartHomeDB) string {
-//	return fmt.Sprintf(
-//		"Dishwasher: %+v\nFridge: %+v\nHVAC: %+v\nLighting: %+v\nMicrowave: %+v\nOven: %+v\nSecuritySystem: %+v\nSolarPanel: %+v\nToaster: %+v\n",
-//		*smartHomeDB.Dishwasher,
-//		*smartHomeDB.Fridge,
-//		*smartHomeDB.HVAC,
-//		*smartHomeDB.Lighting,
-//		*smartHomeDB.Microwave,
-//		*smartHomeDB.Oven,
-//		*smartHomeDB.SecuritySystem,
-//		*smartHomeDB.SolarPanel,
-//		*smartHomeDB.Toaster,
-//	)
-//}
-
-// connect to db if exists, else return error log
-func main() {
-	client, err := ConnectToMongoDB()
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer client.Disconnect(context.Background())
-
-	////Testing fetchedUser function
-	//fetchedUser, err := FetchUser(client, "Owner")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	//fmt.Printf("User name: %s\n", fetchedUser.User)
-	//fmt.Printf("Password: %v\n", fetchedUser.CustomData["password"])
-	//fmt.Printf("UserID: %x\n", fetchedUser.UserID.Data)
-	//fmt.Printf("Role: %s\n", fetchedUser.Role.Role)
-	//fmt.Printf("Role DB: %s\n", fetchedUser.Role.DB)
-
-	//Testing IoT functions
-	// Fetch the IoT system data
-	//smartHomeDB, err := FetchCollections(client, dbName) // Fetches and populates data
-	//if err != nil {
-	//	log.Fatalf("Error fetching IoT data: %v", err)
-	//}
-
-	//fmt.Printf("HVAC Temperature: %s\n", smartHomeDB.HVAC.Temperature)
-
-	//fmt.Printf("Dishwasher Status: %s\n", smartHomeDB.Dishwasher.Status)
-
-	//fmt.Printf("Oven UUID: %s\n", smartHomeDB.Oven.UUID)
-
-	// Print the contents of smartHomeDB
-	//fmt.Printf(PrintSmartHomeDBContents(smartHomeDB))
-
-	fmt.Println(FetchUser(client, "beaconuser"))
-
 }

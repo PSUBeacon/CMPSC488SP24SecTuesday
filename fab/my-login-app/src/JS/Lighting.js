@@ -27,8 +27,9 @@ const Lighting = () => {
     const [roomName, setRoomName] = useState('');
     const [lightName, setLightName] = useState('');
     const [lightStates, setLightStates] = useState({
-        '417293': false, // Initial state: off
-        '417294': false, // Initial state: off
+        '417293': false,
+        '417294': false,
+        '417295': false,
     });
 
 
@@ -196,11 +197,11 @@ const Lighting = () => {
     };
 
     return (
-        <div style={{display: 'flex', minHeight: '100vh', flexDirection: 'column', backgroundColor: '#081624'}}>
+        <div style={{display: 'flex', minHeight: '100vh', flexDirection: 'column'}}>
             <Header accountType={accountType}/>
             <div style={{display: 'flex', flex: '1'}}>
                 <Sidebar isNavVisible={isNavVisible}/>
-                <main style={{flex: '1', padding: '1rem', backgroundColor: '#0E2237', width: '100%'}}>
+                <main style={{flex: '1', padding: '1rem', width: '100%'}}>
                     <div className="contentBlock" style={{
                         display: 'flex',
                         flexDirection: 'row',

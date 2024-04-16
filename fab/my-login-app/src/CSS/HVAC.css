@@ -1,88 +1,38 @@
 /* HVAC.css */
 .hvacPage {
-    display: flex;
-    flex-direction: column;
-    height: 100vh; /* This makes the div take the full height of the viewport */
-    width: 100vw; /* This makes the div take the full width of the viewport */
-    background-color: #2e370e; /* Example background color */
-    color: #ffffff; /* Example text color */
-    margin: 0; /* Removes default margin */
-    padding: 0; /* Removes default padding */
-  }
-  .hvac-data-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .data-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1rem;
-    padding: 1rem;
-    background-color: #1A3851;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 300px;
-  }
-  
-  .data-icon {
-    margin-right: 1rem;
-    font-size: 24px;
-    color: #50BCC0;
-  }
-  
-  .data-info {
-    color: #FFFFFF;
-  }
-  
-  .data-info p:first-child {
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-  }
-
-  .data-info select {
-    z-index: 10; /* Adjust as necessary */
+    transform: scale(1.5);
+    transform-origin: top center;
 }
 
+.hvac-data-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+    width: 100%;
+}
 
-  .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: grey;
-    -webkit-transition: .4s;
-    transition: .4s;
-    border-radius: 34px;
-  }
-  
-  .slider:before {
-    position: absolute;
-    content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    -webkit-transition: .4s;
-    transition: .4s;
-    border-radius: 50%;
-  }
-  
-  input:checked + .slider {
+.navigation {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.navigation button {
+    margin: 5px;
+    min-width: 7rem;
+}
+
+input:checked + .slider {
     background-color: #50BCC0;
-  }
-  
-  input:focus + .slider {
+}
+
+input:focus + .slider {
     box-shadow: 0 0 1px #50BCC0;
-  }
-  
-  input:checked + .slider:before {
+}
+
+input:checked + .slider:before {
     -webkit-transform: translateX(26px);
     -ms-transform: translateX(26px);
     transform: translateX(26px);
-  }
+}
   

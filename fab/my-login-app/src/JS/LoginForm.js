@@ -8,6 +8,7 @@ import logoImage from '../img/logo.webp';
 const LoginForm = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+
     const [error, setError] = useState('');
     const navigate = useNavigate(); // Instantiate useNavigate
 
@@ -18,7 +19,7 @@ const LoginForm = () => {
         try {
             const response = await axios.post(serverUrl, {
                 username,
-                password
+                password,
             });
             const jwtToken = response.data.token; // Assuming the token is returned in a field named 'token'
             const fname = response.data.firstname;
@@ -27,6 +28,9 @@ const LoginForm = () => {
             console.log('JWT Token:', jwtToken);
 
             sessionStorage.setItem('token', jwtToken);
+            sessionStorage.setItem('FirstName', fname);
+            sessionStorage.setItem('LastName', lname);
+            sessionStorage.setItem('Role', role);
 
             // Redirect user to the dashboard page
             navigate('/dashboard'); // Use navigate to redirect

@@ -1,6 +1,7 @@
 .App {
     text-align: center;
     font-family: "Nunito Sans", sans-serif;
+    background-image: linear-gradient(#0E2237, #081624);
 }
 
 .App-logo {

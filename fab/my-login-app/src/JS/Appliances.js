@@ -64,7 +64,7 @@ const Appliances = () => {
 
     // This is the JSX return statement where we layout our component's HTML structure
     return (
-        <div style={{display: 'flex', minHeight: '100vh', flexDirection: 'column', backgroundColor: '#081624'}}>
+        <div style={{display: 'flex', minHeight: '100vh', flexDirection: 'column'}}>
             <Header accountType={accountType}/>
             <div style={{display: 'flex', flex: '1'}}>
                 <Sidebar isNavVisible={isNavVisible}/>
@@ -73,8 +73,7 @@ const Appliances = () => {
                     padding: '1rem',
                     display: 'flex',
                     flexDirection: 'column',
-                    alignItems: 'center',
-                    backgroundColor: '#0E2237'
+                    alignItems: 'center'
                 }}>
                     <h2 style={{color: 'white'}}>Appliances</h2>
                     {Object.keys(data).length > 0 ? (

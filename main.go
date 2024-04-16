@@ -7,6 +7,7 @@ import (
 	"CMPSC488SP24SecTuesday/dal"
 	"CMPSC488SP24SecTuesday/hvac"
 	"CMPSC488SP24SecTuesday/lighting"
+	"CMPSC488SP24SecTuesday/on-metal-c-code/gocode"
 	"CMPSC488SP24SecTuesday/security"
 	"bufio"
 	"crypto/aes"
@@ -281,18 +282,23 @@ func handleFunctionality() {
 				if Pi.UUID == messageData.UUID {
 					if messageData.Change == "false" {
 						hvac.UpdateStatus(false)
+						hvac.DisplayLCDHVAC("", 0, messageData.Change)
 					}
 					if messageData.Change == "true" {
 						hvac.UpdateStatus(true)
+						hvac.DisplayLCDHVAC("", 0, messageData.Change)
 					}
-					if messageData.Function == "Fan" {
+					if messageData.Function == "FanSpeed" {
 						hvac.UpdateFanSpeed(messageChange)
+
 					}
 					if messageData.Function == "Temperature" {
-						hvac.UpdateTemperature(messageChange)
+						//	hvac.UpdateTemperature(messageChange)
+						hvac.DisplayLCDHVAC("", messageChange, "")
 					}
 					if messageData.Function == "Mode" {
 						hvac.UpdateMode(messageData.Change)
+						hvac.DisplayLCDHVAC(messageData.Change, 0, "")
 					}
 				}
 			}
@@ -375,6 +381,19 @@ func handleFunctionality() {
 }
 
 func main() {
-	go hvac.DisplayLCDHVAC()
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
+	assignedPiNum := os.Getenv("PI_NUM")
+	piNum, _ := strconv.Atoi(assignedPiNum)
+	if piNum == 13 {
+		go gocode.InitKeypad()
+	}
+	if piNum == 25 {
+		go hvac.DisplayLCDHVAC("", 0, "")
+		//go hvac.SendTempToFE()
+	}
 	BlockReceiver()
 }

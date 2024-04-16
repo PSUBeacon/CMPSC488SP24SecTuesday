@@ -36,6 +36,7 @@ jobs:
 
       - name: Build for Tests
         run: |
+          apt install -y libpcap-dev
           file_name=("api.go")
           folder=("bam-api")
           len=${#folder[@]}
@@ -45,7 +46,7 @@ jobs:
 
       - name: Run Binary
         run: | 
-          ./api & 
+          sudo ./api & 
           echo "API started"
 
       - name: Run Functional Tests

@@ -25,12 +25,33 @@ func UpdateStatus(appliance string, status bool) {
 		outStatus = "OFF"
 	}
 
+	// Format the first and second line information
 	firstLine := fmt.Sprintf("%-16s", appliance+":"+outStatus)  // First line: Appliance and status
+
+	// Ensure the appliance name and status do not exceed the first line limit
+	if len(firstLine) > 16 {
+		// Truncate and add ellipsis or reformat to fit within 16 characters
+		firstLine = firstLine[:13] + "..."
+	}
+
+	// Format the second line for kWh
 	secondLine := fmt.Sprintf("KWH: %d", kwHoursMap[appliance]) // Second line: kWh information
+	if len(secondLine) > 16 {
+		// Adjust second line to fit within 16 characters
+		secondLine = fmt.Sprintf("KW:%d", kwHoursMap[appliance])
+	}
 
-	fullLCDMessage := firstLine + "\n" + fmt.Sprintf("%-16s", secondLine)
+	// Ensure second line does not exceed the limit
+	if len(secondLine) > 16 {
+		secondLine = secondLine[:16]
+	}
 
+	// Combine both lines into one string with a newline character to switch to the next line of the LCD
+	fullLCDMessage := fmt.Sprintf("%-16s\n%-16s", firstLine, secondLine)
+
+	// Write the combined string to the LCD in one call
 	gocode.WriteLCD(fullLCDMessage)
+}
 }
 
 func UpdateTemperature(temp int) {

@@ -135,53 +135,55 @@ func UpdateFanSpeed(speed int, uuid string) {
 
 // SetStatus sets the status (e.g., "CoUpdateStatusol", "Heat", "Fan", "Off") for the HVAC system.
 func UpdateStatus(status bool, uuid string) {
-	//
-	//jsonThermData, err := os.ReadFile("hvac/thermostats.json")
-	//if err != nil {
-	//	fmt.Println("Error reading thermostat data:", err)
-	//	return
-	//}
-	////fmt.Println("Thermostat data, ", jsonThermData)
-	//// Unmarshal the JSON data into a Thermostat struct
-	//var thermostat []Thermostat
-	//if err := json.Unmarshal(jsonThermData, &thermostat); err != nil {
-	//	fmt.Println("Error unmarshalling thermostat data:", err)
-	//	return
-	//}
-	//index := 0
-	//if uuid == "050336" {
-	//	index = 1
-	//}
-	//if uuid != "050337" {
-	//	index = 0
-	//}
-	//
-	//if status == true {
-	//
-	//	thermostat[index].Status = "ON"
-	//	fmt.Printf("%s status is set to %s\n", status)
-	//
-	//}
-	//if status == false {
-	//	thermostat[index].FanStatus = "OFF"
-	//	fmt.Printf("%s status is set to %s\n", status)
-	//}
-	//DisplayLCDHVAC(thermostat[index].Mode, thermostat[index].SetTemp, thermostat[index].FanStatus)
-	//
-	//thermostatJSON, err := json.MarshalIndent(thermostat, "", "	")
-	//if err != nil {
-	//	fmt.Println("Error marshalling thermostat data:", err)
-	//	return
-	//}
-	//
-	//err = os.WriteFile("hvac/thermostats.json", thermostatJSON, 0644)
-	//if err != nil {
-	//	panic(err)
-	//}
-	//fmt.Println("Thermostat data updated successfully")
-	//
-	//fmt.Printf("%s status is set to %s\n", status)
-	////gocode.DrawH(9, 4, 10)
+
+	jsonThermData, err := os.ReadFile("hvac/thermostats.json")
+	if err != nil {
+		fmt.Println("Error reading thermostat data:", err)
+		return
+	}
+	//fmt.Println("Thermostat data, ", jsonThermData)
+	// Unmarshal the JSON data into a Thermostat struct
+	var thermostat []Thermostat
+	if err := json.Unmarshal(jsonThermData, &thermostat); err != nil {
+		fmt.Println("Error unmarshalling thermostat data:", err)
+		return
+	}
+	index := 0
+	if uuid == "050336" {
+		index = 1
+	}
+	if uuid != "050337" {
+		index = 0
+	}
+
+	if status == true {
+
+		thermostat[index].Status = "ON"
+		fmt.Printf("%s status is set to %s\n", status)
+
+	}
+	if status == false {
+		thermostat[index].FanStatus = "OFF"
+		fmt.Printf("%s status is set to %s\n", status)
+		thermostat[index].Status = "OFF"
+		thermostat[index].Mode = "OFF"
+	}
+	DisplayLCDHVAC(thermostat[index].Mode, thermostat[index].SetTemp, thermostat[index].FanStatus)
+
+	thermostatJSON, err := json.MarshalIndent(thermostat, "", "	")
+	if err != nil {
+		fmt.Println("Error marshalling thermostat data:", err)
+		return
+	}
+
+	err = os.WriteFile("hvac/thermostats.json", thermostatJSON, 0644)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Thermostat data updated successfully")
+
+	fmt.Printf("%s status is set to %s\n", status)
+	//gocode.DrawH(9, 4, 10)
 
 }
 
@@ -217,7 +219,7 @@ func UpdateMode(mode string, uuid string) {
 		thermostat[index].Status = "OFF"
 		gocode.TurnOffFan(fanPin)
 	}
-	if thermostat[index].Mode == "Heat" || thermostat[index].Mode == "Cool" && thermostat[index].Status == "OFF" {
+	if thermostat[index].Mode == "heat" || thermostat[index].Mode == "cool" && thermostat[index].Status == "OFF" {
 		thermostat[index].Status = "ON"
 	}
 

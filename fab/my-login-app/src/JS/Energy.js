@@ -54,7 +54,8 @@ const Energy = () => {
             return;
         }
 
-        await setCategory(CollectionMapping[key.toLowerCase()] || key);
+        const category = CollectionMapping[key.toLowerCase()] || key;
+        await setCategory(category);
 
         const requestBody = {
             uuid: uuid,
@@ -76,13 +77,46 @@ const Energy = () => {
                 body: JSON.stringify(requestBody),
             });
             if (!response.ok) throw new Error('Network response was not ok');
-            const updatedData = await response.json();
-            setData(updatedData);
+            // Update the data state with the new status
+            // setData(prevData => {
+            //     if (!prevData[category] || !Array.isArray(prevData[category])) {
+            //         return prevData;
+            //     }
+            //
+            //     return {
+            //         ...prevData,
+            //         [category]: prevData[category].map(appliance => {
+            //             if (appliance.UUID === uuid) {
+            //                 return {
+            //                     ...appliance,
+            //                     Status: gotstatus.toString(),
+            //                 };
+            //             }
+            //             return appliance;
+            //         }),
+            //     };
+            // });
+            const fetchData = async () => {
+                try {
+                    const response = await fetch('http://localhost:8081/energy/GetEnergy', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({}),
+                    });
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    const jsonData = await response.json();
+                    setData(jsonData);
+                } catch (error) {
+                    console.error('Failed to fetch data:', error);
+                }
+            };
+            await fetchData();
         } catch (error) {
             console.error('Failed to update energy status:', error);
         }
-
-        navigate('/energy')
     };
 
     const [data, setData] = useState({});
@@ -146,7 +180,7 @@ const Energy = () => {
                                     <tr key={index}>
                                         <td style={{width: '25%'}}>{key} - {appliance.Location}</td>
                                         {/* NEED TO USE DEVICE NAME-LABEL */}
-                                        <td style={{width: '25%'}}>{appliance.Status == "true" ? "On" : "Off"}</td>
+                                        <td style={{width: '25%'}}>{appliance.Status === "true" ? "On" : "Off"}</td>
                                         <td style={{width: '25%'}}>{appliance.EnergyConsumption}</td>
                                         <td style={{width: '25%'}}>
                                             {/* Implement actual toggle functionality as needed */}

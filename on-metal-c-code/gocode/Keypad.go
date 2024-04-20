@@ -171,9 +171,9 @@ func onKeyPress(char rune) {
 				return
 			}
 
-			if securitySystem.Status == "armed" {
+			if securitySystem.Status == "Armed" {
 				fmt.Println("Security code entered correctly. disarming alarm...")
-				securitySystem.Status = "disarmed"
+				securitySystem.Status = "Disarmed"
 				securitySystem.SensorStatus = "OFF"
 				WriteLCD("Stat:" + securitySystem.Status + " Motion:" + securitySystem.SensorStatus)
 				enteredCode = ""
@@ -190,9 +190,9 @@ func onKeyPress(char rune) {
 				return
 
 			}
-			if securitySystem.Status == "disarmed" {
+			if securitySystem.Status == "Disarmed" {
 				fmt.Println("Security code entered correctly. arming alarm...")
-				securitySystem.Status = "armed"
+				securitySystem.Status = "Armed"
 				securitySystem.SensorStatus = "ON"
 				WriteLCD("Stat:" + securitySystem.Status + " Motion:" + securitySystem.SensorStatus)
 				enteredCode = ""

@@ -26,7 +26,7 @@ func UpdateStatus(appliance string, status bool) {
 	}
 
 	// Format the first and second line information
-	firstLine := fmt.Sprintf("%-16s", appliance+":"+outStatus)  // First line: Appliance and status
+	firstLine := fmt.Sprintf("%-16s", appliance+":"+outStatus) // First line: Appliance and status
 
 	// Ensure the appliance name and status do not exceed the first line limit
 	if len(firstLine) > 16 {
@@ -51,7 +51,6 @@ func UpdateStatus(appliance string, status bool) {
 
 	// Write the combined string to the LCD in one call
 	gocode.WriteLCD(fullLCDMessage)
-}
 }
 
 func UpdateTemperature(temp int) {

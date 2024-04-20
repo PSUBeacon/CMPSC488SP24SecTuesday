@@ -501,8 +501,8 @@ func UpdateMessaging(client *mongo.Client, UUID []byte, name string, apptype str
 	}
 
 	var updateDoc bson.M
-	if err := bson.UnmarshalExtJSON(updateJSON, true, &updateDoc); err != nil {
-		fmt.Printf("Error unmarshaling update JSON: %v", err)
+	if err := bson.UnmarshalExtJSON(updateJSON, true, &updateDoc); err != nil {\
+		fmt.Printf("Its here Error unmarshaling update JSON: %v", err)
 		return
 	}
 

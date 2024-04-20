@@ -254,6 +254,8 @@ func handleFunctionality() {
 
 	messageChange, _ := strconv.Atoi(messageData.Change)
 
+	fmt.Println("Message is: ", messageData)
+
 	//fmt.Println("This is the uuids", UUIDsData)
 	if messageData.Name == "Lighting" {
 		//fmt.Println("Got past the name")

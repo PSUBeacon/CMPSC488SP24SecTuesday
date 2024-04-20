@@ -25,7 +25,7 @@ func UpdateStatus(appliance string, status bool) {
 		outStatus = "OFF"
 	}
 
-	gocode.WriteLCD(fmt.Sprintf("%-16s", appliance+":"+outStatus) + fmt.Sprintf("KWH: %d", kwHoursMap[appliance]))
+	gocode.WriteLCD(fmt.Sprintf("%-16s", appliance+":"+outStatus) + fmt.Sprintf("KWH:%d", kwHoursMap[appliance]))
 }
 
 func UpdateTemperature(temp int) {

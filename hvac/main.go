@@ -291,24 +291,3 @@ func DisplayLCDHVAC(mode string, tempToSet int, fanStatus string) {
 	gocode.WriteLCD("Now:" + fmt.Sprintf("%02d", intCurrTemp) + " Mode:" + mode + "Set:" + fmt.Sprintf("%02d", tempToSet) + " Fan:" + fanStatus)
 
 }
-
-//func main() {
-//	// Create a new HVAC instance
-//	hvac := NewHVAC("My HVAC")
-//
-//	// Optional: Modify the HVAC instance as needed
-//	hvac.SetTemperature(22)
-//	hvac.SetFanSpeed("Medium")
-//	hvac.SetStatus("Cool")
-//	hvac.SetHumidity(45)
-//
-//	// Serialize the HVAC instance to JSON
-//	jsonData, err := json.Marshal(hvac)
-//	if err != nil {
-//		fmt.Println("Error serializing HVAC to JSON:", err)
-//		return
-//	}
-//
-//	// Print the serialized JSON string
-//	fmt.Println(string(jsonData))
-//}

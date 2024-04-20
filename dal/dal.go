@@ -501,8 +501,8 @@ func UpdateMessaging(client *mongo.Client, UUID []byte, name string, apptype str
 	}
 
 	var updateDoc bson.M
-	if err := bson.UnmarshalExtJSON(updateJSON, true, &updateDoc); err != nil {\
-		fmt.Printf("Its here Error unmarshaling update JSON: %v", err)
+	if err := bson.UnmarshalExtJSON(updateJSON, true, &updateDoc); err != nil {
+		fmt.Printf("Error unmarshaling update JSON: %v", err)
 		return
 	}
 
@@ -575,31 +575,64 @@ func UpdateThermMessaging(client *mongo.Client, UUID []byte, name string, apptyp
 		return
 	}
 
-	//var existingDoc bson.M
-	//err = collection.FindOne(context.Background(), filter).Decode(&existingDoc)
-	//if err != nil {
-	//	if err == mongo.ErrNoDocuments {
-	//		// Document does not exist, you can insert a new one
-	//		_, err = collection.InsertOne(context.Background(), update)
-	//	} else {
-	//		fmt.Printf("Error finding document: %v", err)
-	//		return
-	//	}
-	//} else {
-	//	// Document exists, update it
-	//	_, err = collection.UpdateOne(context.Background(), filter, update)
-	//	if err != nil {
-	//		fmt.Printf("Error updating document: %v", err)
-	//		return
-	//	}
-	//}
-
 	logg.DeviceID = name
 	logg.Function = function
 	logg.Change = string(change)
 	logg.Time = time.Now()
 	_, err = Logging.InsertOne(context.Background(), logg)
 	//time.Sleep(2 * time.Second)
+	return
+}
+
+func UpdateSecurity(client *mongo.Client, UUID []byte, name string, apptype string, function string, change string) {
+	var messageRequest MessagingStruct
+	messageRequest.UUID = string(UUID)
+
+	var logg LoggingStruct
+	// Update the MongoDB collection using JSON
+	collection := client.Database("smartHomeDB").Collection(apptype)
+	Logging := client.Database("smartHomeDB").Collection("Logging")
+	filter := bson.M{"UUID": messageRequest.UUID}
+
+	var updatedValue interface{}
+	switch function {
+	case "WashTime", "TemperatureSettings", "EnergyConsumption", "Brightness", "Power":
+		updatedValue, _ = strconv.Atoi(change)
+	default:
+		updatedValue = change
+	}
+
+	update := map[string]interface{}{
+		"$set": map[string]interface{}{
+			function: updatedValue,
+		},
+	}
+	fmt.Println("update: ", update)
+
+	updateJSON, err := json.Marshal(update)
+	if err != nil {
+		fmt.Printf("Error marshaling update JSON: %v", err)
+		return
+	}
+
+	var updateDoc bson.M
+	if err := bson.UnmarshalExtJSON(updateJSON, true, &updateDoc); err != nil {
+		fmt.Printf("Error unmarshaling update JSON: %v", err)
+		return
+	}
+
+	_, err = collection.UpdateOne(context.Background(), filter, updateDoc)
+	if err != nil {
+		fmt.Printf("Error updating document: %v", err)
+		return
+	}
+
+	logg.DeviceID = name
+	logg.Function = function
+	logg.Change = string(change)
+	logg.Time = time.Now()
+	_, err = Logging.InsertOne(context.Background(), logg)
+
 	return
 }
 

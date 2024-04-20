@@ -188,7 +188,12 @@ func UpdateStatus(status bool, uuid string) {
 }
 
 func UpdateMode(mode string, uuid string) {
-
+	if mode == "cool" {
+		mode = "Cool"
+	}
+	if mode == "heat" {
+		mode = "Heat"
+	}
 	jsonThermData, err := os.ReadFile("hvac/thermostats.json")
 	if err != nil {
 		fmt.Println("Error reading thermostat data:", err)
@@ -219,7 +224,7 @@ func UpdateMode(mode string, uuid string) {
 		thermostat[index].Status = "OFF"
 		gocode.TurnOffFan(fanPin)
 	}
-	if thermostat[index].Mode == "heat" || thermostat[index].Mode == "cool" && thermostat[index].Status == "OFF" {
+	if thermostat[index].Mode == "Heat" || thermostat[index].Mode == "Cool" && thermostat[index].Status == "OFF" {
 		thermostat[index].Status = "ON"
 	}
 
@@ -292,6 +297,7 @@ func DisplayLCDHVAC(mode string, tempToSet int, fanStatus string) {
 	intCurrTemp = int(rawCurrTemp)
 
 	// gocode.WriteLCD("Now:" + fmt.Sprintf("%02d", intCurrTemp) + " Set:" + fmt.Sprintf("%02d", tempToSet) + "   Mode:" + mode + " Fan:" + fanStatus)
-	gocode.WriteLCD("Now:" + fmt.Sprintf("%02d", intCurrTemp) + " Mode:" + mode + "Set:" + fmt.Sprintf("%02d", tempToSet) + " Fan:" + fanStatus)
+
+	gocode.WriteLCD(fmt.Sprintf("%-16s", "Now:"+string(rune(intCurrTemp))+"Mode:"+mode) + fmt.Sprintf("%-16s", "Set:"+string(rune(tempToSet))+" Fan:"+fanStatus))
 
 }

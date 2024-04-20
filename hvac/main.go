@@ -18,6 +18,7 @@ type Thermostat struct {
 	CurrentTemp int    `json:"currentTemp"`
 	Mode        string `json:"mode"`
 	FanStatus   string `json:"fanStatus"`
+	Status      string `json:"status"`
 	FanSpeed    int    `json:"fanSpeed"`
 	SetTemp     int    `json:"setTemp"`
 }
@@ -134,53 +135,53 @@ func UpdateFanSpeed(speed int, uuid string) {
 
 // SetStatus sets the status (e.g., "CoUpdateStatusol", "Heat", "Fan", "Off") for the HVAC system.
 func UpdateStatus(status bool, uuid string) {
-
-	jsonThermData, err := os.ReadFile("hvac/thermostats.json")
-	if err != nil {
-		fmt.Println("Error reading thermostat data:", err)
-		return
-	}
-	//fmt.Println("Thermostat data, ", jsonThermData)
-	// Unmarshal the JSON data into a Thermostat struct
-	var thermostat []Thermostat
-	if err := json.Unmarshal(jsonThermData, &thermostat); err != nil {
-		fmt.Println("Error unmarshalling thermostat data:", err)
-		return
-	}
-	index := 0
-	if uuid == "050336" {
-		index = 1
-	}
-	if uuid != "050337" {
-		index = 0
-	}
-
-	if status == true {
-
-		thermostat[index].FanStatus = "ON"
-		fmt.Printf("%s status is set to %s\n", status)
-
-	}
-	if status == false {
-		thermostat[index].FanStatus = "OFF"
-		fmt.Printf("%s status is set to %s\n", status)
-	}
-	DisplayLCDHVAC(thermostat[index].Mode, thermostat[index].SetTemp, thermostat[index].FanStatus)
-
-	thermostatJSON, err := json.MarshalIndent(thermostat, "", "	")
-	if err != nil {
-		fmt.Println("Error marshalling thermostat data:", err)
-		return
-	}
-
-	err = os.WriteFile("hvac/thermostats.json", thermostatJSON, 0644)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("Thermostat data updated successfully")
-
-	fmt.Printf("%s status is set to %s\n", status)
-	//gocode.DrawH(9, 4, 10)
+	//
+	//jsonThermData, err := os.ReadFile("hvac/thermostats.json")
+	//if err != nil {
+	//	fmt.Println("Error reading thermostat data:", err)
+	//	return
+	//}
+	////fmt.Println("Thermostat data, ", jsonThermData)
+	//// Unmarshal the JSON data into a Thermostat struct
+	//var thermostat []Thermostat
+	//if err := json.Unmarshal(jsonThermData, &thermostat); err != nil {
+	//	fmt.Println("Error unmarshalling thermostat data:", err)
+	//	return
+	//}
+	//index := 0
+	//if uuid == "050336" {
+	//	index = 1
+	//}
+	//if uuid != "050337" {
+	//	index = 0
+	//}
+	//
+	//if status == true {
+	//
+	//	thermostat[index].Status = "ON"
+	//	fmt.Printf("%s status is set to %s\n", status)
+	//
+	//}
+	//if status == false {
+	//	thermostat[index].FanStatus = "OFF"
+	//	fmt.Printf("%s status is set to %s\n", status)
+	//}
+	//DisplayLCDHVAC(thermostat[index].Mode, thermostat[index].SetTemp, thermostat[index].FanStatus)
+	//
+	//thermostatJSON, err := json.MarshalIndent(thermostat, "", "	")
+	//if err != nil {
+	//	fmt.Println("Error marshalling thermostat data:", err)
+	//	return
+	//}
+	//
+	//err = os.WriteFile("hvac/thermostats.json", thermostatJSON, 0644)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//fmt.Println("Thermostat data updated successfully")
+	//
+	//fmt.Printf("%s status is set to %s\n", status)
+	////gocode.DrawH(9, 4, 10)
 
 }
 
@@ -210,6 +211,15 @@ func UpdateMode(mode string, uuid string) {
 	fmt.Printf("%s mode is set to %s\n", mode)
 
 	DisplayLCDHVAC(thermostat[index].Mode, thermostat[index].SetTemp, thermostat[index].FanStatus)
+
+	if thermostat[index].Mode == "OFF" {
+		thermostat[index].FanStatus = "OFF"
+		thermostat[index].Status = "OFF"
+		gocode.TurnOffFan(fanPin)
+	}
+	if thermostat[index].Mode == "Heat" || thermostat[index].Mode == "Cool" && thermostat[index].Status == "OFF" {
+		thermostat[index].Status = "ON"
+	}
 
 	thermostatJSON, err := json.MarshalIndent(thermostat, "", "	")
 	if err != nil {
@@ -253,15 +263,7 @@ func SendTempToFE() {
 }
 
 func DisplayLCDHVAC(mode string, tempToSet int, fanStatus string) {
-	//currentTemp, err := gocode.ReadTemperature(temperaturePin, 22)
-	//if err != nil {
-	//	return
-	//}
-	//if currentTemp > 999 {
-	//	currentTemp = 999
-	//}
-	//intCurrTemp := int(currentTemp)
-	// Hardcode current temp, Mode, Temperature to set, Status
+
 	defaults := DefaultHVAC{
 		Mode:      "Heat",
 		TempToSet: 74,

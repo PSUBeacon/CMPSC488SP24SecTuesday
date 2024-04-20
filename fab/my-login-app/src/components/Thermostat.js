@@ -36,7 +36,7 @@ const ModeToggle = ({initialMode, onModeChange, initialStatus}) => {
     const handleModeChange = async (newMode) => {
         await setMode(newMode);
         await onModeChange(newMode);
-        func = newMode === "cool" || newMode === "heat" ? "Mode" : "Status";
+        func = newMode === "Cool" || newMode === "Heat" ? "Mode" : "Status";
         await sendServerRequest();
     };
 

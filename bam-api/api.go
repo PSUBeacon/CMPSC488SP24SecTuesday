@@ -166,7 +166,7 @@ func main() {
 	}
 
 	energyGroup := r.Group("/energy")
-	appliancesGroup.Use()
+	energyGroup.Use()
 	{
 		energyGroup.GET("/", me)
 		energyGroup.POST("/updateEnergy", updateIoT)
@@ -229,6 +229,10 @@ func updateIoT(c *gin.Context) {
 	// Reset the request body to be able to parse it again
 	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
 
+	//req.Name = string(req.Name)
+
+	//fmt.Println("Req: ", c.ShouldBindJSON(&req))
+
 	if err := c.ShouldBindJSON(&req); err != nil {
 		fmt.Printf("Error binding JSON: %v\n", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -259,7 +263,6 @@ func updateIoT(c *gin.Context) {
 	//	dal.UpdateMessaging(client, []byte(req.UUID), req.Name, req.AppType, req.Function, req.Change)
 	//	c.JSON(http.StatusOK, gin.H{"message": "IOT updated successfully"})
 	//}
-
 	if req.Change == "true" {
 		req.Change = "false"
 	} else {
@@ -298,14 +301,14 @@ func updateThermostat(c *gin.Context) {
 		return
 	}
 
-	if req.Function == "Mode" {
-		var req2 = req
-		req2.Function = "Status"
-		req2.Change = "true"
-
-		dal.UpdateThermMessaging(client, []byte(req2.UUID), req2.Name, req2.AppType, req2.Function, req2.Change)
-		time.Sleep(1 * time.Second)
-	}
+	//if req.Function == "Mode" {
+	//	var req2 = req
+	//	req2.Function = "Status"
+	//	req2.Change = "true"
+	//
+	//	dal.UpdateThermMessaging(client, []byte(req2.UUID), req2.Name, req2.AppType, req2.Function, req2.Change)
+	//	time.Sleep(1 * time.Second)
+	//}
 
 	//fmt.Println([]byte(req.UUID), req.Name, req.AppType, req.Function, req.Change)
 	//fmt.Printf("\n%T\n", req.Change)
@@ -321,7 +324,7 @@ func VerifySecurityCode(c *gin.Context) {
 
 	var req struct {
 		Code   string `json:"code"`
-		Status []byte `json:"status"`
+		Status string `json:"status"`
 	}
 	fmt.Println("Alarm Status: ", req.Status)
 	requestBody, _ := ioutil.ReadAll(c.Request.Body)
@@ -342,7 +345,7 @@ func VerifySecurityCode(c *gin.Context) {
 	if req.Code == securityKey {
 		c.JSON(http.StatusOK, gin.H{"message": "Security code verified"})
 		fmt.Println("Key is valid ", req.Code)
-		dal.UpdateMessaging(client, []byte("502857"), "Security", "SecuritySystem", "Status", string(req.Status))
+		dal.UpdateSecurity(client, []byte("502857"), "Security", "SecuritySystem", "Status", string(req.Status))
 		dal.UpdateMessaging(client, []byte("502858"), "Security", "SecuritySystem", "Status", string(req.Status))
 	} else {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid security code"})

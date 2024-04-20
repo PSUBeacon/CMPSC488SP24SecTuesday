@@ -7,6 +7,16 @@ import (
 
 // TurnOn turns the appliance on.
 func UpdateStatus(appliance string, status bool) {
+
+	kwHoursMap := map[string]int{
+		"Oven":       4,
+		"Microwave":  2,
+		"Fridge":     2,
+		"Toaster":    2,
+		"Dishwasher": 4,
+		"Solar":      15,
+	}
+
 	outStatus := ""
 	if status == true {
 		outStatus = "ON"
@@ -15,7 +25,9 @@ func UpdateStatus(appliance string, status bool) {
 		outStatus = "OFF"
 	}
 	toLCD := appliance + ":" + outStatus
-	gocode.WriteLCD(toLCD)
+	//gocode.WriteLCD(toLCD)
+	gocode.WriteLCD(toLCD + " KWH" + fmt.Sprintf("%d", kwHoursMap[appliance]))
+
 	fmt.Printf("%s Status is now set to: \n", status)
 }
 

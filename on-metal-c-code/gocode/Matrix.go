@@ -215,11 +215,6 @@ func MatrixStatus(dinPin, csPin, clkPin rpio.Pin, status bool, brightness int) {
 	initializeMatrix(dinPin, csPin, clkPin)
 
 	drawLock(dinPin, csPin, clkPin, 5)
-	time.Sleep(5)
-	DrawLightbulb(dinPin, csPin, clkPin, 5)
-	time.Sleep(5)
-	drawH(dinPin, csPin, clkPin, 5)
-	time.Sleep(5)
 
 	if status == false {
 		ClearMatrix(csPin, dinPin, clkPin)

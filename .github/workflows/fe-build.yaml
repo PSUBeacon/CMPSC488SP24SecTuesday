@@ -1,0 +1,65 @@
+name: Build and Deploy
+
+
+on:
+  push:
+    branches:
+      - main
+      - middleware-be
+      - security
+      - network-traffic-analysis
+      - iot-be
+      - front-end
+      - 56-cicd-write-script-to-deploy-requested-binary-on-end-rsp # tmp to test
+  pull_request:
+    branches:
+      - main
+      - middleware-be
+      - security
+      - network-traffic-analysis
+      - iot-be
+      - front-end
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18.18.2'
+
+      - name: Install dependencies
+        run: |
+          cd fab/my-login-app
+          npm install
+
+      - name: Build
+        run: |
+          cd fab/my-login-app
+          npm run build || true
+
+      - name: Copy FE build to remote server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.FE_RSP_HOST }}
+          username: psu
+          key: ${{ secrets.RSP_SSH_KEY }}
+          port: ${{ secrets.FE_RSP_PORT  }}
+          source: "fab/my-login-app/build/"
+          target: "/var/www/html/beacon"
+
+      - name: Restart Nginx
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.FE_RSP_HOST }}
+          username: psu
+          key: ${{ secrets.RSP_SSH_KEY }}
+          port: ${{ secrets.FE_RSP_PORT }}
+          script: |
+            sudo systemctl restart nginx
+  

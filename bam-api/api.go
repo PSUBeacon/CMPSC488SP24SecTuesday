@@ -53,6 +53,8 @@ func errorHandler(c *gin.Context, info ratelimit.Info) {
 }
 
 func main() {
+
+	//connect to mongo server
 	var er error
 	client, er = dal.ConnectToMongoDB()
 	if er != nil {

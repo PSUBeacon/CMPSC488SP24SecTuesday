@@ -34,7 +34,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc-arm-linux-gnueabihf libc6-armhf-cross libc6-dev-armhf-cross
+          sudo apt-get install -y gcc-arm-linux-gnueabihf libc6-armhf-cross libc6-dev-armhf-cross libpcap-dev
 
       - name: Get Short SHA
         id: slug

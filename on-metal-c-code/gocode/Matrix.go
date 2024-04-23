@@ -76,15 +76,25 @@ func sendByte(dinPin, clkPin rpio.Pin, data byte) {
 func DrawLightbulb(dinPin, csPin, clkPin rpio.Pin, brightness int) {
 
 	ClearMatrix(csPin, dinPin, clkPin)
+	//lightbulbPattern := []byte{
+	//	0b00111100,
+	//	0b01111110,
+	//	0b01111110,
+	//	0b01111110,
+	//	0b01111110,
+	//	0b00111100,
+	//	0b00011000,
+	//	0b00011000,
+	//}
 	lightbulbPattern := []byte{
-		0b00111100,
-		0b01111110,
-		0b01111110,
-		0b01111110,
-		0b01111110,
-		0b00111100,
-		0b00011000,
-		0b00011000,
+		0b00000000,
+		0b00011100,
+		0b00111111,
+		0b11111111,
+		0b11111111,
+		0b00111111,
+		0b00011100,
+		0b00000000,
 	}
 	for row, pattern := range lightbulbPattern {
 		sendData(csPin, dinPin, clkPin, byte(row+1), pattern)

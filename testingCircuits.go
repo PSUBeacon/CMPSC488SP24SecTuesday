@@ -12,4 +12,8 @@ func main() {
 	gocode.MatrixStatus(9, 4, 10, true, 5)
 	time.Sleep(5)
 	gocode.TurnOffMatrix(9, 4, 10)
+
+	gocode.MatrixStatus(9, 4, 10, true, 5)
+	time.Sleep(5)
+	gocode.TurnOffMatrix(9, 4, 10)
 }

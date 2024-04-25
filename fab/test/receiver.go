@@ -1,18 +1,15 @@
-package messaging
+package main
 
 import (
 	"CMPSC488SP24SecTuesday/blockchain"
 	"CMPSC488SP24SecTuesday/crypto"
-	"bufio"
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/json"
 	"fmt"
 	"github.com/joho/godotenv"
-	"go.bug.st/serial"
 	"log"
 	"os"
-	"time"
 )
 
 func decryptAES(key, ciphertext []byte) ([]byte, error) {
@@ -52,83 +49,23 @@ func decryptAES(key, ciphertext []byte) ([]byte, error) {
 	return ciphertext, nil
 }
 
-func BlockReceiver() []string {
-	numConnections := 0
-	pinums := []string{"13", "16", "22", "25"}
-	var receivedPiNums []string
+func BlockReceiver() {
 	// Open the XBee module for communication
 	var chain blockchain.Blockchain
 	var block blockchain.Block
-	mode := &serial.Mode{
-		BaudRate: 9600,
-	}
-	port, err := serial.Open("/dev/ttyUSB0", mode)
-	if err != nil {
-		log.Fatal("Error opening XBee module:", err)
-	}
-	defer func(port serial.Port) {
-		err := port.Close()
-		if err != nil {
-
-		}
-	}(port) // Ensure the port is closed when the function returns
-
-	// Wrap the port in a bufio.Reader
-	const bufferSize = 4096 // Adjust this value as needed
-	reader := bufio.NewReaderSize(port, bufferSize)
 
 	fmt.Println("Waiting for incoming messages...")
-
-	ticker := time.NewTicker(60 * time.Second)
-
 	// Use ReadBytes or ReadString to dynamically handle incoming data
-	for {
-		// Read and parse the data manually
-		var message []byte
-		for {
-			b, err := reader.ReadByte()
-			if err != nil {
-				log.Fatal("Error reading byte:", err)
-			}
-			if ticker == nil {
-				if len(receivedPiNums) < 4 {
-					receivedMap := make(map[string]bool)
-					for _, i := range receivedPiNums {
-						receivedMap[i] = true
-					}
-					var missingPi []string
-					for _, i := range pinums {
-						if !receivedMap[i] {
-							missingPi = append(missingPi, i)
-						}
-
-					}
-
-					fmt.Printf("Pi %v not connected\n", missingPi)
-					//go api.UpdateMissingPi(missingPi)
-					return missingPi
-
-				}
-				ticker.Reset(60 * time.Second)
-			}
-			// Check for the UTF-8 encoding of '♄' the hex value is (E2 99 B4)
-			if len(message) >= 2 && message[len(message)-2] == 0xE2 && message[len(message)-1] == 0x99 && b == 0xB4 {
-				//fmt.Println(message)
-				message = message[:len(message)-2] // Remove the delimiter from the message
-				break
-			}
-			message = append(message, b)
-		}
 
 		//loads file and pulls the key from there
-		err = godotenv.Load()
+		err := godotenv.Load()
 		AesKey := os.Getenv("AES_KEY")
 
 		//Decrypt the message.
 		decryptedText, err := decryptAES([]byte(AesKey), message)
 		if err != nil {
 			fmt.Println("Error decrypting:", err)
-			//return
+			return
 		}
 		//fmt.Printf("Decrypted text: %s\n", decryptedText)
 
@@ -175,7 +112,7 @@ func BlockReceiver() []string {
 
 					err := json.Unmarshal(jsonChainData, &chain)
 					if err != nil {
-						return []string{}
+						return
 					}
 
 					chain.Chain = append(chain.Chain, block)
@@ -190,23 +127,12 @@ func BlockReceiver() []string {
 					if err != nil {
 						panic(err)
 					}
-					for i := 0; i < 3; i++ {
-						if block.Data == pinums[i] {
-							receivedPiNums = append(receivedPiNums, block.Data)
-							numConnections++
-						}
-					}
 				}
 				if verify == false {
 					fmt.Println("Invalid Block")
 				}
 			}
 		} else {
-			fmt.Println("Message integrity verification failed.")
-			continue
-
-		}
-		if isValid == false {
 			fmt.Println("Message integrity verification failed.")
 			continue
 
@@ -230,18 +156,17 @@ func verifyBlockchain(currentblock blockchain.Block) bool {
 
 	if readBlockchain.Chain[len(readBlockchain.Chain)-1].Hash == currentblock.PrevHash {
 		// Verify the rest of the hashes
-		//for i := 1; i < len(readBlockchain.Chain); i++ {
-		//currBlock := readBlockchain.Chain[i]
-		//prevBlock := readBlockchain.Chain[i-1]
+		for i := 1; i < len(readBlockchain.Chain); i++ {
+			currBlock := readBlockchain.Chain[i]
+			prevBlock := readBlockchain.Chain[i-1]
 
-		//if currBlock.PrevHash != prevBlock.Hash { //invalid hash
-
-		//checks just the previous block
-		fmt.Println("block and chain is valid")
-		return true
+			if currBlock.PrevHash != prevBlock.Hash { //invalid hash
+				return false
+			}
+		}
 	}
-	//}
-	return false
+	fmt.Println("block and chain is valid")
+	return true
 }
 
 //

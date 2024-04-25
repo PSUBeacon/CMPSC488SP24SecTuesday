@@ -20,17 +20,19 @@ Our mission is to design and develop a unified and secure smart home ecosystem l
 
 ## 🔧 Technologies
 
-- 📣 Language: Golang
-- 🌐 Web UI Framework: 
-- 📖 Database: Mongo DB
+- 📣 Languages: Golang, JavaScript, C++, CSS/HTML
+- 🌐 Web UI Framework: React JS Library
+- 📖 Database: Mongo Database
 - 🗝️ Authentication: Token-based for both users and web services
 - Version Control: Git
 
 ## 🔠 Key Elements 
 
-- 
-- 
-- 
+- React-based web application designed to simulate a smart home system, enabling users to monitor and control various devices and users.
+- Restful API to handle and authenticate front-end requests as well as facilitate DAL functionality.
+- Database Access Layer to interface database and update IoT devices.
+- Zigbee Network to facilitate secure communication between Raspberry Pis an associated devices.
+- AES BlockChain to ensure data integrity, security, and decentralization of device communication.
 
 ## 🛠 Setup and Configuration
 
@@ -38,18 +40,19 @@ Our mission is to design and develop a unified and secure smart home ecosystem l
 - ....list which file has the setup
 
 ## 💼 Data Access Layer (DAL)
+- CRUD (CREATE, READ, UPDATE, DELETE) operations for users and devices within a smart home system
+- Update functionality to change IoT device states via message serialization and broadcasting.
+- IoT device state changes are logged and retrievable
 
-- 🔒 
-- 
+## ⏰ Logging📝
 
-## ⏰ Logging
-
-- 📝  Logs: 
+- All IoT device updates are logged for monitoring, analysis, and auditing purposes.
+- Logged data is stored within a database collection for retrieval from the API.
 
 ## 📇 Database
-
-- 
-- 
+- Contains user collection comprised of name, role, and login credentials.
+- Stores various device collections which correspond with IoT devices.
+- Log collection to track IoT device updates.
 
 ## 🖥 Development Environment
 

@@ -1,0 +1,71 @@
+name: Build Go Binary for Raspberry Pi 3,4
+
+on:
+  push:
+    branches:
+      - main
+      - middleware-be
+      - security
+      - network-traffic-analysis
+      - iot-be
+      - front-end
+  pull_request:
+    branches:
+      - main
+      - middleware-be
+      - security
+      - network-traffic-analysis
+      - iot-be
+      - front-end
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04-arm64 #ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-linux-gnueabihf libc6-armhf-cross libc6-dev-armhf-cross libpcap-dev
+
+      - name: Get Short SHA
+        id: slug
+        run: echo "::set-output name=sha7::$(echo ${{ github.sha }} | cut -c1-7)"
+
+      - name: Build for Raspberry Pi 3
+        run: |
+          sudo apt install -y libpcap-dev
+          file_name=("api.go" "main.go")
+          folder=("bam-api" "blockchain")
+          len=${#folder[@]}
+          for ((i = 0; i < len; i++)); do 
+            env GOOS=linux GOARCH=arm GOARM=7 go build -o "${folder[i]}_pi3_${{ steps.slug.outputs.sha7 }}" "${folder[i]}/${file_name[i]}"
+          done
+
+      - name: Build for Raspberry Pi 4
+        run: |
+          sudo apt install -y libpcap-dev
+          file_name=("api.go" "main.go")
+          folder=("bam-api" "blockchain")
+          len=${#folder[@]}
+          for ((i = 0; i < len; i++)); do 
+            env GOOS=linux GOARCH=arm64 go build -o "${folder[i]}_pi4_${{ steps.slug.outputs.sha7 }}" "${folder[i]}/${file_name[i]}"
+          done
+
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: smarthome_artifacts
+          path: |
+            bam-api_pi3_${{ steps.slug.outputs.sha7 }}
+            bam-api_pi4_${{ steps.slug.outputs.sha7 }}
+            blockchain_pi3_${{ steps.slug.outputs.sha7 }}
+            blockchain_pi4_${{ steps.slug.outputs.sha7 }}

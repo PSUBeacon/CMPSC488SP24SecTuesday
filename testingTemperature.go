@@ -1,50 +1,52 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
-	"github.com/d2r2/go-dht"
+	"io/ioutil"
 	"log"
+	"time"
+
+	"github.com/d2r2/go-dht"
+	"github.com/stianeikeland/go-rpio/v4"
 )
 
 func main() {
-	pinNumber := 4 // GPIO pin connected to DHT22
+	// Redirect all log output to ioutil.Discard, effectively silencing all logs
+	log.SetOutput(ioutil.Discard)
 
-	// Use the ReadDHT22SensorData function to get temperature and humidity
-	temperature, humidity, err := ReadDHT22SensorData(pinNumber)
-	if err != nil {
-		log.Fatalf("Error reading sensor data: %v", err)
+	// Initialize GPIO
+	if err := rpio.Open(); err != nil {
+		fmt.Println("Failed to open GPIO:", err)
+		return // Exit if unable to open GPIO, using fmt.Println to output the error
 	}
+	defer func() {
+		err := rpio.Close()
+		if err != nil {
+			fmt.Println("Failed to close GPIO:", err)
+		}
+	}()
 
-	// Print temperature and humidity
-	fmt.Printf("Temperature: %.2f°F\n", (temperature*9/5)+32)
-	fmt.Printf("Humidity: %.2f%%\n", humidity)
-}
-
-func ReadDHT22SensorData(pinNumber int) (float64, float64, error) {
-	// Temporarily redirect log output to suppress DEBUG and WARN messages
-	originalLogger := log.Default()
-	defer log.SetOutput(originalLogger.Writer())
-
-	var logBuffer bytes.Buffer
-	log.SetOutput(&logBuffer)
-
-	// Initialize the DHT22 sensor
+	// Define your DHT sensor type and GPIO pin
 	sensorType := dht.DHT22
+	pinNumber := 4 // Use the BCM pin number connected to your DHT22 sensor
 
-	// Read data from the sensor
-	temp, hum, _, err := dht.ReadDHTxxWithRetry(sensorType, pinNumber, false, 10)
+	// Prepare the GPIO pin (optional, since go-dht handles GPIO)
+	pin := rpio.Pin(pinNumber)
+	pin.Output()                // Set pin to output mode
+	pin.High()                  // Set pin high (DHT22 requires pull-up resistor)
+	time.Sleep(1 * time.Second) // Stabilize sensor
+
+	// Switch back to input mode before reading (go-dht manages this internally)
+	pin.Input()
+
+	// Now, read from the DHT22 sensor using go-dht
+	temperature, humidity, _, err := dht.ReadDHTxxWithRetry(sensorType, pinNumber, false, 10)
 	if err != nil {
-		return 0, 0, fmt.Errorf("failed to read from DHT22 sensor: %w", err)
+		fmt.Println("Failed to read from DHT22 sensor:", err)
+		return // Exit if there was an error reading from the sensor, using fmt.Println to output the error
 	}
 
-	// Convert float32 to float64
-	temperature := float64(temp)
-	humidity := float64(hum)
-
-	// Process the log buffer if necessary (e.g., checking for critical errors)
-	// Example: log.Println(logBuffer.String())
-
-	// Return the temperature and humidity readings as float64
-	return temperature, humidity, nil
+	// Output the results
+	fmt.Printf("Temperature: %.2f°C\n", temperature)
+	fmt.Printf("Humidity: %.2f%%\n", humidity)
 }

@@ -1,0 +1,132 @@
+.thermostat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /*transform: scale(1.5); !* 25% bigger *!*/
+    transform-origin: top center;
+    min-width: 0;
+}
+
+.thermostat-dial {
+    width: 200px;
+    height: 200px;
+}
+
+.dial-background {
+    fill: #242020;
+}
+
+.dial-progress-cool {
+    fill: #1c8bf1;
+}
+
+.dial-progress-heat {
+    fill: #df5616
+}
+
+.dial-progress-off {
+    fill: #242020;
+}
+
+
+.temperature-text {
+    font-size: 24px;
+    font-weight: bold;
+    text-anchor: middle;
+    fill: white;
+}
+
+.dial-tick {
+    stroke: white;
+    stroke-width: 1;
+}
+
+.temperature-controls {
+    margin-top: 20px;
+}
+
+.temperature-button {
+    font-size: 18px;
+    padding: 5px 15px;
+    margin: 0 5px;
+    border: none;
+    background-color: #1c8bf1;
+    color: white;
+    cursor: pointer;
+}
+
+.mode-toggle {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.mode-button {
+    background-color: #ddd;
+    border: none;
+    color: #666;
+    padding: 8px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.mode-button.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.mode-button:not(.active):hover {
+    background-color: #ccc;
+}
+
+.fan-speed-toggle {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.fan-speed-button {
+    background-color: #ddd;
+    border: none;
+    color: #666;
+    padding: 8px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.fan-speed-button.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.fan-speed-button:not(.active):hover {
+    background-color: #ccc;
+}
+
+.thermostat-container {
+    transform: scale(1.50); /* 25% bigger */
+    transform-origin: top left;
+}
+
+.temperature-slider {
+    width: 200px;
+    margin: 0 10px;
+}
+
+.temperature-display {
+    font-size: 24px;
+    font-weight: bold;
+    margin-left: 10px;
+}

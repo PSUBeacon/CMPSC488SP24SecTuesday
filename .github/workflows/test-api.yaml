@@ -1,0 +1,54 @@
+name: Test API
+
+on:
+  push:
+    branches:
+      - main
+      - iot-back
+      - tests
+
+jobs:
+  func_tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Restore MongoDB backup
+        run: |
+          docker run --name smarthomedb -d -p 27017:27017 -v ./db-schema:/backup mongo:4.4.14
+          docker exec smarthomedb mongorestore /backup/
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-linux-gnueabihf libc6-armhf-cross libc6-dev-armhf-cross
+
+      - name: Get Short SHA
+        id: slug
+        run: echo "::set-output name=sha7::$(echo ${{ github.sha }} | cut -c1-7)"
+
+      - name: Build for Tests
+        run: |
+          sudo apt install -y libpcap-dev
+          file_name=("api.go")
+          folder=("bam-api")
+          len=${#folder[@]}
+          for ((i = 0; i < len; i++)); do 
+            go build "${folder[i]}/${file_name[i]}"
+          done
+
+      - name: Run Binary
+        run: | 
+          sudo ./api & 
+          echo "API started"
+
+      - name: Run Functional Tests
+        run: |
+          go test -v ./tests/...

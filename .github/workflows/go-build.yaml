@@ -20,7 +20,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04-arm64 #ubuntu-latest
 
     steps:
       - name: Checkout repository
@@ -34,7 +34,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc-arm-linux-gnueabihf libc6-armhf-cross libc6-dev-armhf-cross
+          sudo apt-get install -y gcc-arm-linux-gnueabihf libc6-armhf-cross libc6-dev-armhf-cross libpcap-dev
 
       - name: Get Short SHA
         id: slug
@@ -42,6 +42,7 @@ jobs:
 
       - name: Build for Raspberry Pi 3
         run: |
+          sudo apt install -y libpcap-dev
           file_name=("api.go" "main.go")
           folder=("bam-api" "blockchain")
           len=${#folder[@]}
@@ -51,6 +52,7 @@ jobs:
 
       - name: Build for Raspberry Pi 4
         run: |
+          sudo apt install -y libpcap-dev
           file_name=("api.go" "main.go")
           folder=("bam-api" "blockchain")
           len=${#folder[@]}

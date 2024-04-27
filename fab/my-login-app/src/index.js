@@ -1,18 +1,23 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import './CSS/index.css';
+import App from './JS/App';
+import reportWebVitals from './JS/reportWebVitals';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './login.css';
-import './Dashboard.css';
-import './Appliances.css';
+import './CSS/login.css';
+import './CSS/Dashboard.css';
+import './CSS/Appliances.css';
+import './CSS/App.css'
+
+import './CSS/Header.css'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+    <React.StrictMode>
+        <div className="App">
+            <App/>
+        </div>
+    </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

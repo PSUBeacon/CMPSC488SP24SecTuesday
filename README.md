@@ -59,6 +59,48 @@ Our mission is to design and develop a unified and secure smart home ecosystem l
 - 🛠 IDE: [JetBrains GoLand](https://www.jetbrains.com/go/) 
 - ...specify the file that has the instructions to set up the dev env 
 
+## 🛠 Deployment and CI/CD Workflow
+
+### Build Workflows
+
+- The repository is configured with build workflows to compile binary files and store them as zipped artifacts in the GitHub Actions artifact store.
+- Locations of the build files:
+  - For the Golang backend: [go-build.yaml](https://github.com/PSUBeacon/CMPSC488SP24SecTuesday/blob/main/.github/workflows/go-build.yaml)
+  - For the React frontend: [fe-build.yaml](https://github.com/PSUBeacon/CMPSC488SP24SecTuesday/blob/main/.github/workflows/fe-build.yaml)
+
+We utilize cross-platform compilation to compile the backend code for both Raspberry PI 3 and Raspberry PI 4 versions.
+
+#### Build for Raspberry PI 3
+
+- To build the binary file for Raspberry PI 3, we use the following flags with `go build`: `GOOS=linux GOARCH=arm GOARM=7`
+
+#### Build for Raspberry PI 4
+
+- To build the binary file for Raspberry PI 4, we use the following flags with `go build`: `GOOS=linux GOARCH=arm64`
+
+#### Service Deployment
+
+- GitHub Actions is configured to SSH into machines using IP addresses stored in the Secrets storage. It copies artifacts to these end machines using an SSH key, which is also located in the Secrets store.
+
+### Service Testing
+
+#### Test Workflow
+
+- The repository has a test workflow configured to test the software using GitHub Actions.
+- Location of the test workflow files:
+  - For the Golang backend: [test-api.yaml](https://github.com/PSUBeacon/CMPSC488SP24SecTuesday/blob/main/.github/workflows/test-api.yaml)
+
+#### Testing Details
+
+- GitHub Actions is used to run automated tests of the software.
+- The build pipeline performs the following tasks:
+  - Spins up a MongoDB server.
+  - Imports database definitions into the MongoDB server running within a container on GitHub Actions.
+  - Builds and runs binaries in the container.
+  - Executes API requests to test various endpoints and overall software functionality.
+  - Utilizes the Testify library to facilitate writing and running tests.
+
+
 ## 🎙️ Communication
 
 - 📪 Communication Platform: All team communications will be managed via MS Teams.

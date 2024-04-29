@@ -30,7 +30,7 @@ func SetBrightness(brightness int) {
 	}
 	gocode.DrawLightbulb(9, 4, 10, brightness)
 	time.Sleep(3 * time.Second)
-	gocode.ClearMatrix(9, 4, 10)
+	gocode.TurnOffMatrix(9, 4, 10)
 	GlobBrightness = brightness
 	gocode.SetIntensity(9, 4, 10, brightness)
 	fmt.Printf("%s brightness is set to %s\n", brightness)

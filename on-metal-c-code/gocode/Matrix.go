@@ -142,7 +142,7 @@ func drawLock(dinPin, csPin, clkPin rpio.Pin, brightness int) {
 		sendData(csPin, dinPin, clkPin, 0x0A, byte(brightness))
 	}
 	time.Sleep(2 * time.Second)
-	ClearMatrix(csPin, dinPin, clkPin)
+	//ClearMatrix(csPin, dinPin, clkPin)
 }
 
 func drawH(dinPin, csPin, clkPin rpio.Pin, brightness int) {

@@ -220,6 +220,7 @@ func MatrixStatus(dinPin, csPin, clkPin rpio.Pin, status bool, brightness int) {
 		TurnOffMatrix(dinPin, csPin, clkPin)
 	}
 	if status == true {
+		TurnOnMatrix(dinPin, csPin, clkPin)
 		SetIntensity(dinPin, csPin, clkPin, brightness)
 	}
 }

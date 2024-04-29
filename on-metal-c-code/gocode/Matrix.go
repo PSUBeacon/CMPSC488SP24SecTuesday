@@ -215,42 +215,12 @@ func drawA(dinPin, csPin, clkPin rpio.Pin) {
 }
 
 func MatrixStatus(dinPin, csPin, clkPin rpio.Pin, status bool, brightness int) {
-	if err := rpio.Open(); err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
-		os.Exit(1)
-	}
-	defer func() {
-		err := rpio.Close()
-		if err != nil {
-
-		}
-	}()
-
-	dinPin.Output()
-	csPin.Output()
-	clkPin.Output()
-	initializeMatrix(dinPin, csPin, clkPin)
-
-	//drawLock(dinPin, csPin, clkPin, 5)
 
 	if status == false {
-		ClearMatrix(csPin, dinPin, clkPin)
+		TurnOffMatrix(dinPin, csPin, clkPin)
 	}
 	if status == true {
-		OnPattern := []byte{
-			0b11111111,
-			0b11111111,
-			0b11111111,
-			0b11111111,
-			0b11111111,
-			0b11111111,
-			0b11111111,
-			0b11111111,
-		}
-		for row, pattern := range OnPattern {
-			//fmt.Println("got to send data")
-			sendData(csPin, dinPin, clkPin, byte(row+1), pattern)
-		}
+		TurnOnMatrix(dinPin, csPin, clkPin)
 	}
 }
 
@@ -274,6 +244,32 @@ func TurnOffMatrix(dinPin, csPin, clkPin rpio.Pin) {
 		0b00000000,
 		0b00000000,
 		0b00000000,
+	}
+	for row, pattern := range OnPattern {
+		sendData(csPin, dinPin, clkPin, byte(row+1), pattern)
+	}
+}
+
+func TurnOnMatrix(dinPin, csPin, clkPin rpio.Pin) {
+	if err := rpio.Open(); err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
+		os.Exit(1)
+	}
+	defer rpio.Close()
+
+	dinPin.Output()
+	csPin.Output()
+	clkPin.Output()
+	initializeMatrix(dinPin, csPin, clkPin)
+	OnPattern := []byte{
+		0b11111111,
+		0b11111111,
+		0b11111111,
+		0b11111111,
+		0b11111111,
+		0b11111111,
+		0b11111111,
+		0b11111111,
 	}
 	for row, pattern := range OnPattern {
 		sendData(csPin, dinPin, clkPin, byte(row+1), pattern)

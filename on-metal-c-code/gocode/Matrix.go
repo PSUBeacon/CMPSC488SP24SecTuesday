@@ -282,17 +282,6 @@ func TurnOffMatrix(dinPin, csPin, clkPin rpio.Pin) {
 
 // Clear the LED matrix
 func ClearMatrix(csPin, dinPin, clkPin rpio.Pin) {
-	if err := rpio.Open(); err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
-		os.Exit(1)
-	}
-	defer rpio.Close()
-
-	dinPin.Output()
-	csPin.Output()
-	clkPin.Output()
-	initializeMatrix(dinPin, csPin, clkPin)
-
 	for row := 0; row < 8; row++ {
 		sendData(csPin, dinPin, clkPin, byte(row+1), 0x00)
 	}

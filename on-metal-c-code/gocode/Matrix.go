@@ -219,7 +219,12 @@ func MatrixStatus(dinPin, csPin, clkPin rpio.Pin, status bool, brightness int) {
 		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
 		os.Exit(1)
 	}
-	defer rpio.Close()
+	defer func() {
+		err := rpio.Close()
+		if err != nil {
+
+		}
+	}()
 
 	dinPin.Output()
 	csPin.Output()
@@ -243,6 +248,7 @@ func MatrixStatus(dinPin, csPin, clkPin rpio.Pin, status bool, brightness int) {
 			0b11111111,
 		}
 		for row, pattern := range OnPattern {
+			fmt.Println("got to send data")
 			sendData(csPin, dinPin, clkPin, byte(row+1), pattern)
 		}
 	}

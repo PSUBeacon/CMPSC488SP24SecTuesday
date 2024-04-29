@@ -30,7 +30,7 @@ func UpdateStatus(newStatus bool) {
 	// Unmarshal the JSON data into a Thermostat struct
 	var bright light
 	if err := json.Unmarshal(jsonlightData, &bright); err != nil {
-		fmt.Println("Error unmarshalling security data:", err)
+		fmt.Println("Error unmarshalling lighting data:", err)
 		return
 	}
 

@@ -234,20 +234,7 @@ func MatrixStatus(dinPin, csPin, clkPin rpio.Pin, status bool, brightness int) {
 	//drawLock(dinPin, csPin, clkPin, 5)
 
 	if status == false {
-		OffPattern := []byte{
-			0b00000000,
-			0b00000000,
-			0b00000000,
-			0b00000000,
-			0b00000000,
-			0b00000000,
-			0b00000000,
-			0b00000000,
-		}
-		for row, pattern := range OffPattern {
-			//fmt.Println("got to send data")
-			sendData(csPin, dinPin, clkPin, byte(row+1), pattern)
-		}
+		ClearMatrix(csPin, dinPin, clkPin)
 	}
 	if status == true {
 		OnPattern := []byte{
@@ -295,7 +282,18 @@ func MatrixStatus(dinPin, csPin, clkPin rpio.Pin, status bool, brightness int) {
 
 // Clear the LED matrix
 func ClearMatrix(csPin, dinPin, clkPin rpio.Pin) {
-	for row := 0; row < 8; row++ {
-		sendData(csPin, dinPin, clkPin, byte(row+1), 0x00)
+	OffPattern := []byte{
+		0b00000000,
+		0b00000000,
+		0b00000000,
+		0b00000000,
+		0b00000000,
+		0b00000000,
+		0b00000000,
+		0b00000000,
+	}
+	for row, pattern := range OffPattern {
+		//fmt.Println("got to send data")
+		sendData(csPin, dinPin, clkPin, byte(row+1), pattern)
 	}
 }

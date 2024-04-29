@@ -53,6 +53,7 @@ func SetIntensity(dinPin, csPin, clkPin rpio.Pin, intensity int) {
 
 // Send data to the LED matrix
 func sendData(csPin, dinPin, clkPin rpio.Pin, address, data byte) {
+
 	csPin.Low()
 	sendByte(dinPin, clkPin, address)
 	sendByte(dinPin, clkPin, data)
@@ -61,6 +62,7 @@ func sendData(csPin, dinPin, clkPin rpio.Pin, address, data byte) {
 
 // Send a single byte of data
 func sendByte(dinPin, clkPin rpio.Pin, data byte) {
+
 	for i := 7; i >= 0; i-- {
 		clkPin.Low()
 		if (data & (1 << i)) != 0 {
@@ -274,6 +276,16 @@ func TurnOffMatrix(dinPin, csPin, clkPin rpio.Pin) {
 
 // Clear the LED matrix
 func ClearMatrix(csPin, dinPin, clkPin rpio.Pin) {
+	if err := rpio.Open(); err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
+		os.Exit(1)
+	}
+	defer rpio.Close()
+
+	dinPin.Output()
+	csPin.Output()
+	clkPin.Output()
+	initializeMatrix(dinPin, csPin, clkPin)
 
 	for row := 0; row < 8; row++ {
 		sendData(csPin, dinPin, clkPin, byte(row+1), 0x00)

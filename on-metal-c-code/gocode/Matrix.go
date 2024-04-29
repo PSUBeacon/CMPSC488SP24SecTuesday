@@ -100,12 +100,12 @@ func DrawLightbulb(dinPin, csPin, clkPin rpio.Pin, brightness int) {
 	//}
 	lightbulbPattern := []byte{
 		0b00000000,
-		0b00011110,
-		0b00111111,
+		0b01111000,
+		0b11111100,
 		0b11111111,
 		0b11111111,
-		0b00111111,
-		0b00011110,
+		0b11111100,
+		0b01111000,
 		0b00000000,
 	}
 	for row, pattern := range lightbulbPattern {

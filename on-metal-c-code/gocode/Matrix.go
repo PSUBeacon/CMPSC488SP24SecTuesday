@@ -234,7 +234,20 @@ func MatrixStatus(dinPin, csPin, clkPin rpio.Pin, status bool, brightness int) {
 	//drawLock(dinPin, csPin, clkPin, 5)
 
 	if status == false {
-		ClearMatrix(csPin, dinPin, clkPin)
+		OffPattern := []byte{
+			0b00000000,
+			0b00000000,
+			0b00000000,
+			0b00000000,
+			0b00000000,
+			0b00000000,
+			0b00000000,
+			0b00000000,
+		}
+		for row, pattern := range OffPattern {
+			//fmt.Println("got to send data")
+			sendData(csPin, dinPin, clkPin, byte(row+1), pattern)
+		}
 	}
 	if status == true {
 		OnPattern := []byte{
@@ -248,37 +261,37 @@ func MatrixStatus(dinPin, csPin, clkPin rpio.Pin, status bool, brightness int) {
 			0b11111111,
 		}
 		for row, pattern := range OnPattern {
-			fmt.Println("got to send data")
+			//fmt.Println("got to send data")
 			sendData(csPin, dinPin, clkPin, byte(row+1), pattern)
 		}
 	}
 }
 
-func TurnOffMatrix(dinPin, csPin, clkPin rpio.Pin) {
-	if err := rpio.Open(); err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
-		os.Exit(1)
-	}
-	defer rpio.Close()
-
-	dinPin.Output()
-	csPin.Output()
-	clkPin.Output()
-	initializeMatrix(dinPin, csPin, clkPin)
-	OnPattern := []byte{
-		0b00000000,
-		0b00000000,
-		0b00000000,
-		0b00000000,
-		0b00000000,
-		0b00000000,
-		0b00000000,
-		0b00000000,
-	}
-	for row, pattern := range OnPattern {
-		sendData(csPin, dinPin, clkPin, byte(row+1), pattern)
-	}
-}
+//func TurnOffMatrix(dinPin, csPin, clkPin rpio.Pin) {
+//	if err := rpio.Open(); err != nil {
+//		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
+//		os.Exit(1)
+//	}
+//	defer rpio.Close()
+//
+//	dinPin.Output()
+//	csPin.Output()
+//	clkPin.Output()
+//	initializeMatrix(dinPin, csPin, clkPin)
+//	OnPattern := []byte{
+//		0b00000000,
+//		0b00000000,
+//		0b00000000,
+//		0b00000000,
+//		0b00000000,
+//		0b00000000,
+//		0b00000000,
+//		0b00000000,
+//	}
+//	for row, pattern := range OnPattern {
+//		sendData(csPin, dinPin, clkPin, byte(row+1), pattern)
+//	}
+//}
 
 // Clear the LED matrix
 func ClearMatrix(csPin, dinPin, clkPin rpio.Pin) {

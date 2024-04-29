@@ -74,6 +74,16 @@ func sendByte(dinPin, clkPin rpio.Pin, data byte) {
 
 // Drawing functions
 func DrawLightbulb(dinPin, csPin, clkPin rpio.Pin, brightness int) {
+	if err := rpio.Open(); err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
+		os.Exit(1)
+	}
+	defer rpio.Close()
+
+	dinPin.Output()
+	csPin.Output()
+	clkPin.Output()
+	initializeMatrix(dinPin, csPin, clkPin)
 
 	ClearMatrix(csPin, dinPin, clkPin)
 	//lightbulbPattern := []byte{
@@ -101,7 +111,7 @@ func DrawLightbulb(dinPin, csPin, clkPin rpio.Pin, brightness int) {
 		sendData(csPin, dinPin, clkPin, 0x0A, byte(brightness))
 	}
 	time.Sleep(2 * time.Second)
-	ClearMatrix(csPin, dinPin, clkPin)
+	//ClearMatrix(csPin, dinPin, clkPin)
 }
 
 func drawLock(dinPin, csPin, clkPin rpio.Pin, brightness int) {

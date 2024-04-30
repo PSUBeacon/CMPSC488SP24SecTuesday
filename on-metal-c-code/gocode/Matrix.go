@@ -154,14 +154,14 @@ func DrawA(dinPin, csPin, clkPin rpio.Pin, brightness int) {
 
 	ClearMatrix(csPin, dinPin, clkPin)
 	aPattern := []byte{
-		0b00011000,
-		0b00111100,
-		0b01100110,
-		0b01100110,
-		0b01111110,
-		0b01100110,
-		0b01100110,
-		0b01100110,
+		0b01100000,
+		0b01100011,
+		0b01100111,
+		0b01101100,
+		0b01111100,
+		0b01101100,
+		0b01100011,
+		0b01100011,
 	}
 	for row, pattern := range aPattern {
 		sendData(csPin, dinPin, clkPin, byte(row+1), pattern)

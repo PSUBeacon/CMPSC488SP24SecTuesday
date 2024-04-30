@@ -418,9 +418,7 @@ func handleFunctionality() {
 				}
 			}
 		}
-		if itsme == false {
-			lighting.FlashSymbol("App")
-		}
+		lighting.FlashSymbol("App")
 	}
 	return
 }

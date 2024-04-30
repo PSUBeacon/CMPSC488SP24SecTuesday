@@ -441,5 +441,5 @@ func main() {
 		go gocode.InitKeypad()
 	}
 	BlockReceiver()
-	rpio.Close()
+	//rpio.Close()
 }

@@ -151,6 +151,12 @@ func BlockReceiver() {
 				}
 				//fmt.Println("Got to functionality")
 				go handleFunctionality()
+
+				if err := rpio.Open(); err != nil {
+					fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
+					os.Exit(1)
+				}
+
 				continue
 
 			}
@@ -183,6 +189,11 @@ func BlockReceiver() {
 					}
 					//fmt.Println("Got to functionality")
 					go handleFunctionality()
+
+					if err := rpio.Open(); err != nil {
+						fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
+						os.Exit(1)
+					}
 				}
 				if verify == false {
 					fmt.Println("Invalid Block")

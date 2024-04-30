@@ -16,6 +16,8 @@ const (
 
 // SetFanSpeed controls the fan speed using software PWM
 func SetFanSpeed(pin rpio.Pin, speed int) {
+	rpio.Close()
+
 	if err := rpio.Open(); err != nil {
 		fmt.Println("Unable to open GPIO:", err)
 		os.Exit(1)
@@ -23,7 +25,6 @@ func SetFanSpeed(pin rpio.Pin, speed int) {
 	defer rpio.Close()
 
 	pin.Output()
-	pin.Low()
 
 	if speed == 0 {
 		TurnOffFan(pin)

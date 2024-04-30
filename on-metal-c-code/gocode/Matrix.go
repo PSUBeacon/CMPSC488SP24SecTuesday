@@ -94,7 +94,7 @@ func DrawLightbulb(dinPin, csPin, clkPin rpio.Pin, brightness int) {
 	//ClearMatrix(csPin, dinPin, clkPin)
 }
 
-func drawLock(dinPin, csPin, clkPin rpio.Pin, brightness int) {
+func DrawLock(dinPin, csPin, clkPin rpio.Pin, brightness int) {
 
 	dinPin.Output()
 	csPin.Output()
@@ -121,7 +121,7 @@ func drawLock(dinPin, csPin, clkPin rpio.Pin, brightness int) {
 	//ClearMatrix(csPin, dinPin, clkPin)
 }
 
-func drawH(dinPin, csPin, clkPin rpio.Pin, brightness int) {
+func DrawH(dinPin, csPin, clkPin rpio.Pin, brightness int) {
 
 	dinPin.Output()
 	csPin.Output()
@@ -145,7 +145,7 @@ func drawH(dinPin, csPin, clkPin rpio.Pin, brightness int) {
 	}
 }
 
-func drawA(dinPin, csPin, clkPin rpio.Pin) {
+func DrawA(dinPin, csPin, clkPin rpio.Pin, brightness int) {
 
 	dinPin.Output()
 	csPin.Output()
@@ -165,6 +165,7 @@ func drawA(dinPin, csPin, clkPin rpio.Pin) {
 	}
 	for row, pattern := range aPattern {
 		sendData(csPin, dinPin, clkPin, byte(row+1), pattern)
+		sendData(csPin, dinPin, clkPin, 0x0A, byte(brightness))
 	}
 }
 

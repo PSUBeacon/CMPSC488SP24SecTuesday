@@ -81,6 +81,50 @@ func SetBrightness(brightness int) {
 
 }
 
+func FlashSymbol(Symbol string) {
+	jsonlightData, err := os.ReadFile("lighting/lighting.json")
+	if err != nil {
+		fmt.Println("Error reading key data:", err)
+		return
+	}
+	//fmt.Println("Thermostat data, ", jsonThermData)
+	// Unmarshal the JSON data into a Thermostat struct
+	var bright light
+	if err := json.Unmarshal(jsonlightData, &bright); err != nil {
+		fmt.Println("Error unmarshalling security data:", err)
+		return
+	}
+	if Symbol == "Bulb" {
+		gocode.DrawLightbulb(9, 4, 10, bright.Brightness)
+	}
+	if Symbol == "HVAC" {
+		gocode.DrawH(9, 4, 10, bright.Brightness)
+	}
+	if Symbol == "Lock" {
+		gocode.DrawLock(9, 4, 10, bright.Brightness)
+	}
+	if Symbol == "App" {
+		gocode.DrawA(9, 4, 10, bright.Brightness)
+	}
+	time.Sleep(3 * time.Second)
+	gocode.TurnOffMatrix(9, 4, 10)
+	gocode.TurnOnMatrix(9, 4, 10)
+
+	gocode.SetIntensity(9, 4, 10, bright.Brightness)
+	fmt.Printf("%s brightness is set to %s\n", bright.Brightness)
+
+	lightJSON, err := json.MarshalIndent(bright, "", "	")
+	if err != nil {
+		fmt.Println("Error marshalling lighting data:", err)
+		return
+	}
+
+	err = os.WriteFile("lighting/lighting.json", lightJSON, 0644)
+	if err != nil {
+		panic(err)
+	}
+}
+
 //func drawBulblTimer(dinPin, csPin, clkPin rpio.Pin) {
 //	gocode.DrawLightbulb(dinPin, csPin, clkPin)
 //	time.Sleep(3 * time.Second)

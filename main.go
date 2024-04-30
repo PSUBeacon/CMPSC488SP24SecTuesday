@@ -289,6 +289,7 @@ func handleFunctionality() {
 				}
 			}
 		}
+		lighting.FlashSymbol("Bulb")
 	}
 	if messageData.Name == "HVAC" {
 		for _, group := range [][]dal.Pi{UUIDsData.Hvac} {
@@ -320,6 +321,7 @@ func handleFunctionality() {
 				}
 			}
 		}
+		lighting.FlashSymbol("HVAC")
 	}
 
 	if messageData.Name == "Security" {
@@ -347,7 +349,9 @@ func handleFunctionality() {
 				}
 			}
 		}
+		lighting.FlashSymbol("Lock")
 	}
+
 	if messageData.Name == "Appliances" {
 		for _, group := range [][]dal.Pi{UUIDsData.Appliances} {
 			for _, Pi := range group {
@@ -386,18 +390,7 @@ func handleFunctionality() {
 			}
 		}
 	}
-	if messageData.Name == "Energy" {
-		for _, group := range [][]dal.Pi{UUIDsData.Energy} {
-			for _, Pi := range group {
-				if Pi.UUID == messageData.UUID {
-					if messageData.Function == "Status" {
-						//energy.,UpdateAlarmStatus(messageData.StatusChange)
-					}
-				}
-			}
-		}
-
-	}
+	lighting.FlashSymbol("App")
 	return
 }
 
@@ -413,6 +406,7 @@ func main() {
 	}
 	assignedPiNum := os.Getenv("PI_NUM")
 	piNum, _ := strconv.Atoi(assignedPiNum)
+
 	if piNum == 13 {
 		go gocode.InitKeypad()
 	}

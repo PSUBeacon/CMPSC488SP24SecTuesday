@@ -291,6 +291,7 @@ func handleFunctionality() {
 		}
 		lighting.FlashSymbol("Bulb")
 	}
+
 	if messageData.Name == "HVAC" {
 		for _, group := range [][]dal.Pi{UUIDsData.Hvac} {
 			for _, Pi := range group {
@@ -389,8 +390,8 @@ func handleFunctionality() {
 				}
 			}
 		}
+		lighting.FlashSymbol("App")
 	}
-	lighting.FlashSymbol("App")
 	return
 }
 

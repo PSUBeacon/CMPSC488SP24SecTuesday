@@ -15,6 +15,7 @@ const (
 )
 
 type light struct {
+	Status     string
 	Brightness int
 }
 
@@ -108,10 +109,13 @@ func FlashSymbol(Symbol string) {
 	}
 	time.Sleep(3 * time.Second)
 	gocode.TurnOffMatrix(9, 4, 10)
-	gocode.TurnOnMatrix(9, 4, 10)
 
-	gocode.SetIntensity(9, 4, 10, bright.Brightness)
-	fmt.Printf("%s brightness is set to %s\n", bright.Brightness)
+	if bright.Status == "On" {
+		gocode.TurnOnMatrix(9, 4, 10)
+
+		gocode.SetIntensity(9, 4, 10, bright.Brightness)
+		fmt.Printf("%s brightness is set to %s\n", bright.Brightness)
+	}
 
 	lightJSON, err := json.MarshalIndent(bright, "", "	")
 	if err != nil {

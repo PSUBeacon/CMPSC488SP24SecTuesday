@@ -245,6 +245,13 @@ func handleFunctionality() {
 		panic(err)
 	}
 
+	err = godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
+	assignedPiNum := os.Getenv("PI_NUM")
+	envPiNum, _ := strconv.Atoi(assignedPiNum)
+
 	var readBlockchain blockchain.Blockchain
 	err = json.Unmarshal(jsonChainData, &readBlockchain)
 	if err != nil {
@@ -274,7 +281,7 @@ func handleFunctionality() {
 	if messageData.Name == "Lighting" {
 		//fmt.Println("Got past the name")
 		for _, Pi := range UUIDsData.Lighting {
-			if Pi.UUID == messageData.UUID {
+			if Pi.UUID == messageData.UUID && Pi.Pinum == envPiNum {
 				//fmt.Println("got past the loop")
 				if messageData.Function == "Status" {
 					if messageData.Change == "false" {
@@ -302,7 +309,7 @@ func handleFunctionality() {
 	if messageData.Name == "HVAC" {
 		for _, group := range [][]dal.Pi{UUIDsData.Hvac} {
 			for _, Pi := range group {
-				if Pi.UUID == messageData.UUID {
+				if Pi.UUID == messageData.UUID && Pi.Pinum == envPiNum {
 					if messageData.Function == "Status" {
 						if messageData.Change == "false" {
 							hvac.UpdateStatus(false, messageData.UUID)
@@ -337,7 +344,7 @@ func handleFunctionality() {
 	if messageData.Name == "Security" {
 		for _, group := range [][]dal.Pi{UUIDsData.Security} {
 			for _, Pi := range group {
-				if Pi.UUID == messageData.UUID {
+				if Pi.UUID == messageData.UUID && Pi.Pinum == envPiNum {
 					if messageData.Function == "Status" {
 						if messageData.Change == "false" {
 							security.UpdateAlarmStatus(false)
@@ -371,7 +378,7 @@ func handleFunctionality() {
 	if messageData.Name == "Appliances" {
 		for _, group := range [][]dal.Pi{UUIDsData.Appliances} {
 			for _, Pi := range group {
-				if Pi.UUID == messageData.UUID {
+				if Pi.UUID == messageData.UUID && Pi.Pinum == envPiNum {
 					if messageData.Function == "Status" {
 						if messageData.Change == "false" {
 							appliances.UpdateStatus(messageData.AppType, false)
@@ -427,7 +434,7 @@ func main() {
 	piNum, _ := strconv.Atoi(assignedPiNum)
 
 	if piNum == 13 {
-		go gocode.InitKeypad()
+		hvac.StartupLCDHVAC()
 	}
 	if piNum == 16 {
 		//hvac.DisplayLCDHVAC("", 0, "")

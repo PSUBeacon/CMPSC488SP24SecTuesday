@@ -153,16 +153,28 @@ func DrawA(dinPin, csPin, clkPin rpio.Pin, brightness int) {
 	initializeMatrix(dinPin, csPin, clkPin)
 
 	ClearMatrix(csPin, dinPin, clkPin)
+	//aPattern := []byte{
+	//	0b00011000,
+	//	0b00111100,
+	//	0b01100110,
+	//	0b01100110,
+	//	0b01111110,
+	//	0b01100110,
+	//	0b01100110,
+	//	0b01100110,
+	//}
+
 	aPattern := []byte{
-		0b01100000,
-		0b01100011,
-		0b01100111,
-		0b01101100,
-		0b01111100,
-		0b01101100,
-		0b01100011,
-		0b01100011,
+		0b00000000,
+		0b11111100,
+		0b11111110,
+		0b00010011,
+		0b00010011,
+		0b11111110,
+		0b11111100,
+		0b00000000,
 	}
+
 	for row, pattern := range aPattern {
 		sendData(csPin, dinPin, clkPin, byte(row+1), pattern)
 		sendData(csPin, dinPin, clkPin, 0x0A, byte(brightness))

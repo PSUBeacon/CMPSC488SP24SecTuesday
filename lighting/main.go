@@ -34,6 +34,22 @@ func UpdateStatus(newStatus bool) {
 		fmt.Println("Error unmarshalling lighting data:", err)
 		return
 	}
+	if newStatus {
+		bright.Status = "On"
+	} else {
+		bright.Status = "Off"
+	}
+
+	lightJSON, err := json.MarshalIndent(bright, "", "	")
+	if err != nil {
+		fmt.Println("Error marshalling lighting data:", err)
+		return
+	}
+
+	err = os.WriteFile("lighting/lighting.json", lightJSON, 0644)
+	if err != nil {
+		panic(err)
+	}
 
 	fmt.Printf("%s is now turned \n", newStatus)
 	gocode.MatrixStatus(9, 4, 10, newStatus, bright.Brightness)

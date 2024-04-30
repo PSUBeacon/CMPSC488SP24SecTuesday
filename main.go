@@ -15,6 +15,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/joho/godotenv"
+	"github.com/stianeikeland/go-rpio/v4"
 	"go.bug.st/serial"
 	"log"
 	"os"
@@ -390,6 +391,12 @@ func handleFunctionality() {
 }
 
 func main() {
+	if err := rpio.Open(); err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
+		os.Exit(1)
+	}
+	defer rpio.Close()
+
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatalf("Error loading .env file: %v", err)

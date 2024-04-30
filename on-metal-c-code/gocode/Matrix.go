@@ -208,11 +208,6 @@ func MatrixStatus(dinPin, csPin, clkPin rpio.Pin, status bool, brightness int) {
 }
 
 func TurnOffMatrix(dinPin, csPin, clkPin rpio.Pin) {
-	if err := rpio.Open(); err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
-		os.Exit(1)
-	}
-	defer rpio.Close()
 
 	dinPin.Output()
 	csPin.Output()
@@ -234,11 +229,6 @@ func TurnOffMatrix(dinPin, csPin, clkPin rpio.Pin) {
 }
 
 func TurnOnMatrix(dinPin, csPin, clkPin rpio.Pin) {
-	if err := rpio.Open(); err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
-		os.Exit(1)
-	}
-	defer rpio.Close()
 
 	dinPin.Output()
 	csPin.Output()

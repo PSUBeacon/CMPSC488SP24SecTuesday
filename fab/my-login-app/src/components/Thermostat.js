@@ -78,7 +78,7 @@ const FanSpeedToggle = ({initialFanSpeed, onFanSpeedChange}) => {
             setIsLocked(true);
             setTimeout(() => {
                 setIsLocked(false);
-            }, 10000);
+            }, 15000);
         }
     };
 

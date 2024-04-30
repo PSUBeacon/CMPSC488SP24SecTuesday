@@ -32,7 +32,7 @@ func SetFanSpeed(pin rpio.Pin, speed int) {
 
 	onTime := time.Duration(speed) * time.Millisecond
 	offTime := 100*time.Millisecond - onTime
-	for i := 0; i < 200; i++ { // Run PWM for a short period
+	for i := 0; i < 130; i++ { // Run PWM for a short period
 		pin.High()
 		time.Sleep(onTime)
 		pin.Low()

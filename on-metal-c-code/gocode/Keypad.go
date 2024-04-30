@@ -223,6 +223,10 @@ func onKeyPress(char rune) {
 
 // Initialize the keypad and start listening for key presses
 func InitKeypad() rune {
+	if err := rpio.Open(); err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
+		os.Exit(1)
+	}
 
 	// GPIO pin numbers for rows and columns
 	rowPins := []int{22, 23, 24, 25}

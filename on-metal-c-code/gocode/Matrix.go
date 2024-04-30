@@ -32,12 +32,6 @@ func initializeMatrix(dinPin, csPin, clkPin rpio.Pin) {
 // Set the intensity (brightness) of the LED matrix
 func SetIntensity(dinPin, csPin, clkPin rpio.Pin, intensity int) {
 
-	if err := rpio.Open(); err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
-		os.Exit(1)
-	}
-	defer rpio.Close()
-
 	dinPin.Output()
 	csPin.Output()
 	clkPin.Output()
@@ -88,16 +82,7 @@ func DrawLightbulb(dinPin, csPin, clkPin rpio.Pin, brightness int) {
 	initializeMatrix(dinPin, csPin, clkPin)
 
 	ClearMatrix(csPin, dinPin, clkPin)
-	//lightbulbPattern := []byte{
-	//	0b00111100,
-	//	0b01111110,
-	//	0b01111110,
-	//	0b01111110,
-	//	0b01111110,
-	//	0b00111100,
-	//	0b00011000,
-	//	0b00011000,
-	//}
+
 	lightbulbPattern := []byte{
 		0b00000000,
 		0b01111000,
@@ -129,24 +114,15 @@ func drawLock(dinPin, csPin, clkPin rpio.Pin, brightness int) {
 	initializeMatrix(dinPin, csPin, clkPin)
 
 	ClearMatrix(csPin, dinPin, clkPin)
-	//lockPattern := []byte{
-	//	0b00111100,
-	//	0b00100100,
-	//	0b01100110,
-	//	0b01111110,
-	//	0b01111110,
-	//	0b01111110,
-	//	0b01111110,
-	//	0b01111110,
-	//}
+
 	lockPattern := []byte{
 		0b00000000,
-		0b11111100,
+		0b00111111,
 		0b11111111,
-		0b11111001,
-		0b11111001,
+		0b10011111,
+		0b10011111,
 		0b11111111,
-		0b11111100,
+		0b00111111,
 		0b00000000,
 	}
 	for row, pattern := range lockPattern {
@@ -226,11 +202,6 @@ func MatrixStatus(dinPin, csPin, clkPin rpio.Pin, status bool, brightness int) {
 }
 
 func TurnOffMatrix(dinPin, csPin, clkPin rpio.Pin) {
-	if err := rpio.Open(); err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
-		os.Exit(1)
-	}
-	defer rpio.Close()
 
 	dinPin.Output()
 	csPin.Output()
@@ -252,11 +223,6 @@ func TurnOffMatrix(dinPin, csPin, clkPin rpio.Pin) {
 }
 
 func TurnOnMatrix(dinPin, csPin, clkPin rpio.Pin) {
-	if err := rpio.Open(); err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
-		os.Exit(1)
-	}
-	defer rpio.Close()
 
 	dinPin.Output()
 	csPin.Output()

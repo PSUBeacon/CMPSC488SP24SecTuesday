@@ -395,7 +395,6 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
 		os.Exit(1)
 	}
-	defer rpio.Close()
 
 	err := godotenv.Load()
 	if err != nil {

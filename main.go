@@ -150,12 +150,12 @@ func BlockReceiver() {
 					panic(err)
 				}
 				//fmt.Println("Got to functionality")
-				go handleFunctionality()
-
 				if err := rpio.Open(); err != nil {
 					fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
 					os.Exit(1)
 				}
+
+				go handleFunctionality()
 
 				continue
 
@@ -188,12 +188,14 @@ func BlockReceiver() {
 						panic(err)
 					}
 					//fmt.Println("Got to functionality")
-					go handleFunctionality()
 
 					if err := rpio.Open(); err != nil {
 						fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
 						os.Exit(1)
 					}
+
+					go handleFunctionality()
+
 				}
 				if verify == false {
 					fmt.Println("Invalid Block")
@@ -417,11 +419,6 @@ func handleFunctionality() {
 }
 
 func main() {
-	if err := rpio.Open(); err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
-		os.Exit(1)
-	}
-
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatalf("Error loading .env file: %v", err)

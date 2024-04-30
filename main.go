@@ -263,7 +263,7 @@ func handleFunctionality() {
 	if err != nil {
 		panic(err)
 	}
-
+	itsme := false
 	messageChange, _ := strconv.Atoi(messageData.Change)
 
 	fmt.Println("Message is: ", messageData)
@@ -278,18 +278,23 @@ func handleFunctionality() {
 					if messageData.Change == "false" {
 						//fmt.Println("inside the status false")
 						lighting.UpdateStatus(false)
+						itsme = true
 					}
 					if messageData.Change == "true" {
 						//fmt.Println("inside the status false")
 						lighting.UpdateStatus(true)
+						itsme = true
 					}
 				}
 				if messageData.Function == "Brightness" {
 					lighting.SetBrightness(messageChange)
+					itsme = true
 				}
 			}
 		}
-		lighting.FlashSymbol("Bulb")
+		if itsme == false {
+			lighting.FlashSymbol("Bulb")
+		}
 	}
 
 	if messageData.Name == "HVAC" {
@@ -299,30 +304,32 @@ func handleFunctionality() {
 					if messageData.Function == "Status" {
 						if messageData.Change == "false" {
 							hvac.UpdateStatus(false, messageData.UUID)
-							//hvac.DisplayLCDHVAC("", 0, "OFF")
+							itsme = true
 						}
 						if messageData.Change == "true" {
 							hvac.UpdateStatus(true, messageData.UUID)
-							//hvac.DisplayLCDHVAC("", 0, "ON")
+							itsme = true
 						}
 					}
 					if messageData.Function == "FanSpeed" {
 						hvac.UpdateFanSpeed(messageChange, messageData.UUID)
-						//hvac.DisplayLCDHVAC("", 0, "ON")
+						itsme = true
 
 					}
 					if messageData.Function == "Temperature" {
 						hvac.UpdateTemperature(messageChange, messageData.UUID)
-						//hvac.DisplayLCDHVAC("", messageChange, "")
+						itsme = true
 					}
 					if messageData.Function == "Mode" {
 						hvac.UpdateMode(messageData.Change, messageData.UUID)
-						//hvac.DisplayLCDHVAC(messageData.Change, 0, "")
+						itsme = true
 					}
 				}
 			}
 		}
-		lighting.FlashSymbol("HVAC")
+		if itsme == false {
+			lighting.FlashSymbol("HVAC")
+		}
 	}
 
 	if messageData.Name == "Security" {
@@ -333,24 +340,30 @@ func handleFunctionality() {
 						if messageData.Change == "false" {
 							security.UpdateAlarmStatus(false)
 							security.DisplayLCDSecurity("Disarmed", "OFF")
+							itsme = true
 						}
 						if messageData.Change == "true" {
 							security.UpdateAlarmStatus(true)
 							security.DisplayLCDSecurity("Armed", "ON")
+							itsme = true
 						}
 					}
 					if messageData.Function == "LockStatus" {
 						if messageData.Change == "false" {
 							security.LockOrUnlock(false)
+							itsme = true
 						}
 						if messageData.Change == "true" {
 							security.LockOrUnlock(true)
+							itsme = true
 						}
 					}
 				}
 			}
 		}
-		lighting.FlashSymbol("Lock")
+		if itsme == false {
+			lighting.FlashSymbol("Lock")
+		}
 	}
 
 	if messageData.Name == "Appliances" {
@@ -360,37 +373,45 @@ func handleFunctionality() {
 					if messageData.Function == "Status" {
 						if messageData.Change == "false" {
 							appliances.UpdateStatus(messageData.AppType, false)
-							fmt.Println("got here")
+							itsme = true
 						}
 						if messageData.Change == "true" {
 							appliances.UpdateStatus(messageData.AppType, true)
-							fmt.Println("got here")
+							itsme = true
 						}
 					}
 					if messageData.Function == "Temperature" {
 						appliances.UpdateTemperature(messageChange)
+						itsme = true
 					}
 					if messageData.Function == "TimerStopTime" {
 						appliances.UpdateTimeStopTime(messageChange)
+						itsme = true
 					}
 					if messageData.Function == "Power" {
 						appliances.UpdatePower(messageChange)
+						itsme = true
 					}
 					if messageData.Function == "EnergySaveMode" {
 						if messageData.Change == "false" {
 							appliances.UpdateStatus(messageData.AppType, false)
+							itsme = true
 						}
 						if messageData.Change == "true" {
 							appliances.UpdateStatus(messageData.AppType, true)
+							itsme = true
 						}
 					}
 					if messageData.Function == "WashTime" {
 						appliances.UpdateWashTime(messageChange)
+						itsme = true
 					}
 				}
 			}
 		}
-		lighting.FlashSymbol("App")
+		if itsme == false {
+			lighting.FlashSymbol("App")
+		}
 	}
 	return
 }

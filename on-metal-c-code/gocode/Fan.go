@@ -23,6 +23,7 @@ func SetFanSpeed(pin rpio.Pin, speed int) {
 	defer rpio.Close()
 
 	pin.Output()
+	pin.Low()
 
 	if speed == 0 {
 		TurnOffFan(pin)

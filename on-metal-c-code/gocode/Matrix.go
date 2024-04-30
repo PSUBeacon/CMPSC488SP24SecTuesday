@@ -1,6 +1,8 @@
 package gocode
 
 import (
+	"fmt"
+	"os"
 	"time"
 
 	"github.com/stianeikeland/go-rpio/v4"
@@ -29,6 +31,12 @@ func initializeMatrix(dinPin, csPin, clkPin rpio.Pin) {
 
 // Set the intensity (brightness) of the LED matrix
 func SetIntensity(dinPin, csPin, clkPin rpio.Pin, intensity int) {
+
+	if err := rpio.Open(); err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
+		os.Exit(1)
+	}
+	defer rpio.Close()
 
 	dinPin.Output()
 	csPin.Output()
@@ -68,6 +76,12 @@ func sendByte(dinPin, clkPin rpio.Pin, data byte) {
 
 // Drawing functions
 func DrawLightbulb(dinPin, csPin, clkPin rpio.Pin, brightness int) {
+	if err := rpio.Open(); err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
+		os.Exit(1)
+	}
+	defer rpio.Close()
+
 	dinPin.Output()
 	csPin.Output()
 	clkPin.Output()
@@ -94,6 +108,11 @@ func DrawLightbulb(dinPin, csPin, clkPin rpio.Pin, brightness int) {
 }
 
 func drawLock(dinPin, csPin, clkPin rpio.Pin, brightness int) {
+	if err := rpio.Open(); err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
+		os.Exit(1)
+	}
+	defer rpio.Close()
 
 	dinPin.Output()
 	csPin.Output()
@@ -121,6 +140,11 @@ func drawLock(dinPin, csPin, clkPin rpio.Pin, brightness int) {
 }
 
 func drawH(dinPin, csPin, clkPin rpio.Pin, brightness int) {
+	if err := rpio.Open(); err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
+		os.Exit(1)
+	}
+	defer rpio.Close()
 
 	dinPin.Output()
 	csPin.Output()
@@ -145,6 +169,11 @@ func drawH(dinPin, csPin, clkPin rpio.Pin, brightness int) {
 }
 
 func drawA(dinPin, csPin, clkPin rpio.Pin) {
+	if err := rpio.Open(); err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
+		os.Exit(1)
+	}
+	defer rpio.Close()
 
 	dinPin.Output()
 	csPin.Output()
@@ -179,6 +208,11 @@ func MatrixStatus(dinPin, csPin, clkPin rpio.Pin, status bool, brightness int) {
 }
 
 func TurnOffMatrix(dinPin, csPin, clkPin rpio.Pin) {
+	if err := rpio.Open(); err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
+		os.Exit(1)
+	}
+	defer rpio.Close()
 
 	dinPin.Output()
 	csPin.Output()
@@ -200,6 +234,11 @@ func TurnOffMatrix(dinPin, csPin, clkPin rpio.Pin) {
 }
 
 func TurnOnMatrix(dinPin, csPin, clkPin rpio.Pin) {
+	if err := rpio.Open(); err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
+		os.Exit(1)
+	}
+	defer rpio.Close()
 
 	dinPin.Output()
 	csPin.Output()

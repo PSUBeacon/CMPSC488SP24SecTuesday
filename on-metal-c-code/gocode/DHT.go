@@ -17,10 +17,10 @@ func ReadTempHum() string {
 	log.SetOutput(ioutil.Discard)
 
 	// Initialize GPIO
-	//if err := rpio.Open(); err != nil {
-	//	fmt.Println("Failed to open GPIO:", err)
-	//	return "" // Exit if unable to open GPIO, using fmt.Println to output the error
-	//}
+	if err := rpio.Open(); err != nil {
+		fmt.Println("Failed to open GPIO:", err)
+		return "" // Exit if unable to open GPIO, using fmt.Println to output the error
+	}
 
 	// Define your DHT sensor type and GPIO pin
 	sensorType := dht.DHT22

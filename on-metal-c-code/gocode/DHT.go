@@ -16,6 +16,18 @@ func ReadTempHum() string {
 	// Redirect all log output to ioutil.Discard, effectively silencing all logs
 	log.SetOutput(ioutil.Discard)
 
+	// Initialize GPIO
+	if err := rpio.Open(); err != nil {
+		fmt.Println("Failed to open GPIO:", err)
+		return "" // Exit if unable to open GPIO, using fmt.Println to output the error
+	}
+	defer func() {
+		err := rpio.Close()
+		if err != nil {
+			fmt.Println("Failed to close GPIO:", err)
+		}
+	}()
+
 	// Define your DHT sensor type and GPIO pin
 	sensorType := dht.DHT22
 	pinNumber := 17 // Use the BCM pin number connected to your DHT22 sensor

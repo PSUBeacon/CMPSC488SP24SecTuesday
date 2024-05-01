@@ -68,7 +68,7 @@ const Energy = () => {
         console.log(requestBody);
 
         try {
-            const response = await fetch('http://localhost:8081/energy/updateEnergy', {
+            const response = await fetch('https://beacon-cs2024.digital/api/energy/updateEnergy', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -98,7 +98,7 @@ const Energy = () => {
             // });
             const fetchData = async () => {
                 try {
-                    const response = await fetch('http://localhost:8081/energy/GetEnergy', {
+                    const response = await fetch('https://beacon-cs2024.digital/api/energy/GetEnergy', {
                         method: 'POST',
                         headers: {
                             'Authorization': `Bearer ${token}`,
@@ -129,7 +129,7 @@ const Energy = () => {
         }
         const fetchData = async () => {
             try {
-                const response = await fetch('http://localhost:8081/energy/GetEnergy', {
+                const response = await fetch('https://beacon-cs2024.digital/api/energy/GetEnergy', {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,

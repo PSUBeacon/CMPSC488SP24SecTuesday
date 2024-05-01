@@ -41,7 +41,7 @@ const Lighting = () => {
                 return;
             }
 
-            axios.get(`http://localhost:8081/lighting?roomName=${encodeURIComponent(selectedRoom)}`, {
+            axios.get(`https://beacon-cs2024.digital/api/lighting?roomName=${encodeURIComponent(selectedRoom)}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ const Lighting = () => {
     }, [selectedRoom, navigate]); // Add navigate as a dependency if it's used within the effect
 
     const handleDimmerChange = (uuid, brightness) => {
-        const serverUrl = 'http://localhost:8081/lighting';
+        const serverUrl = 'https://beacon-cs2024.digital/api/lighting';
         const token = sessionStorage.getItem('token');
 
         // Prepare the request body
@@ -97,7 +97,7 @@ const Lighting = () => {
 
     useEffect(() => {
         const token = sessionStorage.getItem('token');
-        const url = `http://localhost:8081/lighting?roomName=${encodeURIComponent(selectedRoom)}`;
+        const url = `https://beacon-cs2024.digital/api/lighting?roomName=${encodeURIComponent(selectedRoom)}`;
 
         if (!token) {
             navigate('/'); // Redirect to login page if token is not present
@@ -156,7 +156,7 @@ const Lighting = () => {
         const isTurningOn = !lightStates[uuid];
         setLightStates(prevStates => ({...prevStates, [uuid]: isTurningOn}));
 
-        const serverUrl = 'http://localhost:8081/lighting';
+        const serverUrl = 'https://beacon-cs2024.digital/api/lighting';
         const token = sessionStorage.getItem('token');
 
         // Prepare the request body

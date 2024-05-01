@@ -37,7 +37,7 @@ const Dashboard = () => {
 
     useEffect(() => {
         const token = localStorage.getItem('token');
-        const url = 'http://localhost:8081/dashboard';
+        const url = 'https://beacon-cs2024.digital/api/dashboard';
 
         fetch(url, {
             method: 'GET',

@@ -24,7 +24,7 @@ const Lighting = () => {
   const [dimmerValue, setDimmerValue] = useState(75); // State for dimmer value
   const handleTurnOn = () => {
     setIsLightOn(true);
-    const serverUrl = 'http://localhost:8081/lighting';
+    const serverUrl = 'https://beacon-cs2024.digital/api/lighting';
 
     // Define the body of the request based on your Go server's expected input.
     const requestBody = {
@@ -56,7 +56,7 @@ const Lighting = () => {
 
   const handleTurnOff = () => {
     setIsLightOn(false);
-    const serverUrl = 'http://localhost:8081/lighting';
+    const serverUrl = 'https://beacon-cs2024.digital/api/lighting';
 
     // Define the body of the request based on your Go server's expected input.
     const requestBody = {

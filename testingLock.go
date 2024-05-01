@@ -11,14 +11,13 @@ import (
 	"github.com/stianeikeland/go-rpio/v4"
 )
 
-//
-//const (
-//	servoPinNumber   = 23
-//	pulseFrequency   = 20 * time.Millisecond
-//	minPulseWidth    = 700 * time.Microsecond
-//	maxPulseWidth    = 1500 * time.Microsecond
-//	rotationDuration = 1 * time.Second
-//)
+const (
+	servoPinNumber   = 23
+	pulseFrequency   = 20 * time.Millisecond
+	minPulseWidth    = 700 * time.Microsecond
+	maxPulseWidth    = 1500 * time.Microsecond
+	rotationDuration = 1 * time.Second
+)
 
 func main() {
 	if err := rpio.Open(); err != nil {

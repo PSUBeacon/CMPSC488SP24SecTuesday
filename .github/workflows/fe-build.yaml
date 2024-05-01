@@ -46,7 +46,7 @@ jobs:
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.FE_RSP_HOST }}
-          username: psu
+          username: nickage
           key: ${{ secrets.RSP_SSH_KEY }}
           port: ${{ secrets.FE_RSP_PORT  }}
           source: "fab/my-login-app/build/"

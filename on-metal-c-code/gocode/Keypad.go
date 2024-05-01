@@ -230,7 +230,7 @@ func InitKeypad() rune {
 
 	// GPIO pin numbers for rows and columns
 	rowPins := []int{22, 23, 24, 25}
-	columnPins := []int{17, 18, 27}
+	columnPins := []int{17, 16, 27}
 
 	// Define keys
 	keys := [][]Key{

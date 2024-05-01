@@ -2,40 +2,68 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
+	"os/signal"
+	"periph.io/x/host/v3"
+	"syscall"
 	"time"
 
-	"github.com/stianeikeland/go-rpio/v4"
+	"periph.io/x/conn/v3/gpio"
+	"periph.io/x/conn/v3/gpio/gpioreg"
+)
+
+const (
+	servoPinName     = "GPIO8"
+	pulseFrequency   = 20 * time.Millisecond // Common period for servo control
+	minPulseWidth    = 600 * time.Microsecond
+	maxPulseWidth    = 2400 * time.Microsecond
+	rotationDuration = 1 * time.Second // Duration to send the signal, allowing full rotation
 )
 
 func main() {
-	// Open and map memory to access GPIO, check for errors
-	if err := rpio.Open(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+	if _, err := host.Init(); err != nil {
+		log.Fatal(err)
 	}
-	defer rpio.Close()
 
-	// Define the GPIO pin
-	servoPin := rpio.Pin(12) // Use the correct pin for your setup
+	servoPin := gpioreg.ByName(servoPinName)
+	if servoPin == nil {
+		log.Fatalf("Failed to find pin %s", servoPinName)
+	}
 
-	// Set the pin to PWM mode
-	servoPin.Mode(rpio.Pwm)
+	fmt.Println("Servo door hinge control started. Type 'open' to open or 'close' to close the door. Press Ctrl+C to exit.")
 
-	// Set PWM frequency to 50Hz
-	servoPin.Freq(50)
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-sigChan
+		fmt.Println("\nExiting...")
+		os.Exit(0)
+	}()
 
-	// Define the duty cycle for 90 degrees (adjust as needed for your servo)
-	const dutyCycle90 = 1500 // Duty cycle in microseconds
+	for {
+		var command string
+		fmt.Print("Command (open/close): ")
+		fmt.Scanln(&command)
 
-	// Set the duty cycle to move the servo to 90 degrees
-	servoPin.DutyCycle(dutyCycle90, 20000) // 20000 microseconds = 20ms period
+		switch command {
+		case "open":
+			setServoAngle(servoPin, maxPulseWidth) // Move to one side
+		case "close":
+			setServoAngle(servoPin, minPulseWidth) // Move to the opposite side
+		default:
+			fmt.Println("Invalid command. Please type 'open' or 'close'.")
+		}
+	}
+}
 
-	// Wait for the servo to move
-	time.Sleep(1 * time.Second)
-
-	// Clean up the GPIO pin
-	servoPin.Mode(rpio.Output) // Set the pin to output mode
-	servoPin.Low()             // Set the pin to low state
-	servoPin.Mode(rpio.Input)  // Set the pin back to input mode
+func setServoAngle(pin gpio.PinIO, pulseWidth time.Duration) {
+	end := time.Now().Add(rotationDuration)
+	for time.Now().Before(end) {
+		// Send the pulse
+		pin.Out(gpio.High)
+		time.Sleep(pulseWidth)
+		pin.Out(gpio.Low)
+		time.Sleep(pulseFrequency - pulseWidth)
+	}
 }

@@ -48,7 +48,7 @@ const Energy = () => {
 
     const handleEnergyStatusChange = async (uuid, key, gotstatus) => {
         const token = sessionStorage.getItem('token');
-        await setStatus(gotstatus)
+        await setStatus(gotstatus === "true" ? "false" : "true")
         if (!token) {
             navigate('/');
             return;
@@ -62,10 +62,11 @@ const Energy = () => {
             name: category,
             apptype: key,
             function: "Status",
-            change: gotstatus,
+            change: gotstatus === "true" ? "false" : "true",
         };
 
         console.log(requestBody);
+        console.log(gotstatus === "true" ? "false" : "true")
 
         try {
             const response = await fetch('http://localhost:8081/energy/updateEnergy', {
@@ -117,6 +118,7 @@ const Energy = () => {
         } catch (error) {
             console.error('Failed to update energy status:', error);
         }
+        window.location.reload();
     };
 
     const [data, setData] = useState({});
@@ -186,7 +188,7 @@ const Energy = () => {
                                             {/* Implement actual toggle functionality as needed */}
                                             <button
                                                 onClick={() => handleEnergyStatusChange(appliance.UUID, key, appliance.Status)}>
-                                                Turn On/Off
+                                                Turn {appliance.Status === "true" ? "Off" : "On"}
                                             </button>
                                         </td>
                                     </tr>

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 )
 
 const fanPin = 12
@@ -269,8 +270,8 @@ type DefaultHVAC struct {
 //	}
 //}
 
-func testingTemp() {
-	gocode.ReadTempHum()
+func testingTemp() string {
+	return gocode.ReadTempHum()
 }
 
 func DisplayLCDHVAC(mode string, tempToSet int, fanStatus string) {
@@ -291,11 +292,10 @@ func DisplayLCDHVAC(mode string, tempToSet int, fanStatus string) {
 	if fanStatus == "" {
 		fanStatus = defaults.FanStatus
 	}
-	testingTemp()
-	//spliceTemp := strings.Split(testingTemp(), "/")
-	//currentTemp := spliceTemp[0]
-	//
-	//gocode.WriteLCD(fmt.Sprintf("%-16s", "Now:"+currentTemp+" Mode:"+mode) + fmt.Sprintf("%-16s", "Set:"+strconv.Itoa(tempToSet)+" Fan:"+fanStatus))
+	spliceTemp := strings.Split(testingTemp(), "/")
+	currentTemp := spliceTemp[0]
+
+	gocode.WriteLCD(fmt.Sprintf("%-16s", "Now:"+currentTemp+" Mode:"+mode) + fmt.Sprintf("%-16s", "Set:"+strconv.Itoa(tempToSet)+" Fan:"+fanStatus))
 
 }
 

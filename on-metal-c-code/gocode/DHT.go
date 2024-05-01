@@ -12,14 +12,14 @@ import (
 )
 
 // ReadTemperature reads the temperature from the DHT sensor.
-func ReadTempHum() {
+func ReadTempHum() string {
 	// Redirect all log output to ioutil.Discard, effectively silencing all logs
 	log.SetOutput(ioutil.Discard)
 
 	// Initialize GPIO
 	if err := rpio.Open(); err != nil {
 		fmt.Println("Failed to open GPIO:", err)
-		return // Exit if unable to open GPIO, using fmt.Println to output the error
+		return "" // Exit if unable to open GPIO, using fmt.Println to output the error
 	}
 
 	// Define your DHT sensor type and GPIO pin
@@ -34,16 +34,21 @@ func ReadTempHum() {
 
 	// Switch back to input mode before reading (go-dht manages this internally)
 	pin.Input()
+	retTemp := ""
 	// Now, read from the DHT22 sensor using go-dht
-	temperature, humidity, _, err := dht.ReadDHTxxWithRetry(sensorType, pinNumber, false, 10)
-	if err != nil {
-		fmt.Println("Failed to read from DHT22 sensor:", err)
-		return // Exit if there was an error reading from the sensor, using fmt.Println to output the error
+	for {
+		temperature, humidity, _, err := dht.ReadDHTxxWithRetry(sensorType, pinNumber, false, 10)
+		if err != nil {
+			fmt.Println("Failed to read from DHT22 sensor:", err)
+			time.Sleep(2 * time.Second) // Wait for 2 seconds before retrying
+			continue
+		}
+
+		tempF := temperature*1.8 + 32
+		retTemp = strconv.Itoa(int(tempF)) + "/" + strconv.Itoa(int(humidity))
+		fmt.Println(retTemp)
+		break // Exit the loop if a successful reading is obtained
 	}
 
-	tempF := temperature*1.8 + 32
-	TempHum := strconv.Itoa(int(tempF)) + "/" + strconv.Itoa(int(humidity))
-	fmt.Println(TempHum)
-	rpio.Close()
-	return
+	return retTemp
 }

@@ -16,11 +16,11 @@ func ReadTempHum() string {
 	// Redirect all log output to ioutil.Discard, effectively silencing all logs
 	log.SetOutput(ioutil.Discard)
 
-	// Initialize GPIO
-	if err := rpio.Open(); err != nil {
-		fmt.Println("Failed to open GPIO:", err)
-		return "" // Exit if unable to open GPIO, using fmt.Println to output the error
-	}
+	//// Initialize GPIO
+	//if err := rpio.Open(); err != nil {
+	//	fmt.Println("Failed to open GPIO:", err)
+	//	return "" // Exit if unable to open GPIO, using fmt.Println to output the error
+	//}
 	defer func() {
 		err := rpio.Close()
 		if err != nil {

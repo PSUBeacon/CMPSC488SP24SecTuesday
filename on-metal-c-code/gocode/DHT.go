@@ -34,15 +34,16 @@ func ReadTempHum() {
 
 	// Switch back to input mode before reading (go-dht manages this internally)
 	pin.Input()
-
 	// Now, read from the DHT22 sensor using go-dht
 	temperature, humidity, _, err := dht.ReadDHTxxWithRetry(sensorType, pinNumber, false, 10)
 	if err != nil {
 		fmt.Println("Failed to read from DHT22 sensor:", err)
 		return // Exit if there was an error reading from the sensor, using fmt.Println to output the error
 	}
+
 	tempF := temperature*1.8 + 32
 	TempHum := strconv.Itoa(int(tempF)) + "/" + strconv.Itoa(int(humidity))
 	fmt.Println(TempHum)
 	rpio.Close()
+	return
 }

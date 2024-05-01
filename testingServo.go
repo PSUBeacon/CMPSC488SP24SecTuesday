@@ -16,8 +16,8 @@ func main() {
 	defer rpio.Close()
 
 	// Define the GPIO pin
-	servoPin := rpio.Pin(18) // Use the correct pin for your setup
-	servoPin.Mode(rpio.Pwm)  // Set the pin to PWM mode
+	servoPin := rpio.Pin(8) // Use the correct pin for your setup
+	servoPin.Mode(rpio.Pwm) // Set the pin to PWM mode
 
 	// Manually control PWM for servo
 	const dutyCycle = 150               // Adjust this value for 90 degrees based on your servo
@@ -28,6 +28,7 @@ func main() {
 	time.Sleep(1 * time.Second)
 
 	// Clean up the GPIO pin
-	servoPin.Freq(0)          // Disable PWM
-	servoPin.Mode(rpio.Input) // Set the pin back to input mode
+	servoPin.Mode(rpio.Output) // Set the pin to output mode
+	servoPin.Low()             // Set the pin to low state
+	servoPin.Mode(rpio.Input)  // Set the pin back to input mode
 }

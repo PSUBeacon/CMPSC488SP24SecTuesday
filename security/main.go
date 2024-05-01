@@ -1,6 +1,8 @@
 package security
 
 import (
+	messaging "CMPSC488SP24SecTuesday/AES-BlockChain-Communication"
+	"CMPSC488SP24SecTuesday/dal"
 	"CMPSC488SP24SecTuesday/on-metal-c-code/gocode"
 	"encoding/json"
 	"fmt"
@@ -25,13 +27,25 @@ type DefaultSecurity struct {
 }
 
 func DetectMotion() {
+	var alarm dal.MessagingStruct
 	motion, err := gocode.CheckForMotion(pirPin)
 	if err != nil {
 		fmt.Println("Error detecting motion:", err)
 		return
 	}
 	if motion {
-		gocode.BuzzerStatus()
+		alarm.UUID = "0"
+		alarm.Name = "security"
+		alarm.AppType = "security"
+		alarm.Function = "alarm"
+		alarm.Change = "alarm"
+
+		soundAlarm, err := json.MarshalIndent(alarm, "", "  ")
+		if err != nil {
+			panic(err)
+		}
+
+		messaging.BroadCastMessage(soundAlarm)
 		fmt.Println("Motion detected!")
 	}
 }
@@ -64,9 +78,9 @@ func UpdateAlarmStatus(armed bool) {
 		securitySystem.SensorStatus = "ON"
 		DisplayLCDSecurity(securitySystem.Status, securitySystem.SensorStatus)
 
-		DetectMotion()
+		go DetectMotion()
 	} else {
-		gocode.BuzzerStatus()
+		//gocode.BuzzerStatus()
 		fmt.Println("Alarm disarmed.")
 
 		securitySystem.Status = "Disarmed"

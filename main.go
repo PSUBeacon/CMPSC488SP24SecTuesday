@@ -305,7 +305,9 @@ func handleFunctionality() {
 			lighting.FlashSymbol("Bulb")
 		}
 	}
-
+	if messageData.UUID == "0" {
+		lighting.FlashSymbol("Alarm")
+	}
 	if messageData.Name == "HVAC" {
 		for _, group := range [][]dal.Pi{UUIDsData.Hvac} {
 			for _, Pi := range group {

@@ -123,7 +123,14 @@ func FlashSymbol(Symbol string) {
 	if Symbol == "App" {
 		gocode.DrawA(9, 4, 10, bright.Brightness)
 	}
-	time.Sleep(3 * time.Second)
+	if Symbol == "Alarm" {
+		for i := 0; i < 5; i++ {
+			gocode.DrawLock(9, 4, 10, bright.Brightness)
+			time.Sleep(1 * time.Second)
+			gocode.TurnOffMatrix(9, 4, 10)
+		}
+	}
+	time.Sleep(2 * time.Second)
 	gocode.TurnOffMatrix(9, 4, 10)
 
 	if bright.Status == "On" {
@@ -144,10 +151,3 @@ func FlashSymbol(Symbol string) {
 		panic(err)
 	}
 }
-
-//func drawBulblTimer(dinPin, csPin, clkPin rpio.Pin) {
-//	gocode.DrawLightbulb(dinPin, csPin, clkPin)
-//	time.Sleep(3 * time.Second)
-//	gocode.ClearMatrix(dinPin, csPin, clkPin)
-//
-//}

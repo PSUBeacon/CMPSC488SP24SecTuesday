@@ -36,7 +36,7 @@ func ReadTempHum() string {
 	pin.Input()
 
 	// Now, read from the DHT22 sensor using go-dht
-	temperature, humidity, _, err := dht.ReadDHTxxWithRetry(sensorType, pinNumber, false, 10)
+	temperature, humidity, err := dht.ReadDHTxx(sensorType, pinNumber, false)
 	if err != nil {
 		fmt.Println("Failed to read from DHT22 sensor:", err)
 		return "" // Exit if there was an error reading from the sensor, using fmt.Println to output the error

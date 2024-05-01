@@ -6,7 +6,6 @@ import (
 	"CMPSC488SP24SecTuesday/on-metal-c-code/gocode"
 	"encoding/json"
 	"fmt"
-	"github.com/stianeikeland/go-rpio/v4"
 	"os"
 	"strconv"
 	"strings"
@@ -274,6 +273,10 @@ func SendTempToFE() {
 	}
 }
 
+func testingTemp() string {
+	return gocode.ReadTempHum()
+}
+
 func DisplayLCDHVAC(mode string, tempToSet int, fanStatus string) {
 
 	defaults := DefaultHVAC{
@@ -292,9 +295,9 @@ func DisplayLCDHVAC(mode string, tempToSet int, fanStatus string) {
 	if fanStatus == "" {
 		fanStatus = defaults.FanStatus
 	}
-	spliceTemp := strings.Split(gocode.ReadTempHum(), "/")
+	spliceTemp := strings.Split(testingTemp(), "/")
 	currentTemp := spliceTemp[0]
-	rpio.Close()
+
 	gocode.WriteLCD(fmt.Sprintf("%-16s", "Now:"+currentTemp+" Mode:"+mode) + fmt.Sprintf("%-16s", "Set:"+strconv.Itoa(tempToSet)+" Fan:"+fanStatus))
 
 }

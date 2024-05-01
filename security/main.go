@@ -31,7 +31,7 @@ func DetectMotion() {
 		return
 	}
 	if motion {
-		gocode.BuzzerStatus(buzzerPin, true)
+		gocode.BuzzerStatus()
 		fmt.Println("Motion detected!")
 	}
 }
@@ -66,7 +66,7 @@ func UpdateAlarmStatus(armed bool) {
 
 		DetectMotion()
 	} else {
-		gocode.BuzzerStatus(buzzerPin, false)
+		gocode.BuzzerStatus()
 		fmt.Println("Alarm disarmed.")
 
 		securitySystem.Status = "Disarmed"

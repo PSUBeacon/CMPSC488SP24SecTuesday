@@ -32,7 +32,7 @@ const Dashboard = () => {
 
     useEffect(() => {
         const token = sessionStorage.getItem('token');
-        const url = 'http://localhost:8081/dashboard/GetDashboard';
+        const url = 'https://beacon-cs2024.digital/api/dashboard/GetDashboard';
 
         if (!token) {
             navigate('/'); // Redirect to login page if token is not present
@@ -140,7 +140,7 @@ const Dashboard = () => {
                 return;
             }
 
-            const serverUrl = 'http://localhost:8081/security';
+            const serverUrl = 'https://beacon-cs2024.digital/api/security';
             const requestBody = {
                 uuid: uuid,
                 name: "Security",
@@ -174,7 +174,7 @@ const Dashboard = () => {
             const isTurningOn = lightStatus === 'Off';
             setLightStatus(isTurningOn ? 'On' : 'Off');
 
-            const serverUrl = 'http://localhost:8081/lighting';
+            const serverUrl = 'https://beacon-cs2024.digital/api/lighting';
             const token = sessionStorage.getItem('token');
 
             // Prepare the request body

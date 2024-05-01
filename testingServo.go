@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
-	"github.com/stianeikeland/go-rpio/v4"
 	"os"
 	"time"
+
+	"github.com/stianeikeland/go-rpio/v4"
 )
 
 func main() {
-	// Open and map memory to access gpio, check for errors
+	// Open and map memory to access GPIO, check for errors
 	if err := rpio.Open(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -16,13 +17,19 @@ func main() {
 	defer rpio.Close()
 
 	// Define the GPIO pin
-	servoPin := rpio.Pin(8) // Use the correct pin for your setup
-	servoPin.Mode(rpio.Pwm) // Set the pin to PWM mode
+	servoPin := rpio.Pin(12) // Use the correct pin for your setup
 
-	// Manually control PWM for servo
-	const dutyCycle = 150               // Adjust this value for 90 degrees based on your servo
-	servoPin.Freq(50 * 1000)            // Set frequency to 50Hz
-	servoPin.DutyCycle(dutyCycle, 1000) // Set duty cycle
+	// Set the pin to PWM mode
+	servoPin.Mode(rpio.Pwm)
+
+	// Set PWM frequency to 50Hz
+	servoPin.Freq(50)
+
+	// Define the duty cycle for 90 degrees (adjust as needed for your servo)
+	const dutyCycle90 = 1500 // Duty cycle in microseconds
+
+	// Set the duty cycle to move the servo to 90 degrees
+	servoPin.DutyCycle(dutyCycle90, 20000) // 20000 microseconds = 20ms period
 
 	// Wait for the servo to move
 	time.Sleep(1 * time.Second)

@@ -1,15 +1,12 @@
 package hvac
 
 import (
-	messaging "CMPSC488SP24SecTuesday/AES-BlockChain-Communication"
-	"CMPSC488SP24SecTuesday/dal"
 	"CMPSC488SP24SecTuesday/on-metal-c-code/gocode"
 	"encoding/json"
 	"fmt"
 	"os"
 	"strconv"
 	"strings"
-	"time"
 )
 
 const fanPin = 12
@@ -249,32 +246,33 @@ type DefaultHVAC struct {
 	FanStatus string
 }
 
-func SendTempToFE() {
-	ticker := time.NewTicker(1 * time.Minute)
-	defer ticker.Stop()
-
-	for range ticker.C {
-		spliceTemp := strings.Split(gocode.ReadTempHum(), "/")
-		currentTemp := spliceTemp[0] //update the FE with the temp and humidity data every minute
-		var temp dal.MessagingStruct
-		temp.UUID = "0"
-		temp.Name = "TempFE"
-		temp.AppType = "TempFE"
-		temp.Function = "TempUpdate"
-		temp.Change = currentTemp
-
-		tempJSON, err := json.MarshalIndent(temp, "", "	")
-		if err != nil {
-			fmt.Println("Error marshalling temp data:", err)
-			return
-		}
-
-		messaging.BroadCastMessage(tempJSON)
-	}
-}
+//func SendTempToFE() {
+//	ticker := time.NewTicker(1 * time.Minute)
+//	defer ticker.Stop()
+//
+//	for range ticker.C {
+//		spliceTemp := strings.Split(gocode.ReadTempHum(), "/")
+//		currentTemp := spliceTemp[0] //update the FE with the temp and humidity data every minute
+//		var temp dal.MessagingStruct
+//		temp.UUID = "0"
+//		temp.Name = "TempFE"
+//		temp.AppType = "TempFE"
+//		temp.Function = "TempUpdate"
+//		temp.Change = currentTemp
+//
+//		tempJSON, err := json.MarshalIndent(temp, "", "	")
+//		if err != nil {
+//			fmt.Println("Error marshalling temp data:", err)
+//			return
+//		}
+//
+//		messaging.BroadCastMessage(tempJSON)
+//	}
+//}
 
 func testingTemp() string {
-	return gocode.ReadTempHum()
+	//return gocode.ReadTempHum()
+	return "menning"
 }
 
 func DisplayLCDHVAC(mode string, tempToSet int, fanStatus string) {

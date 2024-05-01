@@ -1,4 +1,4 @@
-name: Build and Deploy
+name: Build and Deploy FrontEnd
 
 
 on:
@@ -10,7 +10,6 @@ on:
       - network-traffic-analysis
       - iot-be
       - front-end
-      - 56-cicd-write-script-to-deploy-requested-binary-on-end-rsp # tmp to test
   pull_request:
     branches:
       - main

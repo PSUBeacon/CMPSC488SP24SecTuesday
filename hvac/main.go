@@ -291,6 +291,7 @@ func DisplayLCDHVAC(mode string, tempToSet int, fanStatus string) {
 	if fanStatus == "" {
 		fanStatus = defaults.FanStatus
 	}
+	testingTemp()
 	//spliceTemp := strings.Split(testingTemp(), "/")
 	//currentTemp := spliceTemp[0]
 	//

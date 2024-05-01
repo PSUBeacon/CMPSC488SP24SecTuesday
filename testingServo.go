@@ -26,4 +26,8 @@ func main() {
 
 	// Wait for the servo to move
 	time.Sleep(1 * time.Second)
+
+	// Clean up the GPIO pin
+	servoPin.Freq(0)          // Disable PWM
+	servoPin.Mode(rpio.Input) // Set the pin back to input mode
 }

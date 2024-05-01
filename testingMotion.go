@@ -44,8 +44,6 @@ func main() {
 		// Read the sensor state
 		if pirSensor.Read() {
 			fmt.Println("Motion detected!")
-		} else {
-			fmt.Println("No motion.")
-		}
 	}
+}
 }

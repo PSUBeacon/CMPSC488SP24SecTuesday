@@ -2,15 +2,16 @@ package hvac
 
 import (
 	messaging "CMPSC488SP24SecTuesday/AES-BlockChain-Communication"
+	"CMPSC488SP24SecTuesday/dal"
 	"CMPSC488SP24SecTuesday/on-metal-c-code/gocode"
 	"encoding/json"
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
-const temperaturePin = 4
 const fanPin = 12
 
 type Thermostat struct {
@@ -253,19 +254,22 @@ func SendTempToFE() {
 	defer ticker.Stop()
 
 	for range ticker.C {
-		currentTemp, err := gocode.ReadTemperature(temperaturePin, 22)
+		spliceTemp := strings.Split(gocode.ReadTempHum(), "/")
+		currentTemp := spliceTemp[0] //update the FE with the temp and humidity data every minute
+		var temp dal.MessagingStruct
+		temp.UUID = "0"
+		temp.Name = "TempFE"
+		temp.AppType = "TempFE"
+		temp.Function = "TempUpdate"
+		temp.Change = currentTemp
+
+		tempJSON, err := json.MarshalIndent(temp, "", "	")
 		if err != nil {
-			fmt.Println("Error reading temperature:", err)
-			continue
+			fmt.Println("Error marshalling temp data:", err)
+			return
 		}
 
-		// Convert the float value to a string
-		tempStr := strconv.FormatFloat(currentTemp, 'f', -1, 64)
-
-		// Convert the string to bytes
-		tempBytes := []byte(tempStr)
-
-		messaging.BroadCastMessage(tempBytes)
+		messaging.BroadCastMessage(tempJSON)
 	}
 }
 
@@ -287,16 +291,10 @@ func DisplayLCDHVAC(mode string, tempToSet int, fanStatus string) {
 	if fanStatus == "" {
 		fanStatus = defaults.FanStatus
 	}
+	spliceTemp := strings.Split(gocode.ReadTempHum(), "/")
+	currentTemp := spliceTemp[0]
 
-	var intCurrTemp int
-	rawCurrTemp, err := gocode.ReadTemperature(temperaturePin, 22)
-	if err != nil {
-		intCurrTemp = 0
-	}
-
-	intCurrTemp = int(rawCurrTemp)
-
-	gocode.WriteLCD(fmt.Sprintf("%-16s", "Now:"+strconv.Itoa(intCurrTemp)+" Mode:"+mode) + fmt.Sprintf("%-16s", "Set:"+strconv.Itoa(tempToSet)+" Fan:"+fanStatus))
+	gocode.WriteLCD(fmt.Sprintf("%-16s", "Now:"+currentTemp+" Mode:"+mode) + fmt.Sprintf("%-16s", "Set:"+strconv.Itoa(tempToSet)+" Fan:"+fanStatus))
 
 }
 

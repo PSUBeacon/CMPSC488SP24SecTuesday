@@ -420,6 +420,10 @@ func handleFunctionality() {
 		}
 		lighting.FlashSymbol("App")
 	}
+	if messageData.Name == "TempFE" {
+		fmt.Println("FE Temp Updated")
+	}
+
 	return
 }
 

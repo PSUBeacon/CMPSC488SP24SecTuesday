@@ -28,7 +28,7 @@ func main() {
 
 	// Define your DHT sensor type and GPIO pin
 	sensorType := dht.DHT22
-	pinNumber := 4 // Use the BCM pin number connected to your DHT22 sensor
+	pinNumber := 17 // Use the BCM pin number connected to your DHT22 sensor
 
 	// Prepare the GPIO pin (optional, since go-dht handles GPIO)
 	pin := rpio.Pin(pinNumber)
@@ -47,6 +47,6 @@ func main() {
 	}
 
 	// Output the results
-	fmt.Printf("Temperature: %.2f°C\n", temperature)
+	fmt.Printf("Temperature: %.2f°C\n", temperature*1.8+32)
 	fmt.Printf("Humidity: %.2f%%\n", humidity)
 }

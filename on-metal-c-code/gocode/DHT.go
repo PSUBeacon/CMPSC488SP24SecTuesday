@@ -21,6 +21,7 @@ func ReadTempHum() {
 		fmt.Println("Failed to open GPIO:", err)
 		return // Exit if unable to open GPIO, using fmt.Println to output the error
 	}
+	defer rpio.Close()
 
 	// Define your DHT sensor type and GPIO pin
 	sensorType := dht.DHT22

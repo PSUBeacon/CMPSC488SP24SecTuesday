@@ -66,13 +66,20 @@ const ModeToggle = ({initialMode, onModeChange, initialStatus}) => {
 };
 
 const FanSpeedToggle = ({initialFanSpeed, onFanSpeedChange}) => {
-    [fanSpeed, setFanSpeed] = useState(initialFanSpeed);
+    const [fanSpeed, setFanSpeed] = useState(initialFanSpeed);
+    const [isLocked, setIsLocked] = useState(false);
 
     const handleFanSpeedChange = async (newFanSpeed) => {
-        await setFanSpeed(newFanSpeed);
-        await onFanSpeedChange(newFanSpeed);
-        func = "FanSpeed";
-        await sendServerRequest();
+        if (!isLocked) {
+            await setFanSpeed(newFanSpeed);
+            await onFanSpeedChange(newFanSpeed);
+            func = "FanSpeed";
+            await sendServerRequest();
+            setIsLocked(true);
+            setTimeout(() => {
+                setIsLocked(false);
+            }, 15000);
+        }
     };
 
     return (
@@ -81,18 +88,21 @@ const FanSpeedToggle = ({initialFanSpeed, onFanSpeedChange}) => {
             <button
                 className={`fan-speed-button ${fanSpeed === 30 ? 'active' : ''}`}
                 onClick={() => handleFanSpeedChange(30)}
+                disabled={isLocked}
             >
                 Low
             </button>
             <button
                 className={`fan-speed-button ${fanSpeed === 50 ? 'active' : ''}`}
                 onClick={() => handleFanSpeedChange(50)}
+                disabled={isLocked}
             >
                 Medium
             </button>
             <button
                 className={`fan-speed-button ${fanSpeed === 90 ? 'active' : ''}`}
                 onClick={() => handleFanSpeedChange(90)}
+                disabled={isLocked}
             >
                 High
             </button>

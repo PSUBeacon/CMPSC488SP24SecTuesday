@@ -5,7 +5,7 @@
       "UUID": "417293"
     },
     {
-      "Pinum": 13,
+      "Pinum": 16,
       "UUID": "417294"
     },
     {
@@ -15,7 +15,7 @@
   ],
   "hvac": [
     {
-      "Pinum": 16,
+      "Pinum": 13,
       "UUID": "050336"
     },
     {
@@ -25,61 +25,61 @@
   ],
   "security": [
     {
-      "Pinum": 13,
+      "Pinum": 22,
       "UUID": "502857"
     },
     {
-      "Pinum": 13,
+      "Pinum": 22,
       "UUID": "502858"
     }
   ],
   "appliances": [
     {
-      "Pinum": 25,
+      "Pinum": 16,
       "UUID": "036821"
     },
     {
-      "Pinum": 25,
+      "Pinum": 16,
       "UUID": "036822"
     },
     {
-      "Pinum": 25,
+      "Pinum": 16,
       "UUID": "939368"
     },
     {
-      "Pinum": 25,
+      "Pinum": 16,
       "UUID": "939369"
     },
     {
-      "Pinum": 25,
+      "Pinum": 16,
       "UUID": "589272"
     },
     {
-      "Pinum": 25,
+      "Pinum": 16,
       "UUID": "589273"
     },
     {
-      "Pinum": 25,
+      "Pinum": 16,
       "UUID": "947268"
     },
     {
-      "Pinum": 25,
+      "Pinum": 16,
       "UUID": "947269"
     },
     {
-      "Pinum": 25,
+      "Pinum": 16,
       "UUID": "636712"
     },
     {
-      "Pinum": 25,
+      "Pinum": 16,
       "UUID": "636713"
     },
     {
-      "Pinum": 25,
+      "Pinum": 16,
       "UUID": "998256"
     },
     {
-      "Pinum": 25,
+      "Pinum": 16,
       "UUID": "998257"
     }
   ]

@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	gpioPin = 4 // GPIO pin connected to the buzzer
+	gpioPin = 26 // GPIO pin connected to the buzzer
 )
 
 func main() {

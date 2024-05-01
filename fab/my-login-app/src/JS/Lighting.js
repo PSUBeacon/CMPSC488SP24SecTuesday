@@ -68,7 +68,7 @@ const Lighting = () => {
             name: "Lighting",
             apptype: "Lighting",
             function: "Brightness",
-            change: JSON.stringify(brightness),
+            change: String(brightness),
         };
 
         // Send a POST request to toggle the light state
@@ -292,14 +292,15 @@ const Lighting = () => {
                                         id="dimmer"
                                         name="dimmer"
                                         min="1"
-                                        max="100"
-                                        value={Math.round((dimmerValue - 1) / 14 * 99) + 1}
+                                        max="15"
+                                        value={dimmerValue}
                                         onChange={(e) => {
-                                            const newValue = Math.round((e.target.value - 1) / 99 * 14) + 1;
+                                            const newValue = parseInt(e.target.value, 10);
                                             setDimmerValue(newValue);
                                         }}
                                         onMouseUp={(e) => {
                                             if (selectedLight) {
+
                                                 handleDimmerChange(selectedLight, dimmerValue);
                                             }
                                         }}

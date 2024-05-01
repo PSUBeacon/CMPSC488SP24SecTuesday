@@ -1,16 +1,14 @@
 package hvac
 
 import (
-	messaging "CMPSC488SP24SecTuesday/AES-BlockChain-Communication"
 	"CMPSC488SP24SecTuesday/on-metal-c-code/gocode"
 	"encoding/json"
 	"fmt"
 	"os"
 	"strconv"
-	"time"
+	"strings"
 )
 
-const temperaturePin = 4
 const fanPin = 12
 
 type Thermostat struct {
@@ -248,25 +246,32 @@ type DefaultHVAC struct {
 	FanStatus string
 }
 
-func SendTempToFE() {
-	ticker := time.NewTicker(1 * time.Minute)
-	defer ticker.Stop()
+//func SendTempToFE() {
+//	ticker := time.NewTicker(1 * time.Minute)
+//	defer ticker.Stop()
+//
+//	for range ticker.C {
+//		spliceTemp := strings.Split(gocode.ReadTempHum(), "/")
+//		currentTemp := spliceTemp[0] //update the FE with the temp and humidity data every minute
+//		var temp dal.MessagingStruct
+//		temp.UUID = "0"
+//		temp.Name = "TempFE"
+//		temp.AppType = "TempFE"
+//		temp.Function = "TempUpdate"
+//		temp.Change = currentTemp
+//
+//		tempJSON, err := json.MarshalIndent(temp, "", "	")
+//		if err != nil {
+//			fmt.Println("Error marshalling temp data:", err)
+//			return
+//		}
+//
+//		messaging.BroadCastMessage(tempJSON)
+//	}
+//}
 
-	for range ticker.C {
-		currentTemp, err := gocode.ReadTemperature(temperaturePin, 22)
-		if err != nil {
-			fmt.Println("Error reading temperature:", err)
-			continue
-		}
-
-		// Convert the float value to a string
-		tempStr := strconv.FormatFloat(currentTemp, 'f', -1, 64)
-
-		// Convert the string to bytes
-		tempBytes := []byte(tempStr)
-
-		messaging.BroadCastMessage(tempBytes)
-	}
+func testingTemp() string {
+	return gocode.ReadTempHum()
 }
 
 func DisplayLCDHVAC(mode string, tempToSet int, fanStatus string) {
@@ -287,15 +292,28 @@ func DisplayLCDHVAC(mode string, tempToSet int, fanStatus string) {
 	if fanStatus == "" {
 		fanStatus = defaults.FanStatus
 	}
+	spliceTemp := strings.Split(testingTemp(), "/")
+	currentTemp := spliceTemp[0]
 
-	var intCurrTemp int
-	rawCurrTemp, err := gocode.ReadTemperature(temperaturePin, 22)
+	gocode.WriteLCD(fmt.Sprintf("%-16s", "Now:"+currentTemp+" Mode:"+mode) + fmt.Sprintf("%-16s", "Set:"+strconv.Itoa(tempToSet)+" Fan:"+fanStatus))
+
+}
+
+func StartupLCDHVAC() {
+
+	jsonThermData, err := os.ReadFile("hvac/thermostats.json")
 	if err != nil {
-		intCurrTemp = 0
+		fmt.Println("Error reading thermostat data:", err)
+		return
+	}
+	//fmt.Println("Thermostat data, ", jsonThermData)
+	// Unmarshal the JSON data into a Thermostat struct
+	var thermostat []Thermostat
+	if err := json.Unmarshal(jsonThermData, &thermostat); err != nil {
+		fmt.Println("Error unmarshalling thermostat data:", err)
+		return
 	}
 
-	intCurrTemp = int(rawCurrTemp)
-
-	gocode.WriteLCD(fmt.Sprintf("%-16s", "Now:"+strconv.Itoa(intCurrTemp)+" Mode:"+mode) + fmt.Sprintf("%-16s", "Set:"+strconv.Itoa(tempToSet)+" Fan:"+fanStatus))
+	gocode.WriteLCD(fmt.Sprintf("%-16s", "Now:"+strconv.Itoa(thermostat[0].CurrentTemp)+" Mode:"+thermostat[0].Mode) + fmt.Sprintf("%-16s", "Set:"+strconv.Itoa(thermostat[0].SetTemp)+" Fan:"+strconv.Itoa(thermostat[0].FanSpeed)))
 
 }

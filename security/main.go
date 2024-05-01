@@ -28,11 +28,7 @@ type DefaultSecurity struct {
 
 func DetectMotion() {
 	var alarm dal.MessagingStruct
-	motion, err := gocode.CheckForMotion(pirPin)
-	if err != nil {
-		fmt.Println("Error detecting motion:", err)
-		return
-	}
+	motion := gocode.CheckForMotion()
 	if motion {
 		alarm.UUID = "0"
 		alarm.Name = "security"

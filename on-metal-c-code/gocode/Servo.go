@@ -2,28 +2,57 @@ package gocode
 
 import (
 	"fmt"
-	"github.com/stianeikeland/go-rpio/v4"
+	"log"
 	"os"
+	"os/signal"
+	"periph.io/x/host/v3"
+	"syscall"
 	"time"
+
+	"periph.io/x/conn/v3/gpio"
+	"periph.io/x/conn/v3/gpio/gpioreg"
 )
 
-func TurnServo() {
-	// Open and map memory to access gpio, check for errors
-	if err := rpio.Open(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+const (
+	servoPinName     = "GPIO8"
+	pulseFrequency   = 20 * time.Millisecond // Common period for servo control
+	minPulseWidth    = 600 * time.Microsecond
+	maxPulseWidth    = 2400 * time.Microsecond
+	rotationDuration = 4 * time.Second // Duration to send the signal, allowing full rotation
+)
+
+func TurnServo(stat bool) {
+	if _, err := host.Init(); err != nil {
+		log.Fatal(err)
 	}
-	defer rpio.Close()
 
-	// Define the GPIO pin
-	servoPin := rpio.Pin(8) // Use the correct pin for your setup
-	servoPin.Mode(rpio.Pwm) // Set the pin to PWM mode
+	servoPin := gpioreg.ByName(servoPinName)
+	if servoPin == nil {
+		log.Fatalf("Failed to find pin %s", servoPinName)
+	}
 
-	// Manually control PWM for servo
-	const dutyCycle = 150               // Adjust this value for 90 degrees based on your servo
-	servoPin.Freq(50 * 1000)            // Set frequency to 50Hz
-	servoPin.DutyCycle(dutyCycle, 1000) // Set duty cycle
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-sigChan
+		fmt.Println("\nExiting...")
+		os.Exit(0)
+	}()
+	if stat == true {
+		setServoAngle(servoPin, maxPulseWidth) // Move to one side
+	}
+	if stat == false {
+		setServoAngle(servoPin, minPulseWidth) // Move to the opposite side
+	}
+}
 
-	// Wait for the servo to move
-	time.Sleep(1 * time.Second)
+func setServoAngle(pin gpio.PinIO, pulseWidth time.Duration) {
+	end := time.Now().Add(rotationDuration)
+	for time.Now().Before(end) {
+		// Send the pulse
+		pin.Out(gpio.High)
+		time.Sleep(pulseWidth)
+		pin.Out(gpio.Low)
+		time.Sleep(pulseFrequency - pulseWidth)
+	}
 }

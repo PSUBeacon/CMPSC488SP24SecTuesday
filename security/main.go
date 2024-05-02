@@ -96,9 +96,32 @@ func UpdateAlarmStatus(armed bool) {
 
 }
 
+type Lock struct {
+	Status bool
+}
+
 func LockOrUnlock(lock bool) {
-	fmt.Println("Door is locked:", lock)
-	// Add logic to control door lock here
+	jsonLockData, err := os.ReadFile("security/lock.json")
+	if err != nil {
+		fmt.Println("Error reading key data:", err)
+		return
+	}
+	var locks Lock
+	if err := json.Unmarshal(jsonLockData, &locks); err != nil {
+		fmt.Println("Error unmarshalling security data:", err)
+		return
+	}
+	var turnStatus bool
+	if locks.Status == true {
+		turnStatus = false
+	}
+	if locks.Status == false {
+		turnStatus = true
+	}
+	gocode.TurnServo(turnStatus)
+
+	fmt.Println("Door is locked:", locks.Status)
+
 }
 
 //func HandleMotionDetection() {

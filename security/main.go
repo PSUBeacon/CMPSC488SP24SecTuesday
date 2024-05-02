@@ -74,7 +74,7 @@ func UpdateAlarmStatus(armed bool) {
 		securitySystem.SensorStatus = "ON"
 		DisplayLCDSecurity(securitySystem.Status, securitySystem.SensorStatus)
 
-		go DetectMotion()
+		//go DetectMotion()
 	} else {
 		//gocode.BuzzerStatus()
 		fmt.Println("Alarm disarmed.")

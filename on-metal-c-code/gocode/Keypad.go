@@ -175,7 +175,7 @@ func onKeyPress(char rune) {
 				fmt.Println("Security code entered correctly. disarming alarm...")
 				securitySystem.Status = "Disarmed"
 				securitySystem.SensorStatus = "OFF"
-				WriteLCD("Stat:" + securitySystem.Status + " Motion:" + securitySystem.SensorStatus)
+				WriteLCD(fmt.Sprintf("%-16s", "Stat:"+securitySystem.Status) + fmt.Sprintf("%-16s", "Motion:"+securitySystem.SensorStatus))
 				enteredCode = ""
 				securityJSON, err := json.MarshalIndent(securitySystem, "", "	")
 				if err != nil {
@@ -194,7 +194,7 @@ func onKeyPress(char rune) {
 				fmt.Println("Security code entered correctly. arming alarm...")
 				securitySystem.Status = "Armed"
 				securitySystem.SensorStatus = "ON"
-				WriteLCD("Stat:" + securitySystem.Status + " Motion:" + securitySystem.SensorStatus)
+				WriteLCD(fmt.Sprintf("%-16s", "Stat:"+securitySystem.Status) + fmt.Sprintf("%-16s", "Motion:"+securitySystem.SensorStatus))
 				enteredCode = ""
 				securityJSON, err := json.MarshalIndent(securitySystem, "", "	")
 				if err != nil {

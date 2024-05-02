@@ -1,13 +1,10 @@
 package security
 
 import (
-	messaging "CMPSC488SP24SecTuesday/AES-BlockChain-Communication"
-	"CMPSC488SP24SecTuesday/dal"
 	"CMPSC488SP24SecTuesday/on-metal-c-code/gocode"
 	"encoding/json"
 	"fmt"
 	"os"
-	"time"
 )
 
 const (
@@ -26,25 +23,26 @@ type DefaultSecurity struct {
 	MotionStatus string
 }
 
-func DetectMotion() {
-	var alarm dal.MessagingStruct
-	motion := gocode.CheckForMotion()
-	if motion {
-		alarm.UUID = "0"
-		alarm.Name = "security"
-		alarm.AppType = "security"
-		alarm.Function = "alarm"
-		alarm.Change = "alarm"
-
-		soundAlarm, err := json.MarshalIndent(alarm, "", "  ")
-		if err != nil {
-			panic(err)
-		}
-
-		messaging.BroadCastMessage(soundAlarm)
-		fmt.Println("Motion detected!")
-	}
-}
+//
+//func DetectMotion() {
+//	var alarm dal.MessagingStruct
+//	motion := gocode.CheckForMotion()
+//	if motion {
+//		alarm.UUID = "0"
+//		alarm.Name = "security"
+//		alarm.AppType = "security"
+//		alarm.Function = "alarm"
+//		alarm.Change = "alarm"
+//
+//		soundAlarm, err := json.MarshalIndent(alarm, "", "  ")
+//		if err != nil {
+//			panic(err)
+//		}
+//
+//		messaging.BroadCastMessage(soundAlarm)
+//		fmt.Println("Motion detected!")
+//	}
+//}
 
 // get keypad input
 func GetKeypadInput() {
@@ -103,19 +101,19 @@ func LockOrUnlock(lock bool) {
 	// Add logic to control door lock here
 }
 
-func HandleMotionDetection() {
-	ticker := time.NewTicker(5 * time.Second)
-	defer ticker.Stop()
-
-	for range ticker.C {
-		motion = !motion
-		if motion {
-			UpdateAlarmStatus(true)
-		} else {
-			UpdateAlarmStatus(false)
-		}
-	}
-}
+//func HandleMotionDetection() {
+//	ticker := time.NewTicker(5 * time.Second)
+//	defer ticker.Stop()
+//
+//	for range ticker.C {
+//		motion = !motion
+//		if motion {
+//			UpdateAlarmStatus(true)
+//		} else {
+//			UpdateAlarmStatus(false)
+//		}
+//	}
+//}
 
 type System struct {
 	UUID         string `json:"UUID"`

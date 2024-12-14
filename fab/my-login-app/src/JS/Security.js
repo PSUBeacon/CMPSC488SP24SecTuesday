@@ -43,7 +43,7 @@ const Security = () => {
 
     useEffect(() => {
         const token = sessionStorage.getItem('token');
-        const url = 'http://localhost:8081/security';
+        const url = 'https://beacon-cs2024.digital/api/security';
 
         if (!token) {
             navigate('/'); // Redirect to login page if token is not present
@@ -81,7 +81,7 @@ const Security = () => {
             return;
         }
 
-        const serverUrl = 'http://localhost:8081/security';
+        const serverUrl = 'https://beacon-cs2024.digital/api/security';
         const requestBody = {
             uuid: uuid,
             name: "Security",

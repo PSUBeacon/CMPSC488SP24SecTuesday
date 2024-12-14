@@ -1,4 +1,4 @@
-name: Build and Deploy
+name: Build and Deploy FrontEnd
 
 
 on:
@@ -10,7 +10,6 @@ on:
       - network-traffic-analysis
       - iot-be
       - front-end
-      - 56-cicd-write-script-to-deploy-requested-binary-on-end-rsp # tmp to test
   pull_request:
     branches:
       - main
@@ -47,7 +46,7 @@ jobs:
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.FE_RSP_HOST }}
-          username: psu
+          username: nickage
           key: ${{ secrets.RSP_SSH_KEY }}
           port: ${{ secrets.FE_RSP_PORT  }}
           source: "fab/my-login-app/build/"
@@ -57,7 +56,7 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.FE_RSP_HOST }}
-          username: psu
+          username: nickage
           key: ${{ secrets.RSP_SSH_KEY }}
           port: ${{ secrets.FE_RSP_PORT }}
           script: |

@@ -14,7 +14,7 @@ const LoginForm = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        const serverUrl = 'http://localhost:8081/login';
+        const serverUrl = 'https://beacon-cs2024.digital/api/login';
 
         try {
             const response = await axios.post(serverUrl, {

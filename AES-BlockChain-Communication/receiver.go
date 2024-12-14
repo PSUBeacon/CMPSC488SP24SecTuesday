@@ -9,10 +9,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/joho/godotenv"
+	"github.com/stianeikeland/go-rpio/v4"
 	"go.bug.st/serial"
 	"log"
 	"os"
-	"time"
 )
 
 func decryptAES(key, ciphertext []byte) ([]byte, error) {
@@ -52,10 +52,7 @@ func decryptAES(key, ciphertext []byte) ([]byte, error) {
 	return ciphertext, nil
 }
 
-func BlockReceiver() []string {
-	numConnections := 0
-	pinums := []string{"13", "16", "22", "25"}
-	var receivedPiNums []string
+func BlockReceiver() {
 	// Open the XBee module for communication
 	var chain blockchain.Blockchain
 	var block blockchain.Block
@@ -79,8 +76,6 @@ func BlockReceiver() []string {
 
 	fmt.Println("Waiting for incoming messages...")
 
-	ticker := time.NewTicker(60 * time.Second)
-
 	// Use ReadBytes or ReadString to dynamically handle incoming data
 	for {
 		// Read and parse the data manually
@@ -90,27 +85,12 @@ func BlockReceiver() []string {
 			if err != nil {
 				log.Fatal("Error reading byte:", err)
 			}
-			if ticker == nil {
-				if len(receivedPiNums) < 4 {
-					receivedMap := make(map[string]bool)
-					for _, i := range receivedPiNums {
-						receivedMap[i] = true
-					}
-					var missingPi []string
-					for _, i := range pinums {
-						if !receivedMap[i] {
-							missingPi = append(missingPi, i)
-						}
+			//if ticker == nil {
+			//go messaging.BroadCastMessage([]byte("pi # connected"))
+			//ticker.Reset(60 * time.Second)
 
-					}
+			//}
 
-					fmt.Printf("Pi %v not connected\n", missingPi)
-					//go api.UpdateMissingPi(missingPi)
-					return missingPi
-
-				}
-				ticker.Reset(60 * time.Second)
-			}
 			// Check for the UTF-8 encoding of '♄' the hex value is (E2 99 B4)
 			if len(message) >= 2 && message[len(message)-2] == 0xE2 && message[len(message)-1] == 0x99 && b == 0xB4 {
 				//fmt.Println(message)
@@ -164,7 +144,6 @@ func BlockReceiver() []string {
 
 			}
 
-			//Checks if the incoming block is not the first block in a chain
 			if chainlen > 0 {
 				blockTojson := json.Unmarshal(receivedMessage, &block)
 				if blockTojson != nil {
@@ -175,7 +154,7 @@ func BlockReceiver() []string {
 
 					err := json.Unmarshal(jsonChainData, &chain)
 					if err != nil {
-						return []string{}
+						return
 					}
 
 					chain.Chain = append(chain.Chain, block)
@@ -190,23 +169,21 @@ func BlockReceiver() []string {
 					if err != nil {
 						panic(err)
 					}
-					for i := 0; i < 3; i++ {
-						if block.Data == pinums[i] {
-							receivedPiNums = append(receivedPiNums, block.Data)
-							numConnections++
-						}
+					//fmt.Println("Got to functionality")
+
+					if err := rpio.Open(); err != nil {
+						fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
+						os.Exit(1)
 					}
+
+					go FrontEndFunctionality()
+
 				}
 				if verify == false {
 					fmt.Println("Invalid Block")
 				}
 			}
 		} else {
-			fmt.Println("Message integrity verification failed.")
-			continue
-
-		}
-		if isValid == false {
 			fmt.Println("Message integrity verification failed.")
 			continue
 
@@ -244,7 +221,6 @@ func verifyBlockchain(currentblock blockchain.Block) bool {
 	return false
 }
 
-//
-//func main() {
-//	BlockReceiver()
-//}
+func FrontEndFunctionality() {
+
+}

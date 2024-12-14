@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"time"
 )
 
 const (
@@ -24,17 +23,26 @@ type DefaultSecurity struct {
 	MotionStatus string
 }
 
-func DetectMotion() {
-	motion, err := gocode.CheckForMotion(pirPin)
-	if err != nil {
-		fmt.Println("Error detecting motion:", err)
-		return
-	}
-	if motion {
-		gocode.BuzzerStatus(buzzerPin, true)
-		fmt.Println("Motion detected!")
-	}
-}
+//
+//func DetectMotion() {
+//	var alarm dal.MessagingStruct
+//	motion := gocode.CheckForMotion()
+//	if motion {
+//		alarm.UUID = "0"
+//		alarm.Name = "security"
+//		alarm.AppType = "security"
+//		alarm.Function = "alarm"
+//		alarm.Change = "alarm"
+//
+//		soundAlarm, err := json.MarshalIndent(alarm, "", "  ")
+//		if err != nil {
+//			panic(err)
+//		}
+//
+//		messaging.BroadCastMessage(soundAlarm)
+//		fmt.Println("Motion detected!")
+//	}
+//}
 
 // get keypad input
 func GetKeypadInput() {
@@ -64,9 +72,9 @@ func UpdateAlarmStatus(armed bool) {
 		securitySystem.SensorStatus = "ON"
 		DisplayLCDSecurity(securitySystem.Status, securitySystem.SensorStatus)
 
-		DetectMotion()
+		//go DetectMotion()
 	} else {
-		gocode.BuzzerStatus(buzzerPin, false)
+		//gocode.BuzzerStatus()
 		fmt.Println("Alarm disarmed.")
 
 		securitySystem.Status = "Disarmed"
@@ -88,24 +96,47 @@ func UpdateAlarmStatus(armed bool) {
 
 }
 
+type Lock struct {
+	Status bool
+}
+
 func LockOrUnlock(lock bool) {
-	fmt.Println("Door is locked:", lock)
-	// Add logic to control door lock here
-}
-
-func HandleMotionDetection() {
-	ticker := time.NewTicker(5 * time.Second)
-	defer ticker.Stop()
-
-	for range ticker.C {
-		motion = !motion
-		if motion {
-			UpdateAlarmStatus(true)
-		} else {
-			UpdateAlarmStatus(false)
-		}
+	jsonLockData, err := os.ReadFile("security/lock.json")
+	if err != nil {
+		fmt.Println("Error reading key data:", err)
+		return
 	}
+	var locks Lock
+	if err := json.Unmarshal(jsonLockData, &locks); err != nil {
+		fmt.Println("Error unmarshalling security data:", err)
+		return
+	}
+	var turnStatus bool
+	if locks.Status == true {
+		turnStatus = false
+	}
+	if locks.Status == false {
+		turnStatus = true
+	}
+	gocode.TurnServo(turnStatus)
+
+	fmt.Println("Door is locked:", locks.Status)
+
 }
+
+//func HandleMotionDetection() {
+//	ticker := time.NewTicker(5 * time.Second)
+//	defer ticker.Stop()
+//
+//	for range ticker.C {
+//		motion = !motion
+//		if motion {
+//			UpdateAlarmStatus(true)
+//		} else {
+//			UpdateAlarmStatus(false)
+//		}
+//	}
+//}
 
 type System struct {
 	UUID         string `json:"UUID"`

@@ -48,7 +48,7 @@ const Energy = () => {
 
     const handleEnergyStatusChange = async (uuid, key, gotstatus) => {
         const token = sessionStorage.getItem('token');
-        await setStatus(gotstatus)
+        await setStatus(gotstatus === "true" ? "false" : "true")
         if (!token) {
             navigate('/');
             return;
@@ -62,13 +62,14 @@ const Energy = () => {
             name: category,
             apptype: key,
             function: "Status",
-            change: gotstatus,
+            change: gotstatus === "true" ? "false" : "true",
         };
 
         console.log(requestBody);
+        console.log(gotstatus === "true" ? "false" : "true")
 
         try {
-            const response = await fetch('http://localhost:8081/energy/updateEnergy', {
+            const response = await fetch('https://beacon-cs2024.digital/api/energy/updateEnergy', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -98,7 +99,7 @@ const Energy = () => {
             // });
             const fetchData = async () => {
                 try {
-                    const response = await fetch('http://localhost:8081/energy/GetEnergy', {
+                    const response = await fetch('https://beacon-cs2024.digital/api/energy/GetEnergy', {
                         method: 'POST',
                         headers: {
                             'Authorization': `Bearer ${token}`,
@@ -117,6 +118,7 @@ const Energy = () => {
         } catch (error) {
             console.error('Failed to update energy status:', error);
         }
+        window.location.reload();
     };
 
     const [data, setData] = useState({});
@@ -129,7 +131,7 @@ const Energy = () => {
         }
         const fetchData = async () => {
             try {
-                const response = await fetch('http://localhost:8081/energy/GetEnergy', {
+                const response = await fetch('https://beacon-cs2024.digital/api/energy/GetEnergy', {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -186,7 +188,7 @@ const Energy = () => {
                                             {/* Implement actual toggle functionality as needed */}
                                             <button
                                                 onClick={() => handleEnergyStatusChange(appliance.UUID, key, appliance.Status)}>
-                                                Turn On/Off
+                                                Turn {appliance.Status === "true" ? "Off" : "On"}
                                             </button>
                                         </td>
                                     </tr>

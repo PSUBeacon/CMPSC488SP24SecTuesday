@@ -34,7 +34,7 @@ function HomeAlarm() {
             console.error("Authorization token not found.");
             return;
         }
-        const serverUrl = 'http://localhost:8081/security/system';
+        const serverUrl = 'https://beacon-cs2024.digital/api/security/system';
         const requestData = {
             code: code,
             status: AlarmStatus,

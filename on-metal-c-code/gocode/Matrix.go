@@ -1,8 +1,6 @@
 package gocode
 
 import (
-	"fmt"
-	"os"
 	"time"
 
 	"github.com/stianeikeland/go-rpio/v4"
@@ -32,12 +30,6 @@ func initializeMatrix(dinPin, csPin, clkPin rpio.Pin) {
 // Set the intensity (brightness) of the LED matrix
 func SetIntensity(dinPin, csPin, clkPin rpio.Pin, intensity int) {
 
-	if err := rpio.Open(); err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
-		os.Exit(1)
-	}
-	defer rpio.Close()
-
 	dinPin.Output()
 	csPin.Output()
 	clkPin.Output()
@@ -53,6 +45,7 @@ func SetIntensity(dinPin, csPin, clkPin rpio.Pin, intensity int) {
 
 // Send data to the LED matrix
 func sendData(csPin, dinPin, clkPin rpio.Pin, address, data byte) {
+
 	csPin.Low()
 	sendByte(dinPin, clkPin, address)
 	sendByte(dinPin, clkPin, data)
@@ -61,6 +54,7 @@ func sendData(csPin, dinPin, clkPin rpio.Pin, address, data byte) {
 
 // Send a single byte of data
 func sendByte(dinPin, clkPin rpio.Pin, data byte) {
+
 	for i := 7; i >= 0; i-- {
 		clkPin.Low()
 		if (data & (1 << i)) != 0 {
@@ -75,25 +69,21 @@ func sendByte(dinPin, clkPin rpio.Pin, data byte) {
 // Drawing functions
 func DrawLightbulb(dinPin, csPin, clkPin rpio.Pin, brightness int) {
 
+	dinPin.Output()
+	csPin.Output()
+	clkPin.Output()
+	initializeMatrix(dinPin, csPin, clkPin)
+
 	ClearMatrix(csPin, dinPin, clkPin)
-	//lightbulbPattern := []byte{
-	//	0b00111100,
-	//	0b01111110,
-	//	0b01111110,
-	//	0b01111110,
-	//	0b01111110,
-	//	0b00111100,
-	//	0b00011000,
-	//	0b00011000,
-	//}
+
 	lightbulbPattern := []byte{
 		0b00000000,
-		0b00011110,
-		0b00111111,
+		0b01111000,
+		0b11111100,
 		0b11111111,
 		0b11111111,
-		0b00111111,
-		0b00011110,
+		0b11111100,
+		0b01111000,
 		0b00000000,
 	}
 	for row, pattern := range lightbulbPattern {
@@ -101,15 +91,10 @@ func DrawLightbulb(dinPin, csPin, clkPin rpio.Pin, brightness int) {
 		sendData(csPin, dinPin, clkPin, 0x0A, byte(brightness))
 	}
 	time.Sleep(2 * time.Second)
-	ClearMatrix(csPin, dinPin, clkPin)
+	//ClearMatrix(csPin, dinPin, clkPin)
 }
 
-func drawLock(dinPin, csPin, clkPin rpio.Pin, brightness int) {
-	if err := rpio.Open(); err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
-		os.Exit(1)
-	}
-	defer rpio.Close()
+func DrawLock(dinPin, csPin, clkPin rpio.Pin, brightness int) {
 
 	dinPin.Output()
 	csPin.Output()
@@ -117,24 +102,15 @@ func drawLock(dinPin, csPin, clkPin rpio.Pin, brightness int) {
 	initializeMatrix(dinPin, csPin, clkPin)
 
 	ClearMatrix(csPin, dinPin, clkPin)
-	//lockPattern := []byte{
-	//	0b00111100,
-	//	0b00100100,
-	//	0b01100110,
-	//	0b01111110,
-	//	0b01111110,
-	//	0b01111110,
-	//	0b01111110,
-	//	0b01111110,
-	//}
+
 	lockPattern := []byte{
 		0b00000000,
-		0b11111100,
+		0b00111111,
 		0b11111111,
-		0b11111001,
-		0b11111001,
+		0b10011111,
+		0b10011111,
 		0b11111111,
-		0b11111100,
+		0b00111111,
 		0b00000000,
 	}
 	for row, pattern := range lockPattern {
@@ -142,15 +118,10 @@ func drawLock(dinPin, csPin, clkPin rpio.Pin, brightness int) {
 		sendData(csPin, dinPin, clkPin, 0x0A, byte(brightness))
 	}
 	time.Sleep(2 * time.Second)
-	ClearMatrix(csPin, dinPin, clkPin)
+	//ClearMatrix(csPin, dinPin, clkPin)
 }
 
-func drawH(dinPin, csPin, clkPin rpio.Pin, brightness int) {
-	if err := rpio.Open(); err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
-		os.Exit(1)
-	}
-	defer rpio.Close()
+func DrawH(dinPin, csPin, clkPin rpio.Pin, brightness int) {
 
 	dinPin.Output()
 	csPin.Output()
@@ -174,12 +145,7 @@ func drawH(dinPin, csPin, clkPin rpio.Pin, brightness int) {
 	}
 }
 
-func drawA(dinPin, csPin, clkPin rpio.Pin) {
-	if err := rpio.Open(); err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
-		os.Exit(1)
-	}
-	defer rpio.Close()
+func DrawA(dinPin, csPin, clkPin rpio.Pin, brightness int) {
 
 	dinPin.Output()
 	csPin.Output()
@@ -187,61 +153,46 @@ func drawA(dinPin, csPin, clkPin rpio.Pin) {
 	initializeMatrix(dinPin, csPin, clkPin)
 
 	ClearMatrix(csPin, dinPin, clkPin)
+	//aPattern := []byte{
+	//	0b00011000,
+	//	0b00111100,
+	//	0b01100110,
+	//	0b01100110,
+	//	0b01111110,
+	//	0b01100110,
+	//	0b01100110,
+	//	0b01100110,
+	//}
+
 	aPattern := []byte{
-		0b00011000,
-		0b00111100,
-		0b01100110,
-		0b01100110,
-		0b01111110,
-		0b01100110,
-		0b01100110,
-		0b01100110,
+		0b00000000,
+		0b00111111,
+		0b01111111,
+		0b11001000,
+		0b11001000,
+		0b01111111,
+		0b00111111,
+		0b00000000,
 	}
+
 	for row, pattern := range aPattern {
 		sendData(csPin, dinPin, clkPin, byte(row+1), pattern)
+		sendData(csPin, dinPin, clkPin, 0x0A, byte(brightness))
 	}
 }
 
 func MatrixStatus(dinPin, csPin, clkPin rpio.Pin, status bool, brightness int) {
-	if err := rpio.Open(); err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
-		os.Exit(1)
-	}
-	defer rpio.Close()
-
-	dinPin.Output()
-	csPin.Output()
-	clkPin.Output()
-	initializeMatrix(dinPin, csPin, clkPin)
-
-	drawLock(dinPin, csPin, clkPin, 5)
 
 	if status == false {
-		ClearMatrix(csPin, dinPin, clkPin)
+		TurnOffMatrix(dinPin, csPin, clkPin)
 	}
 	if status == true {
-		OnPattern := []byte{
-			0b11111111,
-			0b11111111,
-			0b11111111,
-			0b11111111,
-			0b11111111,
-			0b11111111,
-			0b11111111,
-			0b11111111,
-		}
-		for row, pattern := range OnPattern {
-			sendData(csPin, dinPin, clkPin, byte(row+1), pattern)
-		}
+		TurnOnMatrix(dinPin, csPin, clkPin)
+		SetIntensity(dinPin, csPin, clkPin, brightness)
 	}
 }
 
 func TurnOffMatrix(dinPin, csPin, clkPin rpio.Pin) {
-	if err := rpio.Open(); err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
-		os.Exit(1)
-	}
-	defer rpio.Close()
 
 	dinPin.Output()
 	csPin.Output()
@@ -262,10 +213,42 @@ func TurnOffMatrix(dinPin, csPin, clkPin rpio.Pin) {
 	}
 }
 
+func TurnOnMatrix(dinPin, csPin, clkPin rpio.Pin) {
+
+	dinPin.Output()
+	csPin.Output()
+	clkPin.Output()
+	initializeMatrix(dinPin, csPin, clkPin)
+	OnPattern := []byte{
+		0b11111111,
+		0b11111111,
+		0b11111111,
+		0b11111111,
+		0b11111111,
+		0b11111111,
+		0b11111111,
+		0b11111111,
+	}
+	for row, pattern := range OnPattern {
+		sendData(csPin, dinPin, clkPin, byte(row+1), pattern)
+	}
+}
+
 // Clear the LED matrix
 func ClearMatrix(csPin, dinPin, clkPin rpio.Pin) {
 
-	for row := 0; row < 8; row++ {
-		sendData(csPin, dinPin, clkPin, byte(row+1), 0x00)
+	OffPattern := []byte{
+		0b00000000,
+		0b00000000,
+		0b00000000,
+		0b00000000,
+		0b00000000,
+		0b00000000,
+		0b00000000,
+		0b00000000,
+	}
+	for row, pattern := range OffPattern {
+		//fmt.Println("got to send data")
+		sendData(csPin, dinPin, clkPin, byte(row+1), pattern)
 	}
 }

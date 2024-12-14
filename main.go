@@ -15,6 +15,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/joho/godotenv"
+	"github.com/stianeikeland/go-rpio/v4"
 	"go.bug.st/serial"
 	"log"
 	"os"
@@ -149,7 +150,13 @@ func BlockReceiver() {
 					panic(err)
 				}
 				//fmt.Println("Got to functionality")
+				if err := rpio.Open(); err != nil {
+					fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
+					os.Exit(1)
+				}
+
 				go handleFunctionality()
+
 				continue
 
 			}
@@ -181,7 +188,14 @@ func BlockReceiver() {
 						panic(err)
 					}
 					//fmt.Println("Got to functionality")
+
+					if err := rpio.Open(); err != nil {
+						fmt.Fprintf(os.Stderr, "Unable to open GPIO: %v\n", err)
+						os.Exit(1)
+					}
+
 					go handleFunctionality()
+
 				}
 				if verify == false {
 					fmt.Println("Invalid Block")
@@ -231,6 +245,13 @@ func handleFunctionality() {
 		panic(err)
 	}
 
+	err = godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
+	assignedPiNum := os.Getenv("PI_NUM")
+	envPiNum, _ := strconv.Atoi(assignedPiNum)
+
 	var readBlockchain blockchain.Blockchain
 	err = json.Unmarshal(jsonChainData, &readBlockchain)
 	if err != nil {
@@ -251,7 +272,7 @@ func handleFunctionality() {
 	if err != nil {
 		panic(err)
 	}
-
+	itsme := false
 	messageChange, _ := strconv.Atoi(messageData.Change)
 
 	fmt.Println("Message is: ", messageData)
@@ -260,132 +281,151 @@ func handleFunctionality() {
 	if messageData.Name == "Lighting" {
 		//fmt.Println("Got past the name")
 		for _, Pi := range UUIDsData.Lighting {
-			if Pi.UUID == messageData.UUID {
+			if Pi.UUID == messageData.UUID && Pi.Pinum == envPiNum {
 				//fmt.Println("got past the loop")
 				if messageData.Function == "Status" {
 					if messageData.Change == "false" {
 						//fmt.Println("inside the status false")
 						lighting.UpdateStatus(false)
+						itsme = true
 					}
 					if messageData.Change == "true" {
 						//fmt.Println("inside the status false")
 						lighting.UpdateStatus(true)
+						itsme = true
 					}
 				}
 				if messageData.Function == "Brightness" {
 					lighting.SetBrightness(messageChange)
+					itsme = true
 				}
 			}
 		}
+		if itsme == false {
+			lighting.FlashSymbol("Bulb")
+		}
+	}
+	if messageData.UUID == "0" {
+		lighting.FlashSymbol("Alarm")
 	}
 	if messageData.Name == "HVAC" {
 		for _, group := range [][]dal.Pi{UUIDsData.Hvac} {
 			for _, Pi := range group {
-				if Pi.UUID == messageData.UUID {
+				if Pi.UUID == messageData.UUID && Pi.Pinum == envPiNum {
 					if messageData.Function == "Status" {
 						if messageData.Change == "false" {
 							hvac.UpdateStatus(false, messageData.UUID)
-							//hvac.DisplayLCDHVAC("", 0, "OFF")
+							itsme = true
 						}
 						if messageData.Change == "true" {
 							hvac.UpdateStatus(true, messageData.UUID)
-							//hvac.DisplayLCDHVAC("", 0, "ON")
+							itsme = true
 						}
 					}
 					if messageData.Function == "FanSpeed" {
 						hvac.UpdateFanSpeed(messageChange, messageData.UUID)
-						//hvac.DisplayLCDHVAC("", 0, "ON")
+						itsme = true
 
 					}
 					if messageData.Function == "Temperature" {
 						hvac.UpdateTemperature(messageChange, messageData.UUID)
-						//hvac.DisplayLCDHVAC("", messageChange, "")
+						itsme = true
 					}
 					if messageData.Function == "Mode" {
 						hvac.UpdateMode(messageData.Change, messageData.UUID)
-						//hvac.DisplayLCDHVAC(messageData.Change, 0, "")
+						itsme = true
 					}
 				}
 			}
+		}
+		if itsme == false {
+			lighting.FlashSymbol("HVAC")
 		}
 	}
 
 	if messageData.Name == "Security" {
 		for _, group := range [][]dal.Pi{UUIDsData.Security} {
 			for _, Pi := range group {
-				if Pi.UUID == messageData.UUID {
+				if Pi.UUID == messageData.UUID && Pi.Pinum == envPiNum {
 					if messageData.Function == "Status" {
 						if messageData.Change == "false" {
 							security.UpdateAlarmStatus(false)
 							security.DisplayLCDSecurity("Disarmed", "OFF")
+							itsme = true
 						}
 						if messageData.Change == "true" {
 							security.UpdateAlarmStatus(true)
 							security.DisplayLCDSecurity("Armed", "ON")
+							itsme = true
 						}
 					}
 					if messageData.Function == "LockStatus" {
 						if messageData.Change == "false" {
 							security.LockOrUnlock(false)
+							itsme = true
 						}
 						if messageData.Change == "true" {
 							security.LockOrUnlock(true)
+							itsme = true
 						}
 					}
 				}
 			}
 		}
+		if itsme == false {
+			lighting.FlashSymbol("Lock")
+		}
 	}
+
 	if messageData.Name == "Appliances" {
 		for _, group := range [][]dal.Pi{UUIDsData.Appliances} {
 			for _, Pi := range group {
-				if Pi.UUID == messageData.UUID {
+				if Pi.UUID == messageData.UUID && Pi.Pinum == envPiNum {
 					if messageData.Function == "Status" {
 						if messageData.Change == "false" {
 							appliances.UpdateStatus(messageData.AppType, false)
-							fmt.Println("got here")
+							itsme = true
 						}
 						if messageData.Change == "true" {
 							appliances.UpdateStatus(messageData.AppType, true)
-							fmt.Println("got here")
+							itsme = true
 						}
 					}
 					if messageData.Function == "Temperature" {
 						appliances.UpdateTemperature(messageChange)
+						itsme = true
 					}
 					if messageData.Function == "TimerStopTime" {
 						appliances.UpdateTimeStopTime(messageChange)
+						itsme = true
 					}
 					if messageData.Function == "Power" {
 						appliances.UpdatePower(messageChange)
+						itsme = true
 					}
 					if messageData.Function == "EnergySaveMode" {
 						if messageData.Change == "false" {
 							appliances.UpdateStatus(messageData.AppType, false)
+							itsme = true
 						}
 						if messageData.Change == "true" {
 							appliances.UpdateStatus(messageData.AppType, true)
+							itsme = true
 						}
 					}
 					if messageData.Function == "WashTime" {
 						appliances.UpdateWashTime(messageChange)
+						itsme = true
 					}
 				}
 			}
 		}
+		lighting.FlashSymbol("App")
 	}
-	if messageData.Name == "Energy" {
-		for _, group := range [][]dal.Pi{UUIDsData.Energy} {
-			for _, Pi := range group {
-				if Pi.UUID == messageData.UUID {
-					if messageData.Function == "Status" {
-						//energy.,UpdateAlarmStatus(messageData.StatusChange)
-					}
-				}
-			}
-		}
+	if messageData.Name == "TempFE" {
+		fmt.Println("FE Temp Updated")
+	}
 
-	}
 	return
 }
 
@@ -396,8 +436,9 @@ func main() {
 	}
 	assignedPiNum := os.Getenv("PI_NUM")
 	piNum, _ := strconv.Atoi(assignedPiNum)
+
 	if piNum == 13 {
-		go gocode.InitKeypad()
+		hvac.StartupLCDHVAC()
 	}
 	if piNum == 16 {
 		//hvac.DisplayLCDHVAC("", 0, "")
@@ -408,4 +449,5 @@ func main() {
 		go gocode.InitKeypad()
 	}
 	BlockReceiver()
+	//rpio.Close()
 }

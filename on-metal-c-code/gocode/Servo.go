@@ -16,8 +16,8 @@ func TurnServo() {
 	defer rpio.Close()
 
 	// Define the GPIO pin
-	servoPin := rpio.Pin(18) // Use the correct pin for your setup
-	servoPin.Mode(rpio.Pwm)  // Set the pin to PWM mode
+	servoPin := rpio.Pin(8) // Use the correct pin for your setup
+	servoPin.Mode(rpio.Pwm) // Set the pin to PWM mode
 
 	// Manually control PWM for servo
 	const dutyCycle = 150               // Adjust this value for 90 degrees based on your servo

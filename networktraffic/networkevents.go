@@ -44,7 +44,8 @@ func GetNetEvents() ([]byte, error) {
 
 	// Define the network interface you want to capture packets from
 	//device := "/dev/ttyUSB0"
-	device := "en0" // for macbook change to RSP network dev
+	device := "COM4"
+	//device := "en0" // for macbook change to RSP network dev
 
 	var packetsDetails []PacketDetails // empty slice of PacketDetails
 
@@ -117,7 +118,6 @@ func GetNetEvents() ([]byte, error) {
 
 		// append the details to the slice
 		packetsDetails = append(packetsDetails, packetDetails)
-
 
 		// Check if the capture duration has elapsed
 		if time.Now().After(endTime) {

@@ -1,130 +1,54 @@
 package gocode
 
 import (
-	"errors"
 	"fmt"
+	"github.com/d2r2/go-dht"
+	"io/ioutil"
+	"log"
+	"strconv"
 	"time"
 
 	"github.com/stianeikeland/go-rpio/v4"
 )
 
-// Constants for different types of DHT sensors.
-const (
-	DHT11 int = 11
-	DHT22 int = 22
-)
-
 // ReadTemperature reads the temperature from the DHT sensor.
-func ReadTemperature(pin int, inType int) (float64, error) {
-	data, err := readData(pin)
-	if err != nil {
-		return 0, err
-	}
+func ReadTempHum() string {
+	// Redirect all log output to ioutil.Discard, effectively silencing all logs
+	log.SetOutput(ioutil.Discard)
 
-	switch inType {
-	case DHT11:
-		return float64(data[2]), nil
-	case DHT22:
-		rawTemp := int16(data[2]&0x7F)<<8 | int16(data[3])
-		if data[2]&0x80 > 0 {
-			rawTemp *= -1
-		}
-		return float64(rawTemp) / 10.0, nil
-	default:
-		return 0, errors.New("unknown sensor type")
-	}
-}
-
-// ReadHumidity reads the humidity from the DHT sensor.
-func ReadHumidity(pin int, inType int) (float64, error) {
-	data, err := readData(pin)
-	if err != nil {
-		return 0, err
-	}
-
-	switch inType {
-	case DHT11:
-		return float64(data[0]), nil
-	case DHT22:
-		rawHumidity := int16(data[0])<<8 | int16(data[1])
-		return float64(rawHumidity) / 10.0, nil
-	default:
-		return 0, errors.New("unknown sensor type")
-	}
-}
-
-// readData handles the communication with the DHT sensor and returns the raw data.
-func readData(inPin int) ([5]byte, error) {
-	var data [5]byte
-
+	// Initialize GPIO
 	if err := rpio.Open(); err != nil {
-		return data, fmt.Errorf("unable to open GPIO: %w", err)
+		fmt.Println("Failed to open GPIO:", err)
+		return "" // Exit if unable to open GPIO, using fmt.Println to output the error
 	}
 
-	defer func() {
-		err := rpio.Close()
-		if err != nil {
+	// Define your DHT sensor type and GPIO pin
+	sensorType := dht.DHT22
+	pinNumber := 17 // Use the BCM pin number connected to your DHT22 sensor
 
-		}
-	}()
+	// Prepare the GPIO pin (optional, since go-dht handles GPIO)
+	pin := rpio.Pin(pinNumber)
+	pin.Output()                // Set pin to output mode
+	pin.High()                  // Set pin high (DHT22 requires pull-up resistor)
+	time.Sleep(1 * time.Second) // Stabilize sensor
 
-	pin := rpio.Pin(inPin)
-	pin.Output()
-
-	// Send start signal
-	pin.Low()
-	time.Sleep(18 * time.Millisecond)
-	pin.High()
-	time.Sleep(20 * time.Microsecond)
-
-	// Set pin to input and wait for response
+	// Switch back to input mode before reading (go-dht manages this internally)
 	pin.Input()
-	time.Sleep(80 * time.Microsecond)
-
-	// Read data
-	var bits [40]bool
-	for i := 0; i < 40; i++ {
-		// Wait for the pin to go high
-		timeout := time.After(1 * time.Millisecond)
-		for pin.Read() == rpio.Low {
-			select {
-			case <-timeout:
-				return data, errors.New("timeout waiting for high signal")
-			default:
-			}
+	retTemp := ""
+	// Now, read from the DHT22 sensor using go-dht
+	for {
+		temperature, humidity, _, err := dht.ReadDHTxxWithRetry(sensorType, pinNumber, false, 10)
+		if err != nil {
+			fmt.Println("Failed to read from DHT22 sensor:", err)
+			time.Sleep(2 * time.Second) // Wait for 2 seconds before retrying
+			continue
 		}
 
-		// Measure the length of the high signal
-		start := time.Now()
-		timeout = time.After(1 * time.Millisecond)
-		for pin.Read() == rpio.High {
-			select {
-			case <-timeout:
-				return data, errors.New("timeout waiting for low signal")
-			default:
-			}
-		}
-		duration := time.Since(start)
-
-		// The DHT22 sensor uses a high signal of about 70 microseconds to indicate a '1'
-		// and a high signal of about 28 microseconds to indicate a '0'.
-		// We use 50 microseconds as a threshold.
-		bits[i] = duration > 50*time.Microsecond
+		tempF := temperature*1.8 + 32
+		retTemp = strconv.Itoa(int(tempF)) + "/" + strconv.Itoa(int(humidity))
+		fmt.Println(retTemp)
+		break // Exit the loop if a successful reading is obtained
 	}
 
-	// Convert bit array to bytes
-	for i := 0; i < 40; i++ {
-		data[i/8] <<= 1
-		if bits[i] {
-			data[i/8] |= 1
-		}
-	}
-
-	// Verify checksum
-	checksum := data[0] + data[1] + data[2] + data[3]
-	if data[4] != checksum&0xFF {
-		return data, errors.New("checksum mismatch")
-	}
-
-	return data, nil
+	return retTemp
 }

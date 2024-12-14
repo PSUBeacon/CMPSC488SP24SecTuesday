@@ -29,7 +29,7 @@ const Networking = () => {
         setIsLoading(true);
         setError('');
         const token = sessionStorage.getItem('token');
-        const url = currentView === 'iotLogs' ? "http://localhost:8081/networking/GetNetLogs" : "http://localhost:8081/networking/GetNetPcapLogs";
+        const url = currentView === 'iotLogs' ? "https://beacon-cs2024.digital/api/networking/GetNetLogs" : "https://beacon-cs2024.digital/api/networking/GetNetPcapLogs";
 
         fetch(url, {
             method: 'GET',
